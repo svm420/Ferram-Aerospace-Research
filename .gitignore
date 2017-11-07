@@ -4,6 +4,8 @@ obj
 *.mdb
 /GameData/FerramAerospaceResearch/Custom*.cfg
 /GameData/FerramAerospaceResearch/FARForceDataUpdate.cfg
+/GameData/ModularFlightIntegrator/LICENSE.txt
+/GameData/ModularFlightIntegrator/ModularFlightIntegrator.*
 *.suo
 *.DotSettings
 *.user
