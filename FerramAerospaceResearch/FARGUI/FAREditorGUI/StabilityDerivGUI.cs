@@ -123,45 +123,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             spoilersDeployed = GUILayout.Toggle(spoilersDeployed, spoilersDeployed ? Localizer.Format("FAREditorStabDerivSDeploy") : Localizer.Format("FAREditorStabDerivSRetract"), GUILayout.Width(100));
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button(Localizer.Format("FAREditorStabDerivCalcButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
-            {
-                CelestialBody body = _bodySettingDropdown.ActiveSelection;
-                FARAeroUtil.UpdateCurrentActiveBody(body);
-                //atm_temp_str = Regex.Replace(atm_temp_str, @"[^-?[0-9]*(\.[0-9]*)?]", "");
-                //rho_str = Regex.Replace(rho_str, @"[^-?[0-9]*(\.[0-9]*)?]", "");
-                machNumber = Regex.Replace(machNumber, @"[^-?[0-9]*(\.[0-9]*)?]", "");
-
-                altitude = Regex.Replace(altitude, @"[^-?[0-9]*(\.[0-9]*)?]", "");
-                double altitudeDouble = Convert.ToDouble(altitude);
-                altitudeDouble *= 1000;
-
-
-                double temp = body.GetTemperature(altitudeDouble);
-                double pressure = body.GetPressure(altitudeDouble);
-                if (pressure > 0)
-                {
-                    //double temp = Convert.ToSingle(atm_temp_str);
-                    double machDouble = Convert.ToSingle(machNumber);
-                    machDouble = FARMathUtil.Clamp(machDouble, 0.001, float.PositiveInfinity);
-
-                    double density = body.GetDensity(pressure, temp);
-
-                    double sspeed = body.GetSpeedOfSound(pressure, density);
-                    double vel = sspeed * machDouble;
-
-                    //UpdateControlSettings();
-
-                    double q = vel * vel * density * 0.5f;
-
-                    stabDerivOutput = simManager.StabDerivCalculator.CalculateStabilityDerivs(vel, q, machDouble, 0, 0, 0, _flapSettingDropdown.ActiveSelection, spoilersDeployed, body, altitudeDouble);
-                    simManager.vehicleData = stabDerivOutput;
-                    SetAngleVectors(stabDerivOutput.stableAoA);
-                }
-                else
-                {
-                    PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton "), true, HighLogic.UISkin);
-                }
-            }
+                StabDerivCalcButtonAction(false);
+            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivSaveButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
+                StabDerivCalcButtonAction(true);
+            GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(Localizer.Format("FAREditorStabDerivAirProp"), GUILayout.Width(180));
@@ -262,6 +229,30 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndVertical();
 
             DrawTooltip();
+        }
+
+        private void StabDerivCalcButtonAction(bool exportresult)
+        {
+            CelestialBody body = _bodySettingDropdown.ActiveSelection;
+            FARAeroUtil.UpdateCurrentActiveBody(body);
+            altitude = Regex.Replace(altitude, @"[^-?[0-9]*(\.[0-9]*)?]", "");
+            double altitudeDouble = Convert.ToDouble(altitude) * 1000;
+            machNumber = Regex.Replace(machNumber, @"[^-?[0-9]*(\.[0-9]*)?]", "");
+            double machDouble = FARMathUtil.Clamp(Convert.ToSingle(machNumber), 0.001, float.PositiveInfinity);
+            int flapsettingInt = _flapSettingDropdown.ActiveSelection;
+            bool spoilersDeployedBool = spoilersDeployed;
+
+            StabilityDerivOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool);
+            if (stabDerivResult != null)
+            {
+                stabDerivOutput = stabDerivResult;
+                simManager.vehicleData = stabDerivResult;
+                SetAngleVectors(stabDerivResult.stableAoA);
+            }
+            else
+            {
+                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+            }
         }
 
         private void StabilityLabel(String text1, double val, String text2, String tooltip, int width, int sign)

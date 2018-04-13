@@ -58,8 +58,31 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             _instantCondition = instantConditionSim;
         }
 
-        public StabilityDerivOutput CalculateStabilityDerivs(double u0, double q, double machNumber, double alpha, double beta, double phi, int flapSetting, bool spoilers, CelestialBody body, double alt)
+        public StabilityDerivOutput CalculateStabilityDerivs(CelestialBody body, double alt, double machNumber, int flapSetting, bool spoilers)
         {
+            // Rodhern: Only return a result if one is found.
+
+            if (body.GetPressure(alt) > 0)
+            {
+                StabilityDerivOutput result = CalculateStabilityDerivs(body, alt, machNumber, flapSetting, spoilers, 0, 0, 0);
+                if (result.stableAoAState == "")
+                    return result;
+                else
+                    return null;
+            }
+            else
+                return null;
+        }
+
+        public StabilityDerivOutput CalculateStabilityDerivs(CelestialBody body, double alt, double machNumber, int flapSetting, bool spoilers, double alpha, double beta, double phi)
+        {
+            double pressure = body.GetPressure(alt);
+            double temperature = body.GetTemperature(alt);
+            double density = body.GetDensity(pressure, temperature);
+            double sspeed = body.GetSpeedOfSound(pressure, density);
+            double u0 = sspeed * machNumber;
+            double q = u0 * u0 * density * 0.5f;
+
             StabilityDerivOutput stabDerivOutput = new StabilityDerivOutput();
             stabDerivOutput.nominalVelocity = u0;
             stabDerivOutput.altitude = alt;
