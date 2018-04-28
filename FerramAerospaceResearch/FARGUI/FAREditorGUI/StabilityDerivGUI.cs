@@ -242,16 +242,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             int flapsettingInt = _flapSettingDropdown.ActiveSelection;
             bool spoilersDeployedBool = spoilersDeployed;
 
-            StabilityDerivOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool);
-            if (stabDerivResult != null)
-            {
-                stabDerivOutput = stabDerivResult;
-                simManager.vehicleData = stabDerivResult;
-                SetAngleVectors(stabDerivResult.stableAoA);
-            }
+            StabilityDerivExportOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool);
+            if (stabDerivResult == null)
+                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
             else
             {
-                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+                stabDerivOutput = stabDerivResult.outputvals;
+                simManager.vehicleData = stabDerivResult.outputvals;
+                SetAngleVectors(stabDerivResult.outputvals.stableAoA);
             }
         }
 
