@@ -60,7 +60,7 @@ namespace FerramAerospaceResearch
             y += y1;
             return y;
         }
-        
+
         public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
         {
             if (val.CompareTo(min) < 0) return min;
@@ -81,7 +81,7 @@ namespace FerramAerospaceResearch
                 return true;
             return false;
         }
-        
+
         public static double ArithmeticGeometricMean(double a, double b, double error)
         {
             while (!Approximately(a, b, error))
@@ -101,7 +101,7 @@ namespace FerramAerospaceResearch
                 double tmpA = 0.5 * (a + b);
                 double tmpSqrt = Math.Sqrt((a - c) * (b - c));
                 b = c + tmpSqrt;
-                c = c - tmpSqrt; 
+                c = c - tmpSqrt;
                 a = tmpA;
             }
             return (a + b) * 0.5;
@@ -133,7 +133,7 @@ namespace FerramAerospaceResearch
             if (fa * fb >= 0)
                 return 0;
 
-            if(Math.Abs(fa) < Math.Abs(fb))
+            if (Math.Abs(fa) < Math.Abs(fb))
             {
                 double tmp = fa;
                 fa = fb;
@@ -146,13 +146,13 @@ namespace FerramAerospaceResearch
 
             double c = a, d = a, fc = function(c);
 
-            double s = b, fs = fb; 
+            double s = b, fs = fb;
 
             bool flag = true;
             int iter = 0;
-            while(fs != 0 && Math.Abs(a - b) > epsilon && iter < maxIter)
+            while (fs != 0 && Math.Abs(a - b) > epsilon && iter < maxIter)
             {
-                if((fa - fc) > double.Epsilon && (fb - fc) > double.Epsilon)    //inverse quadratic interpolation
+                if ((fa - fc) > double.Epsilon && (fb - fc) > double.Epsilon)    //inverse quadratic interpolation
                 {
                     s = a * fc * fb / ((fa - fb) * (fa - fc));
                     s += b * fc * fa / ((fb - fa) * (fb - fc));
@@ -165,7 +165,7 @@ namespace FerramAerospaceResearch
                     s = b - s;
                 }
 
-                double b_s = Math.Abs(b - s), b_c = Math.Abs(b-c), c_d = Math.Abs(c - d);
+                double b_s = Math.Abs(b - s), b_c = Math.Abs(b - c), c_d = Math.Abs(c - d);
 
                 //Conditions for bisection method
                 bool condition1;
@@ -247,6 +247,11 @@ namespace FerramAerospaceResearch
                 iter++;
             }
             return s;
+        }
+
+        public static double SillySearchMethod(Func<double, double> function)
+        {
+            return FARMathUtil.BrentsMethod(function, -30d, 30d, 0.001, 500);
         }
     }
 }

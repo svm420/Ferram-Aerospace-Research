@@ -234,7 +234,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             //Longitudinal Mess
             _instantCondition.SetState(machNumber, neededCl, CoM, 0, input.flaps, input.spoilers);
 
-            alpha = FARMathUtil.BrentsMethod(_instantCondition.FunctionIterateForAlpha, -30d, 30d, 0.001, 500);
+            alpha = FARMathUtil.SillySearchMethod(_instantCondition.FunctionIterateForAlpha);
             input.alpha = alpha;
             nominalOutput = _instantCondition.iterationOutput;
             //alpha_str = (alpha * Mathf.PI / 180).ToString();

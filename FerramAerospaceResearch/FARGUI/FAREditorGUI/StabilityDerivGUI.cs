@@ -250,6 +250,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 stabDerivOutput = stabDerivResult.outputvals;
                 simManager.vehicleData = stabDerivResult.outputvals;
                 SetAngleVectors(stabDerivResult.outputvals.stableAoA);
+
+                if (exportresult && !StabilityDerivativeExportFile.Export(stabDerivResult))
+                    PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivSaveError", Localizer.Format("FAREditorStabDerivSaveError"), Localizer.Format("FAREditorStabDerivSaveErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
             }
         }
 
