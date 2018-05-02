@@ -249,9 +249,130 @@ namespace FerramAerospaceResearch
             return s;
         }
 
+        private const double rightedge = 30d;
+        private const double leftedge = -rightedge;
+        private const double xstepinitial = 5d;
+        private const double xstepsize = 10d;
+        private const double minpart = 1d / 8d;
+        private const double maxpart = 7d / 8d;
+        private const double tol_triangle = 1E-3;
+        private const double tol_linear = 3E-4;
+        private const double tol_brent = 1E-3;
+        private const int iterlim = 500;
+
         public static double SillySearchMethod(Func<double, double> function)
         {
-            return FARMathUtil.BrentsMethod(function, -30d, 30d, 0.001, 500);
+            double x0 = 0d;
+            double f0 = function(x0);
+            MirroredFunction mfobj = new MirroredFunction(function, f0 > 0d);
+            if (mfobj.IsMirrored) f0 = -f0;
+            Func<double, double> f = mfobj.Delegate;
+            double x1 = xstepinitial;
+            double f1 = f(x1);
+            if (f1 < f0) return mfobj.BrentSolve("Negative initial gradient.");
+
+        LblSkipRight:
+            if (f1 > 0) return mfobj.LinearSolution(x0, f0, x1, f1);
+            double x2 = Clamp<double>(x1 + xstepsize, 0d, rightedge);
+            if (x2 == x1) return mfobj.BrentSolve("Reached far right edge.");
+            double f2 = f(x2);
+            if (f2 > f1)
+            { // skip right
+                x0 = x1; f0 = f1;
+                x1 = x2; f1 = f2;
+                goto LblSkipRight;
+            }
+
+        LblTriangle:
+            if (f1 > 0) return mfobj.LinearSolution(x0, f0, x1, f1);
+            if (x2 - x0 < tol_triangle) return mfobj.BrentSolve("Local maximum is negative (search point x= " + x0 + ").");
+            double x01 = (x0 + x1) / 2d;
+            double x12 = (x1 + x2) / 2d;
+            double f01 = f(x01);
+            double f12 = f(x12);
+            if (f01 >= f1 && f01 >= f12)
+            { // maximum at x01
+                x1 = x01; f1 = f01;
+                x2 = x1; f2 = f1;
+                goto LblTriangle;
+            }
+            else if (f12 > f1 && f12 > f01)
+            { // maximum at x12
+                x0 = x1; f0 = f1;
+                x1 = x12; f1 = f12;
+                goto LblTriangle;
+            }
+            else
+            { // shrink around x1
+                x0 = x01; f0 = f01;
+                x2 = x12; f2 = f12;
+                goto LblTriangle;
+            }
+        }
+
+        public class MirroredFunction
+        {
+            private Func<double, double> F;
+            private bool mirror;
+
+            public MirroredFunction(Func<double, double> original, bool mirrored)
+            {
+                F = original;
+                mirror = mirrored;
+            }
+
+            public Func<double, double> Delegate
+            {
+                get
+                {
+                    if (mirror)
+                        return this.InvokeMirrored;
+                    else
+                        return this.F;
+                }
+            }
+
+            public bool IsMirrored { get { return this.mirror; } }
+
+            private double InvokeMirrored(double x)
+            {
+                return -F.Invoke(-x);
+            }
+
+            public double LinearSolution(double x0, double f0, double x1, double f1)
+            {
+                if (this.IsMirrored)
+                {
+                    double oldx0 = x0;
+                    double oldf0 = f0;
+                    x0 = -x1; f0 = -f1;
+                    x1 = -oldx0; f1 = -oldf0;
+                }
+
+            LblLoop:
+                double x = x0 + (x0 - x1) * f0 / (f1 - f0);
+                if (x1 - x0 < tol_linear) return x;
+                x = Clamp<double>(x, maxpart * x0 + minpart * x1, minpart * x0 + maxpart * x1);
+                double fx = F(x);
+                if (fx < 0d)
+                {
+                    x0 = x; f0 = fx;
+                    goto LblLoop;
+                }
+                else if (fx > 0d)
+                {
+                    x1 = x; f1 = fx;
+                    goto LblLoop;
+                }
+                else
+                    return x;
+            }
+
+            public double BrentSolve(string dbgmsg)
+            {
+                Debug.Log("[Rodhern] FAR: MirroredFunction (mirrored= " + mirror + ") reverting to BrentsMethod: " + dbgmsg);
+                return FARMathUtil.BrentsMethod(this.F, leftedge, rightedge, tol_brent, iterlim);
+            }
         }
     }
 }
