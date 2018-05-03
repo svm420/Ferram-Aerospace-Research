@@ -15,7 +15,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public double sitmach;
         public double sitdynpres;
-        public double siteffG; // local gravity corrected for speed
+        public double siteffg; // local gravity corrected for speed
     }
 
     class StabilityDerivExportOutput

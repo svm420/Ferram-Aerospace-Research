@@ -390,7 +390,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivExport.envg = _instantCondition.CalculateAccelerationDueToGravity(body, alt);
             stabDerivExport.sitmach = machNumber;
             stabDerivExport.sitdynpres = q;
-            stabDerivExport.siteffG = effectiveG;
+            stabDerivExport.siteffg = effectiveG;
 
             return new StabilityDerivExportOutput(stabDerivOutput, stabDerivExport);
         }

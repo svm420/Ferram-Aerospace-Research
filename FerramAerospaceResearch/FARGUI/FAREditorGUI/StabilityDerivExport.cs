@@ -272,7 +272,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 env.AddScalar("g", output.exportvals.envg);
                 env.AddScalar("speed", output.outputvals.nominalVelocity);
                 env.AddScalar("dynpres", output.exportvals.sitdynpres);
-                env.AddScalar("effG", output.exportvals.siteffG);
+                env.AddScalar("effg", output.exportvals.siteffg);
                 
                 deriv.AddScalar("Cl", output.outputvals.stableCl);
                 deriv.AddScalar("Cd", output.outputvals.stableCd);

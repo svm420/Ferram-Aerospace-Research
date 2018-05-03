@@ -175,13 +175,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
-            GUILayout.BeginVertical(BackgroundStyle);
             GUILayout.BeginHorizontal();
             GUILayout.Label(Localizer.Format("FAREditorDownVelDeriv"), GUILayout.Width(W160));
             GUILayout.Label(Localizer.Format("FAREditorFwdVelDeriv"), GUILayout.Width(W160));
             GUILayout.Label(Localizer.Format("FAREditorPitchRateDeriv"), GUILayout.Width(W160));
             GUILayout.Label(Localizer.Format("FAREditorPitchCtrlDeriv"), GUILayout.Width(W160));
             GUILayout.EndHorizontal();
+            GUILayout.BeginVertical(BackgroundStyle);
             GUILayout.BeginHorizontal();
             StabilityLabel(Localizer.Format("FAREditorZw"), stabDerivOutput.stabDerivs[3], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorZwExp"), W160, -1);
             StabilityLabel(Localizer.Format("FAREditorZu"), stabDerivOutput.stabDerivs[6], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorZuExp"), W160, -1);
