@@ -131,6 +131,58 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             bodytextcount = -1;
         }
 
+        static public string ConfigFilePath
+        {
+            get
+            {
+            string path = KSPUtil.ApplicationRootPath;
+            path += "GameData/FerramAerospaceResearch/Plugins/PluginData/FerramAerospaceResearch/";
+            path += "sdexpcfg.txt";
+            return path;
+            }
+        }
+
+        static public List<Vector2> LoadConfigList()
+        {
+            var resultlist = new List<Vector2>();
+            string path = ConfigFilePath;
+            if (File.Exists(path))
+            {
+                string[] lines = File.ReadAllLines(path, System.Text.Encoding.Default);
+                if (lines.Length >= 6)
+                {
+                    bool b1 = lines[0].StartsWith("# Created by");
+                    bool b2 = lines[1] == "# name: altmach";
+                    bool b3 = lines[2] == "# type: matrix";
+                    bool b4 = lines[3].StartsWith("# rows: ");
+                    bool b5 = lines[4] == "# columns: 2";
+                    if (b1 && b2 && b3 && b4 && b5)
+                    {
+                        var enus = System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
+                        var floatstyle = System.Globalization.NumberStyles.Float;
+                        int n = int.Parse(lines[3].Remove(0, 8));
+                        if (lines.Length >= 5 + n)
+                        {
+                            for (int i = 5; i < 5 + n; i++)
+                            {
+                                string[] line = lines[i].Trim().Split(new char[]{' '});
+                                if (line.Length == 2)
+                                {
+                                    float alt; float mach;
+                                    if (float.TryParse(line[0], floatstyle, enus, out alt)
+                                     && float.TryParse(line[1], floatstyle, enus, out mach))
+                                    {
+                                        resultlist.Add(new Vector2(alt, mach));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return resultlist;
+        }
+
         static public string TextFilePath
         {
             get

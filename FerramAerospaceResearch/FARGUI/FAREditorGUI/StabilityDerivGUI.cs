@@ -107,13 +107,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.BeginHorizontal();
             GUILayout.Label(Localizer.Format("FAREditorStabDerivPlanet"));
             _bodySettingDropdown.GUIDropDownDisplay();
-
             GUILayout.Label(Localizer.Format("FAREditorStabDerivAlt"));
             altitude = GUILayout.TextField(altitude, GUILayout.ExpandWidth(true));
-
             GUILayout.Label(Localizer.Format("FAREditorStabDerivMach"));
             machNumber = GUILayout.TextField(machNumber, GUILayout.ExpandWidth(true));
-
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -125,9 +122,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(Localizer.Format("FAREditorStabDerivCalcButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(false);
+                StabDerivCalcButtonAction(CalcAndExportEnum.CalculateOnly);
             if (GUILayout.Button(Localizer.Format("FAREditorStabDerivSaveButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(true);
+                StabDerivCalcButtonAction(CalcAndExportEnum.CalculateAndExport);
+            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivLoopButton"), GUILayout.Width(175.0F), GUILayout.Height(25.0F)))
+                StabDerivCalcButtonAction(CalcAndExportEnum.LoopExport);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -143,7 +142,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.Label(Localizer.Format("FAREditorStabDerivScaledChord") + stabDerivOutput.MAC.ToString("G3") + " " + Localizer.Format("FARUnitM"));
             GUILayout.Label(Localizer.Format("FAREditorStabDerivScaledSpan") + stabDerivOutput.b.ToString("G3") + " " + Localizer.Format("FARUnitM"));
             GUILayout.EndVertical();
-
 
             GUILayout.BeginVertical(GUILayout.Width(W160));
             GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIxx") + stabDerivOutput.stabDerivs[0].ToString("G6") + " " + Localizer.Format("FARUnitKgMSq"), Localizer.Format("FAREditorStabDerivIxxExp")));
@@ -165,16 +163,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndHorizontal();
             GUILayout.Label(new GUIContent(Localizer.Format("FARAbbrevAoA") + ": " + stabDerivOutput.stableAoAState + stabDerivOutput.stableAoA.ToString("G6") + " " + Localizer.Format("FARUnitDeg"), Localizer.Format("FAREditorStabDerivAoAExp")));
             GUILayout.EndVertical();
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(Localizer.Format("FAREditorLongDeriv"), GUILayout.Width(W160));
             GUILayout.EndHorizontal();
 
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Localizer.Format("FAREditorLongDeriv"), GUILayout.Width(W160));
+            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.Label(Localizer.Format("FAREditorDownVelDeriv"), GUILayout.Width(W160));
             GUILayout.Label(Localizer.Format("FAREditorFwdVelDeriv"), GUILayout.Width(W160));
@@ -231,7 +227,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             DrawTooltip();
         }
 
-        private void StabDerivCalcButtonAction(bool exportresult)
+        private enum CalcAndExportEnum { CalculateOnly, CalculateAndExport, LoopExport };
+
+        private void StabDerivCalcButtonAction(CalcAndExportEnum exportflag)
         {
             CelestialBody body = _bodySettingDropdown.ActiveSelection;
             FARAeroUtil.UpdateCurrentActiveBody(body);
@@ -242,6 +240,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             int flapsettingInt = _flapSettingDropdown.ActiveSelection;
             bool spoilersDeployedBool = spoilersDeployed;
 
+            if (exportflag == CalcAndExportEnum.LoopExport)
+            {
+                int n = 0;
+                foreach (Vector2 altmach in StabilityDerivativeExportFile.LoadConfigList())
+                {
+                    StabilityDerivExportOutput output = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, (double)altmach.x, (double)altmach.y, flapsettingInt, spoilersDeployedBool);
+                    if (output != null && StabilityDerivativeExportFile.Export(output))
+                        n++;
+                }
+                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivLoopCount", Localizer.Format("FAREditorStabDerivLoopDone"), Localizer.Format("FAREditorStabDerivLoopDoneExp", n), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+                return; // in the LoopExport case skip the usual calculation
+            }
+
             StabilityDerivExportOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool);
             if (stabDerivResult == null)
                 PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
@@ -251,7 +262,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 simManager.vehicleData = stabDerivResult.outputvals;
                 SetAngleVectors(stabDerivResult.outputvals.stableAoA);
 
-                if (exportresult && !StabilityDerivativeExportFile.Export(stabDerivResult))
+                if (exportflag == CalcAndExportEnum.CalculateAndExport && !StabilityDerivativeExportFile.Export(stabDerivResult))
                     PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivSaveError", Localizer.Format("FAREditorStabDerivSaveError"), Localizer.Format("FAREditorStabDerivSaveErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
             }
         }
