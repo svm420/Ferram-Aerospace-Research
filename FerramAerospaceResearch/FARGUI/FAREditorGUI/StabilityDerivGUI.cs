@@ -243,13 +243,20 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (exportflag == CalcAndExportEnum.LoopExport)
             {
                 int n = 0;
+                ExportTextFileCache filecache = new ExportTextFileCache();
                 foreach (Vector2 altmach in StabilityDerivativeExportFile.LoadConfigList())
                 {
                     StabilityDerivExportOutput output = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, (double)altmach.x, (double)altmach.y, flapsettingInt, spoilersDeployedBool);
-                    if (output != null && StabilityDerivativeExportFile.Export(output))
+                    if (output != null && StabilityDerivativeExportFile.Export(output, filecache))
                         n++;
                 }
-                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivLoopCount", Localizer.Format("FAREditorStabDerivLoopDone"), Localizer.Format("FAREditorStabDerivLoopDoneExp", n), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+                if (n > 0)
+                {
+                    filecache.FlushTextFileLines();
+                    PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivLoopCount", Localizer.Format("FAREditorStabDerivLoopDone"), Localizer.Format("FAREditorStabDerivLoopDoneExp", n), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+                }
+                else
+                    PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivSaveError", Localizer.Format("FAREditorStabDerivSaveError"), Localizer.Format("FAREditorStabDerivSaveErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
                 return; // in the LoopExport case skip the usual calculation
             }
 

@@ -118,6 +118,67 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         }
     }
 
+    class ExportTextFileCache
+    {
+        private string[] filetext;
+
+        /// <summary>
+        ///  Physical file read.
+        /// </summary>
+        public ExportTextFileCache ()
+        {
+            filetext = LoadTextFile();
+        }
+
+        /// <summary>
+        /// Access text cache.
+        /// </summary>
+        public string[] TextFileLines
+        { get { return filetext; } }
+
+        /// <summary>
+        /// Overwrite text cache with new content.
+        /// </summary>
+        public void UpdateTextFileLines(List<string> lines)
+        {
+            filetext = lines.ToArray();
+        }
+
+        /// <summary>
+        /// Write cache to disk.
+        /// </summary>
+        public void FlushTextFileLines()
+        {
+            SaveTextFile(filetext);
+        }
+
+        static public string TextFilePath
+        {
+            get
+            {
+                string path = KSPUtil.ApplicationRootPath;
+                path += "GameData/FerramAerospaceResearch/Plugins/PluginData/";
+                path += "sdexport.txt";
+                return path;
+            }
+        }
+
+        static public string[] LoadTextFile()
+        {
+            string path = TextFilePath;
+            if (File.Exists(path))
+                return File.ReadAllLines(path, System.Text.Encoding.Default);
+            else
+                return new string[] { };
+        }
+
+        static public void SaveTextFile(string[] lines)
+        {
+            string path = TextFilePath;
+            File.WriteAllLines(path, lines);
+        }
+    }
+
     class StabilityDerivativeExportFile
     {
         private StructElement cellelement;
@@ -135,10 +196,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             get
             {
-            string path = KSPUtil.ApplicationRootPath;
-            path += "GameData/FerramAerospaceResearch/Plugins/PluginData/FerramAerospaceResearch/";
-            path += "sdexpcfg.txt";
-            return path;
+                string path = KSPUtil.ApplicationRootPath;
+                path += "GameData/FerramAerospaceResearch/Plugins/PluginData/FerramAerospaceResearch/";
+                path += "sdexpcfg.txt";
+                return path;
             }
         }
 
@@ -183,36 +244,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             return resultlist;
         }
 
-        static public string TextFilePath
-        {
-            get
-            {
-            string path = KSPUtil.ApplicationRootPath;
-            path += "GameData/FerramAerospaceResearch/Plugins/PluginData/";
-            path += "sdexport.txt";
-            return path;
-            }
-        }
-
-        static public string[] LoadTextFile()
-        {
-            string path = TextFilePath;
-            if (File.Exists(path))
-                return File.ReadAllLines(path, System.Text.Encoding.Default);
-            else
-                return new string[] {};
-        }
-
-        static public void SaveTextFile(List<string> lines)
-        {
-            string path = TextFilePath;
-            File.WriteAllLines(path, lines.ToArray());
-        }
-
-        public void LoadBodyText()
+        public void LoadBodyText(ExportTextFileCache cache)
         {
             bodytext = new List<string>();
-            string[] lines = LoadTextFile();
+            string[] lines = cache.TextFileLines;
             if (lines.Length == 0)
                 bodytextcount = 0;
             else if (lines.Length < 5)
@@ -270,12 +305,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             return result;
         }
 
-        public void SaveAllText()
+        public void UpdateAllText(ExportTextFileCache cache)
         {
             if (BodyTextLoaded())
-                SaveTextFile(GetAllLines());
+                cache.UpdateTextFileLines(GetAllLines());
             else
-                throw new InvalidOperationException("Cannot save result file because the file was not loaded properly in the first place.");
+                throw new InvalidOperationException("Cannot save result file to cache because the file was not loaded properly from cache in the first place.");
         }
 
         static public string EditorShipName
@@ -357,14 +392,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
         }
 
-        static public bool Export(Simulation.StabilityDerivExportOutput output)
+        static public bool Export(Simulation.StabilityDerivExportOutput output, ExportTextFileCache filecache = null)
         {
             StabilityDerivativeExportFile body = new StabilityDerivativeExportFile();
-            body.LoadBodyText();
+            ExportTextFileCache cache = (filecache != null) ? filecache : new ExportTextFileCache();
+            body.LoadBodyText(cache);
             if (body.BodyTextLoaded())
             {
                 body.AddResultElements(output);
-                body.SaveAllText();
+                body.UpdateAllText(cache);
+                if (filecache == null)
+                    cache.FlushTextFileLines();
                 return true;
             }
             else
