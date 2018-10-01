@@ -172,6 +172,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             }
 
+            vesselInfo.aerodynamicForce = totalAeroForceVector;
             vesselInfo.dragForce = -Vector3d.Dot(totalAeroForceVector, velVectorNorm);     //reverse along vel normal will be drag
 
             Vector3d remainderVector = totalAeroForceVector + velVectorNorm * vesselInfo.dragForce;

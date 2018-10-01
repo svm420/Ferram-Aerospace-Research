@@ -309,6 +309,16 @@ namespace FerramAerospaceResearch
             return false;
         }
         
+        /// <summary>
+        /// Returns the current aerodynamic force being experienced by the vehicle in world space
+        /// </summary>
+        /// <param name="v">The vessel that force is being queried</param>
+        /// <returns>The force on the vessel in world space</returns>
+        public static Vector3 VesselAerodynamicForce(Vessel v)
+        {
+            return VesselFlightInfo(v).InfoParameters.aerodynamicForce;
+        }
+
         #endregion
 
         #region AeroPredictions
