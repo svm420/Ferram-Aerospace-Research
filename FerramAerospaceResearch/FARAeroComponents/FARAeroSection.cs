@@ -299,157 +299,137 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 {
                     continue;
                 }
-                break;
-            } 
-            if (aeroModule.part == null || aeroModule.part.transform == null)
-            {
-                return;
-            }
-            double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);      //this will be the same for each part, so why recalc it multiple times?
-            double xForceAoA0 = xForcePressureAoA0.Evaluate(machNumber);
-            double xForceAoA180 = xForcePressureAoA180.Evaluate(machNumber);
+                double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);      //this will be the same for each part, so why recalc it multiple times?
+                double xForceAoA0 = xForcePressureAoA0.Evaluate(machNumber);
+                double xForceAoA180 = xForcePressureAoA180.Evaluate(machNumber);
 
-            Vector3 xRefVector = data.xRefVectorPartSpace;
-            Vector3 nRefVector = data.nRefVectorPartSpace;
+                Vector3 xRefVector = data.xRefVectorPartSpace;
+                Vector3 nRefVector = data.nRefVectorPartSpace;
 
-            Vector3 velLocal = aeroModule.part.partTransform.worldToLocalMatrix.MultiplyVector(vel);
-            Vector3 angVelLocal = aeroModule.partLocalAngVel;
+                Vector3 velLocal = aeroModule.part.partTransform.worldToLocalMatrix.MultiplyVector(vel);
+                Vector3 angVelLocal = aeroModule.partLocalAngVel;
 
-            //Vector3 angVelLocal = aeroModule.partLocalAngVel;
+                //Vector3 angVelLocal = aeroModule.partLocalAngVel;
 
-            //velLocal += Vector3.Cross(angVelLocal, data.centroidPartSpace);       //some transform issue here, needs investigation
-            Vector3 velLocalNorm = velLocal.normalized;
+                //velLocal += Vector3.Cross(angVelLocal, data.centroidPartSpace);       //some transform issue here, needs investigation
+                Vector3 velLocalNorm = velLocal.normalized;
 
-            Vector3 localNormalForceVec = Vector3.ProjectOnPlane(-velLocalNorm, xRefVector).normalized;
+                Vector3 localNormalForceVec = Vector3.ProjectOnPlane(-velLocalNorm, xRefVector).normalized;
 
-            double cosAoA = Vector3.Dot(xRefVector, velLocalNorm);
-            double cosSqrAoA = cosAoA * cosAoA;
-            double sinSqrAoA = Math.Max(1 - cosSqrAoA, 0);
-            double sinAoA = Math.Sqrt(sinSqrAoA);
-            double sin2AoA = 2 * sinAoA * Math.Abs(cosAoA);
-            double cosHalfAoA = Math.Sqrt(0.5 + 0.5 * Math.Abs(cosAoA));
+                double cosAoA = Vector3.Dot(xRefVector, velLocalNorm);
+                double cosSqrAoA = cosAoA * cosAoA;
+                double sinSqrAoA = Math.Max(1 - cosSqrAoA, 0);
+                double sinAoA = Math.Sqrt(sinSqrAoA);
+                double sin2AoA = 2 * sinAoA * Math.Abs(cosAoA);
+                double cosHalfAoA = Math.Sqrt(0.5 + 0.5 * Math.Abs(cosAoA));
 
 
-            double nForce = 0;
-            nForce = potentialFlowNormalForce * Math.Sign(cosAoA) * cosHalfAoA * sin2AoA;  //potential flow normal force
-            if (nForce < 0)     //potential flow is not significant over the rear face of things
-                nForce = 0;
-            //if (machNumber > 3)
-            //    nForce *= 2d - machNumber * 0.3333333333333333d;
+                double nForce = 0;
+                nForce = potentialFlowNormalForce * Math.Sign(cosAoA) * cosHalfAoA * sin2AoA;  //potential flow normal force
+                if (nForce < 0)     //potential flow is not significant over the rear face of things
+                    nForce = 0;
+                //if (machNumber > 3)
+                //    nForce *= 2d - machNumber * 0.3333333333333333d;
 
-            float normalForceFactor = Math.Abs(Vector3.Dot(localNormalForceVec, nRefVector));
-            normalForceFactor *= normalForceFactor;
+                float normalForceFactor = Math.Abs(Vector3.Dot(localNormalForceVec, nRefVector));
+                normalForceFactor *= normalForceFactor;
 
-            normalForceFactor = invFlatnessRatio * (1 - normalForceFactor) + flatnessRatio * normalForceFactor;     //accounts for changes in relative flatness of shape
-
-
-            float crossFlowMach, crossFlowReynolds;
-            crossFlowMach = machNumber * (float)sinAoA;
-            crossFlowReynolds = reynoldsPerUnitLength * diameter * (float)sinAoA / normalForceFactor;
-
-            nForce += viscCrossflowDrag * sinSqrAoA * CalculateCrossFlowDrag(crossFlowMach, crossFlowReynolds);            //viscous crossflow normal force
-
-            nForce *= normalForceFactor;
-
-            double xForce = -skinFrictionForce * Math.Sign(cosAoA) * cosSqrAoA;
-            double localVelForce = xForce * pseudoKnudsenNumber;
-            xForce -= localVelForce;
-
-            localVelForce = Math.Abs(localVelForce);
-
-            float moment = (float)(cosAoA * sinAoA);
-            float dampingMoment = 4f * moment;
+                normalForceFactor = invFlatnessRatio * (1 - normalForceFactor) + flatnessRatio * normalForceFactor;     //accounts for changes in relative flatness of shape
 
 
-            if (cosAoA > 0)
-            {
-                xForce += cosSqrAoA * xForceAoA0;
-                float momentFactor;
-                if (machNumber > 6)
-                    momentFactor = hypersonicMomentForward;
-                else if (machNumber < 0.6)
-                    momentFactor = 0.6f * hypersonicMomentBackward;
-                else
+                float crossFlowMach, crossFlowReynolds;
+                crossFlowMach = machNumber * (float)sinAoA;
+                crossFlowReynolds = reynoldsPerUnitLength * diameter * (float)sinAoA / normalForceFactor;
+
+                nForce += viscCrossflowDrag * sinSqrAoA * CalculateCrossFlowDrag(crossFlowMach, crossFlowReynolds);            //viscous crossflow normal force
+
+                nForce *= normalForceFactor;
+
+                double xForce = -skinFrictionForce * Math.Sign(cosAoA) * cosSqrAoA;
+                double localVelForce = xForce * pseudoKnudsenNumber;
+                xForce -= localVelForce;
+
+                localVelForce = Math.Abs(localVelForce);
+
+                float moment = (float)(cosAoA * sinAoA);
+                float dampingMoment = 4f * moment;
+
+
+                if (cosAoA > 0)
                 {
-                    float tmp = (-0.185185185f * machNumber + 1.11111111111f);
-                    momentFactor = tmp * hypersonicMomentBackward * 0.6f + (1 - tmp) * hypersonicMomentForward;
-                }
-                //if (machNumber < 1.5)
-                //    momentFactor += hypersonicMomentBackward * (0.5f - machNumber * 0.33333333333333333333333333333333f) * 0.2f;
-
-                moment *= momentFactor;
-                dampingMoment *= momentFactor;
-            }
-            else
-            {
-                xForce += cosSqrAoA * xForceAoA180;
-                float momentFactor;     //negative to deal with the ref vector facing the opposite direction, causing the moment vector to point in the opposite direction
-                if (machNumber > 6)
-                    momentFactor = hypersonicMomentBackward;
-                else if (machNumber < 0.6)
-                    momentFactor = 0.6f * hypersonicMomentForward;
-                else
-                {
-                    float tmp = (-0.185185185f * machNumber + 1.11111111111f);
-                    momentFactor = tmp * hypersonicMomentForward * 0.6f + (1 - tmp) * hypersonicMomentBackward;
-                }
-                //if (machNumber < 1.5)
-                //    momentFactor += hypersonicMomentForward * (0.5f - machNumber * 0.33333333333333333333333333333333f) * 0.2f;
-
-                moment *= momentFactor;
-                dampingMoment *= momentFactor;
-            }
-            moment /= normalForceFactor;
-            dampingMoment = Math.Abs(dampingMoment) * 0.1f;
-            //dampingMoment += (float)Math.Abs(skinFrictionForce) * 0.1f;
-            float rollDampingMoment = (float)(skinFrictionForce * 0.5 * diameter);      //skin friction force times avg moment arm for vehicle
-            rollDampingMoment *= (0.75f + flatnessRatio * 0.25f);     //this is just an approximation for now
-
-            Vector3 forceVector = (float)xForce * xRefVector + (float)nForce * localNormalForceVec;
-            forceVector -= (float)localVelForce * velLocalNorm;
-
-            Vector3 torqueVector = Vector3.Cross(xRefVector, localNormalForceVec) * moment;
-
-            Vector3 axialAngLocalVel = Vector3.Dot(xRefVector, angVelLocal) * xRefVector;
-            Vector3 nonAxialAngLocalVel = angVelLocal - axialAngLocalVel;
-
-            if (velLocal.sqrMagnitude > 0.001f)
-                torqueVector -= (dampingMoment * nonAxialAngLocalVel) + (rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude) / velLocal.sqrMagnitude;
-            else
-                torqueVector -= (dampingMoment * nonAxialAngLocalVel) + (rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude) / 0.001f;
-
-            Matrix4x4 localToWorld = aeroModule.part.partTransform.localToWorldMatrix;
-
-            float dynPresAndScaling = 0.0005f * atmDensity * velLocal.sqrMagnitude;        //dyn pres and N -> kN conversion
-
-            forceVector *= dynPresAndScaling;
-            torqueVector *= dynPresAndScaling;
-
-            forceVector = localToWorld.MultiplyVector(forceVector);
-            torqueVector = localToWorld.MultiplyVector(torqueVector);
-            Vector3 centroid = Vector3.zero;
-
-            if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
-            {
-                for (int i = 0; i < partData.Count; i++)
-                {
-                    PartData data2 = partData[i];
-                    FARAeroPartModule module = data2.aeroModule;
-                    if ((object)module == null)
-                        continue;
-
-                    if (module.part == null || module.part.partTransform == null)
+                    xForce += cosSqrAoA * xForceAoA0;
+                    float momentFactor;
+                    if (machNumber > 6)
+                        momentFactor = hypersonicMomentForward;
+                    else if (machNumber < 0.6)
+                        momentFactor = 0.6f * hypersonicMomentBackward;
+                    else
                     {
-                        continue;
+                        float tmp = (-0.185185185f * machNumber + 1.11111111111f);
+                        momentFactor = tmp * hypersonicMomentBackward * 0.6f + (1 - tmp) * hypersonicMomentForward;
                     }
+                    //if (machNumber < 1.5)
+                    //    momentFactor += hypersonicMomentBackward * (0.5f - machNumber * 0.33333333333333333333333333333333f) * 0.2f;
 
-                    centroid = module.part.partTransform.localToWorldMatrix.MultiplyPoint3x4(data2.centroidPartSpace);
-                    center.AddForce(centroid, forceVector * data2.dragFactor);
+                    moment *= momentFactor;
+                    dampingMoment *= momentFactor;
                 }
-                center.AddTorque(torqueVector);
+                else
+                {
+                    xForce += cosSqrAoA * xForceAoA180;
+                    float momentFactor;     //negative to deal with the ref vector facing the opposite direction, causing the moment vector to point in the opposite direction
+                    if (machNumber > 6)
+                        momentFactor = hypersonicMomentBackward;
+                    else if (machNumber < 0.6)
+                        momentFactor = 0.6f * hypersonicMomentForward;
+                    else
+                    {
+                        float tmp = (-0.185185185f * machNumber + 1.11111111111f);
+                        momentFactor = tmp * hypersonicMomentForward * 0.6f + (1 - tmp) * hypersonicMomentBackward;
+                    }
+                    //if (machNumber < 1.5)
+                    //    momentFactor += hypersonicMomentForward * (0.5f - machNumber * 0.33333333333333333333333333333333f) * 0.2f;
+
+                    moment *= momentFactor;
+                    dampingMoment *= momentFactor;
+                }
+                moment /= normalForceFactor;
+                dampingMoment = Math.Abs(dampingMoment) * 0.1f;
+                //dampingMoment += (float)Math.Abs(skinFrictionForce) * 0.1f;
+                float rollDampingMoment = (float)(skinFrictionForce * 0.5 * diameter);      //skin friction force times avg moment arm for vehicle
+                rollDampingMoment *= (0.75f + flatnessRatio * 0.25f);     //this is just an approximation for now
+
+                Vector3 forceVector = (float)xForce * xRefVector + (float)nForce * localNormalForceVec;
+                forceVector -= (float)localVelForce * velLocalNorm;
+
+                Vector3 torqueVector = Vector3.Cross(xRefVector, localNormalForceVec) * moment;
+
+                Vector3 axialAngLocalVel = Vector3.Dot(xRefVector, angVelLocal) * xRefVector;
+                Vector3 nonAxialAngLocalVel = angVelLocal - axialAngLocalVel;
+
+                if (velLocal.sqrMagnitude > 0.001f)
+                    torqueVector -= (dampingMoment * nonAxialAngLocalVel) + (rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude) / velLocal.sqrMagnitude;
+                else
+                    torqueVector -= (dampingMoment * nonAxialAngLocalVel) + (rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude) / 0.001f;
+
+                Matrix4x4 localToWorld = aeroModule.part.partTransform.localToWorldMatrix;
+
+                float dynPresAndScaling = 0.0005f * atmDensity * velLocal.sqrMagnitude;        //dyn pres and N -> kN conversion
+
+                forceVector *= dynPresAndScaling;
+                torqueVector *= dynPresAndScaling;
+
+                forceVector = localToWorld.MultiplyVector(forceVector);
+                torqueVector = localToWorld.MultiplyVector(torqueVector);
+                Vector3 centroid = Vector3.zero;
+
+                if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
+                {
+                    centroid = aeroModule.part.partTransform.localToWorldMatrix.MultiplyPoint3x4(data.centroidPartSpace);
+                    center.AddForce(centroid, forceVector * data.dragFactor);
+                    center.AddTorque(torqueVector * data.dragFactor);
+                }
             }
-            else
-                Debug.LogError("[FAR] NaN Prediction Section Error: Inputs: AtmDen: " + atmDensity + " Mach: " + machNumber + " Re: " + reynoldsPerUnitLength + " Kn: " + pseudoKnudsenNumber + " skin: " + skinFrictionDrag + " vel: " + vel);
         }
 
         public void FlightCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
