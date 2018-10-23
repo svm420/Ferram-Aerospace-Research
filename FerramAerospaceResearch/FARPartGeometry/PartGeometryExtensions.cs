@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -256,7 +256,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }*/
             procAsteroid = (PAsteroid)fields[2].GetValue(asteroid);
             int count = transformList.Count;
-            GetChildTransforms(transformList, procAsteroid.gameObject.transform.FindChild(""));
+            GetChildTransforms(transformList, procAsteroid.gameObject.transform.Find(""));
             count = transformList.Count - count;
 
             //Debug.Log("[FAR] New transforms: " + count);
