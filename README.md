@@ -64,6 +64,25 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.15.9.2V "Lighthill"------------------------------------
+
+Update for KSP 1.5.1  
+Update to MM 3.1.0 for KSP 1.5.1  
+Update to MFI 1.2.5  
+
+Dealt with NullReferenceException when trying to access part colliders which do
+not have any (e.g. fuelLine)  
+Dealt with NullReferenceException when trying to determine if an engine has
+fairing which can be jettisoned by defaulting to no fairing  
+Added '[FAR]' tags to all log messages  
+Replaced farshaders.ksp with farassets.ksp which only contains a single
+material (source is in Assets)  
+Fixed curve colors in transonic design defaulting to purple  
+Moved asset bundle from shaders to Assets  
+Replaced icons with new ones (source is in icons, feel free to submit better ones)
+ 
+Removed all All Rights Reserved files  
+
 0.15.9.1V "Liepmann"------------------------------------  
 
 Update for KSP 1.3.1 (though not strictly necessary)  
@@ -129,7 +148,7 @@ Update license
 Fix an issue where voxels could be incredibly asymmetric on symmetric crafts  
 
 
-0.15.7V "Küchemann"------------------------------------  
+0.15.7V "Kï¿½chemann"------------------------------------  
 
 Update to ModuleManager 2.6.25  
 Update for KSP 1.1.3 compatibility  
@@ -174,7 +193,7 @@ Fix RealChute / RealChuteLite interaction breaking stock chute behavior, thanks 
 Fix mass-calc error for wing-mass-strength that resulted in all planes gaining unhealthy amounts of weight  
 Attempt to make debug-compatibility actually work, thanks to NathanKell  
 
-0.15.6.1V "von Kármán"------------------------------------
+0.15.6.1V "von Kï¿½rmï¿½n"------------------------------------
 
 Fix a critical CPU usage bug that resulted in voxelization threads SpinWaiting forever, monopolizing the processor  
 Fix parachutes without RealChute configs not applying forces when FAR + RC are installed, thanks to stupid_chris  
