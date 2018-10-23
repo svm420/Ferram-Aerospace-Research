@@ -1,4 +1,4 @@
-/* Name:    FerramGraph (Graph GUI Plugin)
+﻿/* Name:    FerramGraph (Graph GUI Plugin)
  * Version: 1.3   (KSP 0.22+)
 Copyright 2014, Michael Ferrara, aka Ferram4
 
@@ -15,11 +15,11 @@ Copyright 2014, Michael Ferrara, aka Ferram4
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with FerramGraph.  If not, see <http://www.gnu.org/licenses/>. * 
+    along with FerramGraph.  If not, see <http://www.gnu.org/licenses/>. *
 
  * Disclaimer: You use this at your own risk; this is an alpha plugin for an alpha game; if your computer disintigrates, it's not my fault. :P
- * 
- * 
+ *
+ *
  */
 
 using System;
@@ -468,7 +468,7 @@ namespace ferram4
         {
             Color lineColor = Color.red;
             AddLine(lineName, xValues, yValues, lineColor, lineThickness);
-        }        
+        }
 
         public void AddLine(string lineName, double[] xValues, double[] yValues, Color lineColor, int lineThickness)
         {

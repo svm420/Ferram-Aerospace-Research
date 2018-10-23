@@ -20,25 +20,25 @@ Copyright 2017, Michael Ferrara, aka Ferram4
    You should have received a copy of the GNU General Public License
    along with Ferram Aerospace Research.  If not, see <http://www.gnu.org/licenses/>.
 
-   Serious thanks:		a.g., for tons of bugfixes and code-refactorings   
+   Serious thanks:		a.g., for tons of bugfixes and code-refactorings
 				stupid_chris, for the RealChuteLite implementation
-            			Taverius, for correcting a ton of incorrect values  
+            			Taverius, for correcting a ton of incorrect values
 				Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts
-            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
-            			ialdabaoth (who is awesome), who originally created Module Manager  
-                        	Regex, for adding RPM support  
-				DaMichel, for some ferramGraph updates and some control surface-related features  
-            			Duxwing, for copy editing the readme  
-   
+            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates
+            			ialdabaoth (who is awesome), who originally created Module Manager
+                        	Regex, for adding RPM support
+				DaMichel, for some ferramGraph updates and some control surface-related features
+            			Duxwing, for copy editing the readme
+
    CompatibilityChecker by Majiir, BSD 2-clause http://opensource.org/licenses/BSD-2-Clause
 
-   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission  
+   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/55219
 
    ModularFLightIntegrator by Sarbian, Starwaster and Ferram4, MIT: http://opensource.org/licenses/MIT
 	http://forum.kerbalspaceprogram.com/threads/118088
 
-   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission  
+   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
@@ -177,7 +177,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 overallMeshBounds = SetBoundsFromMeshes();
                 _ready = true;
-            } 
+            }
             if (animStates != null && animStates.Count > 0)
                 CheckAnimations();
             //Debug.Log("[FAR] Geo PM: " + vessel.CoM + " " + Planetarium.GetUniversalTime());
@@ -186,7 +186,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         bool ReadyToBuildMesh()
         {
             bool returnVal = !_started && _sceneSetup;
-            
+
             returnVal &= (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready) || (HighLogic.LoadedSceneIsEditor && ApplicationLauncher.Ready);
 
             returnVal &= part.collider != null || part.Modules.Contains<ModuleWheelBase>() || part.Modules.Contains<KerbalEVA>() || part.Modules.Contains<FlagSite>();
@@ -216,7 +216,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             while (_meshesToUpdate > 0) //if the previous transform order hasn't been completed yet, wait here to let it
                 if (this == null)
                     return;
-            
+
             partTransform = part.partTransform;
             List<Transform> meshTransforms = part.PartModelTransformList();
             List<MeshData> geometryMeshes = CreateMeshListFromTransforms(ref meshTransforms);
@@ -241,7 +241,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     meshTransforms.RemoveAt(i);
                     --i;
                     continue;
-                } 
+                }
                 GeometryMesh geoMesh = new GeometryMesh(m, meshTransforms[i], worldToVesselMatrix, this);
                 meshDataList.Add(geoMesh);
             }
@@ -279,7 +279,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 _valid = true;
 
             return overallBounds;
-            
+
         }
 
         private void GetAnimations()
@@ -294,7 +294,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             foreach (PartModule m in part.Modules)
             {
-                
+
                 FindAnimStatesInModule(animations, m, "animationName");
                 FindAnimStatesInModule(animations, m, "animationStateName");
                 FindAnimStatesInModule(animations, m, "animName");
@@ -363,7 +363,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 StockProcAsteroidGeoUpdater asteroidUpdater = new StockProcAsteroidGeoUpdater(asteroidModule, this);
                 geometryUpdaters.Add(asteroidUpdater);
-                
+
             }
         }
 
@@ -377,7 +377,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             else
             {
                 worldToVesselMatrix = EditorLogic.RootPart.partTransform.worldToLocalMatrix;
-            } 
+            }
             crossSectionAdjusters = new List<ICrossSectionAdjuster>();
 
             string intakeType = "", engineType = "";
@@ -626,14 +626,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (mf != null)
                 {
                     Mesh m = mf.sharedMesh;
-                    
+
                     if (m != null)
                         return new MeshData(m.vertices, m.triangles, m.bounds);
                 }
                 else
                 {
                     Mesh m = mc.sharedMesh;     //but if we can't, grab the sharedMesh anyway and try to use that
-                    
+
                     if (m != null)
                         return new MeshData(m.vertices, m.triangles, m.bounds);
                 }
@@ -702,8 +702,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 validTransformList.Add(part.partTransform);
                 meshTransforms = validTransformList;
                 return meshList;
-            } 
-            
+            }
+
             Bounds rendererBounds = this.part.GetPartOverallMeshBoundsInBasis(part.partTransform.worldToLocalMatrix);
             Bounds colliderBounds = this.part.GetPartColliderBoundsInBasis(part.partTransform.worldToLocalMatrix);
 
@@ -740,11 +740,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     jettisonTransforms.Add(j.jettisonTransform);
                     if (j.isJettisoned)
                         continue;
-                    
+
                     Transform t = j.jettisonTransform;
                     if (t.gameObject.activeInHierarchy == false)
                         continue;
-                    
+
                     MeshData md = GetVisibleMeshData(t, false);
                     if (md == null)
                         continue;
@@ -845,7 +845,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             return CreateBoxMeshFromBoxCollider(new Vector3(0.5f, 0.8f, 0.5f), Vector3.zero);
         }
-        
+
         public void OnRescale(TweakScale.ScalingFactor factor)
         {
             if (meshDataList == null)
@@ -857,7 +857,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public void RC_Rescale(Vector3 relativeRescaleFactor)
         {
             Rescale(relativeRescaleFactor);             //this is currently just a wrapper, in the future if Rescale changes this can change to maintain compatibility
-        }           
+        }
 
         public void Rescale(Vector3 relativeRescaleFactor)
         {

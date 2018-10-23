@@ -20,25 +20,25 @@ Copyright 2017, Michael Ferrara, aka Ferram4
    You should have received a copy of the GNU General Public License
    along with Ferram Aerospace Research.  If not, see <http://www.gnu.org/licenses/>.
 
-   Serious thanks:		a.g., for tons of bugfixes and code-refactorings   
+   Serious thanks:		a.g., for tons of bugfixes and code-refactorings
 				stupid_chris, for the RealChuteLite implementation
-            			Taverius, for correcting a ton of incorrect values  
+            			Taverius, for correcting a ton of incorrect values
 				Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts
-            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
-            			ialdabaoth (who is awesome), who originally created Module Manager  
-                        	Regex, for adding RPM support  
-				DaMichel, for some ferramGraph updates and some control surface-related features  
-            			Duxwing, for copy editing the readme  
-   
+            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates
+            			ialdabaoth (who is awesome), who originally created Module Manager
+                        	Regex, for adding RPM support
+				DaMichel, for some ferramGraph updates and some control surface-related features
+            			Duxwing, for copy editing the readme
+
    CompatibilityChecker by Majiir, BSD 2-clause http://opensource.org/licenses/BSD-2-Clause
 
-   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission  
+   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/55219
 
    ModularFLightIntegrator by Sarbian, Starwaster and Ferram4, MIT: http://opensource.org/licenses/MIT
 	http://forum.kerbalspaceprogram.com/threads/118088
 
-   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission  
+   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
@@ -63,7 +63,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         static double maxLocation = 255;
         static byte maxLocationByte = 255;
         static bool useHigherResVoxels = false;
-        
+
         double elementSize;
         public double ElementSize
         {
@@ -429,7 +429,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     ThreadPool.QueueUserWorkItem(UpdateFromMesh, meshParams);
                 }
-                
+
                 lock (_locker)
                     while (threadsQueued > 0)
                         Monitor.Wait(_locker);
@@ -636,7 +636,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                         if ((object)pair.part != null)
                                         {
                                             DetermineIfPartGetsForcesAndAreas(partSideAreas, pair, i, j, k);
-                                            
+
                                             double size = pair.GetSize();
                                             if (size > 1.0)
                                                 size = 1.0;
@@ -711,7 +711,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                         if ((object)pair.part != null)
                                         {
                                             DetermineIfPartGetsForcesAndAreas(partSideAreas, pair, i, j, k);
-                                            
+
                                             double size = pair.GetSize();
                                             if (size > 1.0)
                                                 size = 1.0;
@@ -980,7 +980,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                         if ((object)pair.part != null)
                                         {
                                             DetermineIfPartGetsForcesAndAreas(partSideAreas, pair, i, j, k);
-                                            
+
                                             double size = pair.GetSize();
                                             if (size > 1.0)
                                                 size = 1.0;
@@ -1680,7 +1680,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             return section.VoxelPointExistsGlobalIndex(i + j * 8 + k * 64);
         }
-        
+
         private Part GetPartAtVoxelPos(int i, int j, int k)
         {
             int iSec, jSec, kSec;
@@ -1774,7 +1774,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 {
                     threadsQueued--;
                     Monitor.Pulse(_locker);
-                } 
+                }
             }
         }
         private void UpdateFromMesh(GeometryMesh mesh, Part part)
@@ -1966,8 +1966,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     Vector3 p2TestPt = pt - vert2Proj;
                     Vector3 p3TestPt = pt - vert3Proj;
-                    if ((u + v < 0.5 && p1TestPt.magnitude <= RC) || 
-                        ((u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC) || 
+                    if ((u + v < 0.5 && p1TestPt.magnitude <= RC) ||
+                        ((u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC) ||
                         ((v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC))
                     {
 
@@ -2042,13 +2042,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             vert2Proj = new Vector2d(vert2.x - lowerRightCorner.x, vert2.z - lowerRightCorner.z) * invElementSize;
             vert3Proj = new Vector2d(vert3.x - lowerRightCorner.x, vert3.z - lowerRightCorner.z) * invElementSize;*/
 
-            
+
             Vector3 p1p2, p1p3;
             p1p2 = vert2Proj - vert1Proj;
             p1p3 = vert3Proj - vert1Proj;
 
             int signW = -Math.Sign(Vector3.Cross(p1p2, p1p3).y) * invertTri;
-            
+
             double dot12_12, dot12_13, dot13_13;
             dot12_12 = p1p2.x * p1p2.x + p1p2.z * p1p2.z;
             dot12_13 = p1p2.x * p1p3.x + p1p2.z * p1p3.z;
@@ -2211,7 +2211,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             p1p3 = vert3Proj - vert1Proj;
 
             int signW = -Math.Sign(Vector3.Cross(p1p2, p1p3).z) * invertTri;
-            
+
             double dot12_12, dot12_13, dot13_13;
             dot12_12 = p1p2.x * p1p2.x + p1p2.y * p1p2.y;
             dot12_13 = p1p2.x * p1p3.x + p1p2.y * p1p3.y;
@@ -2291,7 +2291,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         SetVoxelPoint(i, j, k, part, plane, location);
                         continue;
                     }
-                    
+
                     Vector3 p2TestPt = pt - vert2Proj;
                     Vector3 p3TestPt = pt - vert3Proj;
                     if ((u + v < 0.5 && p1TestPt.magnitude <= RC) ||
@@ -2461,7 +2461,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
             }
         }
-        
+
         private void SolidifyVoxel(int lowJ, int highJ, bool increasingJ)
         {
             SweepPlanePoint[,] plane;
@@ -2553,7 +2553,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             continue;
                         }
                     }
-                    else 
+                    else
                     {
                         if ((object)p == null) //If there is a pt there, but no part listed, this is an interior pt or the cross-section is shrinking
                         {
@@ -2577,11 +2577,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 pt.mark = SweepPlanePoint.MarkingType.VoxelShell;
                             else
                                 pt.mark = SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior;     //this marks that this point was once part of the voxel shell
-                            
+
 
                             pt.part = p;
                             pt.jLastInactive = j;
-                            
+
                         }
                     }
                 }
