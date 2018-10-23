@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -58,7 +58,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             get { return instance; }
         }
-        
+
         Vector3 vesselRootLocalAeroCenter;
         public static Vector3 VesselRootLocalAeroCenter
         {
