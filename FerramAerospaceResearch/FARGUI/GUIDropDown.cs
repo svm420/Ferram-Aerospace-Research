@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -184,7 +184,7 @@ namespace FerramAerospaceResearch.FARGUI
                 GUIStyle tmpStyle = (selectedOption == i) ? selectedItemStyle : dropdownItemStyle;
                 if (GUILayout.Button(stringOptions[i], tmpStyle))
                 {
-                    Debug.Log("Selected " + stringOptions[i]);
+                    Debug.Log("[FAR] Selected " + stringOptions[i]);
                     selectedOption = i;
                     HideList();
                 }

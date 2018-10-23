@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -144,7 +144,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     MAX_CHUNKS_IN_QUEUE = chunksForQueue;
                     MAX_CHUNKS_ALLOWED = (int)Math.Ceiling(1.5 * MAX_CHUNKS_IN_QUEUE);
 
-                    Debug.Log(MAX_CHUNKS_IN_QUEUE + " " + MAX_CHUNKS_ALLOWED);
+                    Debug.Log("[FAR] " + MAX_CHUNKS_IN_QUEUE + " " + MAX_CHUNKS_ALLOWED);
                     for (int i = 0; i < MAX_CHUNKS_IN_QUEUE; i++)
                         clearedChunks.Push(new VoxelChunk(0, Vector3.zero, 0, 0, 0, null, useHigherResVoxels));
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -272,7 +272,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 overallBounds.extents.x + overallBounds.extents.y + overallBounds.extents.z;
             if (float.IsNaN(tmpTestBounds) || float.IsInfinity(tmpTestBounds))
             {
-                Debug.Log("Overall bounds error in " + part.partInfo.title + " " + meshDataList.Count + " meshes");
+                Debug.Log("[FAR] Overall bounds error in " + part.partInfo.title + " " + meshDataList.Count + " meshes");
                 _valid = false;
             }
             else
