@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -180,7 +180,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             } 
             if (animStates != null && animStates.Count > 0)
                 CheckAnimations();
-            //Debug.Log("Geo PM: " + vessel.CoM + " " + Planetarium.GetUniversalTime());
+            //Debug.Log("[FAR] Geo PM: " + vessel.CoM + " " + Planetarium.GetUniversalTime());
         }
 
         bool ReadyToBuildMesh()
@@ -520,7 +520,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     //}
                     if (Math.Abs(prevNormTime - state.time) > 10E-5)       //if the anim is not playing, but it was, also send the event to be sure that we closed
                     {
-                        //Debug.Log(state.time);
+                        //Debug.Log("[FAR] " + state.time);
                         animStateTime[i] = state.time;
                         updateShape = true;
                     }
@@ -581,7 +581,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                     else
                     {
-                        Debug.Log("A mesh on " + part.partInfo.title + " did not exist and was removed");
+                        Debug.Log("[FAR] A mesh on " + part.partInfo.title + " did not exist and was removed");
                         meshDataList.RemoveAt(i);
                         --i;
                         lock (this)
@@ -697,7 +697,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (part.Modules.Contains<KerbalEVA>() || part.Modules.Contains<FlagSite>())
             {
-                Debug.Log("Adding vox box to Kerbal / Flag");
+                Debug.Log("[FAR] Adding vox box to Kerbal / Flag");
                 meshList.Add(CreateBoxMeshForKerbalEVA());
                 validTransformList.Add(part.partTransform);
                 meshTransforms = validTransformList;

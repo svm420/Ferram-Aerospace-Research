@@ -1,4 +1,4 @@
-﻿/* Name:    FerramGraph (Graph GUI Plugin)
+/* Name:    FerramGraph (Graph GUI Plugin)
  * Version: 1.3   (KSP 0.22+)
 Copyright 2014, Michael Ferrara, aka Ferram4
 
@@ -358,16 +358,16 @@ namespace ferram4
             if (pixelWidth <= 1)
             {
                 pixelWidth = 5;
-                Debug.Log("Warning! Grid width scale too fine for scaling; picking safe alternative");
+                Debug.Log("[FAR] Warning! Grid width scale too fine for scaling; picking safe alternative");
             }
             if (pixelHeight <= 1)
             {
                 pixelHeight = 5;
-                Debug.Log("Warning! Grid height scale too fine for scaling; picking safe alternative");
+                Debug.Log("[FAR] Warning! Grid height scale too fine for scaling; picking safe alternative");
             }
 
             SetGridScaleUsingPixels(pixelWidth, pixelHeight);
-            
+
 
         }
 
@@ -375,7 +375,7 @@ namespace ferram4
         {
             if (!allLines.ContainsKey(lineName))
             {
-                MonoBehaviour.print("Error: No line with that name exists");
+                MonoBehaviour.print("[FAR] Error: No line with that name exists");
                 return;
             }
             ferramGraphLine line;

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -226,7 +226,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             if (Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
                 stabDerivOutput.stableAoAState = ((nominalOutput.Cl > neededCl) ? "<" : ">");
 
-            Debug.Log("Cl needed: " + neededCl + ", AoA: " + alpha + ", Cl: " + nominalOutput.Cl + ", Cd: " + nominalOutput.Cd);
+            Debug.Log("[FAR] Cl needed: " + neededCl + ", AoA: " + alpha + ", Cl: " + nominalOutput.Cl + ", Cd: " + nominalOutput.Cd);
 
             pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / (2 * FARMathUtil.deg2rad);                   //vert vel derivs
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / (2 * FARMathUtil.deg2rad);

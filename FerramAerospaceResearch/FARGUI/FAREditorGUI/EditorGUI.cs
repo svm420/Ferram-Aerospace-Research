@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -341,7 +341,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     prevPartCount = EditorLogic.SortedShipList.Count;
 
                     voxelWatch.Stop();
-                    UnityEngine.Debug.Log("Voxelization Time (ms): " + voxelWatch.ElapsedMilliseconds);
+                    UnityEngine.Debug.Log("[FAR] Voxelization Time (ms): " + voxelWatch.ElapsedMilliseconds);
 
                     voxelWatch.Reset();
 
@@ -357,7 +357,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 else if (_updateQueued)
                 {
                     var shipname = EditorLogic.fetch.ship.shipName ?? "unknown ship";
-                    Debug.Log("Updating " + shipname);
+                    Debug.Log("[FAR] Updating " + shipname);
                     RecalculateVoxel();
                 }
             }
@@ -408,7 +408,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                         {
                             _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
                             _updateQueued = true;
-                            //Debug.Log("We're not ready!");
+                            //Debug.Log("[FAR] We're not ready!");
                             return;
                         }
                     }

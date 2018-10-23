@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -67,7 +67,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
             if (validParts == null)
             {
-                Debug.Log("Fairing event setup");
+                Debug.Log("[FAR] Fairing event setup");
                 validParts = new Dictionary<Part, GeometryPartModule>();
                 GameEvents.onFairingsDeployed.Add(FairingDeployGeometryUpdate);
             }
@@ -135,7 +135,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         {
             if (ready == false)
             {
-                Debug.Log("Update fairing event");
+                Debug.Log("[FAR] Update fairing event");
                 GameEvents.onFairingsDeployed.Add(FairingDeployGeometryUpdate);
                 /*FieldInfo[] fields = fairing.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
                 bool deployBool = false, breakBool = false;
@@ -149,9 +149,9 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 breakBool = true;
 
                 if (!deployBool)
-                    Debug.LogError("FAR could not find Stock Procedural Fairing deploy event");
+                    Debug.LogError("[FAR] FAR could not find Stock Procedural Fairing deploy event");
                 if (!breakBool)
-                    Debug.LogError("FAR could not find Stock Procedural Fairing break event");
+                    Debug.LogError("[FAR] FAR could not find Stock Procedural Fairing break event");
             }
 
         }*/

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -318,7 +318,7 @@ namespace FerramAerospaceResearch
             aeroForce = aeroTorque = Vector3.zero;
             if (vessel == null)
             {
-                Debug.LogError("FAR API Error: attempted to simulate aerodynamics of null vessel");
+                Debug.LogError("[FAR] FAR API Error: attempted to simulate aerodynamics of null vessel");
                 return;
             }
 
@@ -326,7 +326,7 @@ namespace FerramAerospaceResearch
 
             if (vesselAero == null)
             {
-                Debug.LogError("FAR API Error: vessel does not have FARVesselAero aerocomponent for simulation");
+                Debug.LogError("[FAR] FAR API Error: vessel does not have FARVesselAero aerocomponent for simulation");
                 return;
             }
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -83,7 +83,7 @@ namespace FerramAerospaceResearch
             }
             catch (Exception e)
             {
-                Debug.Log("[FARWIND] Exception! " + e.Message + e.StackTrace);
+                Debug.Log("[FAR] [FARWIND] Exception! " + e.Message + e.StackTrace);
                 return Vector3.zero;
             }
         }
@@ -97,12 +97,12 @@ namespace FerramAerospaceResearch
         {
             if (newFunction == null)
             {
-                Debug.Log("[FARWind] Attempted to set a null wind function, using ZeroWind instead.");
+                Debug.Log("[FAR] [FARWind] Attempted to set a null wind function, using ZeroWind instead.");
                 FARWind.func = ZeroWind;
             }
             else
             {
-                Debug.Log("[FARWind] Setting wind function to " + newFunction.Method.Name);
+                Debug.Log("[FAR] [FARWind] Setting wind function to " + newFunction.Method.Name);
                 FARWind.func = newFunction;
             }            
         }

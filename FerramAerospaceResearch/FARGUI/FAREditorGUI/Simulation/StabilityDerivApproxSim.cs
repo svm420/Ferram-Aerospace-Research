@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -102,7 +102,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 }
                 else
                     num++;
-                Debug.Log(i + "," + j);
+                Debug.Log("[FAR] " + i + "," + j);
                 if (i <= 2)
                     A.Add(f, i, j);
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -72,7 +72,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         {
             if (!hasLoaded)
             {
-                Debug.Log("Asteroid Geometry Update");
+                Debug.Log("[FAR] Asteroid Geometry Update");
                 hasLoaded = true;
                 geoModule.GeometryPartModuleRebuildMeshData();
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -96,7 +96,7 @@ namespace FerramAerospaceResearch.FARGUI
         public void LoadColors()
         {
             colors = new List<Color>();
-            Debug.Log("Loading FAR GUI Colors");
+            Debug.Log("[FAR] Loading FAR GUI Colors");
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARGUIColors"))
             {
                 if (node.HasValue("ClColor"))

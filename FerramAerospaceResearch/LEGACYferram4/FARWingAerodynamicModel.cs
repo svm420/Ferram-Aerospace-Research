@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -187,7 +187,7 @@ namespace ferram4
             NUFAR_areaExposedFactor = Math.Min(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
             NUFAR_totalExposedAreaFactor = Math.Max(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
 
-            //Debug.Log("kN " + a.ProjectedAreas.kN + " kP " + a.ProjectedAreas.kP + " area " + S);
+            //Debug.Log("[FAR] kN " + a.ProjectedAreas.kN + " kP " + a.ProjectedAreas.kP + " area " + S);
 
         }
 
@@ -347,7 +347,7 @@ namespace ferram4
             }
             catch       //FIX ME!!!
             {           //Yell at KSP devs so that I don't have to engage in bad code practice
-                //Debug.Log("The expected exception from the symmetry counterpart part transform internals was caught and suppressed");
+                //Debug.Log("[FAR] The expected exception from the symmetry counterpart part transform internals was caught and suppressed");
                 return Vector3.zero;
             }
         }
@@ -775,7 +775,7 @@ namespace ferram4
             Vector3d force = (L + D);
             if (double.IsNaN(force.sqrMagnitude) || double.IsNaN(AerodynamicCenter.sqrMagnitude))// || float.IsNaN(moment.magnitude))
             {
-                Debug.LogWarning("FAR Error: Aerodynamic force = " + force.magnitude + " AC Loc = " + AerodynamicCenter.magnitude + " AoA = " + AoA + "\n\rMAC = " + effective_MAC + " B_2 = " + effective_b_2 + " sweepAngle = " + cosSweepAngle + "\n\rMidChordSweep = " + MidChordSweep + " MidChordSweepSideways = " + MidChordSweepSideways + "\n\r at " + part.name);
+                Debug.LogWarning("[FAR] Error: Aerodynamic force = " + force.magnitude + " AC Loc = " + AerodynamicCenter.magnitude + " AoA = " + AoA + "\n\rMAC = " + effective_MAC + " B_2 = " + effective_b_2 + " sweepAngle = " + cosSweepAngle + "\n\rMidChordSweep = " + MidChordSweep + " MidChordSweepSideways = " + MidChordSweepSideways + "\n\r at " + part.name);
                 force = AerodynamicCenter = Vector3d.zero;
             }
 
@@ -983,7 +983,7 @@ namespace ferram4
 
             double CosAoA = Math.Cos(AoA);
 
-            //Debug.Log("Part: " + part.partInfo.title + " Liftslope: " + liftslope);
+            //Debug.Log("[FAR] Part: " + part.partInfo.title + " Liftslope: " + liftslope);
 
             if (MachNumber <= 0.8)
             {
@@ -1173,7 +1173,7 @@ namespace ferram4
             //Region 4 is the lower surface behind the max thickness
             double p4 = PMExpansionCalculation(2 * halfAngle, M3) * p3;
 
-            //Debug.Log(p1 + " " + p2 + " " + p3 + " " + p4);
+            //Debug.Log("[FAR] " + p1 + " " + p2 + " " + p3 + " " + p4);
             pRatio = ((p3 + p4) - (p1 + p2)) * 0.5;
 
             return pRatio;
@@ -1491,7 +1491,7 @@ namespace ferram4
                 PartModule m = part.Modules["TweakScale"];
                 float massScale = (float)m.Fields.GetValue("MassScale");
                 baseMass = part.partInfo.partPrefab.mass + (part.partInfo.partPrefab.mass * (massScale - 1));
-                Debug.Log("TweakScale massScale for FAR usage: " + massScale);
+                Debug.Log("[FAR] TweakScale massScale for FAR usage: " + massScale);
             }
             massScaleReady = false;
 

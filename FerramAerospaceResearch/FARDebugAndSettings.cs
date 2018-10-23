@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -136,7 +136,7 @@ namespace FerramAerospaceResearch
 
         void OnSceneChange(GameEvents.FromToAction<GameScenes,GameScenes> fromToScenes)
         {
-            Debug.Log("check scene");
+            Debug.Log("[FAR] check scene");
             if(fromToScenes.to == GameScenes.SPACECENTER)
             {
                 if (FARDebugValues.useBlizzyToolbar)
@@ -173,7 +173,7 @@ namespace FerramAerospaceResearch
 
         void OnGUIAppLauncherReady()
         {
-            Debug.Log("Adding Debug Button");
+            Debug.Log("[FAR] Adding Debug Button");
             FARDebugButtonStock = ApplicationLauncher.Instance.AddModApplication(
                 ToggleGUI,
                 ToggleGUI,

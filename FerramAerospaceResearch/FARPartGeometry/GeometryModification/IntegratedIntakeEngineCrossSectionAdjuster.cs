@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -140,7 +140,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
             intakeArea = INTAKE_AREA_SCALAR * intake.area;
 
-            Debug.Log("Integrated cross-section adjuster");
+            Debug.Log("[FAR] Integrated cross-section adjuster");
         }
 
         public double AreaRemovedFromCrossSection(Vector3 vehicleAxis)

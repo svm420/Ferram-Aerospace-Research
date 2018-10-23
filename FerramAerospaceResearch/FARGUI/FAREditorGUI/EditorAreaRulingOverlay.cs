@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -104,8 +104,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 if (!FARAssets.shaderDict.TryGetValue("FARCrossSectionGraph", out lineShader))
                 {
                     //TODO: definitely replace this with a proper shader when we can
-                    Debug.Log("Could not load cross-section shader; using fallback shader");
-                    lineShader = Shader.Find("Sprites/Default");
+                    Debug.Log("[FAR] Could not load cross-section shader; using fallback shader");
                 }
 
                 _rendererMaterial = new Material(lineShader);

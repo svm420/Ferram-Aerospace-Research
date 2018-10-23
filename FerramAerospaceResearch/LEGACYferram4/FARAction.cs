@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -120,11 +120,11 @@ namespace ferram4
                 {
                     id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), config.GetValue(configKeys[i], id2actionGroup[i].ToString())); ;
                     currentGuiStrings[i] = id2actionGroup[i].ToString(); // don't forget to initialize the gui
-                    Debug.Log(String.Format("FAR: loaded AG {0} as {1}", configKeys[i], id2actionGroup[i]));
+                    Debug.Log(String.Format("[FAR] Loaded AG {0} as {1}", configKeys[i], id2actionGroup[i]));
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning("FAR: error reading config key '" + configKeys[i] + "' with value '" + config.GetValue(configKeys[i], "n/a") + "' gave " + e.ToString());
+                    Debug.LogWarning("[FAR] Error reading config key '" + configKeys[i] + "' with value '" + config.GetValue(configKeys[i], "n/a") + "' gave " + e.ToString());
                 }
                 int initIndex = 0;
                 for(int j = 0; j < agTypes.Length; j++)
@@ -145,7 +145,7 @@ namespace ferram4
             KSP.IO.PluginConfiguration config = FARDebugAndSettings.config;
             for (int i = 0; i < ACTION_COUNT; ++i)
             {
-                Debug.Log(String.Format("FAR: save AG {0} as {1}", configKeys[i], id2actionGroup[i]));
+                Debug.Log(String.Format("[FAR] Save AG {0} as {1}", configKeys[i], id2actionGroup[i]));
                 config.SetValue(configKeys[i], id2actionGroup[i].ToString());
             }
         }

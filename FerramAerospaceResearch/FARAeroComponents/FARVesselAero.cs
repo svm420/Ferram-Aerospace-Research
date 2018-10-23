@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -101,7 +101,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         protected override void OnStart()
         {
-            Debug.Log("FARVesselAero on " + vessel.name + " reporting startup");
+            Debug.Log("[FAR] FARVesselAero on " + vessel.name + " reporting startup");
             base.OnStart();
 
             if (!CompatibilityChecker.IsAllCompatible())
@@ -151,7 +151,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 if (p.Modules.Contains<KerbalEVA>() || p.Modules.Contains<FlagSite>())
                 {
-                    Debug.Log("Handling Stuff for KerbalEVA / Flag");
+                    Debug.Log("[FAR] Handling Stuff for KerbalEVA / Flag");
                     g = (GeometryPartModule)p.AddModule("GeometryPartModule");
                     g.OnStart(StartState());
                     p.AddModule("FARAeroPartModule").OnStart(StartState());
@@ -166,7 +166,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             //GameEvents.onVesselLoaded.Add(VesselUpdate);
             //GameEvents.onVesselCreate.Add(VesselUpdateEvent);
 
-            //Debug.Log("Starting " + _vessel.vesselName + " aero properties");
+            //Debug.Log("[FAR] Starting " + _vessel.vesselName + " aero properties");
         }
 
         private PartModule.StartState StartState()
@@ -222,14 +222,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     _flightGUI = vessel.GetComponent<FerramAerospaceResearch.FARGUI.FARFlightGUI.FlightGUI>();
 
                 _flightGUI.UpdateAeroModules(_currentAeroModules, _legacyWingModels);
-                //Debug.Log("Updating " + _vessel.vesselName + " aero properties\n\rCross-Sectional Area: " + _vehicleAero.MaxCrossSectionArea + " Crit Mach: " + _vehicleAero.CriticalMach + "\n\rUnusedAeroCount: " + _unusedAeroModules.Count + " UsedAeroCount: " + _currentAeroModules.Count + " sectCount: " + _currentAeroSections.Count);
+                //Debug.Log("[FAR] Updating " + _vessel.vesselName + " aero properties\n\rCross-Sectional Area: " + _vehicleAero.MaxCrossSectionArea + " Crit Mach: " + _vehicleAero.CriticalMach + "\n\rUnusedAeroCount: " + _unusedAeroModules.Count + " UsedAeroCount: " + _currentAeroModules.Count + " sectCount: " + _currentAeroSections.Count);
 
                 for (int i = 0; i < _unusedAeroModules.Count; i++)
                 {
                     FARAeroPartModule a = _unusedAeroModules[i];
                     a.SetShielded(true);
                     a.ForceLegacyAeroUpdates();
-                    //Debug.Log(a.part.partInfo.title + " shielded, area: " + a.ProjectedAreas.totalArea);
+                    //Debug.Log("[FAR] " + a.part.partInfo.title + " shielded, area: " + a.ProjectedAreas.totalArea);
                 }
 
                 for (int i = 0; i < _currentAeroModules.Count; i++)
@@ -237,7 +237,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     FARAeroPartModule a = _currentAeroModules[i];
                     a.SetShielded(false);
                     a.ForceLegacyAeroUpdates();
-                    //Debug.Log(a.part.partInfo.title + " unshielded, area: " + a.ProjectedAreas.totalArea);
+                    //Debug.Log("[FAR] " + a.part.partInfo.title + " unshielded, area: " + a.ProjectedAreas.totalArea);
                 }
 
                 _vesselIntakeRamDrag.UpdateAeroData(_currentAeroModules, _unusedAeroModules);
@@ -466,7 +466,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
              if(_currentGeoModules.Count == 0)
              {
                  DisableModule();
-                 Debug.Log("Disabling FARVesselAero on " + vessel.name + " due to no FARGeometryModules on board");
+                 Debug.Log("[FAR] Disabling FARVesselAero on " + vessel.name + " due to no FARGeometryModules on board");
              }
 
              TriggerIGeometryUpdaters();
@@ -492,7 +492,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
              if(!_updateQueued)
                 setup = true;
 
-             Debug.Log("Updating vessel voxel for " + vessel.vesselName);
+             Debug.Log("[FAR] Updating vessel voxel for " + vessel.vesselName);
          }
 
         //TODO: have this grab from a config file

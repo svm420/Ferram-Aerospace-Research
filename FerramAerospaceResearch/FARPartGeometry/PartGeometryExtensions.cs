@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -201,7 +201,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //The first index of each list is the name of the part module; the rest are the transforms
                 if(p.Modules.Contains(currentPartModuleTransforms[0]))
                 {
-                 //   Debug.Log("Part " + p.partInfo.title + " has module " + currentPartModuleTransforms[0] + ".  Getting exempt transforms");
+                    //   Debug.Log("[FAR] Part " + p.partInfo.title + " has module " + currentPartModuleTransforms[0] + ".  Getting exempt transforms");
                     PartModule module = p.Modules[currentPartModuleTransforms[0]];
 
                     for (int j = 1; j < currentPartModuleTransforms.Count; ++j)
@@ -216,7 +216,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                 }
                 //if (Transform.Count > 0)
-                //    Debug.Log("Total exempt transforms: " + Transform.Count);
+                //    Debug.Log("[FAR] Total exempt transforms: " + Transform.Count);
             }
             foreach (Transform t in p.FindModelComponents<Transform>())
             {
@@ -250,7 +250,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (field.Name.ToLowerInvariant() == "pagenerated")
                 {
                     procAsteroid = (PAsteroid)field.GetValue(asteroid);
-                    Debug.Log("procAsteroid index " + i);
+                    Debug.Log("[FAR] procAsteroid index " + i);
                     break;
                 }
             }*/
@@ -259,7 +259,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             GetChildTransforms(transformList, procAsteroid.gameObject.transform.FindChild(""));
             count = transformList.Count - count;
 
-            //Debug.Log("New transforms: " + count);
+            //Debug.Log("[FAR] New transforms: " + count);
         }
 
         private static void GetChildTransforms(List<Transform> transformList, Transform parent)

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -534,7 +534,7 @@ namespace FerramAerospaceResearch
                     // different from the one after the parts are attached.
                     RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
 
-                    Debug.Log("FAR Raycast mask: "+RaycastMaskVal+" "+RaycastMaskEdit);
+                    Debug.Log("[FAR] FAR Raycast mask: "+RaycastMaskVal+" "+RaycastMaskEdit);
                 }
 
                 return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
