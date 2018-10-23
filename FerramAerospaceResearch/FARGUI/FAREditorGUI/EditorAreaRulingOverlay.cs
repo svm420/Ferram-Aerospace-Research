@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -157,11 +157,25 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             LineRenderer renderer = o.gameObject.AddComponent<LineRenderer>();
 
+            // need to copy the material properties so the same material is not
+            // reused between renderers
+            Material rendererMaterial = new Material(material);
+            // rendererMaterial.CopyPropertiesFromMaterial(material);
+
             renderer.useWorldSpace = false;
-            renderer.material = material;
-            renderer.SetColors(color, color);
+            if (material.HasProperty("_Color"))
+            {
+                // Debug.Log("[FAR] Setting _Color on " + material + "to " + color);
+                rendererMaterial.SetColor("_Color", color);
+            }
+            else
+                Debug.LogWarning("[FAR] Material " + material + " has no _Color property");
+            renderer.material = rendererMaterial;
+            // renderer.startColor = color;
+            // renderer.endColor = color;
             renderer.enabled = false;
-            renderer.SetWidth(width, width);
+            renderer.startWidth = width;
+            renderer.endWidth = width;
             renderer.sortingOrder = 1;
 
             return renderer;
@@ -333,7 +347,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             renderer.transform.localRotation = Quaternion.identity;
             renderer.transform.SetAsFirstSibling();
 
-            renderer.SetVertexCount(xCoords.Length);
+            renderer.positionCount = xCoords.Length;
 
             for (int i = 0; i < xCoords.Length; i++)
             {
