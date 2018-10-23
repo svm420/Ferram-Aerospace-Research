@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.9.1 "Liepmann"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -59,7 +59,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private HashSet<Part> overridingParts;
 
         double _size;
-        static byte maxLocation = 255;
         Vector3d lowerCorner;
         //int iOffset, jOffset, kOffset;
         int offset;
@@ -73,13 +72,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             voxelPoints = new PartSizePair[512];
             if (usePartSize256)
             {
-                maxLocation = 255;
                 for (int i = 0; i < voxelPoints.Length; i++)
                     voxelPoints[i] = new PartSizePair8Bit();
             }
             else
             {
-                maxLocation = 15;
                 for (int i = 0; i < voxelPoints.Length; i++)
                     voxelPoints[i] = new PartSizePair4Bit();
             }
