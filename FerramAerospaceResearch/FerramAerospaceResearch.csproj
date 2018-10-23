@@ -39,15 +39,15 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Games\KSP 1.3\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>C:\Zaidimai\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="KSPAssets, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Games\KSP 1.3\KSP_x64_Data\Managed\KSPAssets.dll</HintPath>
+      <HintPath>C:\Zaidimai\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\KSPAssets.dll</HintPath>
     </Reference>
     <Reference Include="ModularFlightIntegrator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Games\KSP 1.2\GameData\ModularFlightIntegrator\ModularFlightIntegrator.dll</HintPath>
+      <HintPath>C:\Zaidimai\Steam\steamapps\common\Kerbal Space Program\GameData\ModularFlightIntegrator\ModularFlightIntegrator.dll</HintPath>
     </Reference>
     <Reference Include="Scale_Redist, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -56,11 +56,11 @@
     <Reference Include="System" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Games\KSP 1.3\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>C:\Zaidimai\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Games\KSP 1.3\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>C:\Zaidimai\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -169,9 +169,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y "$(TargetPath)*" "$(SolutionDir)/GameData\FerramAerospaceResearch\Plugins"</PostBuildEvent>
+    <PostBuildEvent>call "D:\KSP\pdb2mdb.exe" "$(TargetPath)"
+xcopy /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)\GameData\FerramAerospaceResearch\Plugins"
+rmdir /S /Q "C:\Zaidimai\Steam\steamapps\common\Kerbal Space Program\GameData\FerramAerospaceResearch"
+xcopy /y /s "$(SolutionDir)\GameData" "C:\Zaidimai\Steam\steamapps\common\Kerbal Space Program\GameData"
+</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
