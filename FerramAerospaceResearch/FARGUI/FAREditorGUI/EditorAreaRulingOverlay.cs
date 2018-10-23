@@ -99,20 +99,23 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (_rendererMaterial == null)
             {
 
-                Shader lineShader;
+                Material lineMaterial;
 
-                if (!FARAssets.shaderDict.TryGetValue("FARCrossSectionGraph", out lineShader))
+                if (!FARAssets.materialDict.TryGetValue("FARGraphMaterial", out lineMaterial))
                 {
                     //TODO: definitely replace this with a proper shader when we can
                     Debug.Log("[FAR] Could not load cross-section shader; using fallback shader");
+                    lineMaterial = new Material(Shader.Find("Sprites/Default"));
                 }
 
-                _rendererMaterial = new Material(lineShader);
+                _rendererMaterial = new Material(lineMaterial);
                 _rendererMaterial.hideFlags = HideFlags.HideAndDontSave;
                 _rendererMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
                 _rendererMaterial.renderQueue = 4500;
             }
 
+            // Debug.Log("[FAR] Creating renderers with material " + _rendererMaterial);
+            // Debug.Log("[FAR] Area color: " + _crossSectionColor + ", Deriv: " + _derivColor + ", Coeff: " + Color.cyan + ", Marking: " + _axisColor);
             _areaRenderer = CreateNewRenderer(_crossSectionColor, 0.1f, _rendererMaterial);
             _derivRenderer = CreateNewRenderer(_derivColor, 0.1f, _rendererMaterial);
             _coeffRenderer = CreateNewRenderer(Color.cyan, 0.1f, _rendererMaterial);
