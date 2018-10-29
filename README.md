@@ -1,4 +1,4 @@
-Ferram Aerospace Research v0.15.9.2 "Lighthill"
+Ferram Aerospace Research v0.15.9.5 "Lighthill"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,7 +64,7 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
-0.15.9.2V "Lighthill"------------------------------------
+0.15.9.5V "Lighthill"------------------------------------
 
 Update for KSP 1.5.1  
 Update to MM 3.1.0 for KSP 1.5.1  
