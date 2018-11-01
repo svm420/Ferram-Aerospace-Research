@@ -1,5 +1,5 @@
 /*
-Ferram Aerospace Research v0.15.9.1 "Liepmann"
+Ferram Aerospace Research v0.15.9.5 "Lighthill"
 =========================
 Aerodynamics model for Kerbal Space Program
 

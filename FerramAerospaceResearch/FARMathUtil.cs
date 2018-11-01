@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.9.1 "Liepmann"
+Ferram Aerospace Research v0.15.9.5 "Lighthill"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -20,25 +20,25 @@ Copyright 2017, Michael Ferrara, aka Ferram4
    You should have received a copy of the GNU General Public License
    along with Ferram Aerospace Research.  If not, see <http://www.gnu.org/licenses/>.
 
-   Serious thanks:		a.g., for tons of bugfixes and code-refactorings   
+   Serious thanks:		a.g., for tons of bugfixes and code-refactorings
 				stupid_chris, for the RealChuteLite implementation
-            			Taverius, for correcting a ton of incorrect values  
+            			Taverius, for correcting a ton of incorrect values
 				Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts
-            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
-            			ialdabaoth (who is awesome), who originally created Module Manager  
-                        	Regex, for adding RPM support  
-				DaMichel, for some ferramGraph updates and some control surface-related features  
-            			Duxwing, for copy editing the readme  
-   
+            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates
+            			ialdabaoth (who is awesome), who originally created Module Manager
+                        	Regex, for adding RPM support
+				DaMichel, for some ferramGraph updates and some control surface-related features
+            			Duxwing, for copy editing the readme
+
    CompatibilityChecker by Majiir, BSD 2-clause http://opensource.org/licenses/BSD-2-Clause
 
-   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission  
+   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/55219
 
    ModularFLightIntegrator by Sarbian, Starwaster and Ferram4, MIT: http://opensource.org/licenses/MIT
 	http://forum.kerbalspaceprogram.com/threads/118088
 
-   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission  
+   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
@@ -60,7 +60,7 @@ namespace FerramAerospaceResearch
             y += y1;
             return y;
         }
-        
+
         public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
         {
             if (val.CompareTo(min) < 0) return min;
@@ -81,7 +81,7 @@ namespace FerramAerospaceResearch
                 return true;
             return false;
         }
-        
+
         public static double ArithmeticGeometricMean(double a, double b, double error)
         {
             while (!Approximately(a, b, error))
@@ -101,7 +101,7 @@ namespace FerramAerospaceResearch
                 double tmpA = 0.5 * (a + b);
                 double tmpSqrt = Math.Sqrt((a - c) * (b - c));
                 b = c + tmpSqrt;
-                c = c - tmpSqrt; 
+                c = c - tmpSqrt;
                 a = tmpA;
             }
             return (a + b) * 0.5;
@@ -146,7 +146,7 @@ namespace FerramAerospaceResearch
 
             double c = a, d = a, fc = function(c);
 
-            double s = b, fs = fb; 
+            double s = b, fs = fb;
 
             bool flag = true;
             int iter = 0;
