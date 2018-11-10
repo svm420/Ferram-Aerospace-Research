@@ -121,6 +121,7 @@
     <Compile Include="FARGUI\FAREditorGUI\Simulation\InstantConditionSimOutput.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivApproxSim.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivOutput.cs" />
+    <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivExportOutput.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivCalculator.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\SweepSim.cs" />
     <Compile Include="FARGUI\FAREditorGUI\EditorAreaRulingOverlay.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="FARGUI\FARFlightGUI\FlightGUI.cs" />
     <Compile Include="FARGUI\GUIDropDown.cs" />
     <Compile Include="FARGUI\GUIUtils.cs" />
+    <Compile Include="FARGUI\FAREditorGUI\StabilityDerivExport.cs" />
     <Compile Include="FARGUI\FAREditorGUI\StabilityDerivGUI.cs" />
     <Compile Include="FARPartGeometry\DebugVisualVoxel.cs" />
     <Compile Include="FARPartGeometry\GeometryMesh.cs" />

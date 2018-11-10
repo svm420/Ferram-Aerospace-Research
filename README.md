@@ -64,6 +64,10 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.15.9.6 "" -----------------------------------
+
+Merged in Rodhern's update 3
+
 0.15.9.5V "Lighthill"------------------------------------
 
 Update for KSP 1.5.1  
@@ -148,7 +152,7 @@ Update license
 Fix an issue where voxels could be incredibly asymmetric on symmetric crafts  
 
 
-0.15.7V "Kï¿½chemann"------------------------------------  
+0.15.7V "Küchemann"------------------------------------  
 
 Update to ModuleManager 2.6.25  
 Update for KSP 1.1.3 compatibility  
@@ -193,7 +197,7 @@ Fix RealChute / RealChuteLite interaction breaking stock chute behavior, thanks 
 Fix mass-calc error for wing-mass-strength that resulted in all planes gaining unhealthy amounts of weight  
 Attempt to make debug-compatibility actually work, thanks to NathanKell  
 
-0.15.6.1V "von Kï¿½rmï¿½n"------------------------------------
+0.15.6.1V "von Kármán"------------------------------------
 
 Fix a critical CPU usage bug that resulted in voxelization threads SpinWaiting forever, monopolizing the processor  
 Fix parachutes without RealChute configs not applying forces when FAR + RC are installed, thanks to stupid_chris  
