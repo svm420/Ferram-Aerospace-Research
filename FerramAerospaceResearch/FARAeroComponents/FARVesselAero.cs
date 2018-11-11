@@ -337,18 +337,21 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             float pseudoKnudsenNumber = machNumber / (reynoldsNumber + machNumber);
 
-            for (int i = 0; i < _currentAeroSections.Count; i++)
+            if (_currentAeroSections != null)
             {
-                FARAeroSection curSection = _currentAeroSections[i];
-                if(curSection != null)
-                    curSection.PredictionCalculateAeroForces(density, machNumber, reynoldsPerLength, pseudoKnudsenNumber, skinFriction, velocityWorldVector, center);
-            }
+                for (int i = 0; i < _currentAeroSections.Count; i++)
+                {
+                    FARAeroSection curSection = _currentAeroSections[i];
+                    if(curSection != null)
+                        curSection.PredictionCalculateAeroForces(density, machNumber, reynoldsPerLength, pseudoKnudsenNumber, skinFriction, velocityWorldVector, center);
+                }
 
-            for (int i = 0; i < _legacyWingModels.Count; i++)
-            {
-                FARWingAerodynamicModel curWing = _legacyWingModels[i];
-                if ((object)curWing != null)
-                    curWing.PrecomputeCenterOfLift(velocityWorldVector, machNumber, density, center);
+                for (int i = 0; i < _legacyWingModels.Count; i++)
+                {
+                    FARWingAerodynamicModel curWing = _legacyWingModels[i];
+                    if ((object)curWing != null)
+                        curWing.PrecomputeCenterOfLift(velocityWorldVector, machNumber, density, center);
+                }
             }
 
             aeroForce = center.force;
