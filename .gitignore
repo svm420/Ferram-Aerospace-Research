@@ -13,3 +13,7 @@ obj
 *.pdb
 out
 releasing
+
+.mypy*
+*.json
+*.pyc
