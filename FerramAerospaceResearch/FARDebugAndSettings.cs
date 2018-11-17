@@ -49,6 +49,7 @@ using UnityEngine;
 using KSP;
 using KSP.UI.Screens;
 using FerramAerospaceResearch.FARGUI;
+using FerramAerospaceResearch.FARUtils;
 using ferram4;
 
 namespace FerramAerospaceResearch
@@ -136,7 +137,7 @@ namespace FerramAerospaceResearch
 
         void OnSceneChange(GameEvents.FromToAction<GameScenes,GameScenes> fromToScenes)
         {
-            Debug.Log("[FAR] check scene");
+            FARLogger.Info("check scene");
             if(fromToScenes.to == GameScenes.SPACECENTER)
             {
                 if (FARDebugValues.useBlizzyToolbar)
@@ -173,7 +174,7 @@ namespace FerramAerospaceResearch
 
         void OnGUIAppLauncherReady()
         {
-            Debug.Log("[FAR] Adding Debug Button");
+            FARLogger.Info("Adding Debug Button");
             FARDebugButtonStock = ApplicationLauncher.Instance.AddModApplication(
                 ToggleGUI,
                 ToggleGUI,

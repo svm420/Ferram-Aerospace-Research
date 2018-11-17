@@ -47,6 +47,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
@@ -66,7 +67,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 }
                 catch (NullReferenceException)
                 {
-                    Debug.Log("[FAR] NullReferenceException in StockJettisonTransformGeoUpdater(" + engineFairing + ", " + geoModule + "), setting fairing visibility to false");
+                    FARLogger.Info("NullReferenceException in StockJettisonTransformGeoUpdater(" + engineFairing + ", " + geoModule + "), setting fairing visibility to false");
                     fairingVisible = false;
                 }
         }
