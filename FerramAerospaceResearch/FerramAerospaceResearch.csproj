@@ -157,6 +157,7 @@
     <Compile Include="RealChuteLite\PhysicsWatch.cs" />
     <Compile Include="RealChuteLite\RealChuteFAR.cs" />
     <Compile Include="ToolbarWrapper.cs" />
+    <Compile Include="FARUtils/FARLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
