@@ -54,7 +54,7 @@ namespace FerramAerospaceResearch.FARUtils
     public static class FARLogger
     {
 
-        public const string defaultTag = "[FAR]";
+        public static string defaultTag = $"[FAR {FARVersion.String}]";
 
         private static string _tag = defaultTag;
 
