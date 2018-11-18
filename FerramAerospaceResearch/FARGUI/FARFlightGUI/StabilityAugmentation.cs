@@ -394,7 +394,19 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     break;
                 }
 
-            if (this._vessel == FlightGlobals.ActiveVessel)
+            Vessel active_vessel = null;
+
+            try
+            {
+                active_vessel = FlightGlobals.ActiveVessel;
+            }
+            catch (NullReferenceException)
+            {
+                FARLogger.Error("Could not save Stability Augmentation Settings because 'FlightGlobals.ActiveVessel' is null.");
+                return;
+            }
+
+            if (this._vessel == active_vessel)
             {
                 systemTemplates = systemInstances;
 
