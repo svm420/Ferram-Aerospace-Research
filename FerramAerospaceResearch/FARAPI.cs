@@ -46,6 +46,7 @@ using System;
 using UnityEngine;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARAeroComponents;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch
 {
@@ -62,6 +63,17 @@ namespace FerramAerospaceResearch
             }
         }
 
+        private static FARVersion version;
+
+        public static FARVersion Version
+        {
+            get
+            {
+                if (version == null)
+                    version = new FARVersion();
+                return version;
+            }
+        }
 
 
         #region CurrentFlightInfo
