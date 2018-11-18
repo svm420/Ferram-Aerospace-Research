@@ -75,12 +75,12 @@ namespace ferram4
                     if (double.IsNaN(xValues[i]))
                     {
                         xValues[i] = 0;
-                        MonoBehaviour.print("Warning: NaN in xValues array; value set to zero");
+                        MonoBehaviour.print("[FAR] [ferramGraph] Warning: NaN in xValues array; value set to zero");
                     }
                     if (double.IsNaN(yValues[i]))
                     {
                         yValues[i] = 0;
-                        MonoBehaviour.print("Warning: NaN in yValues array; value set to zero");
+                        MonoBehaviour.print("[FAR] [ferramGraph] Warning: NaN in yValues array; value set to zero");
                     }
                 }
 //                MonoBehaviour.print("Raw Data Arrays Initialized...");
@@ -358,12 +358,12 @@ namespace ferram4
             if (pixelWidth <= 1)
             {
                 pixelWidth = 5;
-                Debug.Log("[FAR] Warning! Grid width scale too fine for scaling; picking safe alternative");
+                Debug.Log("[FAR] [ferramGraph] Warning! Grid width scale too fine for scaling; picking safe alternative");
             }
             if (pixelHeight <= 1)
             {
                 pixelHeight = 5;
-                Debug.Log("[FAR] Warning! Grid height scale too fine for scaling; picking safe alternative");
+                Debug.Log("[FAR] [ferramGraph] Warning! Grid height scale too fine for scaling; picking safe alternative");
             }
 
             SetGridScaleUsingPixels(pixelWidth, pixelHeight);
@@ -375,7 +375,7 @@ namespace ferram4
         {
             if (!allLines.ContainsKey(lineName))
             {
-                MonoBehaviour.print("[FAR] Error: No line with that name exists");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: No line with that name exists");
                 return;
             }
             ferramGraphLine line;
@@ -390,7 +390,7 @@ namespace ferram4
         {
             if (!allLines.ContainsKey(lineName))
             {
-                MonoBehaviour.print("Error: No line with that name exists");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: No line with that name exists");
                 return;
             }
             ferramGraphLine line;
@@ -443,7 +443,7 @@ namespace ferram4
         {
             if (allLines.ContainsKey(lineName))
             {
-                MonoBehaviour.print("Error: A Line with that name already exists");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: A Line with that name already exists");
                 return;
             }
             ferramGraphLine newLine = new ferramGraphLine((int)displayRect.width, (int)displayRect.height);
@@ -480,12 +480,12 @@ namespace ferram4
         {
             if (allLines.ContainsKey(lineName))
             {
-                MonoBehaviour.print("Error: A Line with that name already exists");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: A Line with that name already exists");
                 return;
             }
             if (xValues.Length != yValues.Length)
             {
-                MonoBehaviour.print("Error: X and Y value arrays are different lengths");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: X and Y value arrays are different lengths");
                 return;
             }
 
@@ -505,7 +505,7 @@ namespace ferram4
         {
             if (!allLines.ContainsKey(lineName))
             {
-                MonoBehaviour.print("Error: No line with that name exists");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: No line with that name exists");
                 return;
             }
 
@@ -535,7 +535,7 @@ namespace ferram4
         {
             if (xValues.Length != yValues.Length)
             {
-                MonoBehaviour.print("Error: X and Y value arrays are different lengths");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: X and Y value arrays are different lengths");
                 return;
             }
 
@@ -551,7 +551,7 @@ namespace ferram4
                 Update();
             }
             else
-                MonoBehaviour.print("Error: No line with this name exists");
+                MonoBehaviour.print("[FAR] [ferramGraph] Error: No line with this name exists");
 
         }
 
