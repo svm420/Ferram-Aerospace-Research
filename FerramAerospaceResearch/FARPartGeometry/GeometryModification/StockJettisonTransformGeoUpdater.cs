@@ -61,25 +61,15 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         {
                 this.engineFairing = engineFairing;
                 this.geoModule = geoModule;
-                try
-                {
+                if (ObjectsNotNull())
                     fairingVisible = engineFairing.jettisonTransform.gameObject.activeSelf && !engineFairing.isJettisoned;
-                }
-                catch (NullReferenceException)
-                {
-                    FARLogger.Info("NRE in StockJettisonTransformGeoUpdater with " + engineFairing + ", setting fairing visibility to false");
+                else
                     fairingVisible = false;
-                }
         }
 
         public void EditorGeometryUpdate()
         {
-            Transform t = engineFairing.jettisonTransform;
-            if(t == null)
-                return;
-
-            GameObject o = t.gameObject;
-            if(o != null)
+            if (ObjectsNotNull())
                 if (fairingVisible != engineFairing.jettisonTransform.gameObject.activeSelf)
                 {
                     geoModule.RebuildAllMeshData();
@@ -89,17 +79,25 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void FlightGeometryUpdate()
         {
-            Transform t = engineFairing.jettisonTransform;
-            if (t == null)
-                return;
-
-            GameObject o = t.gameObject;
-            if (o != null)
+            if (ObjectsNotNull())
                 if (fairingVisible != engineFairing.jettisonTransform.gameObject.activeSelf || fairingVisible != !engineFairing.isJettisoned)
                 {
                     geoModule.RebuildAllMeshData();
                     fairingVisible = !fairingVisible;
                 }
+        }
+
+        private bool ObjectsNotNull()
+        {
+            Transform t = engineFairing.jettisonTransform;
+            if (t == null)
+                return false;
+
+            GameObject o = t.gameObject;
+            if (o == null)
+                return false;
+
+            return true;
         }
 
     }
