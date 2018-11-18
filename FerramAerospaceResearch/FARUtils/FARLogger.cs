@@ -53,18 +53,50 @@ namespace FerramAerospaceResearch.FARUtils
     public static class FARLogger
     {
 
-        private static string tag = "[FAR]";
+        public const string defaultTag = "[FAR]";
+
+        private static string _tag = defaultTag;
 
         public static string Tag
         {
             get
             {
-                return tag;
+                return _tag;
             }
             set
             {
-                tag = "[" + value + "]";
+                SetTag(value);
             }
+        }
+
+        public static string GetTag()
+        {
+            return _tag;
+        }
+
+        public static string GetTag(string tag)
+        {
+            return "[" + tag + "]";
+        }
+
+        public static string GetTag(string[] tags)
+        {
+            return GetTag(String.Join("] [", tags));
+        }
+
+        public static void SetTag()
+        {
+            _tag = defaultTag;
+        }
+
+        public static void SetTag(string tag)
+        {
+            _tag = GetTag(tag);
+        }
+
+        public static void SetTag(string[] tags)
+        {
+            _tag = GetTag(tags);
         }
 
         #region Info
