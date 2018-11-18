@@ -67,7 +67,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 }
                 catch (NullReferenceException)
                 {
-                    FARLogger.Info("NullReferenceException in StockJettisonTransformGeoUpdater(" + engineFairing + ", " + geoModule + "), setting fairing visibility to false");
+                    FARLogger.Info("NRE in StockJettisonTransformGeoUpdater with " + engineFairing + ", setting fairing visibility to false");
                     fairingVisible = false;
                 }
         }
