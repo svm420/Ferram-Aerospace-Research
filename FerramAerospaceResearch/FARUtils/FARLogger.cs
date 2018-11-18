@@ -40,9 +40,10 @@ Copyright 2018, Daumantas Kavolis, aka dkavolis
     http: //forum.kerbalspaceprogram.com/threads/60863
  */
 
-#if !DEBUG && !INFO && !WARNING && !ERROR
-    #define INFO
-#endif
+// defining symbols here doesn't work, see https://forum.unity.com/threads/conditionalattribute-not-working.469720/
+// #if !DEBUG && !INFO && !WARNING && !ERROR
+// #define INFO
+// #endif
 
 using System;
 using System.Diagnostics;
@@ -100,36 +101,28 @@ namespace FerramAerospaceResearch.FARUtils
         }
 
         #region Info
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void Info(object message) => UnityEngine.Debug.Log(Tag + " " + message);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void Info(object message, UnityEngine.Object context) => UnityEngine.Debug.Log(Tag + " " + message, context);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void InfoFormat(string format, params object[] args) => UnityEngine.Debug.LogFormat(Tag + " " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void InfoFormat(UnityEngine.Object context, string format, params object[] args) => UnityEngine.Debug.LogFormat(context, Tag + " " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void InfoWithCaller(object message) => UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void InfoWithCaller(object message, UnityEngine.Object context) => UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message, context);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void InfoFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
+        [Conditional("DEBUG"), Conditional("INFO")]
         public static void InfoFormatWithCaller(UnityEngine.Object context, string format, params object[] args) => UnityEngine.Debug.LogFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
         #endregion // Info
 
@@ -160,94 +153,54 @@ namespace FerramAerospaceResearch.FARUtils
         #endregion // Debug
 
         #region Warning
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void Warning(object message) => UnityEngine.Debug.LogWarning(Tag + " " + message);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void Warning(object message, UnityEngine.Object context) => UnityEngine.Debug.LogWarning(Tag + " " + message, context);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void WarningFormat(string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(Tag + " " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void WarningFormat(UnityEngine.Object context, string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(context, Tag + " " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void WarningWithCaller(object message) => UnityEngine.Debug.LogWarning(Tag + " " + GetCallerInfo() + " - " + message);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void WarningWithCaller(object message, UnityEngine.Object context) => UnityEngine.Debug.LogWarning(Tag + " " + GetCallerInfo() + " - " + message, context);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void WarningFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void WarningFormatWithCaller(UnityEngine.Object context, string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
         #endregion // Warning
 
         #region Error
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void Error(object message) => UnityEngine.Debug.LogError(Tag + " " + message);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void Error(object message, UnityEngine.Object context) => UnityEngine.Debug.LogError(Tag + " " + message, context);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void ErrorFormat(string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(Tag + " " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void ErrorFormat(UnityEngine.Object context, string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(context, Tag + " " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void ErrorWithCaller(object message) => UnityEngine.Debug.LogError(Tag + " " + GetCallerInfo() + " - " + message);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void ErrorWithCaller(object message, UnityEngine.Object context) => UnityEngine.Debug.LogError(Tag + " " + GetCallerInfo() + " - " + message, context);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void ErrorFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
 
-        [Conditional("DEBUG")]
-        [Conditional("INFO")]
-        [Conditional("WARNING")]
-        [Conditional("ERROR")]
+        [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void ErrorFormatWithCaller(UnityEngine.Object context, string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
         #endregion // Error
 
