@@ -330,7 +330,7 @@ namespace FerramAerospaceResearch
             aeroForce = aeroTorque = Vector3.zero;
             if (vessel == null)
             {
-                Debug.LogError("[FAR] FAR API Error: attempted to simulate aerodynamics of null vessel");
+                FARLogger.Error("API Error: attempted to simulate aerodynamics of null vessel");
                 return;
             }
 
@@ -338,7 +338,7 @@ namespace FerramAerospaceResearch
 
             if (vesselAero == null)
             {
-                Debug.LogError("[FAR] FAR API Error: vessel does not have FARVesselAero aerocomponent for simulation");
+                FARLogger.Error("API Error: vessel does not have FARVesselAero aerocomponent for simulation");
                 return;
             }
 

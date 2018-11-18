@@ -47,6 +47,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using KSP.Localization;
 using ferram4;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
@@ -383,7 +384,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
             if (flightGUISettings == null)
             {
-                Debug.LogError("[FAR] Could not save Stability Augmentation Settings because settings config list was null");
+                FARLogger.Error("Could not save Stability Augmentation Settings because settings config list was null");
             }
             ConfigNode node = null;
             for (int i = 0; i < flightGUISettings.Count; i++)

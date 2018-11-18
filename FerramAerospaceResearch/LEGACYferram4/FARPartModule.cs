@@ -47,6 +47,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FerramAerospaceResearch.PartExtensions;
 using FerramAerospaceResearch;
+using FerramAerospaceResearch.FARUtils;
 
 namespace ferram4
 {
@@ -107,7 +108,7 @@ namespace ferram4
                 }
                 catch (NullReferenceException)
                 {
-                    Debug.Log("[FAR] NullReferenceException trying to get part colliders from " + part + ", defaulting to no colliders");
+                    FARLogger.Info("NullReferenceException trying to get part colliders from " + part + ", defaulting to no colliders");
                     this.partColliders = new Collider[0];
                 }
             }

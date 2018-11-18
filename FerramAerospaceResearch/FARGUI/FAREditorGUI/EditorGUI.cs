@@ -51,6 +51,7 @@ using KSP.UI.Screens;
 using KSP.Localization;
 using ModuleWheels;
 using PreFlightTests;
+using FerramAerospaceResearch.FARUtils;
 using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
@@ -341,7 +342,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     prevPartCount = EditorLogic.SortedShipList.Count;
 
                     voxelWatch.Stop();
-                    UnityEngine.Debug.Log("[FAR] Voxelization Time (ms): " + voxelWatch.ElapsedMilliseconds);
+                    FARLogger.Info("Voxelization Time (ms): " + voxelWatch.ElapsedMilliseconds);
 
                     voxelWatch.Reset();
 
@@ -357,7 +358,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 else if (_updateQueued)
                 {
                     var shipname = EditorLogic.fetch.ship.shipName ?? "unknown ship";
-                    Debug.Log("[FAR] Updating " + shipname);
+                    FARLogger.Info("Updating " + shipname);
                     RecalculateVoxel();
                 }
             }
@@ -408,7 +409,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                         {
                             _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
                             _updateQueued = true;
-                            //Debug.Log("[FAR] We're not ready!");
+                            //FARLogger.Info("We're not ready!");
                             return;
                         }
                     }
@@ -695,7 +696,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     }
                     catch(Exception e)
                     {
-                        Debug.LogException(e);      //we just catch and print this ourselves to allow things to continue working, since there seems to be a bug in KSPWheels as of this writing
+                        FARLogger.Exception(e);      //we just catch and print this ourselves to allow things to continue working, since there seems to be a bug in KSPWheels as of this writing
                     }
                 }
             }

@@ -45,6 +45,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
@@ -107,7 +108,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
         {
             if (i + 1 > soln.GetLength(0))
             {
-                MonoBehaviour.print("Error; Index out of bounds");
+                FARLogger.Info("Error; Index out of bounds");
                 return new double[time.Length];
             }
 

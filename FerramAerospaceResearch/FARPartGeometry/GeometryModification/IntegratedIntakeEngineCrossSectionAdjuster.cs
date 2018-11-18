@@ -45,6 +45,7 @@ Copyright 2017, Michael Ferrara, aka Ferram4
 using System;
 using System.Reflection;
 using UnityEngine;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
@@ -140,7 +141,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
             intakeArea = INTAKE_AREA_SCALAR * intake.area;
 
-            Debug.Log("[FAR] Integrated cross-section adjuster");
+            FARLogger.Info("Integrated cross-section adjuster");
         }
 
         public double AreaRemovedFromCrossSection(Vector3 vehicleAxis)

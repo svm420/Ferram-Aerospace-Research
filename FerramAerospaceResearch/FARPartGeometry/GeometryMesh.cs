@@ -48,6 +48,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using FerramAerospaceResearch.FARThreading;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
@@ -164,7 +165,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                Debug.LogException(e);
+                FARLogger.Exception(e);
             }
             finally
             {

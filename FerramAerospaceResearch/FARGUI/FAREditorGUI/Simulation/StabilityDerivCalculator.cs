@@ -46,6 +46,7 @@ using System;
 using System.Collections.Generic;
 using ferram4;
 using UnityEngine;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
@@ -226,7 +227,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             if (Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
                 stabDerivOutput.stableAoAState = ((nominalOutput.Cl > neededCl) ? "<" : ">");
 
-            Debug.Log("[FAR] Cl needed: " + neededCl + ", AoA: " + alpha + ", Cl: " + nominalOutput.Cl + ", Cd: " + nominalOutput.Cd);
+            FARLogger.Info("Cl needed: " + neededCl + ", AoA: " + alpha + ", Cl: " + nominalOutput.Cl + ", Cd: " + nominalOutput.Cd);
 
             pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / (2 * FARMathUtil.deg2rad);                   //vert vel derivs
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / (2 * FARMathUtil.deg2rad);

@@ -121,7 +121,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (pingPongAoAFactor >= 2)
                 pingPongAoAFactor = 0;
 
-            //Debug.Log("[FAR] " + velArrow.Direction);
+            //FARLogger.Info("" + velArrow.Direction);
         }
 
         void SetAngleVectors(double lowerAoA, double upperAoA)

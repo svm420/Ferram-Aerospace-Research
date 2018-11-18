@@ -48,6 +48,7 @@ using System.Reflection;
 using UnityEngine;
 using KSP;
 using ProceduralFairings;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
@@ -72,7 +73,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         {
             if (!hasLoaded)
             {
-                Debug.Log("[FAR] Asteroid Geometry Update");
+                FARLogger.Info("Asteroid Geometry Update");
                 hasLoaded = true;
                 geoModule.GeometryPartModuleRebuildMeshData();
 

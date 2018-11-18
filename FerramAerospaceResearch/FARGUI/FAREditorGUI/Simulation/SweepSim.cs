@@ -141,7 +141,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
                 _instantCondition.GetClCdCmSteady(input, out output, i == 0);
 
-                //                MonoBehaviour.print("Cl: " + Cl + " Cd: " + Cd);
+                //                FARLogger.Info("Cl: " + Cl + " Cd: " + Cd);
                 if (i < numPoints)
                 {
                     AlphaValues[i] = angle;
