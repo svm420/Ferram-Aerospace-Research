@@ -39,8 +39,8 @@ namespace ferram4
             public bool displayInLegend;
             private double[] rawDataX = new double[1];
             private double[] rawDataY = new double[1];
-            private int[] pixelDataX = new int[1];
-            private int[] pixelDataY = new int[1];
+            private double[] pixelDataX = new double[1];
+            private double[] pixelDataY = new double[1];
             private Vector4d bounds;
             public int lineThickness;
             public Color lineColor = new Color();
@@ -79,8 +79,8 @@ namespace ferram4
             {
                 double xScaling = lineDisplay.width / (bounds.y - bounds.x);
                 double yScaling = lineDisplay.height / (bounds.w - bounds.z);
-                pixelDataX = rawDataX.toPixels(bounds.x, horizontalScaling, xScaling);
-                pixelDataY = rawDataY.toPixels(bounds.z, verticalScaling, yScaling);
+                pixelDataX = rawDataX.toPixelsF(bounds.x, horizontalScaling, xScaling);
+                pixelDataY = rawDataY.toPixelsF(bounds.z, verticalScaling, yScaling);
                 if(update)
                     Update();
             }
@@ -104,7 +104,7 @@ namespace ferram4
 
                 for(int k = 1; k < pixelDataX.Length; k++)
                 {
-                    lineDisplay.DrawLine(pixelDataX[prev], pixelDataY[prev], pixelDataX[k], pixelDataY[k], lineColor, lineThickness);
+                    lineDisplay.DrawLineAAF(pixelDataX[prev], pixelDataY[prev], pixelDataX[k], pixelDataY[k], lineColor, lineThickness);
                     prev = k;
                 }
                 lineDisplay.Apply();
