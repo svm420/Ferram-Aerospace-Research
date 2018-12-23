@@ -1,5 +1,5 @@
 /*
-Ferram Aerospace Research v0.15.9.5 "Lighthill"
+Ferram Aerospace Research v0.15.9.6 "Lin"
 =========================
 Copyright 2018, Daumantas Kavolis, aka dkavolis
 
@@ -48,8 +48,8 @@ namespace FerramAerospaceResearch.FARUtils
         public const byte Major = 0;
         public const byte Minor = 15;
         public const byte Build = 9;
-        public const byte Revision = 5;
-        public const string Name = "Lighthill";
+        public const byte Revision = 6;
+        public const string Name = "Lin";
 
         public readonly static string String = $"v{Major}.{Minor}.{Build}.{Revision}";
         public readonly static string VersionString = $"{String} '{Name}'";
