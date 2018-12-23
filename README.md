@@ -71,6 +71,7 @@ Update to MM 3.1.2
 Update to MFI 1.2.6  
 
 Mainly a release for RO  
+Trying out enabling FAR for KSP 1.4-1.6  
 
 Much nicer looking anti-aliased line plots  
 Fix NRE when Trajectories tried to access simulation before the vessel was initialized  
