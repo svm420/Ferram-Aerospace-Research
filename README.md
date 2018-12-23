@@ -64,6 +64,20 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.15.9.6V "Lin"------------------------------------
+
+Update for KSP 1.6  
+Update to MM 3.1.2  
+Update to MFI 1.2.6  
+
+Mainly a release for RO  
+
+Much nicer looking anti-aliased line plots  
+Fix NRE when Trajectories tried to access simulation before the vessel was initialized  
+Changed icon to "FARc" to avoid confusion with the original FAR  
+Fix MM pass in a config that is only used on first start of FAR
+Fix NRE when trying to save stability augmentation settings on closing KSP  
+
 0.15.9.5V "Lighthill"------------------------------------
 
 Update for KSP 1.5.1  
