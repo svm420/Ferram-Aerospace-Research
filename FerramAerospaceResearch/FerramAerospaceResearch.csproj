@@ -173,8 +173,8 @@
   <PropertyGroup>
     <PostBuildEvent>call "$(SolutionDir)..\KSP Assemblies\pdb2mdb.exe" "$(TargetPath)"
 xcopy /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)GameData\FerramAerospaceResearch\Plugins"
-rmdir /S /Q "C:\Zaidimai\KSP 1.4.5\GameData\FerramAerospaceResearch"
-xcopy /y /s "$(SolutionDir)GameData" "C:\Zaidimai\KSP 1.4.5\GameData"
+rmdir /S /Q "C:\Zaidimai\KSP 1.6.0\GameData\FerramAerospaceResearch"
+xcopy /y /s "$(SolutionDir)GameData" "C:\Zaidimai\KSP 1.6.0\GameData"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
