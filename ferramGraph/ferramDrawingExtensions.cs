@@ -1,6 +1,6 @@
 /* Name:    FerramGraph (Graph GUI Plugin)
  * Version: 1.3   (KSP 0.22+)
-Copyright 2018, Michael Ferrara, aka Ferram4, and Daumantas Kavolis, aka dkavolis
+Copyright 2018, Daumantas Kavolis, aka dkavolis
 
     This file is part of FerramGraph.
 
@@ -59,7 +59,7 @@ namespace ferram4
                 tmp -= zeroValue;
                 tmp *= scaling;
 
-                pixels[i] = (int)Math.Round(tmp);
+                pixels[i] = (int) Math.Round(tmp);
             }
 
             return pixels;
@@ -95,57 +95,6 @@ namespace ferram4
         }
 
         /// <summary>
-        /// Ferram's implementation of line drawing
-        /// </summary>
-        public static void DrawLine(this Texture2D tex, int x0, int y0, int x1, int y1, Color color, int lw = 1)
-        {
-            if (x0 > x1)
-            {
-                Swap(ref x0, ref x1);
-                Swap(ref y0, ref y1);
-            }
-
-            int tmpLw = lw - 1;
-            double slope = (double)(y1 - y0) / (double)(x1 - x0);
-            int linear;
-            int k;
-
-            if (slope <= 1)
-            {
-                if (x1 == x0)
-                    return;
-
-                for (int i = x0; i < x1; i++)
-                {
-                    linear = (int)Math.Round(slope * (i - x0) + y0);
-                    for (int j = -tmpLw; j < tmpLw + 1; j++)
-                    {
-                        k = j + linear;
-                        if (tex.inBounds(i, k))
-                            tex.SetPixel(i, k, color);
-                    }
-                }
-            }
-            else
-            {
-                if (y1 == y0)
-                    return;
-
-                slope = 1 / slope;
-                for (int j = y0; j < y1; j++)
-                {
-                    linear = (int)Math.Round(slope * (j - y0) + x0);
-                    for (int i = -tmpLw; i < tmpLw + 1; i++)
-                    {
-                        k = i + linear;
-                        if (tex.inBounds(k, j))
-                            tex.SetPixel(k, j, color);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Bresenham line drawing algorithm (quick)
         /// </summary>
         public static void DrawLineBresenham(this Texture2D tex, int x0, int y0, int x1, int y1, Color color)
@@ -178,113 +127,19 @@ namespace ferram4
             for (int x = x0; x < x1; x++)
             {
                 if (steep)
+                {
                     if (tex.inBounds(y, x)) tex.SetPixel(y, x, color);
+                }
                 else
-                    if (tex.inBounds(x, y))  tex.SetPixel(x, y, color);
+                {
+                    if (tex.inBounds(x, y)) tex.SetPixel(x, y, color);
+                }
 
                 error = error - dy;
                 if (error < 0)
                 {
                     y = y + ystep;
                     error = error + dx;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Xiaolin Wu's line drawing algorithm with int endpoints and modified for arbitrary line width <paramref name="wd" />.
-        /// </summary>
-        public static void DrawLineAA(this Texture2D tex, int x0, int y0, int x1, int y1, Color color, float wd)
-        {
-            int dx = x1 - x0;
-            int dy = y1 - y0;
-            bool steep = Math.Abs(dx) < Math.Abs(dy);
-
-            if (steep)
-            {
-                Swap(ref x1, ref y1);
-                Swap(ref x0, ref y0);
-                Swap(ref dx, ref dy);
-            }
-            if (x1 < x0)
-            {
-                Swap(ref x0, ref x1);
-                Swap(ref y0, ref y1);
-            }
-
-            double grad = (double)dy / (double)dx;
-            double intery = y0 + rfpart(x0) * grad;
-
-            // starting point
-            int xend = round(x0);
-            double yend = y0 + grad * (xend - x0) + 0.5 - 0.5 * wd;
-            double xgap = rfpart(x0);
-            int px = xend, py = (int)yend;
-            double high = yend + wd;
-            if (steep)
-            {
-                tex.SetPixelAA(py, px, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
-                    tex.SetPixelAA(y, px, color, xgap);
-                tex.SetPixelAA((int)high, px, color, fpart(high) * xgap);
-            }
-            else
-            {
-                tex.SetPixelAA(px, py, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
-                    tex.SetPixelAA(px, y, color, xgap);
-                tex.SetPixelAA(px, (int)high, color, fpart(high) * xgap);
-            }
-            int xstart = px + 1;
-
-            // end point
-            xend = round(x1);
-            yend = y1 + grad * (xend - x1) + 0.5 - 0.5 * wd;
-            xgap = rfpart(x1);
-            px = xend;
-            py = (int)yend;
-            high = yend + wd;
-            if (steep)
-            {
-                tex.SetPixelAA(py, px, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
-                    tex.SetPixelAA(y, px, color, xgap);
-                tex.SetPixelAA((int)high, px, color, fpart(high) * xgap);
-            }
-            else
-            {
-                tex.SetPixelAA(px, py, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
-                    tex.SetPixelAA(px, y, color, xgap);
-                tex.SetPixelAA(px, (int)high, color, fpart(high) * xgap);
-            }
-
-            // interior
-            intery += 0.5 - 0.5 * wd;
-            if (steep)
-            {
-                for (int x = xstart; x < xend; x++)
-                {
-                    // support for linewidth
-                    double yhigh = intery + wd;
-                    tex.SetPixelAA((int)intery, x, color, rfpart(intery));
-                    tex.SetPixelAA((int)yhigh, x, color, fpart(yhigh));
-                    for (int y = (int)intery + 1; y < (int)yhigh; y++)
-                        tex.SetPixelAA(y, x, color, 1.0);
-                    intery += grad;
-                }
-            }
-            else
-            {
-                for (int x = xstart; x < xend; x++)
-                {
-                    // support for linewidth
-                    double yhigh = intery + wd;
-                    tex.SetPixelAA(x, (int)intery, color, rfpart(intery));
-                    tex.SetPixelAA(x, (int)yhigh, color, fpart(yhigh));
-                    for (int y = (int)intery + 1; y < (int)yhigh; y++)
-                        tex.SetPixelAA(x, y, color, 1.0);
-                    intery += grad;
                 }
             }
         }
@@ -310,30 +165,30 @@ namespace ferram4
                 Swap(ref y0, ref y1);
             }
 
-            double grad = (double)dy / (double)dx;
+            double grad = (double) dy / (double) dx;
             double intery = y0 + rfpart(x0) * grad;
 
             // starting point
             int xend = round(x0);
             double yend = y0 + grad * (xend - x0) + 0.5 - 0.5 * wd;
             double xgap;
-            int px = xend, py = (int)yend;
+            int px = xend, py = (int) yend;
             double high = yend + wd;
             if (steep)
             {
                 xgap = rfpart(y0 + 0.5);
                 tex.SetPixelAA(py, px, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
+                for (int y = py + 1; y < (int) high; y++)
                     tex.SetPixelAA(y, px, color, xgap);
-                tex.SetPixelAA((int)high, px, color, fpart(high) * xgap);
+                tex.SetPixelAA((int) high, px, color, fpart(high) * xgap);
             }
             else
             {
                 xgap = rfpart(x0 + 0.5);
                 tex.SetPixelAA(px, py, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
+                for (int y = py + 1; y < (int) high; y++)
                     tex.SetPixelAA(px, y, color, xgap);
-                tex.SetPixelAA(px, (int)high, color, fpart(high) * xgap);
+                tex.SetPixelAA(px, (int) high, color, fpart(high) * xgap);
             }
             int xstart = px + 1;
 
@@ -341,23 +196,23 @@ namespace ferram4
             xend = round(x1);
             yend = y1 + grad * (xend - x1) + 0.5 - 0.5 * wd;
             px = xend;
-            py = (int)yend;
+            py = (int) yend;
             high = yend + wd;
             if (steep)
             {
                 xgap = rfpart(y1 + 0.5);
                 tex.SetPixelAA(py, px, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
+                for (int y = py + 1; y < (int) high; y++)
                     tex.SetPixelAA(y, px, color, xgap);
-                tex.SetPixelAA((int)high, px, color, fpart(high) * xgap);
+                tex.SetPixelAA((int) high, px, color, fpart(high) * xgap);
             }
             else
             {
                 xgap = rfpart(x1 + 0.5);
                 tex.SetPixelAA(px, py, color, rfpart(yend) * xgap);
-                for (int y = py + 1; y < (int)high; y++)
+                for (int y = py + 1; y < (int) high; y++)
                     tex.SetPixelAA(px, y, color, xgap);
-                tex.SetPixelAA(px, (int)high, color, fpart(high) * xgap);
+                tex.SetPixelAA(px, (int) high, color, fpart(high) * xgap);
             }
 
             // interior
@@ -368,9 +223,9 @@ namespace ferram4
                 {
                     // support for linewidth
                     double yhigh = intery + wd;
-                    tex.SetPixelAA((int)intery, x, color, rfpart(intery));
-                    tex.SetPixelAA((int)yhigh, x, color, fpart(yhigh));
-                    for (int y = (int)intery + 1; y < (int)yhigh; y++)
+                    tex.SetPixelAA((int) intery, x, color, rfpart(intery));
+                    tex.SetPixelAA((int) yhigh, x, color, fpart(yhigh));
+                    for (int y = (int) intery + 1; y < (int) yhigh; y++)
                         tex.SetPixelAA(y, x, color, 1.0);
                     intery += grad;
                 }
@@ -381,28 +236,24 @@ namespace ferram4
                 {
                     // support for linewidth
                     double yhigh = intery + wd;
-                    tex.SetPixelAA(x, (int)intery, color, rfpart(intery));
-                    tex.SetPixelAA(x, (int)yhigh, color, fpart(yhigh));
-                    for (int y = (int)intery + 1; y < (int)yhigh; y++)
+                    tex.SetPixelAA(x, (int) intery, color, rfpart(intery));
+                    tex.SetPixelAA(x, (int) yhigh, color, fpart(yhigh));
+                    for (int y = (int) intery + 1; y < (int) yhigh; y++)
                         tex.SetPixelAA(x, y, color, 1.0);
                     intery += grad;
                 }
             }
         }
 
-        public static void SetPixelAA(this Texture2D tex, int x, int y, Color color, float alpha = 1f)
+        public static void SetPixelAA(this Texture2D tex, int x, int y, Color color, double alpha = 1.0)
         {
             // for now assuming that all lines on tex will be drawn with the same color
             if (tex.inBounds(x, y))
             {
-                color.a += tex.GetPixel(x, y).a;
+                float a = tex.GetPixel(x, y).a;
+                color.a = a + (1 - a) * (float)alpha;
                 tex.SetPixel(x, y, color);
             }
-        }
-
-        public static void SetPixelAA(this Texture2D tex, int x, int y, Color color, double alpha = 1.0)
-        {
-            tex.SetPixelAA(x, y, color, (float)alpha);
         }
 
         private static void Swap(ref double x, ref double y)
@@ -413,17 +264,25 @@ namespace ferram4
         }
 
         private static int ipart(double x)
-        { return (int)Math.Floor(x); }
+        {
+            return (int) Math.Floor(x);
+        }
 
         private static int round(double x)
-        { return ipart(x + 0.5); }
+        {
+            return ipart(x + 0.5);
+        }
 
         // fractional part of x
         private static double fpart(double x)
-        { return x - ipart(x); }
+        {
+            return x - ipart(x);
+        }
 
         private static double rfpart(double x)
-        { return 1 - fpart(x); }
+        {
+            return 1 - fpart(x);
+        }
 
         private static void Swap(ref int x, ref int y)
         {
