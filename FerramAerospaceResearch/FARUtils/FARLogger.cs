@@ -1,5 +1,5 @@
 /*
-Ferram Aerospace Research v0.15.9.5 "Lighthill"
+Ferram Aerospace Research v0.15.9.6 "Lin"
 =========================
 Copyright 2018, Daumantas Kavolis, aka dkavolis
 
