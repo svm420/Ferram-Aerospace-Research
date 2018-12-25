@@ -66,6 +66,8 @@ CHANGELOG
 =======================================================
 0.15.9.6V "Lin"------------------------------------
 
+**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
+
 Update for KSP 1.6  
 Update to MM 3.1.2  
 Update to MFI 1.2.6  
