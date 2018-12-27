@@ -66,8 +66,8 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
-Greatly improved debug visual voxels framerate (#18)
-Enlarged debug voxel texture for higher fidelity (#18)
+Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
+Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
 
 0.15.9.6V "Lin"------------------------------------
 
