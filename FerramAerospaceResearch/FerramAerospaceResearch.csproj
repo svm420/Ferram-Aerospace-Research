@@ -132,6 +132,7 @@
     <Compile Include="FARGUI\GUIUtils.cs" />
     <Compile Include="FARGUI\FAREditorGUI\StabilityDerivGUI.cs" />
     <Compile Include="FARPartGeometry\DebugVisualVoxel.cs" />
+    <Compile Include="FARPartGeometry\DebugVisualVoxelMeshController.cs" />
     <Compile Include="FARPartGeometry\DebugVisualVoxelSubmesh.cs" />
     <Compile Include="FARPartGeometry\GeometryMesh.cs" />
     <Compile Include="FARPartGeometry\GeometryPartModule.cs" />
