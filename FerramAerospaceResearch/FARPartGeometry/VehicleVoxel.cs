@@ -71,7 +71,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             get { return elementSize; }
         }
         double invElementSize;
-
+        VoxelChunk[, , ] voxelChunks;
         DebugVisualVoxelMeshController voxelMesh;
         HashSet<Part> overridingParts;
         HashSet<Part> ductingParts;
