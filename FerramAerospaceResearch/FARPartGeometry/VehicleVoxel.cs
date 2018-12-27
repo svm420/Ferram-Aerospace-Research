@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.6 "Lin"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -72,7 +72,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
         double invElementSize;
 
-        VoxelChunk[, ,] voxelChunks;
+        DebugVisualVoxelMeshController voxelMesh;
         HashSet<Part> overridingParts;
         HashSet<Part> ductingParts;
         int xLength, yLength, zLength;
@@ -272,7 +272,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         }
 
-        private VehicleVoxel() { }
+        private VehicleVoxel()
+        {
+            voxelMesh = new DebugVisualVoxelMeshController();
+            voxelMesh.active = false;
+        }
 
         /*public VehicleVoxel(List<Part> partList, List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded = true, bool solidify = true)
         {
@@ -1477,30 +1481,36 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public void ClearVisualVoxels()
         {
+            FARLogger.Debug("Clearing visual voxels");
+            voxelMesh.active = false;
             for (int i = 0; i < xLength; i++)
+            {
                 for (int j = 0; j < yLength; j++)
+                {
                     for (int k = 0; k < zLength; k++)
                     {
-                        VoxelChunk section = voxelChunks[i, j, k];
-                        if (section != null)
-                        {
-                            section.ClearVisualVoxels();
-                        }
+                        voxelChunks[i, j, k]?.ClearVisualVoxels();
                     }
+                }
+            }
+            voxelMesh.Clear(true);
         }
 
         public void VisualizeVoxel(Matrix4x4 vesselLocalToWorldMatrix)
         {
+            FARLogger.Debug("Creating visual voxels");
             for (int i = 0; i < xLength; i++)
+            {
                 for (int j = 0; j < yLength; j++)
+                {
                     for (int k = 0; k < zLength; k++)
                     {
-                        VoxelChunk section = voxelChunks[i, j, k];
-                        if (section != null)
-                        {
-                            section.VisualizeVoxels(vesselLocalToWorldMatrix);
-                        }
+                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, voxelMesh);
                     }
+                }
+            }
+            voxelMesh.Rebuild();
+            voxelMesh.active = true;
         }
         #endregion
 
