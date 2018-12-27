@@ -1,4 +1,4 @@
-Shader "FerramAerospaceResearch/Debub Voxel Mesh" {
+Shader "FerramAerospaceResearch/Debug Voxel Mesh" {
     Properties{
         _Color("Color", Color) = (1,1,1,1)
         [NoScaleOffset] _MainTex("Albedo (RGB)", 2D) = "white" {}
