@@ -64,6 +64,11 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+-------------------master branch-------------------
+
+Greatly improved debug visual voxels framerate (#18)
+Enlarged debug voxel texture for higher fidelity (#18)
+
 0.15.9.6V "Lin"------------------------------------
 
 **Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
