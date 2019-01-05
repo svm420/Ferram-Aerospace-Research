@@ -4,6 +4,7 @@ obj
 *.mdb
 /GameData/FerramAerospaceResearch/Custom*.cfg
 /GameData/FerramAerospaceResearch/FARForceDataUpdate.cfg
+/note.txt
 *.suo
 *.DotSettings
 *.user

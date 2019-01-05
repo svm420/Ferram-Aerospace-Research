@@ -69,6 +69,10 @@ CHANGELOG
 Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
 Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
 
+0.15.9.?V "???" -----------------------------------
+
+Merged in Rodhern's update 3
+
 0.15.9.6V "Lin"------------------------------------
 
 **Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
@@ -129,7 +133,6 @@ Include German (by terorie), Russian (by pand5461), and Chinese (by Nigh) transl
 Fix NaN errors with Trajectories  
 Fix some issues with identifying KSPWheel Adjustable Landing Gear as gear  
 
-
 0.15.8.1V "Lewis"------------------------------------  
 
 Bugfix patch for KSP 1.2.2  
@@ -156,7 +159,6 @@ Fix voxel errors with some stock parts
 
 Made ignorable transforms for voxelization customizable via config  
 
-
 0.15.7.2V "Lanchester"------------------------------------  
 
 Fix a serious bug in v0.15.7 and v0.15.7.1 where chutes would not provide any drag  
@@ -169,8 +171,7 @@ Update license
 
 Fix an issue where voxels could be incredibly asymmetric on symmetric crafts  
 
-
-0.15.7V "KÃ¼chemann"------------------------------------  
+0.15.7V "Küchemann"------------------------------------  
 
 Update to ModuleManager 2.6.25  
 Update for KSP 1.1.3 compatibility  
@@ -215,7 +216,7 @@ Fix RealChute / RealChuteLite interaction breaking stock chute behavior, thanks 
 Fix mass-calc error for wing-mass-strength that resulted in all planes gaining unhealthy amounts of weight  
 Attempt to make debug-compatibility actually work, thanks to NathanKell  
 
-0.15.6.1V "von KÃ¡rmÃ¡n"------------------------------------
+0.15.6.1V "von Kármán"------------------------------------
 
 Fix a critical CPU usage bug that resulted in voxelization threads SpinWaiting forever, monopolizing the processor  
 Fix parachutes without RealChute configs not applying forces when FAR + RC are installed, thanks to stupid_chris  
