@@ -131,7 +131,6 @@
     <Compile Include="FARGUI\FARFlightGUI\FlightGUI.cs" />
     <Compile Include="FARGUI\GUIDropDown.cs" />
     <Compile Include="FARGUI\GUIUtils.cs" />
-    <Compile Include="FARGUI\FAREditorGUI\StabilityDerivExport.cs" />
     <Compile Include="FARGUI\FAREditorGUI\StabilityDerivGUI.cs" />
     <Compile Include="FARPartGeometry\DebugVisualVoxel.cs" />
     <Compile Include="FARPartGeometry\DebugVisualVoxelMeshController.cs" />
@@ -161,8 +160,8 @@
     <Compile Include="RealChuteLite\PhysicsWatch.cs" />
     <Compile Include="RealChuteLite\RealChuteFAR.cs" />
     <Compile Include="ToolbarWrapper.cs" />
-    <Compile Include="FARUtils/FARLogger.cs" />
-    <Compile Include="FARUtils/FARVersion.cs" />
+    <Compile Include="FARUtils\FARLogger.cs" />
+    <Compile Include="FARUtils\FARVersion.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

@@ -123,7 +123,7 @@ namespace FerramAerospaceResearch
             return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
         }
 
-        public static double BrentsMethod(Func<double, double> function, double a, double b, double epsilon = 0.001, int maxIter = int.MaxValue)
+        public static double BrentsMethod(Func<double, double> function, double a, double b, double epsilon, int maxIter)
         {
             double delta = epsilon * 100;
             double fa, fb;
@@ -258,9 +258,20 @@ namespace FerramAerospaceResearch
         private const double tol_triangle = 1E-3;
         private const double tol_linear = 3E-4;
         private const double tol_brent = 1E-3;
+        private const double machswitchvalue = 0.30;
         private const int iterlim = 500;
 
-        public static double SillySearchMethod(Func<double, double> function)
+        public static double SelectedSearchMethod(double machNumber, Func<double, double> function)
+        {
+            // Rodhern: In dkavolis branch BrentsMethod is the favoured root-finding algorithm.
+            //          At slower speeds however SegmentSearchMethod is used as ad hoc root-finder.
+            if (machNumber >= machswitchvalue)
+                return BrentsMethod(function, leftedge, rightedge, tol_brent, iterlim);
+            else
+                return SegmentSearchMethod(function);
+        }
+
+        public static double SegmentSearchMethod(Func<double, double> function)
         {
             double x0 = 0d;
             double f0 = function(x0);
@@ -274,7 +285,7 @@ namespace FerramAerospaceResearch
         LblSkipRight:
             if (f1 > 0) return mfobj.LinearSolution(x0, f0, x1, f1);
             double x2 = Clamp<double>(x1 + xstepsize, 0d, rightedge);
-            if (x2 == x1) return mfobj.BrentSolve("Reached far right edge.");
+            if (Math.Abs(x2 - x1) < tol_brent) return mfobj.BrentSolve("Reached far right edge."); // Rodhern: Strict equality replaced with approximate equality for readability in dkavolis branch.
             double f2 = f(x2);
             if (f2 > f1)
             { // skip right

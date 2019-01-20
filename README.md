@@ -71,7 +71,7 @@ Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavo
 
 0.15.9.?V "???" -----------------------------------
 
-Merged in Rodhern's update 3
+Merged in Rodhern's update 3 (but disabled the stability derivatives export functionality)
 
 0.15.9.6V "Lin"------------------------------------
 
