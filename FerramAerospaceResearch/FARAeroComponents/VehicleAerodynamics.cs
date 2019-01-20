@@ -1519,7 +1519,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void UpdateSonicDragArea()
         {
-            ferram4.FARCenterQuery center = new ferram4.FARCenterQuery();
+            ferram4.FARCenterQuery center = new ferram4.FARCenterQuery(Vector3.zero);
 
             Vector3 worldMainAxis = _localToWorldMatrix.MultiplyVector(_vehicleMainAxis);
             worldMainAxis.Normalize();

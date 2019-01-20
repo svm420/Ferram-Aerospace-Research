@@ -201,7 +201,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 MAC += w.GetMAC() * w.S;
                 b_2 += w.Getb_2() * w.S;
             }
-            FARCenterQuery center = new FARCenterQuery();
+            FARCenterQuery center = new FARCenterQuery(CoM);
             for (int i = 0; i < _currentAeroSections.Count; i++)
             {
                 _currentAeroSections[i].PredictionCalculateAeroForces(2, (float)input.machNumber, 10000, 0, 0.005f, velocity.normalized, center);
@@ -213,7 +213,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             output.Cy += Vector3d.Dot(centerForce, sideways);
             output.Cd += -Vector3d.Dot(centerForce, velocity);
 
-            Vector3d centerMoment = -center.TorqueAt(CoM) * 1000;
+            Vector3d centerMoment = -center.Torque() * 1000;
 
             output.Cm += Vector3d.Dot(centerMoment, sideways);
             output.Cn += Vector3d.Dot(centerMoment, liftVector);

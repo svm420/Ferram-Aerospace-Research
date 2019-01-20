@@ -56,49 +56,25 @@ namespace ferram4
         // Torque needed to compensate if force were applied at origin.
         public Vector3d torque = Vector3d.zero;
 
-        // Weighted average of force positions used as aid in choosing the
-        // single center location on the line of physically equivalent ones.
+        // Reference point about which to calculate torques
         public Vector3d pos = Vector3d.zero;
-        public double amount = 0.0;
 
-        /*public Vector3d GetACPosition()
+        public FARCenterQuery(Vector3 about)
         {
-            Vector3d bVec = new Vector3d();
-            bVec.x = force.y * torque.z - force.z * torque.y;
-            bVec.y = force.x * torque.z - force.z * torque.x;
-            bVec.z = force.x * torque.y - force.y * torque.x;
+            this.pos = about;
+        }
 
-            double approxA01, approxA02, approxA12;         //commonly used force directions
-            approxA01 = -1 / (force.z * force.z);
-            approxA02 = -1 / (force.y * force.y);
-            approxA12 = -1 / (force.x * force.x);
-
-            Vector3d acPos = new Vector3d();
-            acPos.x = force.x * force.x / (force.y * force.y * force.z * force.z) * bVec.x + bVec.y * approxA01 + bVec.z * approxA02;
-            acPos.y = force.y * force.y / (force.x * force.x * force.z * force.z) * bVec.y + bVec.x * approxA01 + bVec.z * approxA12;
-            acPos.x = force.z * force.z / (force.y * force.y * force.x * force.x) * bVec.z + bVec.y * approxA12 + bVec.x * approxA02;
-
-            acPos *= 0.5;
-            acPos += GetPos();
-
-            return acPos;
-        }*/
         public void ClearAll()
         {
             force = Vector3d.zero;
             torque = Vector3d.zero;
-            pos = Vector3d.zero;
-            amount = 0;
         }
 
         // Record a force applied at a point
         public void AddForce(Vector3d npos, Vector3d nforce)
         {
-            double size = nforce.magnitude;
             force += nforce;
-            torque += Vector3d.Cross(npos, nforce);
-            pos += npos * size;
-            amount += size;
+            torque += Vector3d.Cross(npos - pos, nforce);
         }
 
         // Record an abstracted torque or couple; application point is irrelevant
@@ -107,60 +83,10 @@ namespace ferram4
             torque += ntorque;
         }
 
-        // Merge two force sets
-        public void AddAll(FARCenterQuery q2)
+        // Compute torque.
+        public Vector3d Torque()
         {
-            force += q2.force;
-            torque += q2.torque;
-            pos += q2.pos;
-            amount += q2.amount;
-        }
-
-        // Returns a center of weight-like average of force positions.
-        // Unless all forces are strictly parallel it doesn't mean much.
-        public Vector3d GetPos()
-        {
-            return amount > 0 ? pos / amount : Vector3d.zero;
-        }
-
-        public void SetPos(Vector3d npos)
-        {
-            pos = npos;
-            amount = 1;
-        }
-
-        // Compensating torque at different origin.
-        public Vector3d TorqueAt(Vector3d origin)
-        {
-            return torque - Vector3d.Cross(origin, force);
-        }
-
-        // Returns a point that requires minimal residual torque
-        // (or even 0 if possible) and is closest to origin.
-        // Any remaining torque is always parallel to force.
-        public Vector3d GetMinTorquePos(Vector3d origin)
-        {
-            double fmag = force.sqrMagnitude;
-            if (fmag <= 0) return origin;
-
-            return origin + Vector3d.Cross(force, TorqueAt(origin)) / fmag;
-        }
-
-        public Vector3d GetMinTorquePos()
-        {
-            return GetMinTorquePos(GetPos());
-        }
-
-        // The physics engine limits torque that can be applied to a single
-        // object. This tries to replicate it based on results of experiments.
-        // In practice this is probably not necessary for FAR, but since this
-        // knowledge has been obtained, might as well turn it into code.
-        public static float TorqueClipFactor(Vector3 torque, Rigidbody body)
-        {
-            Vector3 tq = Quaternion.Inverse(body.rotation * body.inertiaTensorRotation) * torque;
-            Vector3 tensor = body.inertiaTensor;
-            float acceleration = new Vector3(tq.x / tensor.x, tq.y / tensor.y, tq.z / tensor.z).magnitude;
-            return Mathf.Max(1.0f, acceleration * Time.fixedDeltaTime / body.maxAngularVelocity);
+            return torque;
         }
     }
 }
