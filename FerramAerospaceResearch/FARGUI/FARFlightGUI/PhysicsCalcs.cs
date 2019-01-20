@@ -62,6 +62,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
 
         Vector3 totalAeroForceVector;
+        Vector3 totalAeroTorqueVector;
         int intakeAirId;
         double intakeAirDensity = 1;
         bool useWingArea;
@@ -125,6 +126,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private void CalculateTotalAeroForce()
         {
             totalAeroForceVector = Vector3.zero;
+            totalAeroTorqueVector = Vector3.zero;
+
 
             if (_vessel.dynamicPressurekPa <= 0.00001)
                 return;
@@ -134,8 +137,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 for (int i = 0; i < _currentAeroModules.Count; i++)
                 {
                     FARAeroPartModule m = _currentAeroModules[i];
-                    if ((object)m != null)
+                    if ((object)m != null) {
                         totalAeroForceVector += m.totalWorldSpaceAeroForce;
+                        totalAeroTorqueVector += m.worldSpaceTorque;
+                        
+                        totalAeroTorqueVector += Vector3.Cross(m.transform.position - _vessel.CoM, m.totalWorldSpaceAeroForce);
+                    }   
                 }
             }
 
@@ -173,6 +180,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
 
             vesselInfo.aerodynamicForce = totalAeroForceVector;
+            vesselInfo.aerodynamicTorque = totalAeroTorqueVector;
             vesselInfo.dragForce = -Vector3d.Dot(totalAeroForceVector, velVectorNorm);     //reverse along vel normal will be drag
 
             Vector3d remainderVector = totalAeroForceVector + velVectorNorm * vesselInfo.dragForce;
