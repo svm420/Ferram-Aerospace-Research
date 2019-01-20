@@ -1,5 +1,5 @@
-﻿/*
-Ferram Aerospace Research v0.15.9.1 "Liepmann"
+/*
+Ferram Aerospace Research v0.15.9.6 "Lin"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -20,25 +20,25 @@ Copyright 2017, Michael Ferrara, aka Ferram4
    You should have received a copy of the GNU General Public License
    along with Ferram Aerospace Research.  If not, see <http://www.gnu.org/licenses/>.
 
-   Serious thanks:		a.g., for tons of bugfixes and code-refactorings   
+   Serious thanks:		a.g., for tons of bugfixes and code-refactorings
 				stupid_chris, for the RealChuteLite implementation
-            			Taverius, for correcting a ton of incorrect values  
+            			Taverius, for correcting a ton of incorrect values
 				Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts
-            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
-            			ialdabaoth (who is awesome), who originally created Module Manager  
-                        	Regex, for adding RPM support  
-				DaMichel, for some ferramGraph updates and some control surface-related features  
-            			Duxwing, for copy editing the readme  
-   
+            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates
+            			ialdabaoth (who is awesome), who originally created Module Manager
+                        	Regex, for adding RPM support
+				DaMichel, for some ferramGraph updates and some control surface-related features
+            			Duxwing, for copy editing the readme
+
    CompatibilityChecker by Majiir, BSD 2-clause http://opensource.org/licenses/BSD-2-Clause
 
-   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission  
+   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/55219
 
    ModularFLightIntegrator by Sarbian, Starwaster and Ferram4, MIT: http://opensource.org/licenses/MIT
 	http://forum.kerbalspaceprogram.com/threads/118088
 
-   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission  
+   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
@@ -59,7 +59,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private HashSet<Part> overridingParts;
 
         double _size;
-        static byte maxLocation = 255;
         Vector3d lowerCorner;
         //int iOffset, jOffset, kOffset;
         int offset;
@@ -73,13 +72,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             voxelPoints = new PartSizePair[512];
             if (usePartSize256)
             {
-                maxLocation = 255;
                 for (int i = 0; i < voxelPoints.Length; i++)
                     voxelPoints[i] = new PartSizePair8Bit();
             }
             else
             {
-                maxLocation = 15;
                 for (int i = 0; i < voxelPoints.Length; i++)
                     voxelPoints[i] = new PartSizePair4Bit();
             }
@@ -227,7 +224,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return voxelPoints[index];
         }
 
-        public void VisualizeVoxels(Matrix4x4 vesselLocalToWorldMatrix)
+        public void VisualizeVoxels(Matrix4x4 vesselLocalToWorldMatrix, DebugVisualVoxelMeshController voxelMesh)
         {
             ClearVisualVoxels();
             visualVoxels = new DebugVisualVoxel[8, 8, 8];
@@ -238,7 +235,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         DebugVisualVoxel vx;
                         //if(voxelPoints[i,j,k] != null)
                         PartSizePair pair = voxelPoints[i + 8 * j + 64 * k];
-                        if ((object)pair.part != null)
+                        if ((object) pair.part != null)
                         {
                             double elementSize = pair.GetSize();
                             if (elementSize > 1)
@@ -246,6 +243,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             elementSize *= _size * 0.5f;
                             vx = new DebugVisualVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner + new Vector3d(i, j, k) * _size), elementSize);
+                            voxelMesh.DebugVoxels.Add(vx);
                             visualVoxels[i, j, k] = vx;
                         }
                     }
@@ -258,10 +256,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     for (int j = 0; j < 8; j++)
                         for (int k = 0; k < 8; k++)
                         {
-                            DebugVisualVoxel vx = visualVoxels[i, j, k];
-                            if (vx != null)
-                                GameObject.Destroy(vx.gameObject);
-                            vx = null;
+                            visualVoxels[i, j, k] = null;
                         }
         }
 

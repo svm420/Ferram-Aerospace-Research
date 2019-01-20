@@ -7,3 +7,13 @@ obj
 *.suo
 *.DotSettings
 *.user
+
+.vscode
+.vs
+*.pdb
+out
+releasing
+
+.mypy*
+*.json
+*.pyc

@@ -1,4 +1,4 @@
-Ferram Aerospace Research v0.15.9.1 "Liepmann"
+Ferram Aerospace Research Continued v0.15.9.6 "Lin"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,6 +64,47 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+-------------------master branch-------------------
+
+Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
+Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
+
+0.15.9.6V "Lin"------------------------------------
+
+**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
+
+Update for KSP 1.6  
+Update to MM 3.1.2  
+Update to MFI 1.2.6  
+
+Mainly a release for RO  
+Trying out enabling FAR for KSP 1.4-1.6  
+
+Much nicer looking anti-aliased line plots  
+Fix NRE when Trajectories tried to access simulation before the vessel was initialized  
+Changed icon to "FARc" to avoid confusion with the original FAR  
+Fix MM pass in a config that is only used on first start of FAR  
+Fix NRE when trying to save stability augmentation settings on closing KSP  
+
+0.15.9.5V "Lighthill"------------------------------------
+
+Update for KSP 1.5.1  
+Update to MM 3.1.0 for KSP 1.5.1  
+Update to MFI 1.2.5  
+
+Dealt with NullReferenceException when trying to access part colliders which do
+not have any (e.g. fuelLine)  
+Dealt with NullReferenceException when trying to determine if an engine has
+fairing which can be jettisoned by defaulting to no fairing  
+Added '[FAR]' tags to all log messages  
+Replaced farshaders.ksp with farassets.ksp which only contains a single
+material (source is in Assets)  
+Fixed curve colors in transonic design defaulting to purple  
+Moved asset bundle from shaders to Assets  
+Replaced icons with new ones (source is in icons, feel free to submit better ones)
+ 
+Removed all All Rights Reserved files  
+
 0.15.9.1V "Liepmann"------------------------------------  
 
 Update for KSP 1.3.1 (though not strictly necessary)  
@@ -129,7 +170,7 @@ Update license
 Fix an issue where voxels could be incredibly asymmetric on symmetric crafts  
 
 
-0.15.7V "Küchemann"------------------------------------  
+0.15.7V "KÃ¼chemann"------------------------------------  
 
 Update to ModuleManager 2.6.25  
 Update for KSP 1.1.3 compatibility  
@@ -174,7 +215,7 @@ Fix RealChute / RealChuteLite interaction breaking stock chute behavior, thanks 
 Fix mass-calc error for wing-mass-strength that resulted in all planes gaining unhealthy amounts of weight  
 Attempt to make debug-compatibility actually work, thanks to NathanKell  
 
-0.15.6.1V "von Kármán"------------------------------------
+0.15.6.1V "von KÃ¡rmÃ¡n"------------------------------------
 
 Fix a critical CPU usage bug that resulted in voxelization threads SpinWaiting forever, monopolizing the processor  
 Fix parachutes without RealChute configs not applying forces when FAR + RC are installed, thanks to stupid_chris  

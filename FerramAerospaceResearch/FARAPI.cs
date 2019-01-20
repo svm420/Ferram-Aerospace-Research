@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.9.1 "Liepmann"
+Ferram Aerospace Research v0.15.9.6 "Lin"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -20,25 +20,25 @@ Copyright 2017, Michael Ferrara, aka Ferram4
    You should have received a copy of the GNU General Public License
    along with Ferram Aerospace Research.  If not, see <http://www.gnu.org/licenses/>.
 
-   Serious thanks:		a.g., for tons of bugfixes and code-refactorings   
+   Serious thanks:		a.g., for tons of bugfixes and code-refactorings
 				stupid_chris, for the RealChuteLite implementation
-            			Taverius, for correcting a ton of incorrect values  
+            			Taverius, for correcting a ton of incorrect values
 				Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts
-            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
-            			ialdabaoth (who is awesome), who originally created Module Manager  
-                        	Regex, for adding RPM support  
-				DaMichel, for some ferramGraph updates and some control surface-related features  
-            			Duxwing, for copy editing the readme  
-   
+            			sarbian, for refactoring code for working with MechJeb, and the Module Manager updates
+            			ialdabaoth (who is awesome), who originally created Module Manager
+                        	Regex, for adding RPM support
+				DaMichel, for some ferramGraph updates and some control surface-related features
+            			Duxwing, for copy editing the readme
+
    CompatibilityChecker by Majiir, BSD 2-clause http://opensource.org/licenses/BSD-2-Clause
 
-   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission  
+   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/55219
 
    ModularFLightIntegrator by Sarbian, Starwaster and Ferram4, MIT: http://opensource.org/licenses/MIT
 	http://forum.kerbalspaceprogram.com/threads/118088
 
-   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission  
+   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
@@ -46,6 +46,7 @@ using System;
 using UnityEngine;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARAeroComponents;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch
 {
@@ -62,6 +63,17 @@ namespace FerramAerospaceResearch
             }
         }
 
+        private static FARVersion version;
+
+        public static FARVersion Version
+        {
+            get
+            {
+                if (version == null)
+                    version = new FARVersion();
+                return version;
+            }
+        }
 
 
         #region CurrentFlightInfo
@@ -195,7 +207,7 @@ namespace FerramAerospaceResearch
         {
             return VesselTSFC(FlightGlobals.ActiveVessel);
         }
-        
+
         public static double VesselTSFC(Vessel v)
         {
             FlightGUI gui = VesselFlightInfo(v);
@@ -209,7 +221,7 @@ namespace FerramAerospaceResearch
         {
             return VesselStallFrac(FlightGlobals.ActiveVessel);
         }
-        
+
         public static double VesselStallFrac(Vessel v)
         {
             FlightGUI gui = VesselFlightInfo(v);
@@ -271,7 +283,7 @@ namespace FerramAerospaceResearch
 
             return -1;
         }
-        
+
         /// <summary>
         /// Sets spoilers to a certain value on this vessel
         /// </summary>
@@ -328,7 +340,6 @@ namespace FerramAerospaceResearch
         {
             return VesselFlightInfo(v).InfoParameters.aerodynamicTorque;
         }
-
         #endregion
 
         #region AeroPredictions
@@ -338,7 +349,7 @@ namespace FerramAerospaceResearch
             aeroForce = aeroTorque = Vector3.zero;
             if (vessel == null)
             {
-                Debug.LogError("FAR API Error: attempted to simulate aerodynamics of null vessel");
+                FARLogger.Error("API Error: attempted to simulate aerodynamics of null vessel");
                 return;
             }
 
@@ -346,13 +357,13 @@ namespace FerramAerospaceResearch
 
             if (vesselAero == null)
             {
-                Debug.LogError("FAR API Error: vessel does not have FARVesselAero aerocomponent for simulation");
+                FARLogger.Error("API Error: vessel does not have FARVesselAero aerocomponent for simulation");
                 return;
             }
 
             vesselAero.SimulateAeroProperties(out aeroForce, out aeroTorque, velocityWorldVector, altitude);
         }
-        
+
         /// <summary>
         /// Calculates the forces and torque on a vessel at a given condition at the CoM
         /// </summary>
@@ -396,7 +407,7 @@ namespace FerramAerospaceResearch
             return vesselAeroModule.HasEverValidVoxelization();
         }
 
-        
+
         /// <summary>
         /// Method to determine if the given vessel has been successfully voxelized nd currently has valid voxelization
         /// </summary>
