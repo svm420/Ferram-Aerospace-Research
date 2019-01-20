@@ -53,7 +53,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
     public struct VesselFlightInfo
     {
         public double liftForce, dragForce, sideForce;
-        public Vector3 aerodynamicForce;
+        public Vector3 aerodynamicForce, aerodynamicTorque;
         public double dynPres;
 
         public double liftCoeff, dragCoeff, sideCoeff;
