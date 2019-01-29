@@ -268,6 +268,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivOutput.stabDerivs[4] = pertOutput.Cd;  //Xw
             stabDerivOutput.stabDerivs[5] = pertOutput.Cm;  //Mw
 
+            // Rodhern: The motivation for the revised stability derivatives sign interpretations of Zq, Xq, Ze and Xe
+            //  is to align the sign conventions used for Zu, Zq, Ze, Xu, Xq and Xe. Further explanation can be found
+            //  here: https://forum.kerbalspaceprogram.com/index.php?/topic/109098-official-far-craft-repository/&do=findComment&comment=2425057
+
             input.alpha = alpha;
             input.machNumber = machNumber + 0.05;
 
