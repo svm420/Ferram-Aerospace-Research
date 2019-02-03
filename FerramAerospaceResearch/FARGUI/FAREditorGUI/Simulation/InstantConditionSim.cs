@@ -124,8 +124,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             }
             CoM /= mass;
 
-            // Rodhern: TODO update dkavolis branch formulas to make explicit calls
-            //  to Vector3d.Cross() and Vector3d.Normalize() before merging.
+            // Rodhern: The original reference directions (velocity, liftVector, sideways) did not form an orthonormal
+            //  basis. That in turn produced some counterintuitive calculation results, such as coupled yaw and pitch
+            //  derivatives. A more thorough discussion of the topic can be found on the KSP forums:
+            //  https://forum.kerbalspaceprogram.com/index.php?/topic/19321-131-ferram-aerospace-research-v01591-liepmann-4218/&do=findComment&comment=2781270
+            //  The reference directions have been replaced by new ones that are orthonormal by construction.
+            //  In dkavolis branch Vector3.Cross() and Vector3d.Normalize() are used explicitly. There is no apparent
+            //  benefit to this other than possibly improved readability.
 
             double sinAlpha = Math.Sin(input.alpha * Math.PI / 180);
             double cosAlpha = Math.Sqrt(Math.Max(1 - sinAlpha * sinAlpha, 0));
@@ -143,14 +148,18 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             Vector3d velocity = forward * cosAlpha * cosBeta;
             velocity += right * (sinPhi * sinAlpha * cosBeta + cosPhi * sinBeta);
             velocity += -up * (cosPhi * sinAlpha * cosBeta - sinPhi * sinBeta);
+            velocity.Normalize();
 
             Vector3d liftDown = -forward * sinAlpha;
             liftDown += right * sinPhi * cosAlpha;
             liftDown += -up * cosPhi * cosAlpha;
+            liftDown.Normalize();
 
-            Vector3d sideways = -forward * cosAlpha * sinBeta;
-            sideways += right * (cosPhi * cosBeta - sinPhi * sinAlpha * sinBeta);
-            sideways += up * (cosPhi * sinAlpha * sinBeta + sinPhi * cosBeta);
+            //Vector3d sideways = -forward * cosAlpha * sinBeta;
+            //sideways += right * (cosPhi * cosBeta - sinPhi * sinAlpha * sinBeta);
+            //sideways += up * (cosPhi * sinAlpha * sinBeta + sinPhi * cosBeta);
+            Vector3d sideways = Vector3.Cross(velocity, liftDown);
+            sideways.Normalize();
 
             Vector3d angVel = forward * (phiDot - sinAlpha * betaDot);
             angVel += right * (cosPhi * alphaDot + cosAlpha * sinPhi * betaDot);
