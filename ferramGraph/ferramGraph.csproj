@@ -37,13 +37,13 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KSP Assemblies\1.6.0\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(KSP_DIR_BUILD)KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KSP Assemblies\1.6.0\UnityEngine.dll</HintPath>
+      <HintPath>$(KSP_DIR_BUILD)KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +54,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(SolutionDir)..\KSP Assemblies\pdb2mdb.exe" "$(TargetPath)"
+    <PostBuildEvent>call "$(PDB2MDB)" "$(TargetPath)"
 xcopy /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)GameData\FerramAerospaceResearch\Plugins"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
