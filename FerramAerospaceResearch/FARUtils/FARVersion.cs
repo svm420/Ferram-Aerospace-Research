@@ -48,8 +48,8 @@ namespace FerramAerospaceResearch.FARUtils
         public const byte Major = 0;
         public const byte Minor = 15;
         public const byte Build = 9;
-        public const byte Revision = 6;
-        public const string Name = "Lin";
+        public const byte Revision = 7;
+        public const string Name = "Lumley";
 
         public readonly static string String = $"v{Major}.{Minor}.{Build}.{Revision}";
         public readonly static string VersionString = $"{String} '{Name}'";
