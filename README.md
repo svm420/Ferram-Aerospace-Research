@@ -67,7 +67,7 @@ CHANGELOG
 -------------------master branch-------------------
 
 Fix new stock parts ([#24](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/24), thanks [@HSJasperism](https://github.com/HSJasperism))  
-Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
+Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18), [#29](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/29))  
 Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
 
 0.15.9.6V "Lin"------------------------------------

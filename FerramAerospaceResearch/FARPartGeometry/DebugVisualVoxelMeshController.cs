@@ -43,6 +43,7 @@ Copyright 2018, Daumantas Kavolis, aka dkavolis
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -61,7 +62,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public DebugVisualVoxelMeshController(Transform parent = null)
         {
             m_parent = parent;
-            m_submeshes.Add(DebugVisualVoxelSubmesh.Create(m_parent, m_active));
         }
 
         public bool active
@@ -71,11 +71,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 if (m_active != value)
                 {
-                    foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
-                    {
-                        submesh.active = value;
-                    }
                     m_active = value;
+                    QueueMainThreadTask(UpdateActive);
                 }
             }
         }
@@ -88,6 +85,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             get => m_parent;
             set => m_parent = value;
+        }
+
+        private void UpdateActive()
+        {
+            foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
+            {
+                submesh.active = m_active;
+            }
         }
 
         public void Rebuild()
@@ -109,6 +114,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             FARLogger.Info("Finished rebuilding visual voxel mesh.");
         }
 
+        public void RebuildSafe()
+        {
+            QueueMainThreadTask(Rebuild);
+        }
+
         public void Clear(bool clearVoxels = false)
         {
             foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
@@ -121,6 +131,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
+        public void ClearSafe(bool clearVoxels = false)
+        {
+            QueueMainThreadTask(() => Clear(clearVoxels));
+        }
+
         private void SetupSubmeshes(int submeshes)
         {
             for (int i = m_submeshes.Count; i < submeshes; i++)
@@ -131,10 +146,30 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public void Dispose()
         {
+            QueueMainThreadTask(DisposeSafe);
+        }
+
+        private void DisposeSafe()
+        {
             foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
             {
                 MonoBehaviour.Destroy(submesh);
             }
         }
+
+        private void QueueMainThreadTask(Action action)
+        {
+            if (VoxelizationThreadpool.Instance.inMainThread)
+            {
+                FARLogger.Debug("In main thread, not queueing " + action.Method.Name);
+                action();
+            }
+            else
+            {
+                ThreadSafeDebugLogger.Instance.RegisterDebugMessage("Running " + action.Method.Name + " in main thread");
+                VoxelizationThreadpool.Instance.RunOnMainThread(action);
+            }
+        }
+
     }
 }

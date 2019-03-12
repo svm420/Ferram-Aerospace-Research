@@ -1509,7 +1509,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                 }
             }
-            voxelMesh.Rebuild();
+            voxelMesh.RebuildSafe();
             voxelMesh.active = true;
         }
         #endregion

@@ -2,6 +2,6 @@
  <PropertyGroup>
    <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.6.1\</KSP_DIR_BUILD>
    <KSP_DIR_INSTALL>$(KSP_DIR_BUILD)</KSP_DIR_INSTALL>
-   <PDB2MDB>..\KSP Assemblies\pdb2mdb.exe</PDB2MDB>
+   <PDB2MDB>$(SolutionDir)..\KSP Assemblies\pdb2mdb.exe</PDB2MDB>
  </PropertyGroup>
 </Project>
