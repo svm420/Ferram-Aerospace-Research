@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.7 "Lumley"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -84,6 +84,34 @@ namespace FerramAerospaceResearch
             FlightGUI.vesselFlightGUI.TryGetValue(v, out gui);
 
             return gui;
+        }
+
+        /// <summary>
+        /// Toggle or enable/disable FAR speed display.
+        /// </summary>
+        /// <param name="v">Vessel to toggle or enable/disable speed display for</param>
+        /// <param name="enabled">Enable/disable the speed display, null value toggles the speed display</param>
+        /// <returns>Success/failure of toggling or enabling/disabling the speed display</returns>
+        public static bool ToggleAirspeedDisplay(Vessel v, bool? enabled = null)
+        {
+            FlightGUI gui = VesselFlightInfo(v);
+            if (gui != null)
+            {
+                AirspeedSettingsGUI airspeedSettingsGUI = gui.airSpeedGUI;
+                if (airspeedSettingsGUI != null)
+                {
+                    if (enabled == null)
+                    {
+                        airspeedSettingsGUI.enabled = !airspeedSettingsGUI.enabled;
+                    }
+                    else
+                    {
+                        airspeedSettingsGUI.enabled = (bool)enabled;
+                    }
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static FlightGUI VesselFlightInfo(Vessel v)
