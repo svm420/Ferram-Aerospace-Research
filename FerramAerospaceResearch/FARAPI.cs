@@ -90,10 +90,24 @@ namespace FerramAerospaceResearch
         /// Toggle or enable/disable FAR speed display.
         /// </summary>
         /// <param name="v">Vessel to toggle or enable/disable speed display for</param>
+        /// <param name="globally">whether to apply the state to all FAR speed displays</param>
         /// <param name="enabled">Enable/disable the speed display, null value toggles the speed display</param>
         /// <returns>Success/failure of toggling or enabling/disabling the speed display</returns>
-        public static bool ToggleAirspeedDisplay(Vessel v, bool? enabled = null)
+        public static bool ToggleAirspeedDisplay(Vessel v, bool globally = false, bool? enabled = null)
         {
+            if (globally)
+            {
+                if (enabled == null)
+                {
+                    AirspeedSettingsGUI.allEnabled = !AirspeedSettingsGUI.allEnabled;
+                }
+                else
+                {
+                    AirspeedSettingsGUI.allEnabled = (bool)enabled;
+                }
+                return true;
+            }
+
             FlightGUI gui = VesselFlightInfo(v);
             if (gui != null)
             {
