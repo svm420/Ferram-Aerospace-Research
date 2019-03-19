@@ -54,9 +54,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class AirspeedSettingsGUI
     {
+        public static bool allEnabled = true;
         Vessel _vessel;
         GUIStyle buttonStyle;
-        public bool enabled { get; set; }
+        public bool enabled
+        {
+            get;
+            set;
+        }
 
         public AirspeedSettingsGUI(Vessel vessel, bool enabled = true)
         {
@@ -124,13 +129,13 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             value_out = velString;
             mode_out = velMode;
-            return enabled && active;
+            return allEnabled && enabled && active;
         }
 
         public void ChangeSurfVelocity()
         {
             // No need to build the string
-            if (!enabled)
+            if (!(allEnabled && enabled))
             {
                 return;
             }
