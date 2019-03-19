@@ -89,13 +89,12 @@ namespace FerramAerospaceResearch
         /// <summary>
         /// Toggle or enable/disable FAR speed display.
         /// </summary>
-        /// <param name="v">Vessel to toggle or enable/disable speed display for</param>
-        /// <param name="globally">whether to apply the state to all FAR speed displays</param>
         /// <param name="enabled">Enable/disable the speed display, null value toggles the speed display</param>
+        /// <param name="v">Vessel to toggle or enable/disable speed display for, null to apply <paramref name="enabled"/> globally</param>
         /// <returns>Success/failure of toggling or enabling/disabling the speed display</returns>
-        public static bool ToggleAirspeedDisplay(Vessel v, bool globally = false, bool? enabled = null)
+        public static bool ToggleAirspeedDisplay(bool? enabled = null, Vessel v = null)
         {
-            if (globally)
+            if (v == null)
             {
                 if (enabled == null)
                 {
@@ -103,7 +102,7 @@ namespace FerramAerospaceResearch
                 }
                 else
                 {
-                    AirspeedSettingsGUI.allEnabled = (bool)enabled;
+                    AirspeedSettingsGUI.allEnabled = (bool) enabled;
                 }
                 return true;
             }
@@ -120,7 +119,7 @@ namespace FerramAerospaceResearch
                     }
                     else
                     {
-                        airspeedSettingsGUI.enabled = (bool)enabled;
+                        airspeedSettingsGUI.enabled = (bool) enabled;
                     }
                     return true;
                 }
