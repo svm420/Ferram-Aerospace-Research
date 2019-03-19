@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.9.7 "Lumley"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -54,12 +54,19 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class AirspeedSettingsGUI
     {
+        public static bool allEnabled = true;
         Vessel _vessel;
         GUIStyle buttonStyle;
+        public bool enabled
+        {
+            get;
+            set;
+        }
 
-        public AirspeedSettingsGUI(Vessel vessel)
+        public AirspeedSettingsGUI(Vessel vessel, bool enabled = true)
         {
             _vessel = vessel;
+            this.enabled = enabled;
             LoadSettings();
         }
 
@@ -122,11 +129,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             value_out = velString;
             mode_out = velMode;
-            return active;
+            return allEnabled && enabled && active;
         }
 
         public void ChangeSurfVelocity()
         {
+            // No need to build the string
+            if (!(allEnabled && enabled))
+            {
+                return;
+            }
+
             active = false;
             //DaMichel: Avoid conflict between multiple vessels in physics range. We only want to show the speed of the active vessel.
             if (FlightGlobals.ActiveVessel != _vessel)

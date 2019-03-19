@@ -66,6 +66,8 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
+Enable/disable FAR speed display on the navball from FARAPI ([#33](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/33))  
+
 0.15.9.7V "Lumley"------------------------------------
 
 **Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
