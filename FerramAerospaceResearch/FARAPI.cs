@@ -132,6 +132,26 @@ namespace FerramAerospaceResearch
             return Instance.GetFlightInfo(v);
         }
 
+        public static double ActiveVesselIAS()
+        {
+            return VesselIAS(FlightGlobals.ActiveVessel);
+        }
+
+        public static double VesselIAS(Vessel vessel)
+        {
+            return VesselFlightInfo(vessel)?.airSpeedGUI?.CalculateIAS() ?? 0;
+        }
+
+        public static double ActiveVesselEAS()
+        {
+            return VesselEAS(FlightGlobals.ActiveVessel);
+        }
+
+        public static double VesselEAS(Vessel vessel)
+        {
+            return VesselFlightInfo(vessel)?.airSpeedGUI?.CalculateEAS() ?? 0;
+        }
+
         public static double ActiveVesselDynPres()
         {
             return VesselDynPres(FlightGlobals.ActiveVessel);
