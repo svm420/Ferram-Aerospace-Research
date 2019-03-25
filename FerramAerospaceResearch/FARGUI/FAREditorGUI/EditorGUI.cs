@@ -167,6 +167,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             guiRect.width = 650;
 
 
+            GameEvents.onEditorVariantApplied.Add(UpdateGeometryEvent);
             GameEvents.onEditorPartEvent.Add(UpdateGeometryEvent);
             GameEvents.onEditorUndo.Add(ResetEditorEvent);
             GameEvents.onEditorRedo.Add(ResetEditorEvent);
@@ -196,6 +197,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         void OnDestroy()
         {
+            GameEvents.onEditorVariantApplied.Remove(UpdateGeometryEvent);
             GameEvents.onEditorPartEvent.Remove(UpdateGeometryEvent);
             GameEvents.onEditorUndo.Remove(ResetEditorEvent);
             GameEvents.onEditorRedo.Remove(ResetEditorEvent);
@@ -254,6 +256,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             RequestUpdateVoxel();
         }
 
+        private void UpdateGeometryEvent(Part part, PartVariant partVariant)
+        {
+            UpdateGeometryEvent(ConstructionEventType.Unknown, part);
+        }
+
         private void UpdateGeometryEvent(ConstructionEventType type, Part pEvent)
         {
             if (type == ConstructionEventType.PartRotated ||
@@ -274,7 +281,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void UpdateGeometryModule(ConstructionEventType type, Part p)
         {
-            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
+            GeometryPartModule g = p?.GetComponent<GeometryPartModule>();
             if (g != null && g.Ready)
             {
                 if (type == ConstructionEventType.Unknown)
@@ -286,7 +293,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void UpdateGeometryModule(Part p)
         {
-            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
+            GeometryPartModule g = p?.GetComponent<GeometryPartModule>();
             if (g != null && g.Ready)
             {
                 g.EditorUpdate();

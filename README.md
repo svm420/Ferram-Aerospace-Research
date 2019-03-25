@@ -66,6 +66,7 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
+Voxelization respects part variant changes in the editor ([#35](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/35))  
 Expose IAS and EAS used by FAR in FARAPI ([#34](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/34))  
 Enable/disable FAR speed display on the navball from FARAPI ([#33](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/33))  
 
