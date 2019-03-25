@@ -132,6 +132,24 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             return allEnabled && enabled && active;
         }
 
+        public double CalculateIAS()
+        {
+            double pressureRatio = FARAeroUtil.RayleighPitotTubeStagPressure(_vessel.mach); //stag pressure at pitot tube face / ambient pressure
+
+            double velocity = pressureRatio - 1;
+            velocity *= _vessel.staticPressurekPa * 1000 * 2;
+            velocity /= 1.225;
+            velocity = Math.Sqrt(velocity);
+
+            return velocity;
+        }
+
+        public double CalculateEAS()
+        {
+            double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
+            return _vessel.srfSpeed * Math.Sqrt(densityRatio);
+        }
+
         public void ChangeSurfVelocity()
         {
             // No need to build the string
@@ -152,7 +170,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
 
             double unitConversion = 1;
-            string unitString;// = "m/s";
+            string unitString; // = "m/s";
             string caption;
             if (unitMode == SurfaceVelUnit.KNOTS)
             {
@@ -184,22 +202,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 {
                     caption = surfModel_str[1];
                     //double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
-                    double pressureRatio = FARAeroUtil.RayleighPitotTubeStagPressure(_vessel.mach);     //stag pressure at pitot tube face / ambient pressure
 
-                    double velocity = pressureRatio - 1;
-                    velocity *= _vessel.staticPressurekPa * 1000 * 2;
-                    velocity /= 1.225;
-                    velocity = Math.Sqrt(velocity);
-
-                    velString = (velocity * unitConversion).ToString("F1") + unitString;
+                    velString = (CalculateIAS() * unitConversion).ToString("F1") + unitString;
                 }
                 else if (velMode == SurfaceVelMode.EAS)
                 {
                     caption = surfModel_str[2];
-                    double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
-                    velString = (_vessel.srfSpeed * Math.Sqrt(densityRatio) * unitConversion).ToString("F1") + unitString;
+                    velString = (CalculateEAS() * unitConversion).ToString("F1") + unitString;
                 }
-                else// if (velMode == SurfaceVelMode.MACH)
+                else // if (velMode == SurfaceVelMode.MACH)
                 {
                     caption = surfModel_str[3];
                     velString = _vessel.mach.ToString("F3");
