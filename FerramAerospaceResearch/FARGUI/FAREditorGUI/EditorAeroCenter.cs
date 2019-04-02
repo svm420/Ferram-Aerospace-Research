@@ -82,6 +82,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         void UpdateAerodynamicCenter()
         {
+            FARCenterQuery aeroSection, dummy;
+            aeroSection = new FARCenterQuery();
+            dummy = new FARCenterQuery();
+
             if((object)EditorLogic.RootPart == null)
                 return;
 
@@ -99,22 +103,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 vel_fuzz = -0.02f * Vector3.forward;
             }
 
-            Vector3 pos = Vector3.zero;//rootPartTrans.position;
-            float mass = 0;
-            for (int i = 0; i < EditorLogic.SortedShipList.Count; i++)
-            {
-                Part p = EditorLogic.SortedShipList[i];
-                float tmpMass = p.mass + p.GetResourceMass();
-                mass += tmpMass;
-                pos += p.partTransform.position * tmpMass;
-            }
-            pos /= mass;
-            FARCenterQuery aeroSection = new FARCenterQuery(pos);
-            FARCenterQuery dummy = new FARCenterQuery(pos);
-
             Vector3 vel = (vel_base - vel_fuzz).normalized;
 
-            for (int i = 0; i < _currentAeroSections.Count; i++)
+            for(int i = 0; i < _currentAeroSections.Count; i++)
             {
                 FARAeroSection section = _currentAeroSections[i];
                 section.PredictionCalculateAeroForces(1, 0.5f, 100000, 0, 0.005f, vel, aeroSection);
@@ -122,10 +113,23 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             FARBaseAerodynamics.PrecomputeGlobalCenterOfLift(aeroSection, dummy, vel, 1);
 
+            Vector3 pos = Vector3.zero;//rootPartTrans.position;
+            float mass = 0;
+            for(int i = 0; i < EditorLogic.SortedShipList.Count; i++)
+            {
+                Part p = EditorLogic.SortedShipList[i];
+                float tmpMass = p.mass + p.GetResourceMass();
+                mass += tmpMass;
+                pos += p.partTransform.position * tmpMass;
+            }
+            pos /= mass;
+
+            Vector3 avgForcePos = Vector3.zero;
 
             Vector3 force0, moment0;
             force0 = aeroSection.force;
-            moment0 = aeroSection.Torque();
+            moment0 = aeroSection.TorqueAt(pos);
+            avgForcePos += aeroSection.GetPos();
 
             //aeroSection.force = -aeroSection.force;
             //aeroSection.torque = -aeroSection.torque;
@@ -144,9 +148,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             Vector3 force1, moment1;
             force1 = aeroSection.force;
-            moment1 = aeroSection.Torque();
+            moment1 = aeroSection.TorqueAt(pos);
+            avgForcePos += aeroSection.GetPos();
 
             aeroSection.ClearAll();
+
+            avgForcePos *= 0.5f;
 
             Vector3 deltaForce = force1 - force0;
             Vector3 deltaMoment = moment1 - moment0;

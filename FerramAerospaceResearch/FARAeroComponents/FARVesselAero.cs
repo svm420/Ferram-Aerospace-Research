@@ -309,7 +309,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void SimulateAeroProperties(out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
         {
-            FARCenterQuery center = new FARCenterQuery(vessel.CoM);
+            FARCenterQuery center = new FARCenterQuery();
 
             float pressure;
             float density;
@@ -356,7 +356,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
 
             aeroForce = center.force;
-            aeroTorque = center.Torque();
+            aeroTorque = center.TorqueAt(vessel.CoM);
         }
 
 
