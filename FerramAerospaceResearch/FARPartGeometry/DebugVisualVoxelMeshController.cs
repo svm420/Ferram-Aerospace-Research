@@ -91,7 +91,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
             {
-                submesh.active = m_active;
+                if ((object)submesh != null) submesh.active = m_active;
             }
         }
 

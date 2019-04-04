@@ -1733,14 +1733,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (module == null || !module.Valid)
                                 continue;
 
-                            for (int j = 0; j < module.meshDataList.Count; j++)
+                            int count = module?.meshDataList?.Count ?? 0;
+                            for (int j = 0; j < count; j++)
                             {
                                 GeometryMesh mesh = module.meshDataList[j];
                                 lock (mesh)
                                     if (mesh.meshTransform != null && mesh.gameObjectActiveInHierarchy && mesh.valid)
                                         meshes.Add(mesh);
                             }
-
                         }
                     });
                     for (int i = 0; i < meshes.Count; i++)
@@ -1759,7 +1759,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         if (module == null || !module.Valid)
                             continue;
 
-                        for (int j = 0; j < module.meshDataList.Count; j++)
+                        int count = module?.meshDataList?.Count ?? 0;
+                        for (int j = 0; j < count; j++)
                         {
                             GeometryMesh mesh = module.meshDataList[j];
                             bool updateFromMesh = false;
@@ -1770,7 +1771,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (updateFromMesh)
                                 UpdateFromMesh(mesh, mesh.part);
                         }
-
                     }
                 }
             }
