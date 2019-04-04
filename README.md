@@ -66,11 +66,15 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
+Fix voxelization of most stock engines ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
+Voxelization correctly handles jettison transforms with part variants ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
+Fix voxelization of `InflatableHeatShield` ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
 Fixed voxelization of simple heat shields ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37))  
-Added additional nodes to `GeometryPartModule` ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37), see PR for more details):
+Added additional nodes to `GeometryPartModule` ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37), [#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39), see PRs for more details). The new nodes should allow parts to be voxelized much closer to what is visible and handle animations better:
 * `ignoreTransform` (string)
 * `ignoreIfNoRenderer` (bool)
 * `unignoreTransform` (string)
+* `rebuildOnAnimation` (bool)
 
 NRE fixes ([#36](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/36)):  
 * Trying to display debug voxels with no parts in the editor
