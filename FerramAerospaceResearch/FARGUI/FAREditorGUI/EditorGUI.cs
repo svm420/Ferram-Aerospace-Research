@@ -560,7 +560,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(Localizer.Format("FARDebugVoxels")))
-                _vehicleAero.DebugVisualizeVoxels(EditorLogic.RootPart.partTransform.localToWorldMatrix);
+            {
+                Matrix4x4? localToWorldMatrix = null;
+                try
+                {
+                    // even with no root parts in the editor, neither RootPart or its partTransform are null
+                    // but trying to get locaToWorldMatrix throws NRE
+                    localToWorldMatrix = EditorLogic.RootPart.partTransform.localToWorldMatrix;
+                }
+                catch (NullReferenceException)
+                { }
+                if (localToWorldMatrix != null)
+                    _vehicleAero.DebugVisualizeVoxels((Matrix4x4)localToWorldMatrix);
+            }
             GUILayout.EndHorizontal();
         }
 
