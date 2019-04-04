@@ -43,6 +43,8 @@ Copyright 2017, Michael Ferrara, aka Ferram4
  */
 
 using System;
+using System.Text;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
@@ -129,6 +131,96 @@ namespace FerramAerospaceResearch.FARPartGeometry
         bool forceUseMeshes;
         [SerializeField]
         bool ignoreForMainAxis;
+        [SerializeField]
+        List<string> ignoredTransforms,
+        unignoredTransforms;
+        [SerializeField]
+        bool ignoreIfNoRenderer;
+
+#if DEBUG
+        class DebugInfoBuilder
+        {
+            public List<string> meshes, colliders, noRenderer;
+
+            public DebugInfoBuilder()
+            {
+                meshes = new List<string>();
+                colliders = new List<string>();
+                noRenderer = new List<string>();
+            }
+
+            public void Clear()
+            {
+                meshes.Clear();
+                colliders.Clear();
+                noRenderer.Clear();
+            }
+
+            public void Print(Part p)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"{p.name} - mesh build info:");
+                if (meshes.Count > 0)
+                {
+                    sb.Append("\n     Meshes: ");
+                    sb.Append(string.Join(", ", meshes.ToArray()));
+                }
+                if (colliders.Count > 0)
+                {
+                    sb.Append("\n     Colliders: ");
+                    sb.Append(string.Join(", ", colliders.ToArray()));
+                }
+                if (noRenderer.Count > 0)
+                {
+                    sb.Append("\n     No renderer found: ");
+                    sb.Append(string.Join(", ", noRenderer.ToArray()));
+                }
+                FARLogger.Debug(sb.ToStringAndRelease());
+            }
+        }
+        DebugInfoBuilder m_debugInfo = new DebugInfoBuilder();
+#endif
+
+        [Conditional("DEBUG")]
+        private void DebugAddMesh(Transform t)
+        {
+#if DEBUG
+            m_debugInfo.meshes.Add(t.name);
+#endif
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugAddCollider(Transform t)
+        {
+#if DEBUG
+            m_debugInfo.colliders.Add(t.name);
+#endif
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugAddNoRenderer(Transform t)
+        {
+#if DEBUG
+            m_debugInfo.noRenderer.Add(t.name);
+#endif
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugClear()
+        {
+#if DEBUG
+            m_debugInfo.Clear();
+#endif
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugPrint()
+        {
+#if DEBUG
+            m_debugInfo.Print(part);
+#endif
+        }
+
 
         public bool IgnoreForMainAxis
         {
@@ -220,6 +312,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             partTransform = part.partTransform;
             List<Transform> meshTransforms = part.PartModelTransformList();
+            meshTransforms.RemoveAll(IgnoredPredicate);
             List<MeshData> geometryMeshes = CreateMeshListFromTransforms(ref meshTransforms);
 
             meshDataList = new List<GeometryMesh>();
@@ -252,6 +345,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             //UpdateTransformMatrixList(worldToVesselMatrix);
             //overallMeshBounds = part.GetPartOverallMeshBoundsInBasis(worldToVesselMatrix);
+        }
+
+        private bool IgnoredPredicate(Transform t)
+        {
+            return ignoredTransforms.Contains(t.name);
         }
 
         private Bounds SetBoundsFromMeshes()
@@ -650,7 +748,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return null;
         }
 
-        private MeshData GetVisibleMeshData(Transform t, bool onlyMeshes)
+        private MeshData GetVisibleMeshData(Transform t, bool skipIfNoRenderer, bool onlyMeshes)
         {
             Mesh m = null;
             MeshFilter mf = t.GetComponent<MeshFilter>();
@@ -660,6 +758,24 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (mf != null)
             {
+                if (skipIfNoRenderer && !unignoredTransforms.Contains(t.name))
+                {
+                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
+                    if (mr == null)
+                    {
+                        DebugAddNoRenderer(t);
+                        return null;
+                    }
+                }
+#if DEBUG
+                else
+                {
+                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
+                    if (mr == null)
+                        DebugAddNoRenderer(t);
+                }
+#endif
+
                 m = mf.sharedMesh;
 
                 //MeshRenderer mr = t.GetComponent<MeshRenderer>();
@@ -693,6 +809,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private List<MeshData> CreateMeshListFromTransforms(ref List<Transform> meshTransforms)
         {
+            DebugClear();
             List<MeshData> meshList = new List<MeshData>();
             List<Transform> validTransformList = new List<Transform>();
 
@@ -721,6 +838,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     if (md == null)
                         continue;
 
+                    DebugAddCollider(t);
                     meshList.Add(md);
                     validTransformList.Add(t);
                     cantUseColliders = false;
@@ -746,10 +864,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     if (t.gameObject.activeInHierarchy == false)
                         continue;
 
-                    MeshData md = GetVisibleMeshData(t, false);
+                    MeshData md = GetVisibleMeshData(t, ignoreIfNoRenderer, false);
                     if (md == null)
                         continue;
 
+                    DebugAddMesh(t);
                     meshList.Add(md);
                     validTransformList.Add(t);
                 }
@@ -761,10 +880,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         if (jettisonTransforms.Contains(t))
                             continue;
-                        MeshData md = GetVisibleMeshData(t, false);
+                        MeshData md = GetVisibleMeshData(t, ignoreIfNoRenderer, false);
                         if (md == null)
                             continue;
 
+                        DebugAddMesh(t);
                         meshList.Add(md);
                         validTransformList.Add(t);
                     }
@@ -777,15 +897,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 {
                     foreach (Transform t in meshTransforms)
                     {
-                        MeshData md = GetVisibleMeshData(t, false);
+                        MeshData md = GetVisibleMeshData(t, ignoreIfNoRenderer, false);
                         if (md == null)
                             continue;
 
+                        DebugAddMesh(t);
                         meshList.Add(md);
                         validTransformList.Add(t);
                     }
                 }
             }
+            DebugPrint();
             meshTransforms = validTransformList;
             return meshList;
         }
@@ -877,21 +999,39 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public override void OnLoad(ConfigNode node)
         {
             base.OnLoad(node);
-            if(node.HasValue("forceUseColliders"))
+            LoadBool(node, "forceUseColliders", out forceUseColliders);
+            LoadBool(node, "forceUseMeshes", out forceUseMeshes);
+            LoadBool(node, "ignoreForMainAxis", out ignoreForMainAxis);
+            LoadBool(node, "ignoreIfNoRenderer", out ignoreIfNoRenderer);
+            ignoredTransforms = LoadList(node, "ignoreTransform");
+            unignoredTransforms = LoadList(node, "unignoreTransform");
+        }
+
+        private void LoadBool(ConfigNode node, string name, out bool value)
+        {
+            if (node.HasValue(name))
             {
-                bool.TryParse(node.GetValue("forceUseColliders"), out forceUseColliders);
+                bool.TryParse(node.GetValue(name), out value);
                 _ready = false;
             }
-            if (node.HasValue("forceUseMeshes"))
+            else
             {
-                bool.TryParse(node.GetValue("forceUseMeshes"), out forceUseMeshes);
+                value = false;
+            }
+        }
+
+        private List<string> LoadList(ConfigNode node, string name)
+        {
+            var list = new List<string>();
+            if (node.HasValue(name))
+            {
+                foreach (string _name in node.GetValues(name))
+                {
+                    list.Add(_name);
+                }
                 _ready = false;
             }
-            if(node.HasValue("ignoreForMainAxis"))
-            {
-                bool.TryParse(node.GetValue("ignoreForMainAxis"), out ignoreForMainAxis);
-                _ready = false;
-            }
+            return list;
         }
     }
 }

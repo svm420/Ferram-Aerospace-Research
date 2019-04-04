@@ -66,6 +66,12 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
+Fixed voxelization of simple heat shields ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37))  
+Added additional nodes to `GeometryPartModule` ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37), see PR for more details):
+* `ignoreTransform` (string)
+* `ignoreIfNoRenderer` (bool)
+* `unignoreTransform` (string)
+
 NRE fixes ([#36](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/36)):  
 * Trying to display debug voxels with no parts in the editor
 * Occasional  NRE when voxelizing vehicle (due to race conditions?)
