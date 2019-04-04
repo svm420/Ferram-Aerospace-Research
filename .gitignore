@@ -1,4 +1,5 @@
-bin
+// ignore pattern for files so some can be unignored later
+**/bin/**/*.*
 obj
 
 *.mdb
@@ -17,3 +18,6 @@ releasing
 .mypy*
 *.json
 *.pyc
+
+// unignore Debug build DLLs
+!bin/[Dd]ebug/[Ff]erram*.dll
