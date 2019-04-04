@@ -136,6 +136,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         unignoredTransforms;
         [SerializeField]
         bool ignoreIfNoRenderer;
+        [SerializeField]
+        bool rebuildOnAnimation;
 
 #if DEBUG
         class DebugInfoBuilder
@@ -629,7 +631,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 ++_sendUpdateTick;
 
             if(updateShape)
-                UpdateShapeWithAnims(); //event to update voxel, with rate limiter for computer's sanity and error reduction
+            {
+                if (rebuildOnAnimation)
+                    RebuildAllMeshData();
+                else
+                    UpdateShapeWithAnims(); //event to update voxel, with rate limiter for computer's sanity and error reduction
+                UpdateVoxelShape();
+            }
         }
 
         private void UpdateShapeWithAnims()
@@ -641,8 +649,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 transformMatrix = EditorLogic.RootPart.partTransform.worldToLocalMatrix;
 
             UpdateTransformMatrixList(transformMatrix);
-
-            UpdateVoxelShape();
         }
 
         private void UpdateVoxelShape()
@@ -848,15 +854,25 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (part.Modules.Contains<ModuleJettison>())
             {
+                bool variants = part.Modules.Contains<ModulePartVariants>();
                 List<ModuleJettison> jettisons = part.Modules.GetModules<ModuleJettison>();
-                HashSet<Transform> jettisonTransforms = new HashSet<Transform>();
+                HashSet<string> jettisonTransforms = new HashSet<string>();
                 for(int i = 0; i < jettisons.Count; i++)
                 {
                     ModuleJettison j = jettisons[i];
                     if (j.jettisonTransform == null)
                         continue;
 
-                    jettisonTransforms.Add(j.jettisonTransform);
+                    if (variants)
+                    {
+                        // with part variants, jettison name is a comma separated list of transform names
+                        foreach (string name in j.jettisonName.Split(','))
+                        {
+                            jettisonTransforms.Add(name);
+                        }
+                    }
+                    else
+                        jettisonTransforms.Add(j.jettisonTransform.name);
                     if (j.isJettisoned)
                         continue;
 
@@ -878,7 +894,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 {
                     foreach (Transform t in meshTransforms)
                     {
-                        if (jettisonTransforms.Contains(t))
+                        if (jettisonTransforms.Contains(t.name))
                             continue;
                         MeshData md = GetVisibleMeshData(t, ignoreIfNoRenderer, false);
                         if (md == null)
@@ -1003,6 +1019,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             LoadBool(node, "forceUseMeshes", out forceUseMeshes);
             LoadBool(node, "ignoreForMainAxis", out ignoreForMainAxis);
             LoadBool(node, "ignoreIfNoRenderer", out ignoreIfNoRenderer);
+            LoadBool(node, "rebuildOnAnimation", out rebuildOnAnimation);
             ignoredTransforms = LoadList(node, "ignoreTransform");
             unignoredTransforms = LoadList(node, "unignoreTransform");
         }
