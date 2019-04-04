@@ -40,7 +40,6 @@ Copyright 2018, Daumantas Kavolis, aka dkavolis
     http: //forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
@@ -73,7 +72,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public bool active
         {
             get => gameObject.activeSelf;
-            set => gameObject.SetActive(value);
+            set => gameObject?.SetActive(value);
         }
 
         public Mesh Mesh
