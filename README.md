@@ -66,6 +66,11 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
+NRE fixes ([#36](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/36)):  
+* Trying to display debug voxels with no parts in the editor
+* Occasional  NRE when voxelizing vehicle (due to race conditions?)
+* When force closing the game from the editor with debug voxels displayed
+
 Voxelization respects part variant changes in the editor ([#35](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/35))  
 Expose IAS and EAS used by FAR in FARAPI ([#34](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/34))  
 Enable/disable FAR speed display on the navball from FARAPI ([#33](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/33))  
