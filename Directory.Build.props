@@ -1,7 +1,8 @@
 <Project>
  <PropertyGroup>
    <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.6.1\</KSP_DIR_BUILD>
-   <KSP_DIR_INSTALL>$(KSP_DIR_BUILD)</KSP_DIR_INSTALL>
-   <PDB2MDB>$(SolutionDir)..\KSP Assemblies\pdb2mdb.exe</PDB2MDB>
+   <PostBuildCommand>
+      cd "$(SolutionDir)""
+      python -m buildtools postbuild -f "$(SolutionDir)config.json" -c "$(Configuration)" -t</PostBuildCommand>
  </PropertyGroup>
 </Project>
