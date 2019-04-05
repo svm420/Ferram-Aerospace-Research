@@ -1,7 +1,7 @@
 /*
 Ferram Aerospace Research v0.15.9.7 "Lumley"
 =========================
-Copyright 2018, Daumantas Kavolis, aka dkavolis
+Copyright 2019, Daumantas Kavolis, aka dkavolis
 
    This file is part of Ferram Aerospace Research.
 
