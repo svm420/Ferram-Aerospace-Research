@@ -44,6 +44,7 @@ Copyright 2017, Michael Ferrara, aka Ferram4
 
 using System;
 using UnityEngine;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch
 {
@@ -123,7 +124,7 @@ namespace FerramAerospaceResearch
             return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
         }
 
-        public static double BrentsMethod(Func<double, double> function, double a, double b, double epsilon, int maxIter)
+        public static double BrentsMethod(Func<double, double> function, double a, double b, double epsilon = 0.001, int maxIter = int.MaxValue)
         {
             double delta = epsilon * 100;
             double fa, fb;
@@ -381,7 +382,7 @@ namespace FerramAerospaceResearch
 
             public double BrentSolve(string dbgmsg)
             {
-                Debug.Log("[FAR]: MirroredFunction (mirrored= " + mirror + ") reverting to BrentsMethod: " + dbgmsg);
+                FARLogger.Info("MirroredFunction (mirrored= " + mirror + ") reverting to BrentsMethod: " + dbgmsg);
                 return FARMathUtil.BrentsMethod(this.F, leftedge, rightedge, tol_brent, iterlim);
             }
         }
