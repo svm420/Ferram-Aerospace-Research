@@ -243,25 +243,26 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             int flapsettingInt = _flapSettingDropdown.ActiveSelection;
             bool spoilersDeployedBool = spoilersDeployed;
 
-            if (exportflag == CalcAndExportEnum.LoopExport)
-            {
-                // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-                return;
-            }
+            // Rodhern: Export of stability derivatives disabled in dkavolis branch.
+            // if (exportflag == CalcAndExportEnum.LoopExport ...
 
-            StabilityDerivExportOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool);
-            if (stabDerivResult == null)
-                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+            if (body.GetPressure(altitudeDouble) > 0)
+            {
+                StabilityDerivExportOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool, 0, 0, 0);
+                if (stabDerivResult.outputvals.stableAoAState == "")
+                {
+                    stabDerivOutput = stabDerivResult.outputvals;
+                    simManager.vehicleData = stabDerivResult.outputvals;
+                    SetAngleVectors(stabDerivResult.outputvals.stableAoA);
+
+                    // Rodhern: Export of stability derivatives disabled in dkavolis branch.
+                    // if (exportflag == CalcAndExportEnum.CalculateAndExport ...
+                }
+                else
+                    PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+            }
             else
-            {
-                stabDerivOutput = stabDerivResult.outputvals;
-                simManager.vehicleData = stabDerivResult.outputvals;
-                SetAngleVectors(stabDerivResult.outputvals.stableAoA);
-
-                // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-                // if (exportflag == CalcAndExportEnum.CalculateAndExport && !StabilityDerivativeExportFile.Export(stabDerivResult))
-                //     PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivSaveError", Localizer.Format("FAREditorStabDerivSaveError"), Localizer.Format("FAREditorStabDerivSaveErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
-            }
+                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
         }
 
         private void StabilityLabel(String text1, double val, String text2, String tooltip, int width, int sign)
