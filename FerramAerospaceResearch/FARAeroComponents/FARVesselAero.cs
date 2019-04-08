@@ -310,6 +310,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public void SimulateAeroProperties(out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
         {
             FARCenterQuery center = new FARCenterQuery();
+            FARCenterQuery dummy = new FARCenterQuery();
 
             float pressure;
             float density;
@@ -337,7 +338,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             float skinFriction = (float)FARAeroUtil.SkinFrictionDrag(reynoldsNumber, machNumber);
 
             float pseudoKnudsenNumber = machNumber / (reynoldsNumber + machNumber);
-
+            
             if (_currentAeroSections != null)
             {
                 for (int i = 0; i < _currentAeroSections.Count; i++)
@@ -351,7 +352,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 {
                     FARWingAerodynamicModel curWing = _legacyWingModels[i];
                     if ((object)curWing != null)
-                        curWing.PrecomputeCenterOfLift(velocityWorldVector, machNumber, density, center);
+                        center.AddForce(curWing.transform.position, curWing.PrecomputeCenterOfLift(velocityWorldVector, machNumber, density, dummy));
                 }
             }
 
