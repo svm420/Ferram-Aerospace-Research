@@ -426,13 +426,21 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag,
                 pd => pd.aeroModule.part.partTransform.InverseTransformVector(vel),
-                (pd, forceVector, torqueVector, pcentroid) =>
-                {
-                    forceVector = pd.aeroModule.transform.TransformDirection(forceVector);
-                    torqueVector = pd.aeroModule.transform.TransformDirection(torqueVector);
+                (pd, forceVector, torqueVector, pcentroid) => {
+                    var localVel = pd.aeroModule.part.partTransform.InverseTransformVector(vel);
+                    var tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
+                    var dynamicPressurekPA = tmp * atmDensity;
+                    var dragFactor = dynamicPressurekPA*Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
+                    var liftFactor = dynamicPressurekPA;
+
+                    var localVelNorm = Vector3.Normalize(localVel);
+                    Vector3 localForceTemp = Vector3.Dot(localVelNorm, forceVector) * localVelNorm;
+                    var partLocalForce = (localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor);
+                    forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
+                    torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)pd.aeroModule.part.dynamicPressurekPa);
                     if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
                     {
-                        Vector3 centroid = pd.aeroModule.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
+                        Vector3 centroid = pd.aeroModule.part.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
                         center.AddForce(centroid, forceVector);
                         center.AddTorque(torqueVector);
                     }
@@ -441,8 +449,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void FlightCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
         {
-            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, 
-                pd => pd.aeroModule.partLocalVel, 
+            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag,
+                pd => pd.aeroModule.partLocalVel,
                 (pd, forceVector, torqueVector, centroid) => pd.aeroModule.AddLocalForceAndTorque(forceVector, torqueVector, pd.centroidPartSpace));
 
         }
