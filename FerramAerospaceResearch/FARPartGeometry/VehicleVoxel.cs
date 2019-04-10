@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.9.7 "Lumley"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2017, Michael Ferrara, aka Ferram4
+Copyright 2019, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -1509,7 +1509,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                 }
             }
-            voxelMesh.Rebuild();
+            voxelMesh.RebuildSafe();
             voxelMesh.active = true;
         }
         #endregion
@@ -1733,14 +1733,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (module == null || !module.Valid)
                                 continue;
 
-                            for (int j = 0; j < module.meshDataList.Count; j++)
+                            int count = module?.meshDataList?.Count ?? 0;
+                            for (int j = 0; j < count; j++)
                             {
                                 GeometryMesh mesh = module.meshDataList[j];
                                 lock (mesh)
                                     if (mesh.meshTransform != null && mesh.gameObjectActiveInHierarchy && mesh.valid)
                                         meshes.Add(mesh);
                             }
-
                         }
                     });
                     for (int i = 0; i < meshes.Count; i++)
@@ -1759,7 +1759,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         if (module == null || !module.Valid)
                             continue;
 
-                        for (int j = 0; j < module.meshDataList.Count; j++)
+                        int count = module?.meshDataList?.Count ?? 0;
+                        for (int j = 0; j < count; j++)
                         {
                             GeometryMesh mesh = module.meshDataList[j];
                             bool updateFromMesh = false;
@@ -1770,7 +1771,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (updateFromMesh)
                                 UpdateFromMesh(mesh, mesh.part);
                         }
-
                     }
                 }
             }

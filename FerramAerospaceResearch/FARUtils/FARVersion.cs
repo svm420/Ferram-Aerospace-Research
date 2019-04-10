@@ -1,7 +1,7 @@
 /*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.9.7 "Lumley"
 =========================
-Copyright 2018, Daumantas Kavolis, aka dkavolis
+Copyright 2019, Daumantas Kavolis, aka dkavolis
 
    This file is part of Ferram Aerospace Research.
 
@@ -48,8 +48,8 @@ namespace FerramAerospaceResearch.FARUtils
         public const byte Major = 0;
         public const byte Minor = 15;
         public const byte Build = 9;
-        public const byte Revision = 6;
-        public const string Name = "Lin";
+        public const byte Revision = 7;
+        public const string Name = "Lumley";
 
         public readonly static string String = $"v{Major}.{Minor}.{Build}.{Revision}";
         public readonly static string VersionString = $"{String} '{Name}'";

@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.9.7 "Lumley"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2017, Michael Ferrara, aka Ferram4
+Copyright 2019, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -167,6 +167,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             guiRect.width = 650;
 
 
+            GameEvents.onEditorVariantApplied.Add(UpdateGeometryEvent);
             GameEvents.onEditorPartEvent.Add(UpdateGeometryEvent);
             GameEvents.onEditorUndo.Add(ResetEditorEvent);
             GameEvents.onEditorRedo.Add(ResetEditorEvent);
@@ -196,6 +197,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         void OnDestroy()
         {
+            GameEvents.onEditorVariantApplied.Remove(UpdateGeometryEvent);
             GameEvents.onEditorPartEvent.Remove(UpdateGeometryEvent);
             GameEvents.onEditorUndo.Remove(ResetEditorEvent);
             GameEvents.onEditorRedo.Remove(ResetEditorEvent);
@@ -257,6 +259,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             RequestUpdateVoxel();
         }
 
+        private void UpdateGeometryEvent(Part part, PartVariant partVariant)
+        {
+            UpdateGeometryEvent(ConstructionEventType.Unknown, part);
+        }
+
         private void UpdateGeometryEvent(ConstructionEventType type, Part pEvent)
         {
             if (type == ConstructionEventType.PartRotated ||
@@ -277,7 +284,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void UpdateGeometryModule(ConstructionEventType type, Part p)
         {
-            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
+            GeometryPartModule g = p?.GetComponent<GeometryPartModule>();
             if (g != null && g.Ready)
             {
                 if (type == ConstructionEventType.Unknown)
@@ -289,7 +296,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void UpdateGeometryModule(Part p)
         {
-            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
+            GeometryPartModule g = p?.GetComponent<GeometryPartModule>();
             if (g != null && g.Ready)
             {
                 g.EditorUpdate();
@@ -557,7 +564,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(Localizer.Format("FARDebugVoxels")))
-                _vehicleAero.DebugVisualizeVoxels(EditorLogic.RootPart.partTransform.localToWorldMatrix);
+            {
+                Matrix4x4? localToWorldMatrix = null;
+                try
+                {
+                    // even with no root parts in the editor, neither RootPart or its partTransform are null
+                    // but trying to get locaToWorldMatrix throws NRE
+                    localToWorldMatrix = EditorLogic.RootPart.partTransform.localToWorldMatrix;
+                }
+                catch (NullReferenceException)
+                { }
+                if (localToWorldMatrix != null)
+                    _vehicleAero.DebugVisualizeVoxels((Matrix4x4)localToWorldMatrix);
+            }
             GUILayout.EndHorizontal();
         }
 

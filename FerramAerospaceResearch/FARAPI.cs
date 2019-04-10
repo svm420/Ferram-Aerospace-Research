@@ -1,9 +1,9 @@
-﻿/*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+/*
+Ferram Aerospace Research v0.15.9.7 "Lumley"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2017, Michael Ferrara, aka Ferram4
+Copyright 2019, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -86,9 +86,70 @@ namespace FerramAerospaceResearch
             return gui;
         }
 
+        /// <summary>
+        /// Toggle or enable/disable FAR speed display.
+        /// </summary>
+        /// <param name="enabled">Enable/disable the speed display, null value toggles the speed display</param>
+        /// <param name="v">Vessel to toggle or enable/disable speed display for, null to apply <paramref name="enabled"/> globally</param>
+        /// <returns>Success/failure of toggling or enabling/disabling the speed display</returns>
+        public static bool ToggleAirspeedDisplay(bool? enabled = null, Vessel v = null)
+        {
+            if (v == null)
+            {
+                if (enabled == null)
+                {
+                    AirspeedSettingsGUI.allEnabled = !AirspeedSettingsGUI.allEnabled;
+                }
+                else
+                {
+                    AirspeedSettingsGUI.allEnabled = (bool) enabled;
+                }
+                return true;
+            }
+
+            FlightGUI gui = VesselFlightInfo(v);
+            if (gui != null)
+            {
+                AirspeedSettingsGUI airspeedSettingsGUI = gui.airSpeedGUI;
+                if (airspeedSettingsGUI != null)
+                {
+                    if (enabled == null)
+                    {
+                        airspeedSettingsGUI.enabled = !airspeedSettingsGUI.enabled;
+                    }
+                    else
+                    {
+                        airspeedSettingsGUI.enabled = (bool) enabled;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static FlightGUI VesselFlightInfo(Vessel v)
         {
             return Instance.GetFlightInfo(v);
+        }
+
+        public static double ActiveVesselIAS()
+        {
+            return VesselIAS(FlightGlobals.ActiveVessel);
+        }
+
+        public static double VesselIAS(Vessel vessel)
+        {
+            return VesselFlightInfo(vessel)?.airSpeedGUI?.CalculateIAS() ?? 0;
+        }
+
+        public static double ActiveVesselEAS()
+        {
+            return VesselEAS(FlightGlobals.ActiveVessel);
+        }
+
+        public static double VesselEAS(Vessel vessel)
+        {
+            return VesselFlightInfo(vessel)?.airSpeedGUI?.CalculateEAS() ?? 0;
         }
 
         public static double ActiveVesselDynPres()

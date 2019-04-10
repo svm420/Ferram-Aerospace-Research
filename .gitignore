@@ -1,7 +1,9 @@
-bin
+// ignore pattern for files so some can be unignored later
+**/bin/**/*.*
 obj
 
 *.mdb
+/Ships
 /GameData/FerramAerospaceResearch/Custom*.cfg
 /GameData/FerramAerospaceResearch/FARForceDataUpdate.cfg
 *.suo
@@ -12,8 +14,11 @@ obj
 .vs
 *.pdb
 out
-releasing
+releases
 
 .mypy*
-*.json
+.pytest_cache
 *.pyc
+
+// unignore Debug build DLLs
+!bin/[Dd]ebug/[Ff]erram*.dll

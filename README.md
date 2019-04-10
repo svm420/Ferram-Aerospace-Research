@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.15.9.6 "Lin"
+Ferram Aerospace Research Continued v0.15.9.7 "Lumley"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -66,7 +66,34 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
-Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
+Fix voxelization of most stock engines ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
+Voxelization correctly handles jettison transforms with part variants ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
+Fix voxelization of `InflatableHeatShield` ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
+Fixed voxelization of simple heat shields ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37))  
+Added additional nodes to `GeometryPartModule` ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37), [#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39), see PRs for more details). The new nodes should allow parts to be voxelized much closer to what is visible and handle animations better:
+* `ignoreTransform` (string)
+* `ignoreIfNoRenderer` (bool)
+* `unignoreTransform` (string)
+* `rebuildOnAnimation` (bool)
+
+NRE fixes ([#36](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/36)):  
+* Trying to display debug voxels with no parts in the editor
+* Occasional  NRE when voxelizing vehicle (due to race conditions?)
+* When force closing the game from the editor with debug voxels displayed
+
+Voxelization respects part variant changes in the editor ([#35](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/35))  
+Expose IAS and EAS used by FAR in FARAPI ([#34](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/34))  
+Enable/disable FAR speed display on the navball from FARAPI ([#33](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/33))  
+
+0.15.9.7V "Lumley"------------------------------------
+
+**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
+
+Update to MM 4.0.2
+
+Fix skinned meshes having scale applied twice in voxelization ([#30](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/30))  
+Fix new stock parts ([#24](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/24), thanks [@HSJasperism](https://github.com/HSJasperism))  
+Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18), [#29](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/29))  
 Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
 
 0.15.9.?V "???" -----------------------------------
