@@ -66,6 +66,7 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
+Fix principal axes in simulation and other bugfixes ([#23](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/23), [@Rodhern](https://github.com/Rodhern))  
 Fix voxelization of most stock engines ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
 Voxelization correctly handles jettison transforms with part variants ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
 Fix voxelization of `InflatableHeatShield` ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
@@ -95,10 +96,6 @@ Fix skinned meshes having scale applied twice in voxelization ([#30](https://git
 Fix new stock parts ([#24](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/24), thanks [@HSJasperism](https://github.com/HSJasperism))  
 Greatly improved debug visual voxels framerate ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18), [#29](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/29))  
 Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/18))  
-
-0.15.9.?V "???" -----------------------------------
-
-Merged in Rodhern's update 3 (but disabled the stability derivatives export functionality)
 
 0.15.9.6V "Lin"------------------------------------
 
@@ -198,7 +195,7 @@ Update license
 
 Fix an issue where voxels could be incredibly asymmetric on symmetric crafts  
 
-0.15.7V "Küchemann"------------------------------------  
+0.15.7V "KÃ¼chemann"------------------------------------  
 
 Update to ModuleManager 2.6.25  
 Update for KSP 1.1.3 compatibility  
@@ -243,7 +240,7 @@ Fix RealChute / RealChuteLite interaction breaking stock chute behavior, thanks 
 Fix mass-calc error for wing-mass-strength that resulted in all planes gaining unhealthy amounts of weight  
 Attempt to make debug-compatibility actually work, thanks to NathanKell  
 
-0.15.6.1V "von Kármán"------------------------------------
+0.15.6.1V "von KÃ¡rmÃ¡n"------------------------------------
 
 Fix a critical CPU usage bug that resulted in voxelization threads SpinWaiting forever, monopolizing the processor  
 Fix parachutes without RealChute configs not applying forces when FAR + RC are installed, thanks to stupid_chris  
