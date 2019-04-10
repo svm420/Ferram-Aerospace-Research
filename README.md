@@ -66,6 +66,7 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------
 
+Fix principal axes in simulation and other bugfixes ([#23](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/23), [@Rodhern](https://github.com/Rodhern))  
 Fix voxelization of most stock engines ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
 Voxelization correctly handles jettison transforms with part variants ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
 Fix voxelization of `InflatableHeatShield` ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
@@ -156,7 +157,6 @@ Include German (by terorie), Russian (by pand5461), and Chinese (by Nigh) transl
 Fix NaN errors with Trajectories  
 Fix some issues with identifying KSPWheel Adjustable Landing Gear as gear  
 
-
 0.15.8.1V "Lewis"------------------------------------  
 
 Bugfix patch for KSP 1.2.2  
@@ -183,7 +183,6 @@ Fix voxel errors with some stock parts
 
 Made ignorable transforms for voxelization customizable via config  
 
-
 0.15.7.2V "Lanchester"------------------------------------  
 
 Fix a serious bug in v0.15.7 and v0.15.7.1 where chutes would not provide any drag  
@@ -195,7 +194,6 @@ Update CompatibilityChecker version
 Update license  
 
 Fix an issue where voxels could be incredibly asymmetric on symmetric crafts  
-
 
 0.15.7V "Küchemann"------------------------------------  
 

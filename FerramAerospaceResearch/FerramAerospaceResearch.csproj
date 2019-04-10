@@ -122,6 +122,7 @@
     <Compile Include="FARGUI\FAREditorGUI\Simulation\InstantConditionSimOutput.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivApproxSim.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivOutput.cs" />
+    <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivExportOutput.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\StabilityDerivCalculator.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\SweepSim.cs" />
     <Compile Include="FARGUI\FAREditorGUI\EditorAreaRulingOverlay.cs" />
@@ -160,8 +161,8 @@
     <Compile Include="RealChuteLite\PhysicsWatch.cs" />
     <Compile Include="RealChuteLite\RealChuteFAR.cs" />
     <Compile Include="ToolbarWrapper.cs" />
-    <Compile Include="FARUtils/FARLogger.cs" />
-    <Compile Include="FARUtils/FARVersion.cs" />
+    <Compile Include="FARUtils\FARLogger.cs" />
+    <Compile Include="FARUtils\FARVersion.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

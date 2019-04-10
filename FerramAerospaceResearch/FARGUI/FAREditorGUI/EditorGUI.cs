@@ -230,6 +230,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         #region EditorEvents
         private void ResetEditorEvent(ShipConstruct construct)
         {
+            FARAeroUtil.ResetEditorParts(); // Rodhern: Partial fix to https://github.com/ferram4/Ferram-Aerospace-Research/issues/177 .
+
             if (EditorLogic.RootPart != null)
             {
                 List<Part> partsList = EditorLogic.SortedShipList;
@@ -239,6 +241,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             RequestUpdateVoxel();
         }
+
         private void ResetEditorEvent(ShipConstruct construct, CraftBrowserDialog.LoadType type)
         {
             ResetEditor();
@@ -264,10 +267,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private void UpdateGeometryEvent(ConstructionEventType type, Part pEvent)
         {
             if (type == ConstructionEventType.PartRotated ||
-            type == ConstructionEventType.PartOffset ||
-            type == ConstructionEventType.PartAttached ||
-            type == ConstructionEventType.PartDetached ||
-            type == ConstructionEventType.PartRootSelected ||
+                type == ConstructionEventType.PartOffset ||
+                type == ConstructionEventType.PartAttached ||
+                type == ConstructionEventType.PartDetached ||
+                type == ConstructionEventType.PartRootSelected ||
                 type == ConstructionEventType.Unknown)
             {
                 if (EditorLogic.SortedShipList.Count > 0)
@@ -324,15 +327,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                         _wingAerodynamicModel.Add(c);
                     }
             }
-
         }
         #endregion
+
         void Awake()
         {
             FARThreading.VoxelizationThreadpool.RunInMainThread = Debug.isDebugBuild;
             if (FARDebugValues.useBlizzyToolbar)
                 GenerateBlizzyToolbarButton();
         }
+
         void Update()
         {
             FARThreading.VoxelizationThreadpool.Instance.ExecuteMainThreadTasks();
