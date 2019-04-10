@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.15.9.7 "Lumley"
+Ferram Aerospace Research Continued v0.15.10.0 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,7 +64,7 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
--------------------master branch-------------------
+0.15.10.0V "Lundgren"------------------------------------
 
 Fix principal axes in simulation and other bugfixes ([#23](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/23), [@Rodhern](https://github.com/Rodhern))  
 Fix voxelization of most stock engines ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
