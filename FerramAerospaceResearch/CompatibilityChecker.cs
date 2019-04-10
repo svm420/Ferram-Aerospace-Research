@@ -43,7 +43,7 @@ namespace FerramAerospaceResearch
     {
         public const int KSP_MAJOR_MAX = 1,
             KSP_MAJOR_MIN = 1,
-            KSP_MINOR_MAX = 6,
+            KSP_MINOR_MAX = 7,
             KSP_MINOR_MIN = 4;
         public static bool IsCompatible()
         {

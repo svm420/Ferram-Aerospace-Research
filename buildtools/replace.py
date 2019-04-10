@@ -5,7 +5,7 @@
 @Date:                 05-Apr-2019
 @Filename:             replace.py
 @Last Modified By:     Daumantas Kavolis
-@Last Modified Time:   05-Apr-2019
+@Last Modified Time:   10-Apr-2019
 """
 
 from __future__ import annotations
@@ -26,11 +26,28 @@ def build_parser(parser):
 
 
 def replace(config):
-    for glob_pattern, subs in config["replace"].items():
+    for glob_pattern, subs in config.get("replace", {}).get("regex", {}).items():
         files = common.glob(common.resolve_path(glob_pattern, config))
 
         for filename in files:
             replace_in_file(filename, subs, config)
+
+    for src, dst in config.get("replace", {}).get("template_files", {}).items():
+        src = common.resolve_path(src, config)
+        dst = common.resolve_path(dst, config)
+
+        replace_in_file_all(src, dst, config)
+
+
+def replace_in_file_all(src, dst, config):
+    print(f"Updating {src!r} -> {dst!r}")
+    with open(src, "r") as file:
+        contents = file.read()
+
+    contents = common.resolve(contents, config)
+
+    with open(dst, "w") as file:
+        file.write(contents)
 
 
 def replace_in_file(filename, replacements, config):
@@ -38,8 +55,8 @@ def replace_in_file(filename, replacements, config):
     with open(filename, "r") as file:
         contents = file.read()
     for pattern, replacement in replacements.items():
-        pattern = common.resolve_path(pattern, config)
-        replacement = common.resolve_path(replacement, config)
+        pattern = common.resolve(pattern, config)
+        replacement = common.resolve(replacement, config)
 
         def replace(matchobj):
             if (len(matchobj.groups())) > 0:
