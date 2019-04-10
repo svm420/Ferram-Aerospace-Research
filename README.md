@@ -66,6 +66,8 @@ CHANGELOG
 =======================================================
 0.15.10.0V "Lundgren"------------------------------------
 
+**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
+
 Fix principal axes in simulation and other bugfixes ([#23](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/23), [@Rodhern](https://github.com/Rodhern))  
 Fix voxelization of most stock engines ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
 Voxelization correctly handles jettison transforms with part variants ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
