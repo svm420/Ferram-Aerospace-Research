@@ -229,6 +229,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             get { return ignoreForMainAxis; }
         }
 
+        public override void OnAwake()
+        {
+            base.OnAwake();
+            ignoredTransforms = new List<string>();
+            unignoredTransforms = new List<string>();
+        }
+
         void Start()
         {
             destroyed = false;
@@ -1020,8 +1027,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             LoadBool(node, "ignoreForMainAxis", out ignoreForMainAxis);
             LoadBool(node, "ignoreIfNoRenderer", out ignoreIfNoRenderer);
             LoadBool(node, "rebuildOnAnimation", out rebuildOnAnimation);
-            ignoredTransforms = LoadList(node, "ignoreTransform");
-            unignoredTransforms = LoadList(node, "unignoreTransform");
+            LoadList(node, "ignoreTransform", ref ignoredTransforms);
+            LoadList(node, "unignoreTransform", ref unignoredTransforms);
         }
 
         private void LoadBool(ConfigNode node, string name, out bool value)
@@ -1037,9 +1044,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private List<string> LoadList(ConfigNode node, string name)
+        private void LoadList(ConfigNode node, string name, ref List<string> list)
         {
-            var list = new List<string>();
+            list.Clear();
             if (node.HasValue(name))
             {
                 foreach (string _name in node.GetValues(name))
@@ -1048,7 +1055,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
                 _ready = false;
             }
-            return list;
         }
     }
 }
