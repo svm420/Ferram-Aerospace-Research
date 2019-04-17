@@ -1022,31 +1022,26 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public override void OnLoad(ConfigNode node)
         {
             base.OnLoad(node);
-            LoadBool(node, "forceUseColliders", out forceUseColliders);
-            LoadBool(node, "forceUseMeshes", out forceUseMeshes);
-            LoadBool(node, "ignoreForMainAxis", out ignoreForMainAxis);
-            LoadBool(node, "ignoreIfNoRenderer", out ignoreIfNoRenderer);
-            LoadBool(node, "rebuildOnAnimation", out rebuildOnAnimation);
+            LoadBool(node, "forceUseColliders", ref forceUseColliders);
+            LoadBool(node, "forceUseMeshes", ref forceUseMeshes);
+            LoadBool(node, "ignoreForMainAxis", ref ignoreForMainAxis);
+            LoadBool(node, "ignoreIfNoRenderer", ref ignoreIfNoRenderer);
+            LoadBool(node, "rebuildOnAnimation", ref rebuildOnAnimation);
             LoadList(node, "ignoreTransform", ref ignoredTransforms);
             LoadList(node, "unignoreTransform", ref unignoredTransforms);
         }
 
-        private void LoadBool(ConfigNode node, string name, out bool value)
+        private void LoadBool(ConfigNode node, string name, ref bool value)
         {
             if (node.HasValue(name))
             {
                 bool.TryParse(node.GetValue(name), out value);
                 _ready = false;
             }
-            else
-            {
-                value = false;
-            }
         }
 
         private void LoadList(ConfigNode node, string name, ref List<string> list)
         {
-            list.Clear();
             if (node.HasValue(name))
             {
                 foreach (string _name in node.GetValues(name))
