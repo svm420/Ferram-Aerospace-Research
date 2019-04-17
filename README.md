@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.15.10.0 "Lundgren"
+Ferram Aerospace Research Continued v0.15.10.1 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,7 +64,7 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
--------------------master branch-------------------------  
+0.15.10.1V "Lundgren"------------------------------------  
 
 Fix config values reset on load in `GeometryPartModule` [#47](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/47)  
 Fix NRE spam on EVA [#43](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/43) ([#44](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/44))  
