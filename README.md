@@ -66,6 +66,7 @@ CHANGELOG
 =======================================================
 -------------------master branch-------------------------  
 
+Fix config values reset on load in `GeometryPartModule` [#47](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/47)  
 Fix NRE spam on EVA [#43](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/43) ([#44](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/44))  
 
 0.15.10.0V "Lundgren"------------------------------------

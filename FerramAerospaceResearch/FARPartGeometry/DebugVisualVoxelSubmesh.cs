@@ -72,7 +72,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public bool active
         {
             get => gameObject.activeSelf;
-            set => gameObject?.SetActive(value);
+            set
+            {
+                if (gameObject != null)
+                    gameObject.SetActive(value);
+            }
         }
 
         public Mesh Mesh
