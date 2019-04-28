@@ -284,7 +284,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void UpdateGeometryModule(ConstructionEventType type, Part p)
         {
-            GeometryPartModule g = p?.GetComponent<GeometryPartModule>();
+            if (p is null) return;
+            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
             if (g != null && g.Ready)
             {
                 if (type == ConstructionEventType.Unknown)
@@ -296,7 +297,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void UpdateGeometryModule(Part p)
         {
-            GeometryPartModule g = p?.GetComponent<GeometryPartModule>();
+            if (p is null) return;
+            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
             if (g != null && g.Ready)
             {
                 g.EditorUpdate();
