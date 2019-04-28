@@ -64,6 +64,10 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+-----------------------master branch---------------------
+
+Fix part tinting not cleared after last tint option is disabled [#49](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/49)  
+
 0.15.10.1V "Lundgren"------------------------------------  
 
 Fix config values reset on load in `GeometryPartModule` [#47](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/47)  
