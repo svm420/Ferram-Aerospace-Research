@@ -66,6 +66,7 @@ CHANGELOG
 =======================================================
 -----------------------master branch---------------------
 
+Fix Runge Kutta method in transient simulation ([#50](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/50))  
 Fix part tinting not cleared after last tint option is disabled ([#49](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/49))  
 
 0.15.10.1V "Lundgren"------------------------------------  
