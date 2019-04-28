@@ -297,25 +297,25 @@ namespace ferram4
             associatedInfluences.Clear();
             double influencePerIndex = 1 / (double)arrayIn.Length;
 
-            for (int i = 0; i < arrayIn.Length; i++)
+            var forward = parentWingPart.partTransform.forward;
+            foreach (var w in arrayIn)
             {
-                FARWingAerodynamicModel w = arrayIn[i];
+                if (w is null) continue;
                 bool foundModule = false;
+                double influence = influencePerIndex * Math.Abs(Vector3.Dot(forward, w.part.partTransform.forward));
                 for (int j = 0; j < moduleList.Count; j++)
                 {
-                    if (moduleList[j] == w)
-                    {
-                        associatedInfluences[j] += influencePerIndex * Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward, w.part.partTransform.forward));
-                        foundModule = true;
-                        break;
-                    }
+                    if (moduleList[j] != w) continue;
+                    associatedInfluences[j] += influence;
+                    foundModule             =  true;
+                    break;
                 }
-                if (foundModule || (object)w == null)
+                if (foundModule)
                     continue;
 
 
                 moduleList.Add(w);
-                associatedInfluences.Add(influencePerIndex * Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward, w.part.partTransform.forward)));
+                associatedInfluences.Add(influence);
             }
         }
 
