@@ -699,15 +699,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 }
                 if(p.Modules.Contains("FSwheel"))
                 {
-                    PartModule m = p.Modules["FSwheel"];
-                    MethodInfo method = m.GetType().GetMethod("animate", BindingFlags.Instance | BindingFlags.NonPublic);
-                    method.Invoke(m, gearToggle ? new object[] { "Deploy" } : new object[] { "Retract" });
+                    var m = p.Modules["FSwheel"];
+                    var method = m.GetType().GetMethod("animate", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (method == null)
+                        FARLogger.Error("FSwheel does not have method 'animate");
+                    else
+                        method.Invoke(m, gearToggle ? new object[] { "Deploy" } : new object[] { "Retract" });
                 }
                 if (p.Modules.Contains("FSBDwheel"))
                 {
-                    PartModule m = p.Modules["FSBDwheel"];
-                    MethodInfo method = m.GetType().GetMethod("animate", BindingFlags.Instance | BindingFlags.NonPublic);
-                    method.Invoke(m, gearToggle ? new object[] { "Deploy" } : new object[] { "Retract" });
+                    var m = p.Modules["FSBDwheel"];
+                    var method = m.GetType().GetMethod("animate", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (method == null)
+                        FARLogger.Error("FSBDwheel does not have method 'animate");
+                    else
+                        method.Invoke(m, gearToggle ? new object[] { "Deploy" } : new object[] { "Retract" });
                 }
                 if (p.Modules.Contains("KSPWheelAdjustableGear"))
                 {
@@ -715,7 +721,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     MethodInfo method = m.GetType().GetMethod("deploy", BindingFlags.Instance | BindingFlags.Public);
                     try
                     {
-                        method.Invoke(m, null);
+                        if (method == null)
+                            FARLogger.Error("KSPWheelAdjustableGear does not have method 'animate");
+                        else
+                            method.Invoke(m, null);
                     }
                     catch(Exception e)
                     {

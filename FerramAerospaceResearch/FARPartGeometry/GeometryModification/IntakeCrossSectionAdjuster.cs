@@ -43,7 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Reflection;
+using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
@@ -100,40 +100,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetupAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
         {
-            this.part = intake.part;
-            intakeModule = intake as ModuleResourceIntake;
-            intakeTrans = intakeModule.intakeTransform;
-            if (intakeTrans == null)
-                intakeTrans = intake.part.partTransform;
-
-            if (!string.IsNullOrEmpty(intakeModule.occludeNode))
-                node = intakeModule.node;
-
-            foreach (AttachNode candidateNode in part.attachNodes)
-                if (candidateNode.nodeType == AttachNode.NodeType.Stack && Vector3.Dot(candidateNode.position, (part.transform.worldToLocalMatrix * intakeTrans.localToWorldMatrix).MultiplyVector(Vector3.forward)) > 0)
-                {
-                    if (candidateNode == node)
-                        continue;
-
-                    nodeOffsetArea = candidateNode.size;
-                    if (nodeOffsetArea == 0)
-                        nodeOffsetArea = 0.5;
-
-                    nodeOffsetArea *= 0.625;     //scale it up as needed
-                    nodeOffsetArea *= nodeOffsetArea;
-                    nodeOffsetArea *= Math.PI;  //calc area;
-
-                    nodeOffsetArea *= -1;        //and the adjustment area
-                    break;
-                }
-
-            thisToVesselMatrix = worldToVesselMatrix * intakeTrans.localToWorldMatrix;
-
-            vehicleBasisForwardVector = Vector3.forward;
-            vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);
-
-            Type intakeType = intake.GetType();
-            intakeArea = (float)intakeType.GetField("Area").GetValue(intake);
+            if (intake is ModuleResourceIntake module)
+                SetupAdjuster(module, worldToVesselMatrix);
+            else
+                FARLogger.Error($"{intake} is not typeof ModuleResourceIntake");
         }
 
         public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)

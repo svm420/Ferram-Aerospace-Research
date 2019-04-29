@@ -194,6 +194,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (ignorePartModuleTransforms == null)
                 LoadPartModuleTransformStrings();
 
+            // ReSharper disable once PossibleNullReferenceException
             for (int i = 0; i < ignorePartModuleTransforms.Count; ++i)
             {
                 List<string> currentPartModuleTransforms = ignorePartModuleTransforms[i];

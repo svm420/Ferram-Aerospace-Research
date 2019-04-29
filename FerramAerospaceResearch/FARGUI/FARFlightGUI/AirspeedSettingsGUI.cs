@@ -232,6 +232,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if(flightGUISettings == null)
             {
                 FARLogger.Error("Could not save Airspeed Settings because settings config list was null");
+                return;
             }
             ConfigNode node = null;
             for(int i = 0; i < flightGUISettings.Count; i++)
