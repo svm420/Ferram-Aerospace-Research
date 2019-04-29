@@ -274,10 +274,8 @@ namespace ferram4
                 MonoBehaviour.print("[FAR] [ferramGraph] Error: No line with that name exists");
                 return;
             }
-            ferramGraphLine line;
 
-            allLines.TryGetValue(lineName, out line);
-
+            if (!allLines.TryGetValue(lineName, out var line)) return;
             line.UpdateVerticalScaling(scaling);
         }
 
@@ -289,10 +287,8 @@ namespace ferram4
                 MonoBehaviour.print("[FAR] [ferramGraph] Error: No line with that name exists");
                 return;
             }
-            ferramGraphLine line;
 
-            allLines.TryGetValue(lineName, out line);
-
+            if (!allLines.TryGetValue(lineName, out var line)) return;
             line.UpdateHorizontalScaling(scaling);
         }
 

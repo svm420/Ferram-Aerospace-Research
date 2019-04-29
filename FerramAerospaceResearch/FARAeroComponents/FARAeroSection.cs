@@ -302,7 +302,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 break;
             }
-            if (aeroModule.part == null || aeroModule.part.transform == null)
+            if (aeroModule == null || aeroModule.part == null || aeroModule.part.transform == null)
             {
                 return;
             }

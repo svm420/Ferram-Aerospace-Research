@@ -93,28 +93,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetupAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
         {
-            this.part = intake.part;
-            intakeModule = intake as ModuleResourceIntake;
-            intakeTrans = intakeModule.intakeTransform;
-            //ModuleResourceIntake intake = intake;
-
-
-            /*vehicleBasisForwardVector = Vector3.forward;//intakeTrans.forward;
-
-            foreach(AttachNode node in part.attachNodes)
-                if(node.nodeType == AttachNode.NodeType.Stack && Vector3.Dot(node.position, (part.transform.worldToLocalMatrix * intakeTrans.localToWorldMatrix).MultiplyVector(Vector3.forward)) > 0)
-                {
-                    frontNode = node;
-                    break;
-                }*/
-
-            thisToVesselMatrix = worldToVesselMatrix * intakeTrans.localToWorldMatrix;
-
-            vehicleBasisForwardVector = Vector3.forward;
-            vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);
-
-            Type intakeType = intake.GetType();
-            intakeArea = (float)intakeType.GetField("Area").GetValue(intake);
+            if (intake is ModuleResourceIntake module)
+                SetupAdjuster(module, worldToVesselMatrix);
+            else
+                FARLogger.Error($"{intake} is not typeof ModuleResourceIntake");
         }
 
         public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)

@@ -1729,12 +1729,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         VoxelShellMeshParams meshParams = (VoxelShellMeshParams)meshParamsObject;
                         for (int i = meshParams.lowerIndex; i < meshParams.upperIndex; i++)
                         {
-                            GeometryPartModule module = meshParams.modules[i];
-                            if (module == null || !module.Valid)
+                            var module = meshParams.modules[i];
+                            if (module == null || !module.Valid || module.meshDataList == null)
                                 continue;
 
-                            int count = module?.meshDataList?.Count ?? 0;
-                            for (int j = 0; j < count; j++)
+                            for (int j = 0; j < module.meshDataList.Count; j++)
                             {
                                 GeometryMesh mesh = module.meshDataList[j];
                                 lock (mesh)
@@ -1755,12 +1754,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     VoxelShellMeshParams meshParams = (VoxelShellMeshParams)meshParamsObject;
                     for (int i = meshParams.lowerIndex; i < meshParams.upperIndex; i++)
                     {
-                        GeometryPartModule module = meshParams.modules[i];
-                        if (module == null || !module.Valid)
+                        var module = meshParams.modules[i];
+                        if (module == null || !module.Valid || module.meshDataList == null)
                             continue;
 
-                        int count = module?.meshDataList?.Count ?? 0;
-                        for (int j = 0; j < count; j++)
+                        for (int j = 0; j < module.meshDataList.Count; j++)
                         {
                             GeometryMesh mesh = module.meshDataList[j];
                             bool updateFromMesh = false;
