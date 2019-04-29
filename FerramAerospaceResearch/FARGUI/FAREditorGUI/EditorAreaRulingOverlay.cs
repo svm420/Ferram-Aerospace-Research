@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -344,10 +344,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor)
         {
-            renderer.transform.parent = EditorLogic.RootPart.partTransform;
-            renderer.transform.localPosition = Vector3.zero;
-            renderer.transform.localRotation = Quaternion.identity;
-            renderer.transform.SetAsFirstSibling();
+            // getting transform is internal call, cache
+            Transform transform = renderer.transform;
+            transform.parent = EditorLogic.RootPart.partTransform;
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            transform.SetAsFirstSibling();
 
             renderer.positionCount = xCoords.Length;
 

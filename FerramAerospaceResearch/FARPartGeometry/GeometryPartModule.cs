@@ -835,8 +835,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 return meshList;
             }
 
-            Bounds rendererBounds = this.part.GetPartOverallMeshBoundsInBasis(part.partTransform.worldToLocalMatrix);
-            Bounds colliderBounds = this.part.GetPartColliderBoundsInBasis(part.partTransform.worldToLocalMatrix);
+            var worldToLocalMatrix = part.partTransform.worldToLocalMatrix;
+            var rendererBounds = part.GetPartOverallMeshBoundsInBasis(worldToLocalMatrix);
+            var colliderBounds = part.GetPartColliderBoundsInBasis(worldToLocalMatrix);
 
             bool cantUseColliders = true;
             bool isFairing = part.Modules.Contains<ModuleProceduralFairing>() || part.Modules.Contains("ProceduralFairingSide");
