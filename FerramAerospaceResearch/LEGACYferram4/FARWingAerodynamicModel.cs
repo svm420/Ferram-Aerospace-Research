@@ -427,7 +427,7 @@ namespace ferram4
         public override void Initialization()
         {
             base.Initialization();
-            if (b_2_actual == 0)
+            if (b_2_actual.NearlyEqual(0))
             {
                 b_2_actual = b_2;
                 MAC_actual = MAC;
@@ -801,7 +801,7 @@ namespace ferram4
                 UpdateMassToAccountForArea();
                 updateMassNextFrame = false;
             }
-            else if (HighLogic.LoadedSceneIsEditor && massMultiplier != oldMassMultiplier)
+            else if (HighLogic.LoadedSceneIsEditor && !massMultiplier.NearlyEqual(oldMassMultiplier))
             {
                 GetRefAreaChildren();
                 UpdateMassToAccountForArea();

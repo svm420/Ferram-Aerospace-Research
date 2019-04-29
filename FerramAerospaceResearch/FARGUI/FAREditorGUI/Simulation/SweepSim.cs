@@ -82,7 +82,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             {
                 input.machNumber = i / (double)numPoints * (upperBound - lowerBound) + lowerBound;
 
-                if (input.machNumber == 0)
+                if (input.machNumber.NearlyEqual(0))
                     input.machNumber = 0.001;
 
                 InstantConditionSimOutput output;
@@ -107,7 +107,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public GraphData AngleOfAttackSweep(double machNumber, double pitch, double lowerBound, double upperBound, int numPoints, int flapSetting, bool spoilers, CelestialBody body)
         {
-            if (machNumber == 0)
+            if (machNumber.NearlyEqual(0))
                 machNumber = 0.001;
 
             InstantConditionSimInput input = new InstantConditionSimInput(0, 0, 0, 0, 0, 0, machNumber, pitch, flapSetting, spoilers);

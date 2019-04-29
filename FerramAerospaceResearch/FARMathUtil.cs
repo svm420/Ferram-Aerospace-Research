@@ -192,7 +192,7 @@ namespace FerramAerospaceResearch
 
             bool flag = true;
             int iter = 0;
-            while (fs != 0 && Math.Abs(a - b) > epsilon && iter < maxIter)
+            while (!fs.NearlyEqual(0) && Math.Abs(a - b) > epsilon && iter < maxIter)
             {
                 if ((fa - fc) > double.Epsilon && (fb - fc) > double.Epsilon)    //inverse quadratic interpolation
                 {

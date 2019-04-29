@@ -124,7 +124,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                         continue;
 
                     nodeOffsetArea = candidateNode.size;
-                    if (nodeOffsetArea == 0)
+                    if (nodeOffsetArea.NearlyEqual(0))
                         nodeOffsetArea = 0.5;
 
                     nodeOffsetArea *= 0.625;     //scale it up as needed
