@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -76,6 +76,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         int _numGridLines;
 
         Material _rendererMaterial;
+        private static readonly int colorId = Shader.PropertyToID("_Color");
 
         public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(Color axisColor, Color crossSectionColor, Color derivColor, double yScaleMaxDistance, double yAxisGridScale)
         {
@@ -167,7 +168,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (material.HasProperty("_Color"))
             {
                 // FARLogger.Info("Setting _Color on " + material + "to " + color);
-                rendererMaterial.SetColor("_Color", color);
+                rendererMaterial.SetColor(colorId, color);
             }
             else
                 FARLogger.Warning("Material " + material + " has no _Color property");
