@@ -200,14 +200,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             Transform refTransform = _vessel.ReferenceTransform;
 
-            Vector3 tmpVec = refTransform.up * Vector3.Dot(refTransform.up, velVectorNorm) + refTransform.forward * Vector3.Dot(refTransform.forward, velVectorNorm);   //velocity vector projected onto a plane that divides the airplane into left and right halves
-            vesselInfo.aoA = Vector3.Dot(tmpVec.normalized, refTransform.forward);
+            Vector3 up = refTransform.up;
+            Vector3 forward = refTransform.forward;
+            Vector3 right = refTransform.right;
+            Vector3 tmpVec = up * Vector3.Dot(up, velVectorNorm) + forward * Vector3.Dot(forward, velVectorNorm);   //velocity vector projected onto a plane that divides the airplane into left and right halves
+            vesselInfo.aoA = Vector3.Dot(tmpVec.normalized, forward);
             vesselInfo.aoA = FARMathUtil.rad2deg * Math.Asin(vesselInfo.aoA);
             if (double.IsNaN(vesselInfo.aoA))
                 vesselInfo.aoA = 0;
 
-            tmpVec = refTransform.up * Vector3.Dot(refTransform.up, velVectorNorm) + refTransform.right * Vector3.Dot(refTransform.right, velVectorNorm);     //velocity vector projected onto the vehicle-horizontal plane
-            vesselInfo.sideslipAngle = Vector3.Dot(tmpVec.normalized, refTransform.right);
+            tmpVec = up * Vector3.Dot(up, velVectorNorm) + right * Vector3.Dot(right, velVectorNorm);     //velocity vector projected onto the vehicle-horizontal plane
+            vesselInfo.sideslipAngle = Vector3.Dot(tmpVec.normalized, right);
             vesselInfo.sideslipAngle = FARMathUtil.rad2deg * Math.Asin(vesselInfo.sideslipAngle);
             if (double.IsNaN(vesselInfo.sideslipAngle))
                 vesselInfo.sideslipAngle = 0;

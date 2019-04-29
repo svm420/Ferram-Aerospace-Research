@@ -376,19 +376,32 @@ namespace ferram4
             if (HighLogic.LoadedSceneIsEditor && (!FlightGlobals.ready || (object)vessel == null || (object)part.partTransform == null))
                 return;
 
+            // use caching to improve performance since all vector properties call into native code
+            Vector3 partForward = part.partTransform.forward;
+            Vector3 partPosition = part.partTransform.position;
+            Vector3 forward, right, up;
+            if (HighLogic.LoadedSceneIsFlight)
+            {
+                forward = vessel.ReferenceTransform.forward;
+                right = vessel.ReferenceTransform.right;
+                up = vessel.ReferenceTransform.up;
+            }
+            else
+            {
+                forward = EditorLogic.RootPart.partTransform.forward;
+                right = EditorLogic.RootPart.partTransform.right;
+                up = EditorLogic.RootPart.partTransform.up;
+            }
 
             if (part.symMethod == SymmetryMethod.Mirror || part.symmetryCounterparts.Count < 1)
             {
-                if (HighLogic.LoadedSceneIsFlight)
-                    flapLocation = Math.Sign(Vector3.Dot(vessel.ReferenceTransform.forward, part.partTransform.forward));      //figure out which way is up
-                else
-                    flapLocation = Math.Sign(Vector3.Dot(EditorLogic.RootPart.partTransform.forward, part.partTransform.forward));      //figure out which way is up
+                flapLocation = Math.Sign(Vector3.Dot(forward, partForward));
 
                 spoilerLocation = -flapLocation;
             }
             else if (part.parent != null)
             {
-                flapLocation = Math.Sign(Vector3.Dot(part.partTransform.position - part.parent.partTransform.position, part.partTransform.forward));
+                flapLocation = Math.Sign(Vector3.Dot(partPosition - part.parent.partTransform.position, partForward));
                 spoilerLocation = flapLocation;
             }
             else
@@ -412,30 +425,15 @@ namespace ferram4
             if (HighLogic.LoadedSceneIsEditor && (isFlap || isSpoiler))
                 SetControlStateEditor(CoM, part.partTransform.up, 0, 0, 0, 0, false);
 
-            float roll2 = 0;
-            if (HighLogic.LoadedSceneIsEditor)
-            {
-                Vector3 CoMoffset = (part.partTransform.position - CoM).normalized;
-                PitchLocation = Vector3.Dot(part.partTransform.forward, EditorLogic.RootPart.partTransform.forward) * Math.Sign(Vector3.Dot(CoMoffset, EditorLogic.RootPart.partTransform.up));
-                YawLocation = -Vector3.Dot(part.partTransform.forward, EditorLogic.RootPart.partTransform.right) * Math.Sign(Vector3.Dot(CoMoffset, EditorLogic.RootPart.partTransform.up));
-                RollLocation = Vector3.Dot(part.partTransform.forward, EditorLogic.RootPart.partTransform.forward) * Math.Sign(Vector3.Dot(CoMoffset, -EditorLogic.RootPart.partTransform.right));
-                roll2 = Vector3.Dot(part.partTransform.forward, EditorLogic.RootPart.partTransform.right) * Math.Sign(Vector3.Dot(CoMoffset, EditorLogic.RootPart.partTransform.forward));
-                BrakeRudderLocation = Vector3.Dot(part.partTransform.forward, EditorLogic.RootPart.partTransform.forward);
-                BrakeRudderSide = Math.Sign(Vector3.Dot(CoMoffset, EditorLogic.RootPart.partTransform.right));
-                AoAsign = Math.Sign(Vector3.Dot(part.partTransform.up, EditorLogic.RootPart.partTransform.up));
-            }
-            else
-            {
-                //Figures out where the ctrl surface is; this must be done after physics starts to get vessel COM
-                Vector3 CoMoffset = (part.partTransform.position - CoM).normalized;
-                PitchLocation = Vector3.Dot(part.partTransform.forward, vessel.ReferenceTransform.forward) * Math.Sign(Vector3.Dot(CoMoffset, vessel.ReferenceTransform.up));
-                YawLocation = -Vector3.Dot(part.partTransform.forward, vessel.ReferenceTransform.right) * Math.Sign(Vector3.Dot(CoMoffset, vessel.ReferenceTransform.up));
-                RollLocation = Vector3.Dot(part.partTransform.forward, vessel.ReferenceTransform.forward) * Math.Sign(Vector3.Dot(CoMoffset, -vessel.ReferenceTransform.right));
-                roll2 = Vector3.Dot(part.partTransform.forward, vessel.ReferenceTransform.right) * Math.Sign(Vector3.Dot(CoMoffset, vessel.ReferenceTransform.forward));
-                BrakeRudderLocation = Vector3.Dot(part.partTransform.forward, vessel.ReferenceTransform.forward);
-                BrakeRudderSide = Mathf.Sign(Vector3.Dot(CoMoffset, vessel.ReferenceTransform.right));
-                AoAsign = Math.Sign(Vector3.Dot(part.partTransform.up, vessel.ReferenceTransform.up));
-            }
+            Vector3 CoMoffset = (partPosition - CoM).normalized;
+            Vector3 partUp = part.partTransform.up;
+            PitchLocation = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, up));
+            YawLocation = -Vector3.Dot(partForward, right) * Math.Sign(Vector3.Dot(CoMoffset, up));
+            RollLocation = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, -right));
+            float roll2 = Vector3.Dot(partForward, right) * Math.Sign(Vector3.Dot(CoMoffset, forward));
+            BrakeRudderLocation = Vector3.Dot(partForward, forward);
+            BrakeRudderSide = Math.Sign(Vector3.Dot(CoMoffset, right));
+            AoAsign = Math.Sign(Vector3.Dot(partUp, up));
             //PitchLocation *= PitchLocation * Mathf.Sign(PitchLocation);
             //YawLocation *= YawLocation * Mathf.Sign(YawLocation);
             //RollLocation = RollLocation * RollLocation * Mathf.Sign(RollLocation) + roll2 * roll2 * Mathf.Sign(roll2);
@@ -616,13 +614,21 @@ namespace ferram4
                 Transform partTransform = part.partTransform;
                 Transform rootTransform = EditorLogic.RootPart.partTransform;
 
-                Vector3 CoMoffset = (partTransform.position - CoM);
-                PitchLocation = Vector3.Dot(partTransform.forward, rootTransform.forward) * Math.Sign(Vector3.Dot(CoMoffset, rootTransform.up));
-                YawLocation = -Vector3.Dot(partTransform.forward, rootTransform.right) * Math.Sign(Vector3.Dot(CoMoffset, rootTransform.up));
-                RollLocation = Vector3.Dot(partTransform.forward, rootTransform.forward) * Math.Sign(Vector3.Dot(CoMoffset, -rootTransform.right));
-                BrakeRudderLocation = Vector3.Dot(partTransform.forward, rootTransform.forward);
-                BrakeRudderSide = Mathf.Sign(Vector3.Dot(CoMoffset, rootTransform.right));
-                AoAsign = Math.Sign(Vector3.Dot(partTransform.up, rootTransform.up));
+                // cache transform vectors
+                Vector3 partPosition = partTransform.position;
+                Vector3 CoMoffset = partPosition - CoM;
+
+                Vector3 partForward = partTransform.forward;
+                Vector3 forward = rootTransform.forward;
+                Vector3 up = rootTransform.up;
+                Vector3 right = rootTransform.right;
+
+                PitchLocation = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, up));
+                YawLocation = -Vector3.Dot(partForward, right) * Math.Sign(Vector3.Dot(CoMoffset, up));
+                RollLocation = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, -right));
+                BrakeRudderLocation = Vector3.Dot(partForward, forward);
+                BrakeRudderSide = Mathf.Sign(Vector3.Dot(CoMoffset, right));
+                AoAsign = Math.Sign(Vector3.Dot(partTransform.up, up));
                 AoAdesiredControl = 0;
                 if (pitchaxis != 0.0)
                 {
@@ -643,7 +649,7 @@ namespace ferram4
                 AoAdesiredControl *= maxdeflect;
                 if (pitchaxisDueToAoA != 0.0)
                 {
-                    Vector3 tmpVec = rootTransform.up * Vector3.Dot(rootTransform.up, velocityVec) + rootTransform.forward * Vector3.Dot(rootTransform.forward, velocityVec);   //velocity vector projected onto a plane that divides the airplane into left and right halves
+                    Vector3 tmpVec = up * Vector3.Dot(up, velocityVec) + forward * Vector3.Dot(forward, velocityVec);   //velocity vector projected onto a plane that divides the airplane into left and right halves
                     double AoA = base.CalculateAoA(tmpVec.normalized);      //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
                     AoA = FARMathUtil.rad2deg * AoA;
                     if (double.IsNaN(AoA))
@@ -659,15 +665,15 @@ namespace ferram4
                 if (part.symMethod == SymmetryMethod.Mirror || part.symmetryCounterparts.Count < 1)
                 {
                     if (HighLogic.LoadedSceneIsFlight)
-                        flapLocation = Math.Sign(Vector3.Dot(vessel.ReferenceTransform.forward, part.partTransform.forward));      //figure out which way is up
+                        flapLocation = Math.Sign(Vector3.Dot(vessel.ReferenceTransform.forward, partForward));      //figure out which way is up
                     else
-                        flapLocation = Math.Sign(Vector3.Dot(EditorLogic.RootPart.partTransform.forward, part.partTransform.forward));      //figure out which way is up
+                        flapLocation = Math.Sign(Vector3.Dot(EditorLogic.RootPart.partTransform.forward, partForward));      //figure out which way is up
 
                     spoilerLocation = -flapLocation;
                 }
                 else if (part.parent != null)
                 {
-                    flapLocation = Math.Sign(Vector3.Dot(part.partTransform.position - part.parent.partTransform.position, part.partTransform.forward));
+                    flapLocation = Math.Sign(Vector3.Dot(partPosition - part.parent.partTransform.position, partForward));
                     spoilerLocation = flapLocation;
                 }
                 else

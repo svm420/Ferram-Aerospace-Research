@@ -656,8 +656,9 @@ namespace ferram4
                         //This accounts for the effect of flap effects only being handled by the rearward surface
                         scaledForce *= S / (S + wingInteraction.EffectiveUpstreamArea);
 
-                        double forwardScaledForceMag = Vector3d.Dot(scaledForce, part_transform.forward);
-                        Vector3d forwardScaledForce = forwardScaledForceMag * (Vector3d)part_transform.forward;
+                        Vector3 forward = part_transform.forward;
+                        double forwardScaledForceMag = Vector3d.Dot(scaledForce, forward);
+                        Vector3d forwardScaledForce = forwardScaledForceMag * (Vector3d)forward;
 
                         if (Math.Abs(forwardScaledForceMag) > YmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000) || (scaledForce - forwardScaledForce).magnitude > XZmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000))
                             if (part.parent && !vessel.packed)

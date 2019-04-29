@@ -76,6 +76,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         int _numGridLines;
 
         Material _rendererMaterial;
+        private static readonly int colorId = Shader.PropertyToID("_Color");
 
         public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(Color axisColor, Color crossSectionColor, Color derivColor, double yScaleMaxDistance, double yAxisGridScale)
         {
@@ -167,7 +168,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (material.HasProperty("_Color"))
             {
                 // FARLogger.Info("Setting _Color on " + material + "to " + color);
-                rendererMaterial.SetColor("_Color", color);
+                rendererMaterial.SetColor(colorId, color);
             }
             else
                 FARLogger.Warning("Material " + material + " has no _Color property");
@@ -343,10 +344,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor)
         {
-            renderer.transform.parent = EditorLogic.RootPart.partTransform;
-            renderer.transform.localPosition = Vector3.zero;
-            renderer.transform.localRotation = Quaternion.identity;
-            renderer.transform.SetAsFirstSibling();
+            // getting transform is internal call, cache
+            Transform transform = renderer.transform;
+            transform.parent = EditorLogic.RootPart.partTransform;
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            transform.SetAsFirstSibling();
 
             renderer.positionCount = xCoords.Length;
 
