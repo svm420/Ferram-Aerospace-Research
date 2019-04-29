@@ -104,13 +104,11 @@ namespace FerramAerospaceResearch
 
         public static void MainMenuBuildDefaultScenarioModule()
         {
-            if (instance == null)
-            {
-                instance = new FARSettingsScenarioModule();
-                FARLogger.Info("Creating new setting module for tutorial/scenario");
-                instance.OnLoad(new ConfigNode());
-                instance.Start();
-            }
+            if (instance != null) return;
+            instance = new GameObject().AddComponent<FARSettingsScenarioModule>();
+            FARLogger.Info("Creating new setting module for tutorial/scenario");
+            instance.OnLoad(new ConfigNode());
+            instance.Start();
         }
 
 
@@ -139,12 +137,6 @@ namespace FerramAerospaceResearch
 
             //GameEvents.onGameStateSave.Add(OnSave);
             newGame = false;
-        }
-
-        void OnDestroy()
-        {
-            //GamePersistence.SaveGame("persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
-            //GameEvents.onGameStateSave.Remove(OnSave);
         }
 
         public override void OnSave(ConfigNode node)
