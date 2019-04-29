@@ -619,7 +619,7 @@ namespace ferram4
 
             double MachCoeff = FARMathUtil.Clamp(1 - thisWingMachNumber * thisWingMachNumber, 0, 1);
 
-            if (MachCoeff != 0)
+            if (!MachCoeff.NearlyEqual(0))
             {
                 double flapRatio = FARMathUtil.Clamp(thisWingMAC / (thisWingMAC + effectiveUpstreamMAC), 0, 1);
                 float flt_flapRatio = (float)flapRatio;

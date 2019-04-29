@@ -252,7 +252,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 output.Cn += stock_drag * Vector3d.Dot(part_pos, sideways);
             }*/
 
-            if (area == 0)
+            if (area.NearlyEqual(0))
             {
                 area = _maxCrossSectionFromBody;
                 b_2 = 1;

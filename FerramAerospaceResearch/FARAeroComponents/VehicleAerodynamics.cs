@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -499,7 +499,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         tmpCandVector = p.srfAttachNode.orientation;
                         tmpCandVector = new Vector3(0, Math.Abs(tmpCandVector.x) + Math.Abs(tmpCandVector.z), Math.Abs(tmpCandVector.y));
 
-                        if (p.srfAttachNode.position.sqrMagnitude == 0 && tmpCandVector == Vector3.forward)
+                        if (p.srfAttachNode.position.sqrMagnitude.NearlyEqual(0) && tmpCandVector == Vector3.forward)
                             tmpCandVector = Vector3.up;
 
                         if (tmpCandVector.z > tmpCandVector.x && tmpCandVector.z > tmpCandVector.y)
@@ -651,7 +651,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         double gaussianFactor = gaussianFactors[k];
 
                         curValue += gaussianFactor * val;        //central and previous values;
-                        if (val == 0)
+                        if (val.NearlyEqual(0))
                             borderScaling -= gaussianFactor;
                     }
                     for (int k = 0; k < numVals - 1; k++)
@@ -660,7 +660,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         double gaussianFactor = gaussianFactors[k + 1];
 
                         curValue += gaussianFactor * val;      //future values
-                        if (val == 0)
+                        if (val.NearlyEqual(0))
                             borderScaling -= gaussianFactor;
                     }
                     if (borderScaling > 0)
@@ -705,7 +705,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         double gaussianFactor = gaussianFactors[k];
 
                         curValue += gaussianFactor * val;        //central and previous values;
-                        if (val == 0)
+                        if (val.NearlyEqual(0))
                             borderScaling -= gaussianFactor;
                     }
                     for (int k = 0; k < numVals - 1; k++)
@@ -714,7 +714,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         double gaussianFactor = gaussianFactors[k + 1];
 
                         curValue += gaussianFactor * val;      //future values
-                        if (val == 0)
+                        if (val.NearlyEqual(0))
                             borderScaling -= gaussianFactor;
                     }
                     if (borderScaling > 0)
@@ -859,7 +859,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
 
             //ThreadSafeDebugLogger.Instance.RegisterMessage(intakeArea + " " + engineExitArea);
-            if (intakeArea != 0 && engineExitArea != 0)        //if they exist, go through the calculations
+            if (!intakeArea.NearlyEqual(0) && !engineExitArea.NearlyEqual(0))        //if they exist, go through the calculations
             {
                 if (_ductedAreaAdjustment.Length != vehicleCrossSection.Length)
                     _ductedAreaAdjustment = new double[vehicleCrossSection.Length];
@@ -883,7 +883,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                             if (adjuster.IntegratedCrossSectionIncreaseDecrease())
                                 continue;
 
-                            if (adjuster.AreaRemovedFromCrossSection() == 0)
+                            if (adjuster.AreaRemovedFromCrossSection().NearlyEqual(0))
                                 continue;
 
                             VoxelCrossSection.SideAreaValues val;
@@ -910,7 +910,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         //if (Math.Abs(actualArea) < Math.Abs(ductedArea))
                         //    ductedArea = actualArea;
 
-                        if (ductedArea != 0)
+                        if (!ductedArea.NearlyEqual(0))
                             if (frontMostIndex < 0)
                                 frontMostIndex = i;
                             else
@@ -1005,7 +1005,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     if (Math.Abs(actualArea) < Math.Abs(ductedArea))
                         ductedArea = actualArea;
 
-                    if (ductedArea != 0)
+                    if (!ductedArea.NearlyEqual(0))
                         if (i < frontMostIndex)
                             frontMostIndex = i;
                         else if (i > backMostIndex)
@@ -1198,7 +1198,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 else if (potentialFlowNormalForce < -areaChangeMax)
                     potentialFlowNormalForce = -areaChangeMax;
                 else
-                    if (areaChangeMax != 0)
+                    if (!areaChangeMax.NearlyEqual(0))
                     sonicBaseDrag *= Math.Abs(potentialFlowNormalForce / areaChangeMax);      //some scaling for small changes in cross-section
 
                 double flatnessRatio = _vehicleCrossSection[index].flatnessRatio;
@@ -1215,9 +1215,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 float hypersonicDragForwardFrac = 0, hypersonicDragBackwardFrac = 0;
 
-                if (curArea - prevArea != 0)
+                if (!curArea.NearlyEqual(prevArea))
                     hypersonicDragForwardFrac = Math.Abs(hypersonicDragForward * 0.5f / (float)(curArea - prevArea));
-                if (curArea - nextArea != 0)
+                if (!curArea.NearlyEqual(nextArea))
                     hypersonicDragBackwardFrac = Math.Abs(hypersonicDragBackward * 0.5f / (float)(curArea - nextArea));
 
                 hypersonicDragForwardFrac *= hypersonicDragForwardFrac;     //^2
@@ -1892,7 +1892,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             double currentSectAreaCrossSection = MathClampAbs(_vehicleCrossSection[index].secondAreaDeriv, cutoff);
 
-            if (currentSectAreaCrossSection == 0)       //quick escape for 0 cross-section section drag
+            if (currentSectAreaCrossSection.NearlyEqual(0))       //quick escape for 0 cross-section section drag
                 return 0;
 
             double lj2ndTerm = 0;

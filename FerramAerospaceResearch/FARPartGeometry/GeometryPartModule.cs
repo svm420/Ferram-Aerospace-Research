@@ -587,12 +587,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 ICrossSectionAdjuster adjuster = crossSectionAdjusters[i];
                 //adjuster.TransformBasis(basis);
 
-                if (adjuster.AreaRemovedFromCrossSection(vehicleMainAxis) != 0)
+                if (!adjuster.AreaRemovedFromCrossSection(vehicleMainAxis).NearlyEqual(0))
                 {
                     adjuster.SetForwardBackwardNoFlowDirection(1);
                     activeAdjusters.Add(adjuster);
                 }
-                else if (adjuster.AreaRemovedFromCrossSection(-vehicleMainAxis) != 0)
+                else if (!adjuster.AreaRemovedFromCrossSection(-vehicleMainAxis).NearlyEqual(0))
                 {
                     adjuster.SetForwardBackwardNoFlowDirection(-1);
                     activeAdjusters.Add(adjuster);

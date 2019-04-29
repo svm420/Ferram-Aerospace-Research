@@ -513,19 +513,19 @@ namespace FerramAerospaceResearch
             GUILayout.BeginHorizontal(GUILayout.Width(100));
             float tmp = input.r;
             input.r = (float)GUIUtils.TextEntryForDouble("", 0, input.r);
-            updateTexture |= tmp != input.r;
+            updateTexture |= !tmp.NearlyEqual(input.r);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal(GUILayout.Width(100));
             tmp = input.g;
             input.g = (float)GUIUtils.TextEntryForDouble("", 0, input.g);
-            updateTexture |= tmp != input.g;
+            updateTexture |= !tmp.NearlyEqual(input.g);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal(GUILayout.Width(100));
             tmp = input.b;
             input.b = (float)GUIUtils.TextEntryForDouble("", 0, input.b);
-            updateTexture |= tmp != input.b;
+            updateTexture |= !tmp.NearlyEqual(input.b);
             GUILayout.EndHorizontal();
 
             if (updateTexture)

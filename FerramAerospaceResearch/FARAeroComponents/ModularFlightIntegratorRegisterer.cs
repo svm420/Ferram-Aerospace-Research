@@ -105,7 +105,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 {
                     part.dragVector = rb.velocity + Krakensbane.GetFrameVelocity() - FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
                     part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
-                    if (part.dragVectorSqrMag == 0f || part.ShieldedFromAirstream)
+                    if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
                     {
                         part.dragVectorMag = 0f;
                         part.dragVectorDir = Vector3.zero;

@@ -283,7 +283,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             else
                 vesselInfo.tSFC = 0;
 
-            if (airDemandVol != 0)
+            if (!airDemandVol.NearlyEqual(0))
                 vesselInfo.intakeAirFrac = airAvailableVol / airDemandVol;
             else
                 vesselInfo.intakeAirFrac = double.PositiveInfinity;
@@ -294,7 +294,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             vesselInfo.velocityLiftToDragRatio = vesselSpeed * vesselInfo.liftToDragRatio;
             double L_D_TSFC = 0;
             double VL_D_TSFC = 0;
-            if (vesselInfo.tSFC != 0)
+            if (!vesselInfo.tSFC.NearlyEqual(0))
             {
                 L_D_TSFC = vesselInfo.liftToDragRatio / vesselInfo.tSFC;
                 VL_D_TSFC = vesselInfo.velocityLiftToDragRatio / vesselInfo.tSFC * 3600;
@@ -327,7 +327,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void CalculateBallisticCoefficientAndTermVel()
         {
-            if (vesselInfo.dragCoeff == 0)
+            if (vesselInfo.dragCoeff.NearlyEqual(0))
             {
                 vesselInfo.ballisticCoeff = 0;
                 vesselInfo.termVelEst = 0;
