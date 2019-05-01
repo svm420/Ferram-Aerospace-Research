@@ -1,0 +1,200 @@
+{
+    "root": ".",
+    "build_props": "Directory.Build.Props",
+    "variables": {
+        "ModName": "FerramAerospaceResearch",
+        "ModDirRelative": "GameData/$(ModName)/",
+        "ModDir": "$(SolutionDir)$(ModDirRelative)",
+        "PluginDir": "$(ModDir)Plugins/",
+        "AssetDir": "$(ModDir)Assets/",
+        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.7.0/",
+        "KSPGameData": "$(KSP_DIR_INSTALL)GameData/",
+        "GameDir": "$(KSPGameData)$(ModName)/",
+        "VersionMajor": 0,
+        "VersionMinor": 15,
+        "VersionBuild": 10,
+        "VersionRevision": 1,
+        "VersionName": "Lundgren",
+        "Year": 2019,
+        "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
+        "VersionString": "$(NumericalVersion) \"$(VersionName)\"",
+        "VersionRegex": "\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?\\s*\"\\w+\"",
+        "KSPMajorMin": 1,
+        "KSPMajorMax": 1,
+        "KSPMinorMin": 4,
+        "KSPMinorMax": 7
+    },
+    "post_build": {
+        "pdb2mdb": "$(SolutionDir)../KSP Assemblies/pdb2mdb.exe",
+        "clean": [],
+        "install": [
+            {
+                "source": "$(TargetDir)$(TargetName).*",
+                "destination": "$(PluginDir)"
+            }
+        ],
+        "[FerramAerospaceResearch]": {
+            "clean": [
+                "$(GameDir)"
+            ],
+            "install": [
+                {
+                    "source": "$(TargetDir)$(TargetName).*",
+                    "destination": "$(PluginDir)"
+                },
+                {
+                    "source": "GameData/$(ModName)",
+                    "destination": "$(GameDir)"
+                }
+            ]
+        }
+    },
+    "replace": {
+        "regex": [
+            {
+                "pattern": "**/*.cs",
+                "substitutions": [
+                    {
+                        "search": "([Cc]opyright )\\d+",
+                        "replace": "\\g<1>$(Year)"
+                    },
+                    {
+                        "search": "v$(VersionRegex)",
+                        "replace": "v$(VersionString)"
+                    }
+                ]
+            },
+            {
+                "pattern": "$(ModName)/FARUtils/FARVersion.cs",
+                "substitutions": [
+                    {
+                        "search": "Major = \\d+;",
+                        "replace": "Major = $(VersionMajor);"
+                    },
+                    {
+                        "search": "Minor = \\d+;",
+                        "replace": "Minor = $(VersionMinor);"
+                    },
+                    {
+                        "search": "Build = \\d+;",
+                        "replace": "Build = $(VersionBuild);"
+                    },
+                    {
+                        "search": "Revision = \\d+;",
+                        "replace": "Revision = $(VersionRevision);"
+                    },
+                    {
+                        "search": "Name = \"\\w+\";",
+                        "replace": "Name = \"$(VersionName)\";"
+                    }
+                ]
+            },
+            {
+                "pattern": "README.md",
+                "substitutions": [
+                    {
+                        "search": "v$(VersionRegex)",
+                        "replace": "v$(VersionString)"
+                    },
+                    {
+                        "search": "-+master branch-+",
+                        "replace": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)V \"$(VersionName)\"------------------------------------"
+                    }
+                ]
+            },
+            {
+                "pattern": "$(ModName)/Properties/AssemblyInfo.cs",
+                "substitutions": [
+                    {
+                        "search": "(Copyright .* )\\d+",
+                        "replace": "\\g<1>$(Year)"
+                    },
+                    {
+                        "search": "(Assembly\\w*Version\\(\")[\\.\\d]+(\"\\))",
+                        "replace": "\\g<1>$(NumericalVersion)\\g<2>"
+                    },
+                    {
+                        "search": "(KSPAssembly\\(\"\\w+\", )\\d+, \\d+(\\))",
+                        "replace": "\\g<1>$(VersionMajor), $(VersionMinor)\\g<2>"
+                    }
+                ]
+            },
+            {
+                "pattern": "$(ModName)/CompatibilityChecker.cs",
+                "substitutions": [
+                    {
+                        "search": "(KSP_MAJOR_MAX\\s*=\\s*)\\d+",
+                        "replace": "\\g<1>$(KSPMajorMax)"
+                    },
+                    {
+                        "search": "(KSP_MAJOR_MIN\\s*=\\s*)\\d+",
+                        "replace": "\\g<1>$(KSPMajorMin)"
+                    },
+                    {
+                        "search": "(KSP_MINOR_MAX\\s*=\\s*)\\d+",
+                        "replace": "\\g<1>$(KSPMinorMax)"
+                    },
+                    {
+                        "search": "(KSP_MINOR_MIN\\s*=\\s*)\\d+",
+                        "replace": "\\g<1>$(KSPMinorMin)"
+                    }
+                ]
+            }
+        ],
+        "template_files": [
+            {
+                "source": "$(ModDir)FAR.version.in",
+                "destination": "$(ModDir)FAR.version"
+            }
+        ]
+    },
+    "package": {
+        "compression": "deflated",
+        "filename": "FAR_$(VersionMajor)_$(VersionMinor)_$(VersionBuild)_$(VersionRevision)_$(VersionName).zip",
+        "output_dir": "$(SolutionDir)releases",
+        "include": [
+            "$(ModDirRelative)**/*",
+            "Ships",
+            "README.md"
+        ],
+        "exclude": [
+            "$(ModDirRelative)**/*db",
+            "$(ModDirRelative)**/*.in",
+            "$(ModDirRelative)**/*.dll.*"
+        ],
+        "map": [
+            {
+                "source": "LICENSE",
+                "destination": "LICENSE_FAR"
+            }
+        ],
+        "dependencies": [
+            {
+                "path": "$(KSPGameData)ModularFlightIntegrator",
+                "destination": "GameData/ModularFlightIntegrator/",
+                "include": [
+                    "*"
+                ],
+                "map": [
+                    {
+                        "source": "LICENSE.txt",
+                        "destination": "LICENSE_ModularFlightIntegrator"
+                    }
+                ]
+            },
+            {
+                "path": "$(KSPGameData)",
+                "destination": "GameData/",
+                "include": [
+                    "ModuleManager*.dll"
+                ],
+                "map": [
+                    {
+                        "source": "$(SolutionDir)releases/MM_LICENSE",
+                        "destination": "LICENSE_ModuleManager"
+                    }
+                ]
+            }
+        ]
+    }
+}

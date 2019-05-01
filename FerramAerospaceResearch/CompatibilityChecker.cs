@@ -41,6 +41,10 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class CompatibilityChecker : MonoBehaviour
     {
+        public const int KSP_MAJOR_MAX = 1,
+            KSP_MAJOR_MIN = 1,
+            KSP_MINOR_MAX = 7,
+            KSP_MINOR_MIN = 4;
         public static bool IsCompatible()
         {
             /*-----------------------------------------------*\
@@ -58,7 +62,10 @@ namespace FerramAerospaceResearch
             // Even if you don't lock down functionality, you should return true if your users
             // can expect a future update to be available.
             //
-            return Versioning.version_major == 1 && Versioning.version_minor >= 4 && Versioning.version_minor < 7;
+            return  Versioning.version_major >= KSP_MAJOR_MIN &&
+                    Versioning.version_major <= KSP_MAJOR_MAX &&
+                    Versioning.version_minor >= KSP_MINOR_MIN &&
+                    Versioning.version_minor <= KSP_MINOR_MAX;
 
             /*-----------------------------------------------*\
             | IMPLEMENTERS SHOULD NOT EDIT BEYOND THIS POINT! |

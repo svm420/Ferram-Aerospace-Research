@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2017, Michael Ferrara, aka Ferram4
+Copyright 2019, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -59,9 +59,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             _instantCondition = instantConditionSim;
         }
 
-        public StabilityDerivOutput CalculateStabilityDerivs(double u0, double q, double machNumber, double alpha, double beta, double phi, int flapSetting, bool spoilers, CelestialBody body, double alt)
+        public StabilityDerivExportOutput CalculateStabilityDerivs(CelestialBody body, double alt, double machNumber, int flapSetting, bool spoilers, double alpha, double beta, double phi)
         {
+            double pressure = body.GetPressure(alt);
+            double temperature = body.GetTemperature(alt);
+            double density = body.GetDensity(pressure, temperature);
+            double sspeed = body.GetSpeedOfSound(pressure, density);
+            double u0 = sspeed * machNumber;
+            double q = u0 * u0 * density * 0.5f;
+
             StabilityDerivOutput stabDerivOutput = new StabilityDerivOutput();
+            StabilityDerivExportVariables stabDerivExport = new StabilityDerivExportVariables();
             stabDerivOutput.nominalVelocity = u0;
             stabDerivOutput.altitude = alt;
             stabDerivOutput.body = body;
@@ -116,7 +124,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     }
                 }
             }
-            if (area == 0)
+            if (area.NearlyEqual(0))
             {
                 area = _instantCondition._maxCrossSectionFromBody;
                 MAC = _instantCondition._bodyLength;
@@ -211,7 +219,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             //Longitudinal Mess
             _instantCondition.SetState(machNumber, neededCl, CoM, 0, input.flaps, input.spoilers);
 
-            alpha = FARMathUtil.BrentsMethod(_instantCondition.FunctionIterateForAlpha, -30d, 30d, 0.001, 500);
+            alpha = FARMathUtil.SelectedSearchMethod(machNumber, _instantCondition.FunctionIterateForAlpha);
             input.alpha = alpha;
             nominalOutput = _instantCondition.iterationOutput;
             //alpha_str = (alpha * Mathf.PI / 180).ToString();
@@ -243,6 +251,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivOutput.stabDerivs[3] = pertOutput.Cl;  //Zw
             stabDerivOutput.stabDerivs[4] = pertOutput.Cd;  //Xw
             stabDerivOutput.stabDerivs[5] = pertOutput.Cm;  //Mw
+
+            // Rodhern: The motivation for the revised stability derivatives sign interpretations of Zq, Xq, Ze and Xe
+            //  is to align the sign conventions used for Zu, Zq, Ze, Xu, Xq and Xe. Further explanation can be found
+            //  here: https://forum.kerbalspaceprogram.com/index.php?/topic/109098-official-far-craft-repository/&do=findComment&comment=2425057
 
             input.alpha = alpha;
             input.machNumber = machNumber + 0.05;
@@ -276,8 +288,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / 0.05;
             pertOutput.Cm = (pertOutput.Cm - nominalOutput.Cm) / 0.05;
 
-            pertOutput.Cl *= q * area * MAC / (2 * u0 * mass);
-            pertOutput.Cd *= q * area * MAC / (2 * u0 * mass);
+            pertOutput.Cl *= -q * area * MAC / (2 * u0 * mass); // Rodhern: Replaced 'q' by '-q', so that formulas
+            pertOutput.Cd *= -q * area * MAC / (2 * u0 * mass); //  for Zq and Xq match those for Zu and Xu.
             pertOutput.Cm *= q * area * MAC * MAC / (2 * u0 * Iy);
 
             stabDerivOutput.stabDerivs[9] = pertOutput.Cl;  //Zq
@@ -293,8 +305,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / 0.1;
             pertOutput.Cm = (pertOutput.Cm - nominalOutput.Cm) / 0.1;
 
-            pertOutput.Cl *= q * area / mass;
-            pertOutput.Cd *= q * area / mass;
+            pertOutput.Cl *= -q * area / mass; // Rodhern: Replaced 'q' by '-q', so that formulas
+            pertOutput.Cd *= -q * area / mass; //  for Ze and Xe match those for Zu and Xu.
             pertOutput.Cm *= q * area * MAC / Iy;
 
             stabDerivOutput.stabDerivs[12] = pertOutput.Cl; //Ze
@@ -358,7 +370,18 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivOutput.stabDerivs[23] = pertOutput.Cn;     //Nr
             stabDerivOutput.stabDerivs[22] = pertOutput.C_roll; //Lr
 
-            return stabDerivOutput;
+            // Assign values to export variables
+            stabDerivExport.craftmass = mass;
+            stabDerivExport.envpressure = pressure;
+            stabDerivExport.envtemperature = temperature;
+            stabDerivExport.envdensity = density;
+            stabDerivExport.envsoundspeed = sspeed;
+            stabDerivExport.envg = _instantCondition.CalculateAccelerationDueToGravity(body, alt);
+            stabDerivExport.sitmach = machNumber;
+            stabDerivExport.sitdynpres = q;
+            stabDerivExport.siteffg = effectiveG;
+
+            return new StabilityDerivExportOutput(stabDerivOutput, stabDerivExport);
         }
 
     }

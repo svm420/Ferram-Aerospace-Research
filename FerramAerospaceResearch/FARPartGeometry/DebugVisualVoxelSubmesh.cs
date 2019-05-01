@@ -1,7 +1,7 @@
 /*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
-Copyright 2018, Daumantas Kavolis, aka dkavolis
+Copyright 2019, Daumantas Kavolis, aka dkavolis
 
    This file is part of Ferram Aerospace Research.
 
@@ -40,7 +40,6 @@ Copyright 2018, Daumantas Kavolis, aka dkavolis
     http: //forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
@@ -73,7 +72,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public bool active
         {
             get => gameObject.activeSelf;
-            set => gameObject.SetActive(value);
+            set
+            {
+                if (gameObject != null)
+                    gameObject.SetActive(value);
+            }
         }
 
         public Mesh Mesh

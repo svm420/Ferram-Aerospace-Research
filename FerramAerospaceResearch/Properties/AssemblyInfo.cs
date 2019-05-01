@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("FerramAerospaceResearch")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+//[assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("FerramAerospaceResearch")]
-[assembly: AssemblyCopyright("Copyright © Michael Ferrara 2018")]
+[assembly: AssemblyCopyright("Copyright © Michael Ferrara et al. 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: KSPAssembly("FerramAerospaceResearch", 0, 15)]
@@ -35,6 +35,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.15.9.6")]
-[assembly: AssemblyFileVersion("0.15.9.6")]
+[assembly: AssemblyVersion("0.15.10.1")]
+[assembly: AssemblyFileVersion("0.15.10.1")]
 [assembly: KSPAssemblyDependency("ModularFlightIntegrator", 1, 0)]

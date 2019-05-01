@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2017, Michael Ferrara, aka Ferram4
+Copyright 2019, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -82,7 +82,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             {
                 input.machNumber = i / (double)numPoints * (upperBound - lowerBound) + lowerBound;
 
-                if (input.machNumber == 0)
+                if (input.machNumber.NearlyEqual(0))
                     input.machNumber = 0.001;
 
                 InstantConditionSimOutput output;
@@ -107,7 +107,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public GraphData AngleOfAttackSweep(double machNumber, double pitch, double lowerBound, double upperBound, int numPoints, int flapSetting, bool spoilers, CelestialBody body)
         {
-            if (machNumber == 0)
+            if (machNumber.NearlyEqual(0))
                 machNumber = 0.001;
 
             InstantConditionSimInput input = new InstantConditionSimInput(0, 0, 0, 0, 0, 0, machNumber, pitch, flapSetting, spoilers);

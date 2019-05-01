@@ -1,7 +1,7 @@
 /*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
-Copyright 2018, Daumantas Kavolis, aka dkavolis
+Copyright 2019, Daumantas Kavolis, aka dkavolis
 
    This file is part of Ferram Aerospace Research.
 
@@ -47,9 +47,9 @@ namespace FerramAerospaceResearch.FARUtils
         // using byte here because 0-255 should be enough for any version number
         public const byte Major = 0;
         public const byte Minor = 15;
-        public const byte Build = 9;
-        public const byte Revision = 6;
-        public const string Name = "Lin";
+        public const byte Build = 10;
+        public const byte Revision = 1;
+        public const string Name = "Lundgren";
 
         public readonly static string String = $"v{Major}.{Minor}.{Build}.{Revision}";
         public readonly static string VersionString = $"{String} '{Name}'";

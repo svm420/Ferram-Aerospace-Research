@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.15.9.6 "Lin"
+Ferram Aerospace Research v0.15.10.1 "Lundgren"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2017, Michael Ferrara, aka Ferram4
+Copyright 2019, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -762,7 +762,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     Vector3 axis1 = new Vector3(1, 0, 0), axis2 = new Vector3(0, 0, 1);
                     double flatnessRatio = 1;
 
-                    if (tanPrinAngle != 0)
+                    if (!tanPrinAngle.NearlyEqual(0))
                     {
                         axis1 = new Vector3(1, 0, (float)tanPrinAngle);
                         axis1.Normalize();
@@ -1031,7 +1031,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     Vector3 axis1 = new Vector3(1, 0, 0), axis2 = new Vector3(0, 0, 1);
                     double flatnessRatio = 1;
 
-                    if (tanPrinAngle != 0)
+                    if (!tanPrinAngle.NearlyEqual(0))
                     {
                         axis1 = new Vector3(1, 0, (float)tanPrinAngle);
                         axis1.Normalize();
@@ -1304,7 +1304,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     Vector3 axis1 = new Vector3(1, 0, 0), axis2 = new Vector3(0, 0, 1);
                     double flatnessRatio = 1;
 
-                    if (tanPrinAngle != 0)
+                    if (!tanPrinAngle.NearlyEqual(0))
                     {
                         axis1 = new Vector3(1, 0, (float)tanPrinAngle);
                         axis1.Normalize();
@@ -1460,7 +1460,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private double TanPrincipalAxisAngle(double Ixx, double Iyy, double Ixy)
         {
-            if (Ixx == Iyy)
+            if (Ixx.NearlyEqual(Iyy))
                 return 0;
 
             double tan2Angle = 2d * Ixy / (Ixx - Iyy);
@@ -1509,7 +1509,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                 }
             }
-            voxelMesh.Rebuild();
+            voxelMesh.RebuildSafe();
             voxelMesh.active = true;
         }
         #endregion
@@ -1729,8 +1729,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         VoxelShellMeshParams meshParams = (VoxelShellMeshParams)meshParamsObject;
                         for (int i = meshParams.lowerIndex; i < meshParams.upperIndex; i++)
                         {
-                            GeometryPartModule module = meshParams.modules[i];
-                            if (module == null || !module.Valid)
+                            var module = meshParams.modules[i];
+                            if (module == null || !module.Valid || module.meshDataList == null)
                                 continue;
 
                             for (int j = 0; j < module.meshDataList.Count; j++)
@@ -1740,7 +1740,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                     if (mesh.meshTransform != null && mesh.gameObjectActiveInHierarchy && mesh.valid)
                                         meshes.Add(mesh);
                             }
-
                         }
                     });
                     for (int i = 0; i < meshes.Count; i++)
@@ -1755,8 +1754,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     VoxelShellMeshParams meshParams = (VoxelShellMeshParams)meshParamsObject;
                     for (int i = meshParams.lowerIndex; i < meshParams.upperIndex; i++)
                     {
-                        GeometryPartModule module = meshParams.modules[i];
-                        if (module == null || !module.Valid)
+                        var module = meshParams.modules[i];
+                        if (module == null || !module.Valid || module.meshDataList == null)
                             continue;
 
                         for (int j = 0; j < module.meshDataList.Count; j++)
@@ -1770,7 +1769,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (updateFromMesh)
                                 UpdateFromMesh(mesh, mesh.part);
                         }
-
                     }
                 }
             }
@@ -1858,7 +1856,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             z = Math.Abs(indexPlane.z);
 
             double testSum = x + y + z;
-            if (testSum == 0 || double.IsNaN(testSum) || double.IsInfinity(testSum))
+            if (testSum.NearlyEqual(0) || double.IsNaN(testSum) || double.IsInfinity(testSum))
             {
                 //ThreadSafeDebugLogger.Instance.RegisterMessage("Error in mesh triangle; triangle plane components are NaN or triangle is degenerate; FAR unable to use this triangle");
                 //after much user confusion, we're just gonna quietly swallow this error; need to change so there's a debug switch
