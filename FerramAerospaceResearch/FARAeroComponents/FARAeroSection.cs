@@ -49,6 +49,7 @@ using System.Text;
 using UnityEngine;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARUtils;
+using ferram4;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
@@ -284,10 +285,98 @@ namespace FerramAerospaceResearch.FARAeroComponents
             partData.Clear();
             handledAeroModulesIndexDict.Clear();
         }
-      
+
+        #region Force application contexts
+        private interface IForceContext
+        {
+            /// <summary>
+            /// The part-relative velocity of the part whose force is being computed
+            /// </summary>
+            /// <param name="pd">The part data for which to compute the local velocity</param>
+            Vector3 LocalVelocity(PartData pd);
+            /// <summary>
+            /// Apply a calculated force to a part.
+            /// </summary>
+            /// <param name="pd">The part data of the part that the force should be applied to</param>
+            /// <param name="forceVector">The calculated force vector to be applied to the part</param>
+            /// <param name="torqueVector">The calculated torque vector to be applied to the part</param>
+            void ApplyForce(PartData pd, Vector3 forceVector, Vector3 torqueVector);
+        }
+
+        private class SimulatedForceContext : IForceContext
+        {
+            /// <summary>
+            /// The world-space velocity of the part whose force is being simulated
+            /// </summary>
+            private Vector3 worldVel;
+
+            /// <summary>
+            /// The center with which force should be accumulated
+            /// </summary>
+            private ferram4.FARCenterQuery center;
+
+            /// <summary>
+            /// The atmospheric density that the force is being simulated at
+            /// </summary>
+            private float atmDensity;
+            
+            public SimulatedForceContext(Vector3 worldVel, FARCenterQuery center, float atmDensity)
+            {
+                this.worldVel = worldVel;
+                this.center = center;
+                this.atmDensity = atmDensity;
+            }
+
+            public void UpdateSimulationContext(Vector4 worldVel, FARCenterQuery center, float atmDensity)
+            {
+                this.worldVel = worldVel;
+                this.center = center;
+                this.atmDensity = atmDensity;
+            }
+
+            public Vector3 LocalVelocity(PartData pd)
+            {
+                return pd.aeroModule.part.partTransform.InverseTransformVector(worldVel);
+            }
+
+            public void ApplyForce(PartData pd, Vector3 forceVector, Vector3 torqueVector)
+            {
+                var localVel = pd.aeroModule.part.partTransform.InverseTransformVector(worldVel);
+                var tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
+                var dynamicPressurekPa = tmp * atmDensity;
+                var dragFactor = dynamicPressurekPa * Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
+                var liftFactor = dynamicPressurekPa;
+
+                var localVelNorm = Vector3.Normalize(localVel);
+                Vector3 localForceTemp = Vector3.Dot(localVelNorm, forceVector) * localVelNorm;
+                var partLocalForce = (localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor);
+                forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
+                torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)dynamicPressurekPa);
+                if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
+                {
+                    Vector3 centroid = pd.aeroModule.part.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
+                    center.AddForce(centroid, forceVector);
+                    center.AddTorque(torqueVector);
+                }
+            }
+        }
+
+        private class FlightForceContext : IForceContext
+        {
+            public Vector3 LocalVelocity(PartData pd)
+            {
+                return pd.aeroModule.partLocalVel;
+            }
+
+            public void ApplyForce(PartData pd, Vector3 forceVector, Vector3 torqueVector)
+            {
+                pd.aeroModule.AddLocalForceAndTorque(forceVector, torqueVector, pd.centroidPartSpace);
+            }
+        }
+        #endregion
+
         private void CalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, 
-            Func<PartData,Vector3> localVel, 
-            Action<PartData, Vector3,Vector3,Vector3> applyLocalForce)
+            IForceContext forceContext)
         {
             double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);      //this will be the same for each part, so why recalc it multiple times?
             double xForceAoA0 = xForcePressureAoA0.Evaluate(machNumber);
@@ -305,7 +394,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 xRefVector = data.xRefVectorPartSpace;
                 Vector3 nRefVector = data.nRefVectorPartSpace;
 
-                Vector3 velLocal = localVel(data);
+                Vector3 velLocal = forceContext.LocalVelocity(data);
 
                 Vector3 angVelLocal = aeroModule.partLocalAngVel;
 
@@ -418,40 +507,26 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 forceVector *= data.dragFactor;
                 torqueVector *= data.dragFactor;
 
-                applyLocalForce(data, forceVector, torqueVector, data.centroidPartSpace);
+                forceContext.ApplyForce(data, forceVector, torqueVector);
             }
         }
         
+        private SimulatedForceContext simContext;
         public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, ferram4.FARCenterQuery center)
         {
-            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag,
-                pd => pd.aeroModule.part.partTransform.InverseTransformVector(vel),
-                (pd, forceVector, torqueVector, pcentroid) => {
-                    var localVel = pd.aeroModule.part.partTransform.InverseTransformVector(vel);
-                    var tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
-                    var dynamicPressurekPa = tmp * atmDensity;
-                    var dragFactor = dynamicPressurekPa*Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
-                    var liftFactor = dynamicPressurekPa;
-
-                    var localVelNorm = Vector3.Normalize(localVel);
-                    Vector3 localForceTemp = Vector3.Dot(localVelNorm, forceVector) * localVelNorm;
-                    var partLocalForce = (localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor);
-                    forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
-                    torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)dynamicPressurekPa);
-                    if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
-                    {
-                        Vector3 centroid = pd.aeroModule.part.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
-                        center.AddForce(centroid, forceVector);
-                        center.AddTorque(torqueVector);
-                    }
-                });
+            if (simContext == null)
+                simContext = new SimulatedForceContext(vel, center, atmDensity);
+            else
+                simContext.UpdateSimulationContext(vel, center, atmDensity);
+            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);
         }
 
+        private FlightForceContext flightContext;
         public void FlightCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
         {
-            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag,
-                pd => pd.aeroModule.partLocalVel,
-                (pd, forceVector, torqueVector, centroid) => pd.aeroModule.AddLocalForceAndTorque(forceVector, torqueVector, pd.centroidPartSpace));
+            if (flightContext == null)
+                flightContext = new FlightForceContext();
+            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, flightContext);
 
         }
 
