@@ -389,7 +389,7 @@ namespace FerramAerospaceResearch
         /// <returns>The force on the vessel in world space</returns>
         public static Vector3 VesselAerodynamicForce(Vessel v)
         {
-            return VesselFlightInfo(v)?.InfoParameters?.aerodynamicForce ?? Vector3.zero;
+            return VesselFlightInfo(v)?.InfoParameters.aerodynamicForce ?? Vector3.zero;
         }
 
         /// <summary>
@@ -399,7 +399,7 @@ namespace FerramAerospaceResearch
         /// <returns>The torque on the vessel in world space</returns>
         public static Vector3 VesselAerodynamicTorque(Vessel v)
         {
-            return VesselFlightInfo(v)?.InfoParameters?.aerodynamicTorque ?? Vector3.zero;
+            return VesselFlightInfo(v)?.InfoParameters.aerodynamicTorque ?? Vector3.zero;
         }
         #endregion
 
