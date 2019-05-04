@@ -429,15 +429,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 (pd, forceVector, torqueVector, pcentroid) => {
                     var localVel = pd.aeroModule.part.partTransform.InverseTransformVector(vel);
                     var tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
-                    var dynamicPressurekPA = tmp * atmDensity;
-                    var dragFactor = dynamicPressurekPA*Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
-                    var liftFactor = dynamicPressurekPA;
+                    var dynamicPressurekPa = tmp * atmDensity;
+                    var dragFactor = dynamicPressurekPa*Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
+                    var liftFactor = dynamicPressurekPa;
 
                     var localVelNorm = Vector3.Normalize(localVel);
                     Vector3 localForceTemp = Vector3.Dot(localVelNorm, forceVector) * localVelNorm;
                     var partLocalForce = (localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor);
                     forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
-                    torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)pd.aeroModule.part.dynamicPressurekPa);
+                    torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)dynamicPressurekPa);
                     if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
                     {
                         Vector3 centroid = pd.aeroModule.part.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
