@@ -61,7 +61,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         List<FARAeroPartModule> _currentAeroModules;
         List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
 
-        FARCenterQuery aeroForces = new FARCenterQuery();
+        FARCenterQuery aeroForces = null;
         int intakeAirId;
         double intakeAirDensity = 1;
         bool useWingArea;
@@ -124,6 +124,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void CalculateTotalAeroForce()
         {
+            if (aeroForces == null)
+                aeroForces = new FARCenterQuery();
             aeroForces.ClearAll();
 
 
@@ -182,6 +184,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             }
 
+            if (aeroForces == null)
+                aeroForces = new FARCenterQuery();
             var com_frc = aeroForces.force;
             var com_trq = aeroForces.TorqueAt(_vessel.CoM);
 
