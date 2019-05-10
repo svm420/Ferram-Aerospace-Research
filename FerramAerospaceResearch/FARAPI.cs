@@ -406,7 +406,7 @@ namespace FerramAerospaceResearch
         /// Returns the current aerodynamic force being experienced by the active vehicle in world space
         /// </summary>
         /// <returns>The force on the vessel in world space</returns>
-        public static Vector3 ActiveVesselAerodynamicForce(Vessel v)
+        public static Vector3 ActiveVesselAerodynamicForce()
         {
             return VesselAerodynamicForce(FlightGlobals.ActiveVessel);
         }
@@ -415,7 +415,7 @@ namespace FerramAerospaceResearch
         /// Returns the current aerodynamic torque being experienced by the active vehicle in world space
         /// </summary>
         /// <returns>The torque on the vessel in world space</returns>
-        public static Vector3 ActiveVesselAerodynamicTorque(Vessel v)
+        public static Vector3 ActiveVesselAerodynamicTorque()
         {
             return VesselAerodynamicTorque(FlightGlobals.ActiveVessel);
         }
