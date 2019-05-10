@@ -511,21 +511,16 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
         
-        private SimulatedForceContext simContext;
+        private SimulatedForceContext simContext = new SimulatedForceContext(Vector3.zero, new FARCenterQuery(), 0.0f);
         public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, ferram4.FARCenterQuery center)
         {
-            if (simContext == null)
-                simContext = new SimulatedForceContext(vel, center, atmDensity);
-            else
-                simContext.UpdateSimulationContext(vel, center, atmDensity);
+            simContext.UpdateSimulationContext(vel, center, atmDensity);
             CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);
         }
 
-        private FlightForceContext flightContext;
+        private FlightForceContext flightContext = new FlightForceContext();
         public void FlightCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
         {
-            if (flightContext == null)
-                flightContext = new FlightForceContext();
             CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, flightContext);
 
         }
