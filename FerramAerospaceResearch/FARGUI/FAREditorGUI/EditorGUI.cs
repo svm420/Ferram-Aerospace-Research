@@ -205,7 +205,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GameEvents.onEditorLoad.Remove(ResetEditorEvent);
 
             GameEvents.onGUIEngineersReportReady.Remove(AddDesignConcerns);
-            GameEvents.onGUIEngineersReportDestroy.Remove(AddDesignConcerns);
+            GameEvents.onGUIEngineersReportDestroy.Remove(RemoveDesignConcerns);
 
             //EditorLogic.fetch.Unlock("FAREdLock");
 
