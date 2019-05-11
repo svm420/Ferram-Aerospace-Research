@@ -298,9 +298,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             /// Apply a calculated force to a part.
             /// </summary>
             /// <param name="pd">The part data of the part that the force should be applied to</param>
+            /// <param name="localVel">The local velocity of the part</param>
             /// <param name="forceVector">The calculated force vector to be applied to the part</param>
             /// <param name="torqueVector">The calculated torque vector to be applied to the part</param>
-            void ApplyForce(PartData pd, Vector3 forceVector, Vector3 torqueVector);
+            void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector);
         }
 
         private class SimulatedForceContext : IForceContext
@@ -336,12 +337,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             public Vector3 LocalVelocity(PartData pd)
             {
+                if (pd.aeroModule.part == null || pd.aeroModule.part.partTransform == null)
+                    return Vector3.zero;
                 return pd.aeroModule.part.partTransform.InverseTransformVector(worldVel);
             }
 
-            public void ApplyForce(PartData pd, Vector3 forceVector, Vector3 torqueVector)
+            public void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector)
             {
-                var localVel = pd.aeroModule.part.partTransform.InverseTransformVector(worldVel);
+                if (pd.aeroModule.part == null || pd.aeroModule.part.partTransform == null)
+                    return;
                 var tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
                 var dynamicPressurekPa = tmp * atmDensity;
                 var dragFactor = dynamicPressurekPa * Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
@@ -368,7 +372,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 return pd.aeroModule.partLocalVel;
             }
 
-            public void ApplyForce(PartData pd, Vector3 forceVector, Vector3 torqueVector)
+            public void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector)
             {
                 pd.aeroModule.AddLocalForceAndTorque(forceVector, torqueVector, pd.centroidPartSpace);
             }
@@ -507,7 +511,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 forceVector *= data.dragFactor;
                 torqueVector *= data.dragFactor;
 
-                forceContext.ApplyForce(data, forceVector, torqueVector);
+                forceContext.ApplyForce(data, velLocal, forceVector, torqueVector);
             }
         }
         
