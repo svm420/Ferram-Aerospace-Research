@@ -66,6 +66,7 @@ CHANGELOG
 =======================================================
 -----------------------master branch---------------------
 
+Fix assymetrical voxelization on some Mk2/Mk3 adapters [#56](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/56) ([#57](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/57))  
 Cache some Unity properties for performance reasons ([#53](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/53))  
 Fix Runge Kutta method in transient simulation ([#50](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/50))  
 Fix part tinting not cleared after last tint option is disabled ([#49](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/49))  
