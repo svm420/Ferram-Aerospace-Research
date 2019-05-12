@@ -74,8 +74,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             get => gameObject.activeSelf;
             set
             {
-                if (gameObject != null)
-                    gameObject.SetActive(value);
+                gameObject.SetActive(value);
             }
         }
 
