@@ -49,8 +49,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
     [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer))]
     public class DebugVisualVoxelSubmesh : MonoBehaviour
     {
-        public static Texture2D voxelTexture;
-
         private Mesh m_mesh;
         private MeshFilter m_meshFilter;
         private MeshRenderer m_meshRenderer;
@@ -107,23 +105,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             m_meshRenderer = GetComponent<MeshRenderer>();
 
             m_meshFilter.mesh = m_mesh;
-
-            if (voxelTexture == null)
-            {
-                voxelTexture = GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/sprite_debug_voxel", false);
-            }
-
-            Material material;
-            if (FARAssets.materialDict.TryGetValue("FARVoxelMeshMaterial", out material))
-            {
-                m_meshRenderer.material = material;
-            }
-            else
-            {
-                FARLogger.Warning("FARVoxelMeshMaterial was not found, using Sprites/Default for rendering, you WILL see depth artifacts");
-                m_meshRenderer.material = new Material(Shader.Find("Sprites/Default"));
-            }
-            m_meshRenderer.material.mainTexture = voxelTexture;
+            m_meshRenderer.material = FARAssets.ShaderCache.DebugVoxels.Material;
+            m_meshRenderer.material.mainTexture = FARAssets.TextureCache.VoxelTexture;
             setupMeshRenderer();
         }
 

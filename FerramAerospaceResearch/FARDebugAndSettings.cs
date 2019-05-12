@@ -183,7 +183,7 @@ namespace FerramAerospaceResearch
                 null,
                 null,
                 ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.FLIGHT,
-                (Texture)GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_stock", false));
+                FARAssets.TextureCache.IconLarge);
         }
 
         void onAppLaunchToggle()
