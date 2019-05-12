@@ -66,6 +66,7 @@ CHANGELOG
 =======================================================
 -----------------------master branch---------------------
 
+Now really fixed ocassional NRE when cleaning up debug voxels ([#59](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/59))  
 Fix unsubsribing correct method from `GameEvents.onGUIEngineersReportDestroy` in `EditorGUI` ([#58](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/58))  
 Fix assymetrical voxelization on some Mk2/Mk3 adapters [#56](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/56) ([#57](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/57))  
 Cache some Unity properties for performance reasons ([#53](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/53))  
