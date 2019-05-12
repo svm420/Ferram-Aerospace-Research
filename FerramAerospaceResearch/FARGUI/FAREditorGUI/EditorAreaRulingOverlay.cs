@@ -100,15 +100,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //Based on Kronal Vessel Viewer CoM axes rendering
             if (_rendererMaterial == null)
             {
-
-                Material lineMaterial;
-
-                if (!FARAssets.materialDict.TryGetValue("FARGraphMaterial", out lineMaterial))
-                {
-                    //TODO: definitely replace this with a proper shader when we can
-                    FARLogger.Warning("Could not load cross-section shader; using fallback shader");
-                    lineMaterial = new Material(Shader.Find("Sprites/Default"));
-                }
+                Material lineMaterial = FARAssets.ShaderCache.LineRenderer.Material;
 
                 _rendererMaterial = new Material(lineMaterial);
                 _rendererMaterial.hideFlags = HideFlags.HideAndDontSave;
