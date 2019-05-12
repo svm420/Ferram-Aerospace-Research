@@ -22,7 +22,9 @@
         "KSPMajorMin": 1,
         "KSPMajorMax": 1,
         "KSPMinorMin": 4,
-        "KSPMinorMax": 7
+        "KSPMinorMax": 7,
+        "UnityDir": "Unity/$(ModName)/",
+        "AssetBundleDir": "$(UnityDir)AssetBundles/"
     },
     "post_build": {
         "pdb2mdb": "$(SolutionDir)../KSP Assemblies/pdb2mdb.exe",
@@ -31,6 +33,10 @@
             {
                 "source": "$(TargetDir)$(TargetName).*",
                 "destination": "$(PluginDir)"
+            },
+            {
+                "source": "$(AssetBundleDir)*.far",
+                "destination": "$(AssetDir)"
             }
         ],
         "[FerramAerospaceResearch]": {
@@ -41,6 +47,10 @@
                 {
                     "source": "$(TargetDir)$(TargetName).*",
                     "destination": "$(PluginDir)"
+                },
+                {
+                    "source": "$(AssetBundleDir)*.far",
+                    "destination": "$(AssetDir)"
                 },
                 {
                     "source": "GameData/$(ModName)",
