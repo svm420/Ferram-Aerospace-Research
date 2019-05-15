@@ -43,8 +43,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI;
+using UnityEngine;
 
 namespace ferram4
 {
@@ -121,8 +122,7 @@ namespace ferram4
             if (HighLogic.LoadedSceneIsFlight)
                 return part.Rigidbody.velocity + Krakensbane.GetFrameVelocityV3f()
                     - FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
-            else
-                return velocityEditor;
+            return velocityEditor;
         }
 
         public Vector3d GetVelocity(Vector3 refPoint)
@@ -138,8 +138,8 @@ namespace ferram4
 
                 return velocity;
             }
-            else
-                return velocityEditor;
+
+            return velocityEditor;
         }
 
         protected virtual void ResetCenterOfLift()
@@ -217,7 +217,7 @@ namespace ferram4
         {
             // Compute the actual center ourselves once per frame
             // Feed the precomputed values to the vanilla indicator
-            CoLMarker.pos = FerramAerospaceResearch.FARGUI.FAREditorGUI.EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
             CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;

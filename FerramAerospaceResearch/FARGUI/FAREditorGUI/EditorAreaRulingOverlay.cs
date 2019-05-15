@@ -44,8 +44,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
@@ -236,7 +236,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         public void UpdateAeroData(Matrix4x4 voxelLocalToWorldMatrix, double[] xCoords, double[] yCoordsCrossSection, double[] yCoordsDeriv, double[] yCoordsPressureCoeffs, double maxValue)
         {
             _numGridLines = (int)Math.Ceiling(maxValue / _yAxisGridScale);       //add one to account for the xAxis
-            double gridScale = _yScaleMaxDistance / (double)_numGridLines;
+            double gridScale = _yScaleMaxDistance / _numGridLines;
             double scalingFactor = _yScaleMaxDistance / (_yAxisGridScale * _numGridLines);
 
             /*if (_areaLine == null)
@@ -282,12 +282,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
 
 
-            double[] shortXCoords = new double[] {xCoords[0], xCoords[xCoords.Length - 1]};
+            double[] shortXCoords = {xCoords[0], xCoords[xCoords.Length - 1]};
 
             for (int i = 0; i < _markingRenderers.Count; i++)
             {
                 double height = i * gridScale;
-                UpdateRenderer(_markingRenderers[i], voxelLocalToWorldMatrix, shortXCoords, new double[] { height, height });
+                UpdateRenderer(_markingRenderers[i], voxelLocalToWorldMatrix, shortXCoords, new[] { height, height });
                 if (i > _numGridLines)
                     _markingRenderers[i].enabled = false;
                 else

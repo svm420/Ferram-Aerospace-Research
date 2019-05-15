@@ -157,8 +157,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                     continue;
                 }
-                else
-                    m = mc.sharedMesh;
+
+                m = mc.sharedMesh;
 
                 if (m == null)
                     continue;
@@ -277,7 +277,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             ignorePartModuleTransforms = new List<List<string>>();
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARPartModuleTransformExceptions"))
-                if((object)node != null)
+                if(node != null)
                     foreach(ConfigNode template in node.GetNodes("FARPartModuleException"))
                     {
                         if(!template.HasValue("PartModuleName"))

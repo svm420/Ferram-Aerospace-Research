@@ -44,18 +44,18 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace ferram4
 {
     public class FARPartModule : PartModule
     {
         protected Callback OnVesselPartsChange;
-        public List<Part> VesselPartList = null;
-        int VesselPartListCount = 0;
-        private Collider[] partColliders = null;
+        public List<Part> VesselPartList;
+        int VesselPartListCount;
+        private Collider[] partColliders;
 
         public Collider[] PartColliders { get { if(partColliders == null) TriggerPartColliderUpdate(); return partColliders; } protected set { partColliders = value; } }
 
@@ -74,7 +74,7 @@ namespace ferram4
         {
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
 
@@ -93,22 +93,22 @@ namespace ferram4
                     FARPartModule farModule = (m as FARPartModule);
                     if (farModule.partColliders != null)
                     {
-                        this.partColliders = farModule.partColliders;
+                        partColliders = farModule.partColliders;
                         break;
                     }
                 }
             }
             // For some reason fuelLine throws NRE when trying to get colliders
-            if (this.partColliders == null)
+            if (partColliders == null)
             {
                 try
                 {
-                    this.partColliders = part.GetPartColliders();
+                    partColliders = part.GetPartColliders();
                 }
                 catch (NullReferenceException)
                 {
                     FARLogger.Info("NullReferenceException trying to get part colliders from " + part + ", defaulting to no colliders");
-                    this.partColliders = new Collider[0];
+                    partColliders = new Collider[0];
                 }
             }
         }

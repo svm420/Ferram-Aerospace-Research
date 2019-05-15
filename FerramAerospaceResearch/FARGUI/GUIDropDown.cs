@@ -42,16 +42,16 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
 {
     public class GUIDropDown<T>
     {
         private int selectedOption;
-        private bool isActive = false;
-        private bool toggleBtnState = false;
+        private bool isActive;
+        private bool toggleBtnState;
         private Vector2 scrollPos;
 
         private string[] stringOptions;
@@ -156,7 +156,7 @@ namespace FerramAerospaceResearch.FARGUI
             if (!isActive)
             {
                 toggleBtnState = isActive = true;
-                FARGUIDropDownDisplay.Instance.ActivateDisplay(this.GetHashCode(), btnRect, dropdownRect, OnDisplayList, listStyle);
+                FARGUIDropDownDisplay.Instance.ActivateDisplay(GetHashCode(), btnRect, dropdownRect, OnDisplayList, listStyle);
                 InputLockManager.SetControlLock(ControlTypes.All, "DropdownScrollLock");
             }
         }
@@ -212,8 +212,8 @@ namespace FerramAerospaceResearch.FARGUI
 
         private void Start()
         {
-            this.enabled = true;
-            GameObject.DontDestroyOnLoad(this);
+            enabled = true;
+            DontDestroyOnLoad(this);
         }
 
 
@@ -234,11 +234,11 @@ namespace FerramAerospaceResearch.FARGUI
 
         public void ActivateDisplay(int id, Rect btnRect, Rect rect, GUI.WindowFunction func, GUIStyle style)
         {
-            this.windowId = id;
+            windowId = id;
             this.btnRect = btnRect;
-            this.displayRect = rect;
-            this.windowFunction = func;
-            this.listStyle = style;
+            displayRect = rect;
+            windowFunction = func;
+            listStyle = style;
         }
 
         public void DisableDisplay()

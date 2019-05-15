@@ -44,9 +44,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using FerramAerospaceResearch.FARPartGeometry;
 using ferram4;
+using FerramAerospaceResearch.FARPartGeometry;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
@@ -66,7 +66,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         float hypersonicMomentBackward;
         float diameter;
 
-        float mergeFactor = 0;
+        float mergeFactor;
         Vector3 worldNormalVector;
 
         List<PartData> partData;
@@ -311,7 +311,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             /// <summary>
             /// The center with which force should be accumulated
             /// </summary>
-            private ferram4.FARCenterQuery center;
+            private FARCenterQuery center;
 
             /// <summary>
             /// The atmospheric density that the force is being simulated at
@@ -395,7 +395,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 velLocal = forceContext.LocalVelocity(data);
                 // Rejects both negligable speed and invalid simulation cases
-                if (FARMathUtil.NearlyEqual(velLocal.sqrMagnitude, 0.0f)) 
+                if (velLocal.sqrMagnitude.NearlyEqual(0.0f)) 
                 {
                     continue;
                 }
@@ -516,7 +516,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
         
         private SimulatedForceContext simContext = new SimulatedForceContext(Vector3.zero, new FARCenterQuery(), 0.0f);
-        public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, ferram4.FARCenterQuery center)
+        public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, FARCenterQuery center)
         {
             simContext.UpdateSimulationContext(vel, center, atmDensity);
             CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);

@@ -43,9 +43,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using UnityEngine;
 using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
@@ -70,15 +70,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public GeometryMesh(MeshData meshData, Transform meshTransform, Matrix4x4 worldToVesselMatrix, GeometryPartModule module)
         {
-            this.meshLocalVerts = meshData.vertices;
-            this.triangles = meshData.triangles;
-            this.isSkinned = meshData.isSkinned;
+            meshLocalVerts = meshData.vertices;
+            triangles = meshData.triangles;
+            isSkinned = meshData.isSkinned;
             Bounds meshBounds = meshData.bounds;
 
             vertices = new Vector3[meshLocalVerts.Length];
             this.meshTransform = meshTransform;
             UpdateLocalToWorldMatrix();
-            this.thisToVesselMatrix = worldToVesselMatrix * meshLocalToWorld;
+            thisToVesselMatrix = worldToVesselMatrix * meshLocalToWorld;
 
             for (int i = 0; i < vertices.Length; i++)
             {
@@ -95,7 +95,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 vertices[i] = vert;
             }
 
-            this.gameObjectActiveInHierarchy = meshTransform.gameObject.activeInHierarchy;
+            gameObjectActiveInHierarchy = meshTransform.gameObject.activeInHierarchy;
 
             bounds = TransformBounds(meshBounds, thisToVesselMatrix);
 
@@ -110,7 +110,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 valid = true;
 
             this.module = module;
-            this.part = module.part;
+            part = module.part;
 
             if (!module.part.isMirrored)
                 invertXYZ = 1;
@@ -189,7 +189,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             lock(this)
             {
-                this.TransformBasis((Matrix4x4) newThisToVesselMatrixObj);
+                TransformBasis((Matrix4x4) newThisToVesselMatrixObj);
             }
         }
 

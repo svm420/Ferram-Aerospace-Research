@@ -41,8 +41,9 @@ Copyright 2019, Daumantas Kavolis, aka dkavolis
  */
 
 using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
@@ -112,9 +113,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void setupMeshRenderer()
         {
-            m_meshRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            m_meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
-            m_meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            m_meshRenderer.lightProbeUsage = LightProbeUsage.Off;
+            m_meshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+            m_meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
             m_meshRenderer.receiveShadows = false;
             m_meshRenderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
         }

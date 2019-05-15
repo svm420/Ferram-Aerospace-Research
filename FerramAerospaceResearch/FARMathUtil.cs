@@ -105,8 +105,8 @@ namespace FerramAerospaceResearch
         public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
         {
             if (val.CompareTo(min) < 0) return min;
-            else if (val.CompareTo(max) > 0) return max;
-            else return val;
+            if (val.CompareTo(max) > 0) return max;
+            return val;
         }
 
         public static bool Approximately(double p, double q)
@@ -308,8 +308,7 @@ namespace FerramAerospaceResearch
             //          At slower speeds however SegmentSearchMethod is used as ad hoc root-finder.
             if (machNumber >= machswitchvalue)
                 return BrentsMethod(function, leftedge, rightedge, tol_brent, iterlim);
-            else
-                return SegmentSearchMethod(function);
+            return SegmentSearchMethod(function);
         }
 
         public static double SegmentSearchMethod(Func<double, double> function)
@@ -325,7 +324,7 @@ namespace FerramAerospaceResearch
 
         LblSkipRight:
             if (f1 > 0) return mfobj.LinearSolution(x0, f0, x1, f1);
-            double x2 = Clamp<double>(x1 + xstepsize, 0d, rightedge);
+            double x2 = Clamp(x1 + xstepsize, 0d, rightedge);
             if (Math.Abs(x2 - x1) < tol_brent) return mfobj.BrentSolve("Reached far right edge."); // Rodhern: Strict equality replaced with approximate equality for readability in dkavolis branch.
             double f2 = f(x2);
             if (f2 > f1)
@@ -348,18 +347,18 @@ namespace FerramAerospaceResearch
                 x2 = x1; f2 = f1;
                 goto LblTriangle;
             }
-            else if (f12 > f1 && f12 > f01)
+
+            if (f12 > f1 && f12 > f01)
             { // maximum at x12
-                x0 = x1; f0 = f1;
+                x0 = x1; f0  = f1;
                 x1 = x12; f1 = f12;
                 goto LblTriangle;
             }
-            else
-            { // shrink around x1
-                x0 = x01; f0 = f01;
-                x2 = x12; f2 = f12;
-                goto LblTriangle;
-            }
+
+            // shrink around x1
+            x0 = x01; f0 = f01;
+            x2 = x12; f2 = f12;
+            goto LblTriangle;
         }
 
         public class MirroredFunction
@@ -378,13 +377,12 @@ namespace FerramAerospaceResearch
                 get
                 {
                     if (mirror)
-                        return this.InvokeMirrored;
-                    else
-                        return this.F;
+                        return InvokeMirrored;
+                    return F;
                 }
             }
 
-            public bool IsMirrored { get { return this.mirror; } }
+            public bool IsMirrored { get { return mirror; } }
 
             private double InvokeMirrored(double x)
             {
@@ -393,7 +391,7 @@ namespace FerramAerospaceResearch
 
             public double LinearSolution(double x0, double f0, double x1, double f1)
             {
-                if (this.IsMirrored)
+                if (IsMirrored)
                 {
                     double oldx0 = x0;
                     double oldf0 = f0;
@@ -404,26 +402,27 @@ namespace FerramAerospaceResearch
             LblLoop:
                 double x = x0 + (x0 - x1) * f0 / (f1 - f0);
                 if (x1 - x0 < tol_linear) return x;
-                x = Clamp<double>(x, maxpart * x0 + minpart * x1, minpart * x0 + maxpart * x1);
+                x = Clamp(x, maxpart * x0 + minpart * x1, minpart * x0 + maxpart * x1);
                 double fx = F(x);
                 if (fx < 0d)
                 {
                     x0 = x; f0 = fx;
                     goto LblLoop;
                 }
-                else if (fx > 0d)
+
+                if (fx > 0d)
                 {
                     x1 = x; f1 = fx;
                     goto LblLoop;
                 }
-                else
-                    return x;
+
+                return x;
             }
 
             public double BrentSolve(string dbgmsg)
             {
                 FARLogger.Info("MirroredFunction (mirrored= " + mirror + ") reverting to BrentsMethod: " + dbgmsg);
-                return FARMathUtil.BrentsMethod(this.F, leftedge, rightedge, tol_brent, iterlim);
+                return BrentsMethod(F, leftedge, rightedge, tol_brent, iterlim);
             }
         }
     }

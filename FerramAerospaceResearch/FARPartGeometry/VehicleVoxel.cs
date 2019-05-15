@@ -45,9 +45,10 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEngine;
+using ferram4;
 using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
@@ -58,12 +59,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
         static Stack<VoxelChunk> clearedChunks = new Stack<VoxelChunk>();
         static Stack<SweepPlanePoint[,]> clearedPlanes;
 
-        static int MAX_CHUNKS_ALLOWED = 0;
-        static int chunksInUse = 0;
+        static int MAX_CHUNKS_ALLOWED;
+        static int chunksInUse;
 
         static double maxLocation = 255;
         static byte maxLocationByte = 255;
-        static bool useHigherResVoxels = false;
+        static bool useHigherResVoxels;
 
         double elementSize;
         public double ElementSize
@@ -77,7 +78,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         HashSet<Part> ductingParts;
         int xLength, yLength, zLength;
         int xCellLength, yCellLength, zCellLength;
-        int threadsQueued = 0;
+        int threadsQueued;
         object _locker = new object();
 
         Vector3d lowerRightCorner;
@@ -386,7 +387,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             PartModuleList modules = g.part.Modules;
             bool returnVal = false;
 
-            if(modules.Contains<ferram4.FARControllableSurface>() ||
+            if(modules.Contains<FARControllableSurface>() ||
                 modules.Contains<ModuleRCS>() ||
                 modules.Contains<ModuleEngines>() ||
                 modules.Contains<ModuleProceduralFairing>() ||
@@ -2559,7 +2560,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             pt = new SweepPlanePoint(p, i, k);
                             pt.jLastInactive = j;
                             sweepPlane[i, k] = pt;
-                            continue;
                         }
                     }
                     else
@@ -2684,7 +2684,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             public Part part;
             public int i, k;
             public int jLastInactive;
-            public bool ductingParts = false;
+            public bool ductingParts;
 
             public MarkingType mark = MarkingType.VoxelShell;
 

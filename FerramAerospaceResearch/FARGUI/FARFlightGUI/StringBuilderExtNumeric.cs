@@ -9,16 +9,16 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Text;
 using System.Diagnostics;
+using System.Text;
 
 namespace StringLeakTest
 {
-	public static partial class StringBuilderExtensions
+	public static class StringBuilderExtensions
 	{
 		// These digits are here in a static array to support hex with simple, easily-understandable code. 
 		// Since A-Z don't sit next to 0-9 in the ascii table.
-		private static readonly char[]	ms_digits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		private static readonly char[]	ms_digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 		private static readonly uint	ms_default_decimal_places = 5; //< Matches standard .NET formatting dp's
 		private static readonly char	ms_default_pad_char = '0';
@@ -189,14 +189,16 @@ namespace StringLeakTest
 				string_builder.Append("NaN");
 				return string_builder;
 			}
-			else if (float.IsInfinity(float_val))
+
+			if (float.IsInfinity(float_val))
 			{
 				if (float.IsPositiveInfinity(float_val))
 				{
 					string_builder.Append("Infinity");
 					return string_builder;
 				}
-				else if (float.IsInfinity(float_val))
+
+				if (float.IsInfinity(float_val))
 				{
 					string_builder.Append("-Infinity");
 					return string_builder;

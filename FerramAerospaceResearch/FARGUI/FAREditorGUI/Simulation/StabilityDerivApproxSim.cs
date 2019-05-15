@@ -99,8 +99,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     num++;              //Avoid Ix, Iy, Iz and long derivs
                     continue;
                 }
-                else
-                    num++;
+
+                num++;
                 FARLogger.Info("" + i + "," + j);
                 if (i <= 2)
                     A.Add(f, i, j);
@@ -185,8 +185,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     num++;              //Avoid Ix, Iy, Iz
                     continue;
                 }
-                else
-                    num++;
+
+                num++;
                 FARLogger.Info(i + "," + j);
                 if (i <= 2)
                     if (num == 10)

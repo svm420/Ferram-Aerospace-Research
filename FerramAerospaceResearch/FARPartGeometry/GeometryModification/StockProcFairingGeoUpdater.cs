@@ -43,9 +43,10 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System.Collections.Generic;
-using UnityEngine;
-using ProceduralFairings;
+using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.FARUtils;
+using ProceduralFairings;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
@@ -125,7 +126,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         private void FairingDeployGeometryUpdate(Part p)
         {
-            FARThreading.ThreadSafeDebugLogger.Instance.RegisterMessage("Fairing Geometry Update");
+            ThreadSafeDebugLogger.Instance.RegisterMessage("Fairing Geometry Update");
             validParts[p].GeometryPartModuleRebuildMeshData();
         }
 

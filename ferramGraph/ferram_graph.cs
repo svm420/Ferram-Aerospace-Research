@@ -42,8 +42,8 @@ namespace ferram4
             private double[] pixelDataY = new double[1];
             private Vector4d bounds;
             public int lineThickness;
-            public Color lineColor = new Color();
-            public Color backgroundColor = new Color();
+            public Color lineColor;
+            public Color backgroundColor;
             private double verticalScaling;
             private double horizontalScaling;
 

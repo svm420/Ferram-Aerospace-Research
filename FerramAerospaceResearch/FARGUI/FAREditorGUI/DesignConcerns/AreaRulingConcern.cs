@@ -42,9 +42,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using PreFlightTests;
-using KSP.Localization;
 using FerramAerospaceResearch.FARAeroComponents;
+using KSP.Localization;
+using PreFlightTests;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 {

@@ -43,17 +43,19 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System.Collections.Generic;
-using UnityEngine;
+using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI;
+using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT)]
     public class FARSettingsScenarioModule : ScenarioModule
     {
-        public bool newGame = false;
+        public bool newGame;
         public FARDifficultyAndExactnessSettings settings;
         public static FARDifficultyAndExactnessSettings Settings
         {
@@ -116,7 +118,7 @@ namespace FerramAerospaceResearch
         {
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
             instance = this;
@@ -125,7 +127,7 @@ namespace FerramAerospaceResearch
             //    PopupDialog.SpawnPopupDialog("Ferram Aerospace Research", "Welcome to KSP with FAR!\n\r\n\rThings will be much harder from here on out; the FAR button in the top-right corner will bring you to difficulty settings if you ever decide to change them.  Have fun!", "OK", false, HighLogic.Skin);
 
             FARLogger.Info("Vehicle Voxel Setup started");
-            FerramAerospaceResearch.FARAeroComponents.FARAeroSection.GenerateCrossFlowDragCurve();
+            FARAeroSection.GenerateCrossFlowDragCurve();
             VehicleVoxel.VoxelSetup();
             PhysicsGlobals.DragCubeMultiplier = 0;
             FARLogger.Info("Vehicle Voxel Setup complete");
@@ -148,7 +150,7 @@ namespace FerramAerospaceResearch
             node.AddValue("useHigherResVoxelPoints", voxelSettings.useHigherResVoxelPoints);
             node.AddValue("index", settings.index);
 
-            FARGUI.FARFlightGUI.FlightGUI.SaveActiveData();
+            FlightGUI.SaveActiveData();
             ConfigNode flightGUINode = new ConfigNode("FlightGUISettings");
             FARLogger.Info("Saving FAR Data");
             for (int i = 0; i < flightGUISettings.Count; i++)

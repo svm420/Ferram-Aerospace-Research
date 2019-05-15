@@ -43,16 +43,18 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System.Collections.Generic;
-using UnityEngine;
-using FerramAerospaceResearch.FARPartGeometry;
-using FerramAerospaceResearch.FARUtils;
 using ferram4;
+using FerramAerospaceResearch.FARGUI.FARFlightGUI;
+using FerramAerospaceResearch.FARPartGeometry;
+using FerramAerospaceResearch.FARThreading;
+using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
     public class FARVesselAero : VesselModule
     {
-        FerramAerospaceResearch.FARGUI.FARFlightGUI.FlightGUI _flightGUI;
+        FlightGUI _flightGUI;
         int _voxelCount;
 
         public double Length
@@ -82,7 +84,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
 
         List<GeometryPartModule> _currentGeoModules;
-        int geoModulesReady = 0;
+        int geoModulesReady;
 
         List<FARAeroPartModule> _currentAeroModules;
         List<FARAeroPartModule> _unusedAeroModules;
@@ -91,8 +93,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         int _updateRateLimiter = 20;
         bool _updateQueued = true;
-        bool _recalcGeoModules = false;
-        bool setup = false;
+        bool _recalcGeoModules;
+        bool setup;
 
         VehicleAerodynamics _vehicleAero;
         VesselIntakeRamDrag _vesselIntakeRamDrag;
@@ -104,12 +106,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
             if (!HighLogic.LoadedSceneIsFlight)
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
 
@@ -158,7 +160,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
             RequestUpdateVoxel(false);
 
-            this.enabled = true;
+            enabled = true;
             //GameEvents.onVesselLoaded.Add(VesselUpdateEvent);
             //GameEvents.onVesselChange.Add(VesselUpdateEvent);
             //GameEvents.onVesselLoaded.Add(VesselUpdate);
@@ -217,7 +219,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 _vehicleAero.GetNewAeroData(out _currentAeroModules, out _unusedAeroModules, out _currentAeroSections, out _legacyWingModels);
 
                 if ((object)_flightGUI == null)
-                    _flightGUI = vessel.GetComponent<FerramAerospaceResearch.FARGUI.FARFlightGUI.FlightGUI>();
+                    _flightGUI = vessel.GetComponent<FlightGUI>();
 
                 _flightGUI.UpdateAeroModules(_currentAeroModules, _legacyWingModels);
                 //FARLogger.Info("Updating " + _vessel.vesselName + " aero properties\n\rCross-Sectional Area: " + _vehicleAero.MaxCrossSectionArea + " Crit Mach: " + _vehicleAero.CriticalMach + "\n\rUnusedAeroCount: " + _unusedAeroModules.Count + " UsedAeroCount: " + _currentAeroModules.Count + " sectCount: " + _currentAeroSections.Count);
@@ -432,11 +434,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                  _updateQueued = true;
                  return;
              }
-             else                                //last update was far enough in the past to run; reset rate limit counter and clear the queued flag
-             {
-                 _updateRateLimiter = 0;
-                 _updateQueued = false;
-             }
+
+             _updateRateLimiter = 0;
+             _updateQueued      = false;
              if (vessel.rootPart.Modules.Contains<LaunchClamp>())// || _vessel.rootPart.Modules.Contains("KerbalEVA"))
              {
                  DisableModule();
@@ -472,7 +472,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
              }
 
              TriggerIGeometryUpdaters();
-             if (FARThreading.VoxelizationThreadpool.RunInMainThread)
+             if (VoxelizationThreadpool.RunInMainThread)
              {
                  for (int i = _currentGeoModules.Count - 1; i >= 0; --i)
                  {
@@ -504,11 +504,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 if (vessel.parts.Count >= 2)
                     return FARSettingsScenarioModule.VoxelSettings.numVoxelsDebrisVessel;
-                else
-                    return 200;
+                return 200;
             }
-            else
-                return FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel;
+
+            return FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel;
         }
 
         public override void OnLoadVessel()
@@ -518,7 +517,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (vessel.rootPart.Modules.Contains("MissileLauncher") && vessel.parts.Count == 1)
                 {
                     vessel.rootPart.dragModel = Part.DragModel.CUBE;
-                    this.enabled = false;
+                    enabled = false;
                     return;
                 }
             }
@@ -542,7 +541,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private void DisableModule()
         {
-            this.enabled = false;
+            enabled = false;
 
             //GameEvents.onVesselLoaded.Remove(VesselUpdateEvent);
             //GameEvents.onVesselChange.Remove(VesselUpdateEvent);

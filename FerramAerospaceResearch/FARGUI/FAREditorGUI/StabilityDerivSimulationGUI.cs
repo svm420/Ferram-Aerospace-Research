@@ -45,10 +45,10 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ferram4;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 using KSP.Localization;
 using UnityEngine;
-using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
@@ -64,21 +64,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private enum SimMode
         {
             LONG,
-            LAT,
+            LAT
         }
 
         private static string[] SimMode_str =
         {
             Localizer.Format("FAREditorSimModeLong"),
-            Localizer.Format("FAREditorSimModeLat"),
+            Localizer.Format("FAREditorSimModeLat")
         };
 
         public StabilityDerivSimulationGUI(EditorSimManager simManager)
         {
             this.simManager = simManager;
 
-            lonConditions = new InitialConditions(new string[] { "0", "0", "0", "0" }, new string[] { "w", "u", "q", "θ" }, new double[]{1, 1, Math.PI/180, Math.PI/180}, "0.01", "10");
-            latConditions = new InitialConditions(new string[] { "0", "0", "0", "0" }, new string[] { "β", "p", "r", "φ" }, new double[]{Math.PI/180, Math.PI/180, Math.PI/180, Math.PI/180}, "0.01", "10");
+            lonConditions = new InitialConditions(new[] { "0", "0", "0", "0" }, new[] { "w", "u", "q", "θ" }, new[]{1, 1, Math.PI/180, Math.PI/180}, "0.01", "10");
+            latConditions = new InitialConditions(new[] { "0", "0", "0", "0" }, new[] { "β", "p", "r", "φ" }, new[]{Math.PI/180, Math.PI/180, Math.PI/180, Math.PI/180}, "0.01", "10");
 
             _graph.SetBoundaries(0, 10, 0, 2);
             _graph.SetGridScaleUsingValues(1, 0.25);

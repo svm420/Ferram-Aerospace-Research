@@ -54,8 +54,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         byte xPlane, yPlane, zPlane;
         //byte xPlaneDown, yPlaneDown, zPlaneDown;
 
-        public PartSizePair4Bit() { }
-
         public override void Clear()
         {
             xPlane = yPlane = zPlane = 0;

@@ -42,8 +42,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using UnityEngine;
+using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARThreading;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
@@ -57,7 +58,7 @@ namespace FerramAerospaceResearch
         {
             VoxelizationThreadpool.RunInMainThread = Debug.isDebugBuild;
 
-            FerramAerospaceResearch.FARAeroComponents.FARAeroSection.GenerateCrossFlowDragCurve();
+            FARAeroSection.GenerateCrossFlowDragCurve();
             FARAeroStress.LoadStressTemplates();
             FARAeroUtil.LoadAeroDataFromConfig();
             FARAnimOverrides.LoadAnimOverrides();

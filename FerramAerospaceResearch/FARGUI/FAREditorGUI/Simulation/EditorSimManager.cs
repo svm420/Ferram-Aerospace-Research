@@ -43,6 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System.Collections.Generic;
+using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
@@ -92,7 +93,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             vehicleData = new StabilityDerivOutput();
         }
 
-        public void UpdateAeroData(VehicleAerodynamics vehicleAero, List<ferram4.FARWingAerodynamicModel> wingAerodynamicModel)
+        public void UpdateAeroData(VehicleAerodynamics vehicleAero, List<FARWingAerodynamicModel> wingAerodynamicModel)
         {
              List<FARAeroPartModule> aeroModules;
              List<FARAeroSection> aeroSections;

@@ -45,8 +45,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using UnityEngine;
+using System.Text;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARThreading
 {
@@ -72,7 +73,7 @@ namespace FerramAerospaceResearch.FARThreading
             _exceptionsThrown = new List<Exception>();
             _infoMessages = new List<string>();
             _debugMessages = new List<string>();
-            GameObject.DontDestroyOnLoad(this.gameObject);
+            DontDestroyOnLoad(gameObject);
         }
 
         void Update()
@@ -94,13 +95,13 @@ namespace FerramAerospaceResearch.FARThreading
         {
             if (_infoMessages.Count > 0)
             {
-                System.Text.StringBuilder sB = new System.Text.StringBuilder();
+                StringBuilder sB = new StringBuilder();
                 for (int i = 0; i < _infoMessages.Count; i++)
                     sB.AppendLine(_infoMessages[i]);
 
                 _infoMessages.Clear();
 
-                FARLogger.Info("" + sB.ToString());
+                FARLogger.Info("" + sB);
             }
         }
 
@@ -109,13 +110,13 @@ namespace FerramAerospaceResearch.FARThreading
         {
             if (_debugMessages.Count > 0)
             {
-                System.Text.StringBuilder sB = new System.Text.StringBuilder();
+                StringBuilder sB = new StringBuilder();
                 for (int i = 0; i < _debugMessages.Count; i++)
                     sB.AppendLine(_debugMessages[i]);
 
                 _debugMessages.Clear();
 
-                FARLogger.Debug("" + sB.ToString());
+                FARLogger.Debug("" + sB);
             }
         }
 

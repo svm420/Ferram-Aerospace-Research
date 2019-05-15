@@ -44,11 +44,14 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using KSP.Localization;
-using FerramAerospaceResearch.FARGUI;
-using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using ferram4;
+using FerramAerospaceResearch.FARGUI;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI;
+using FerramAerospaceResearch.FARGUI.FARFlightGUI;
+using FerramAerospaceResearch.FARPartGeometry;
+using FerramAerospaceResearch.RealChuteLite;
+using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
@@ -70,7 +73,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public float hackWaterDragVal;
         public static float waterSlowDragNew = -1;
-        public static float minVelVesselMultNew = 0;
+        public static float minVelVesselMultNew;
 
         ProjectedArea projectedArea;
 
@@ -84,7 +87,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private ArrowPointer dragArrow;
         private ArrowPointer momentArrow;
 
-        bool fieldsVisible = false;
+        bool fieldsVisible;
 
         [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiFormat = "F3", guiUnits = "FARUnitKN")]
         public float dragForce;
@@ -133,7 +136,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 return a;
             }
 
-            public static ProjectedArea operator + (ProjectedArea a, FARPartGeometry.VoxelCrossSection.SideAreaValues b)
+            public static ProjectedArea operator + (ProjectedArea a, VoxelCrossSection.SideAreaValues b)
             {
                 a.iN += b.iN;
                 a.iP += b.iP;
@@ -144,7 +147,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 return a;
             }
 
-            public static implicit operator ProjectedArea(FARPartGeometry.VoxelCrossSection.SideAreaValues b)
+            public static implicit operator ProjectedArea(VoxelCrossSection.SideAreaValues b)
             {
                 ProjectedArea a = new ProjectedArea();
                 a.iN = b.iN;
@@ -220,17 +223,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 if ((object)liftArrow != null)
                 {
-                    UnityEngine.Object.Destroy(liftArrow);
+                    Destroy(liftArrow);
                     liftArrow = null;
                 }
                 if ((object)dragArrow != null)
                 {
-                    UnityEngine.Object.Destroy(dragArrow);
+                    Destroy(dragArrow);
                     dragArrow = null;
                 }
                 if ((object)momentArrow != null)
                 {
-                    UnityEngine.Object.Destroy(momentArrow);
+                    Destroy(momentArrow);
                     momentArrow = null;
                 }
             }
@@ -240,7 +243,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
 
             double areaForStress = projectedArea.totalArea / 6;
-            if (!FARDebugValues.allowStructuralFailures || areaForStress <= 0.1 || part.Modules.Contains<RealChuteLite.RealChuteFAR>() || part.Modules.Contains<ModuleAblator>())
+            if (!FARDebugValues.allowStructuralFailures || areaForStress <= 0.1 || part.Modules.Contains<RealChuteFAR>() || part.Modules.Contains<ModuleAblator>())
             {
                 partForceMaxY = double.MaxValue;
                 partForceMaxXZ = double.MaxValue;
@@ -283,9 +286,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
             part.minimum_drag = 0;
             part.angularDrag = 0;
             if (HighLogic.LoadedSceneIsFlight)
-                this.enabled = true;
+                enabled = true;
             else if (HighLogic.LoadedSceneIsEditor)
-                this.enabled = false;
+                enabled = false;
 
             partLocalVel = Vector3.zero;
             partLocalForce = Vector3.zero;
@@ -296,7 +299,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             if (FARDebugValues.allowStructuralFailures && !partStressOverride)
             {
-                FARPartStressTemplate template = FARAeroStress.DetermineStressTemplate(this.part);
+                FARPartStressTemplate template = FARAeroStress.DetermineStressTemplate(part);
                 partStressMaxY = template.YmaxStress;
                 partStressMaxXZ = template.XZmaxStress;
             }
@@ -448,8 +451,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Vector3 localForceTemp = Vector3.Dot(partLocalVelNorm, partLocalForce) * partLocalVelNorm;
 
-            partLocalForce = (localForceTemp * (float)part.dragScalar + (partLocalForce - localForceTemp) * (float)part.bodyLiftScalar);
-            partLocalTorque *= (float)part.dragScalar;
+            partLocalForce = (localForceTemp * part.dragScalar + (partLocalForce - localForceTemp) * part.bodyLiftScalar);
+            partLocalTorque *= part.dragScalar;
 
             part.dragScalar = 0;
             part.bodyLiftScalar = 0;
@@ -539,7 +542,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public void AddLocalForce(Vector3 partLocalForce, Vector3 partLocalLocation)
         {
             this.partLocalForce += partLocalForce;
-            this.partLocalTorque += Vector3.Cross(partLocalLocation - part.CoMOffset, partLocalForce);
+            partLocalTorque += Vector3.Cross(partLocalLocation - part.CoMOffset, partLocalForce);
         }
 
         public void AddLocalForceAndTorque(Vector3 partLocalForce, Vector3 partLocalTorque, Vector3 partLocalLocation)
@@ -605,7 +608,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             // Compute the actual center ourselves once per frame
             // Feed the precomputed values to the vanilla indicator
-            CoLMarker.pos = FerramAerospaceResearch.FARGUI.FAREditorGUI.EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
             CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;
@@ -704,17 +707,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 if ((object)liftArrow != null)
                 {
-                    UnityEngine.Object.Destroy(liftArrow);
+                    Destroy(liftArrow);
                     liftArrow = null;
                 }
                 if ((object)dragArrow != null)
                 {
-                    UnityEngine.Object.Destroy(dragArrow);
+                    Destroy(dragArrow);
                     dragArrow = null;
                 }
                 if ((object)momentArrow != null)
                 {
-                    UnityEngine.Object.Destroy(momentArrow);
+                    Destroy(momentArrow);
                     momentArrow = null;
                 }
             }
@@ -748,7 +751,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if(FARDebugValues.allowStructuralFailures && node.HasNode("FARPartStressTemplate"))
             {
                 ConfigNode stressTemplate = node.GetNode("FARPartStressTemplate");
-                FARPartStressTemplate defaultTemplate = FARAeroStress.DetermineStressTemplate(this.part);
+                FARPartStressTemplate defaultTemplate = FARAeroStress.DetermineStressTemplate(part);
                 if(stressTemplate.HasValue("YmaxStress"))
                 {
                     if (!double.TryParse(stressTemplate.GetValue("YmaxStress"), out partStressMaxY))
@@ -767,17 +770,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             if (liftArrow != null)
             {
-                UnityEngine.Object.Destroy(liftArrow);
+                Destroy(liftArrow);
                 liftArrow = null;
             }
             if (dragArrow != null)
             {
-                UnityEngine.Object.Destroy(dragArrow);
+                Destroy(dragArrow);
                 dragArrow = null;
             }
             if (momentArrow != null)
             {
-                UnityEngine.Object.Destroy(momentArrow);
+                Destroy(momentArrow);
                 momentArrow = null;
             }
             legacyWingModel = null;

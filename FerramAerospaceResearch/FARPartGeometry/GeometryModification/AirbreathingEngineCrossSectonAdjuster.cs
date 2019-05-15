@@ -88,7 +88,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
 
             this.engine = engine;
-            this.part = engine.part;
+            part = engine.part;
 
             Bounds partBounds = part.GetPartColliderBoundsInBasis(Matrix4x4.identity);
             exitArea = partBounds.extents.x + partBounds.extents.z;
@@ -104,8 +104,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             double dot = Vector3.Dot(vehicleAxis, vehicleBasisForwardVector);
             if (dot > 0.9)
                 return exitArea;
-            else
-                return 0;
+            return 0;
         }
 
         public double AreaRemovedFromCrossSection()

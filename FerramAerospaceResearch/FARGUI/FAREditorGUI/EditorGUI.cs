@@ -44,19 +44,20 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Diagnostics;
-using UnityEngine;
-using KSP.UI.Screens;
+using System.Reflection;
+using ferram4;
+using FerramAerospaceResearch.FARAeroComponents;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
+using FerramAerospaceResearch.FARPartGeometry;
+using FerramAerospaceResearch.FARThreading;
+using FerramAerospaceResearch.FARUtils;
 using KSP.Localization;
+using KSP.UI.Screens;
 using ModuleWheels;
 using PreFlightTests;
-using FerramAerospaceResearch.FARUtils;
-using FerramAerospaceResearch.FARAeroComponents;
-using FerramAerospaceResearch.FARPartGeometry;
-using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
-using FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns;
-using ferram4;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
@@ -70,10 +71,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             get { return instance; }
         }
 
-        int _updateRateLimiter = 0;
+        int _updateRateLimiter;
         bool _updateQueued = true;
 
-        static bool showGUI = false;
+        static bool showGUI;
         bool useKSPSkin = true;
         Rect guiRect;
         public static Rect GUIRect
@@ -87,8 +88,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         List<FARWingAerodynamicModel> _wingAerodynamicModel = new List<FARWingAerodynamicModel>();
         Stopwatch voxelWatch = new Stopwatch();
 
-        int prevPartCount = 0;
-        bool partMovement = false;
+        int prevPartCount;
+        bool partMovement;
 
         EditorSimManager _simManager;
 
@@ -102,11 +103,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         MethodInfo editorReportUpdate;
 
-        bool gearToggle = false;
+        bool gearToggle;
         bool showAoAArrow = true;
 
-        ArrowPointer velocityArrow = null;
-        Transform arrowTransform = null;
+        ArrowPointer velocityArrow;
+        Transform arrowTransform;
 
         GUIDropDown<FAREditorMode> modeDropdown;
         FAREditorMode currentMode = FAREditorMode.STATIC;
@@ -132,7 +133,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 instance = this;
             else
             {
-                GameObject.Destroy(this);
+                Destroy(this);
                 return;
             }
 
@@ -145,10 +146,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             guiRect = new Rect(Screen.width / 4, Screen.height / 6, 10, 10);
 
             _instantSim = new InstantConditionSim();
-            GUIDropDown<int> flapSettingDropDown = new GUIDropDown<int>(new string[] { Localizer.Format("FARFlapSetting0"), Localizer.Format("FARFlapSetting1"), Localizer.Format("FARFlapSetting2"), Localizer.Format("FARFlapSetting3") }, new int[] { 0, 1, 2, 3 }, 0);
+            GUIDropDown<int> flapSettingDropDown = new GUIDropDown<int>(new[] { Localizer.Format("FARFlapSetting0"), Localizer.Format("FARFlapSetting1"), Localizer.Format("FARFlapSetting2"), Localizer.Format("FARFlapSetting3") }, new[] { 0, 1, 2, 3 }, 0);
             GUIDropDown<CelestialBody> celestialBodyDropdown = CreateBodyDropdown();
 
-            modeDropdown = new GUIDropDown<FAREditorMode>(FAReditorMode_str, new FAREditorMode[] {FAREditorMode.STATIC, FAREditorMode.STABILITY, FAREditorMode.SIMULATION, FAREditorMode.AREA_RULING});
+            modeDropdown = new GUIDropDown<FAREditorMode>(FAReditorMode_str, new[] {FAREditorMode.STATIC, FAREditorMode.STABILITY, FAREditorMode.SIMULATION, FAREditorMode.AREA_RULING});
 
             _simManager = new EditorSimManager(_instantSim);
 
@@ -334,14 +335,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         void Awake()
         {
-            FARThreading.VoxelizationThreadpool.RunInMainThread = Debug.isDebugBuild;
+            VoxelizationThreadpool.RunInMainThread = Debug.isDebugBuild;
             if (FARDebugValues.useBlizzyToolbar)
                 GenerateBlizzyToolbarButton();
         }
 
         void Update()
         {
-            FARThreading.VoxelizationThreadpool.Instance.ExecuteMainThreadTasks();
+            VoxelizationThreadpool.Instance.ExecuteMainThreadTasks();
         }
 
         void FixedUpdate()
@@ -399,11 +400,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 _updateQueued = true;
                 return;
             }
-            else                                //last update was far enough in the past to run; reset rate limit counter and clear the queued flag
-            {
-                _updateRateLimiter = 0;
-                _updateQueued = false;
-            }
+
+            _updateRateLimiter = 0;
+            _updateQueued      = false;
             List<Part> partList = EditorLogic.SortedShipList;
 
             _currentGeometryModules.Clear();
@@ -434,7 +433,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (_currentGeometryModules.Count > 0)
             {
                 voxelWatch.Start();
-                if (!_vehicleAero.TryVoxelUpdate(EditorLogic.RootPart.partTransform.worldToLocalMatrix, EditorLogic.RootPart.partTransform.localToWorldMatrix, FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel, partList, _currentGeometryModules, true))
+                if (!_vehicleAero.TryVoxelUpdate(EditorLogic.RootPart.partTransform.worldToLocalMatrix, EditorLogic.RootPart.partTransform.localToWorldMatrix, FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel, partList, _currentGeometryModules))
                 {
                     voxelWatch.Stop();
                     voxelWatch.Reset();
@@ -498,7 +497,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
             if (showGUI)
             {
-                guiRect = GUILayout.Window(this.GetHashCode(), guiRect, OverallSelectionGUI, Localizer.Format("FAREditorTitle"));
+                guiRect = GUILayout.Window(GetHashCode(), guiRect, OverallSelectionGUI, Localizer.Format("FAREditorTitle"));
                 guiRect = GUIUtils.ClampToScreen(guiRect);
                 cursorInGUI = guiRect.Contains(GUIUtils.GetMousePos());
             }
@@ -625,7 +624,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (arrowTransform == null)
             {
                 if (velocityArrow != null)
-                    UnityEngine.Object.Destroy(velocityArrow);
+                    Destroy(velocityArrow);
 
                 if (EditorLogic.RootPart != null)
                     arrowTransform = EditorLogic.RootPart.partTransform;
@@ -664,7 +663,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 blizzyEditorGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FAREditorButtonBlizzy");
                 blizzyEditorGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
                 blizzyEditorGUIButton.ToolTip = "FAR Editor";
-                blizzyEditorGUIButton.OnClick += (e) => showGUI = !showGUI;
+                blizzyEditorGUIButton.OnClick += e => showGUI = !showGUI;
             }
         }
 

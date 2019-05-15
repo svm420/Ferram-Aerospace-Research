@@ -57,7 +57,7 @@ namespace ferram4
         // Weighted average of force positions used as aid in choosing the
         // single center location on the line of physically equivalent ones.
         public Vector3d pos = Vector3d.zero;
-        public double amount = 0.0;
+        public double amount;
 
         /*public Vector3d GetACPosition()
         {

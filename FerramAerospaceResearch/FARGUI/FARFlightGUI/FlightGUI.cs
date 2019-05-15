@@ -44,12 +44,13 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
-using KSP.Localization;
-using StringLeakTest;
+using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARUtils;
-using ferram4;
+using KSP.IO;
+using KSP.Localization;
+using StringLeakTest;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
@@ -58,15 +59,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         Vessel _vessel;
         FARVesselAero _vesselAero;
 
-        static bool showGUI = false;
+        static bool showGUI;
         public static bool showAllGUI = true;
         public static bool savedShowGUI = true;
         static Rect mainGuiRect;
         static Rect dataGuiRect;
         static Rect settingsGuiRect;
         static IButton blizzyFlightGUIButton;
-        static int activeFlightGUICount = 0;
-        static int frameCountForSaving = 0;
+        static int activeFlightGUICount;
+        static int frameCountForSaving;
         public static Dictionary<Vessel, FlightGUI> vesselFlightGUI;
 
         private StringBuilder _strBuilder = new StringBuilder();
@@ -92,11 +93,11 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             get { return _airSpeedGUI; }
         }
 
-        bool showFlightDataWindow = false;
-        bool showSettingsWindow = false;
+        bool showFlightDataWindow;
+        bool showSettingsWindow;
 
-        internal static GUIStyle boxStyle = null;
-        internal static GUIStyle buttonStyle = null;
+        internal static GUIStyle boxStyle;
+        internal static GUIStyle buttonStyle;
 
         GUIDropDown<int> settingsWindow;
 
@@ -114,7 +115,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
 
@@ -143,7 +144,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             else
                 vesselFlightGUI.Add(_vessel, this);
 
-            this.enabled = true;
+            enabled = true;
 
             if(FARDebugValues.useBlizzyToolbar)
                 GenerateBlizzyToolbarButton();
@@ -297,18 +298,18 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
             if (_vessel == FlightGlobals.ActiveVessel && showGUI && showAllGUI)
             {
-                mainGuiRect = GUILayout.Window(this.GetHashCode(), mainGuiRect, MainFlightGUIWindow, "FAR, " + FARVersion.VersionString, GUILayout.MinWidth(230));
+                mainGuiRect = GUILayout.Window(GetHashCode(), mainGuiRect, MainFlightGUIWindow, "FAR, " + FARVersion.VersionString, GUILayout.MinWidth(230));
                 GUIUtils.ClampToScreen(mainGuiRect);
 
                 if (showFlightDataWindow)
                 {
-                    dataGuiRect = GUILayout.Window(this.GetHashCode() + 1, dataGuiRect, FlightDataWindow, Localizer.Format("FARFlightDataTitle"), GUILayout.MinWidth(150));
+                    dataGuiRect = GUILayout.Window(GetHashCode() + 1, dataGuiRect, FlightDataWindow, Localizer.Format("FARFlightDataTitle"), GUILayout.MinWidth(150));
                     GUIUtils.ClampToScreen(dataGuiRect);
                 }
 
                 if (showSettingsWindow)
                 {
-                    settingsGuiRect = GUILayout.Window(this.GetHashCode() + 2, settingsGuiRect, SettingsWindow, Localizer.Format("FARFlightSettings"), GUILayout.MinWidth(200));
+                    settingsGuiRect = GUILayout.Window(GetHashCode() + 2, settingsGuiRect, SettingsWindow, Localizer.Format("FARFlightSettings"), GUILayout.MinWidth(200));
                     GUIUtils.ClampToScreen(settingsGuiRect);
                 }
             }
@@ -390,7 +391,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 blizzyFlightGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARFlightButtonBlizzy");
                 blizzyFlightGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
                 blizzyFlightGUIButton.ToolTip = "FAR Flight Sys";
-                blizzyFlightGUIButton.OnClick += (e) => showGUI = !showGUI;
+                blizzyFlightGUIButton.OnClick += e => showGUI = !showGUI;
             }
         }
 
@@ -414,7 +415,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             if (FARDebugAndSettings.config != null)
             {
-                KSP.IO.PluginConfiguration config = FARDebugAndSettings.config;
+                PluginConfiguration config = FARDebugAndSettings.config;
                 config.SetValue("flight_mainGuiRect", mainGuiRect);
                 config.SetValue("flight_dataGuiRect", dataGuiRect);
                 config.SetValue("flight_settingsGuiRect", settingsGuiRect);
@@ -423,7 +424,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         void LoadConfigs()
         {
-            KSP.IO.PluginConfiguration config = FARDebugAndSettings.config;
+            PluginConfiguration config = FARDebugAndSettings.config;
             mainGuiRect = config.GetValue("flight_mainGuiRect", new Rect());
             dataGuiRect = config.GetValue("flight_dataGuiRect", new Rect());
             settingsGuiRect = config.GetValue("flight_settingsGuiRect", new Rect());

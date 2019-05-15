@@ -44,11 +44,10 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using KSP.UI.Screens.Flight;
-using KSP.Localization;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
-
+using KSP.Localization;
+using KSP.UI.Screens.Flight;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
@@ -91,7 +90,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             M_S,
             KNOTS,
             MPH,
-            KM_H,
+            KM_H
         }
 
         private string[] surfUnit_str =

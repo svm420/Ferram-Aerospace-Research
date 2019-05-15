@@ -50,7 +50,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
     {
         ModuleAsteroid asteroid;
         GeometryPartModule geoModule;
-        bool hasLoaded = false;
+        bool hasLoaded;
 
         public StockProcAsteroidGeoUpdater(ModuleAsteroid asteroid, GeometryPartModule geoModule)
         {

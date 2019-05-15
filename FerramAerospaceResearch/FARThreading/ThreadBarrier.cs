@@ -53,10 +53,10 @@ namespace FerramAerospaceResearch.FARThreading
         object _lockerObject = new object();
         int _threadParticipatingCount;
 
-        int currentCountOdd = 0;
-        int currentCountEven = 0;
+        int currentCountOdd;
+        int currentCountEven;
 
-        bool useEvenCount = false;
+        bool useEvenCount;
 
         public ThreadBarrier(int threadParticipatingCount)
         {

@@ -22,8 +22,8 @@
 
         public StabilityDerivExportOutput(StabilityDerivOutput outputvalues, StabilityDerivExportVariables exportvalues)
         {
-            this.outputvals = outputvalues;
-            this.exportvals = exportvalues;
+            outputvals = outputvalues;
+            exportvals = exportvalues;
         }
     }
 }

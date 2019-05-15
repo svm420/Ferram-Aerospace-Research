@@ -45,29 +45,33 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using UnityEngine;
-using KSP.UI.Screens;
-using FerramAerospaceResearch.FARGUI;
-using FerramAerospaceResearch.FARUtils;
 using ferram4;
+using FerramAerospaceResearch.FARAeroComponents;
+using FerramAerospaceResearch.FARGUI;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI;
+using FerramAerospaceResearch.FARGUI.FARFlightGUI;
+using FerramAerospaceResearch.FARUtils;
+using KSP.IO;
+using KSP.UI.Screens;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class FARDebugAndSettings : MonoBehaviour
     {
-        public static KSP.IO.PluginConfiguration config;
+        public static PluginConfiguration config;
         private static bool hasScenarioChanged = true;
-        private static IButton FARDebugButtonBlizzy = null;
-        public static ApplicationLauncherButton FARDebugButtonStock = null;
+        private static IButton FARDebugButtonBlizzy;
+        public static ApplicationLauncherButton FARDebugButtonStock;
         public static Callback Toggle = delegate { };
-        private static bool debugMenu = false;
-        private static bool inputLocked = false;
+        private static bool debugMenu;
+        private static bool inputLocked;
         private Rect debugWinPos = new Rect(50, 50, 700, 250);
-        private Texture2D cLTexture = null;
-        private Texture2D cDTexture = null;
-        private Texture2D cMTexture = null;
-        private Texture2D l_DTexture = null;
+        private Texture2D cLTexture;
+        private Texture2D cDTexture;
+        private Texture2D cMTexture;
+        private Texture2D l_DTexture;
 
         private enum MenuTab
         {
@@ -76,24 +80,22 @@ namespace FerramAerospaceResearch
             AtmComposition
         }
 
-        private static string[] MenuTab_str = new string[]
-        {
+        private static string[] MenuTab_str = {
             "Difficulty and Debug",
             "Aerodynamic Failure",
-            "Atm Composition",
+            "Atm Composition"
         };
 
-        public static string[] FlowMode_str = new string[]
-        {
+        public static string[] FlowMode_str = {
             "NO_FLOW",
             "ALL_VESSEL",
             "STAGE_PRIORITY_FLOW",
-            "STACK_PRIORITY_SEARCH",
+            "STACK_PRIORITY_SEARCH"
         };
 
         private MenuTab activeTab = MenuTab.DebugAndData;
 
-        private int aeroStressIndex = 0;
+        private int aeroStressIndex;
         private int atmBodyIndex = 1;
 
         #region Unity MonoBehaviour messages
@@ -111,15 +113,15 @@ namespace FerramAerospaceResearch
         {
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
 
-            FerramAerospaceResearch.FARAeroComponents.FARAeroSection.GenerateCrossFlowDragCurve();
+            FARAeroSection.GenerateCrossFlowDragCurve();
             FARAeroStress.LoadStressTemplates();
             FARAeroUtil.LoadAeroDataFromConfig();
             //LoadConfigs();
-            GameObject.DontDestroyOnLoad(this);
+            DontDestroyOnLoad(this);
 
             debugMenu = false;
         }
@@ -146,7 +148,7 @@ namespace FerramAerospaceResearch
                         FARDebugButtonBlizzy = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARDebugButtonBlizzy");
                         FARDebugButtonBlizzy.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
                         FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
-                        FARDebugButtonBlizzy.OnClick += (e) => debugMenu = !debugMenu;
+                        FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
                     }
                 }
             }
@@ -162,8 +164,8 @@ namespace FerramAerospaceResearch
             OnGUIAppLauncherReady();
             GameEvents.onGUIApplicationLauncherReady.Remove(OnAppLauncherReadySetup);
             Toggle += onAppLaunchToggle;
-            Toggle += FerramAerospaceResearch.FARGUI.FAREditorGUI.EditorGUI.onAppLaunchToggle;
-            Toggle += FerramAerospaceResearch.FARGUI.FARFlightGUI.FlightGUI.onAppLaunchToggle;
+            Toggle += EditorGUI.onAppLaunchToggle;
+            Toggle += FlightGUI.onAppLaunchToggle;
         }
 
         void ToggleGUI()
@@ -486,7 +488,7 @@ namespace FerramAerospaceResearch
                         FARDebugButtonBlizzy = ToolbarManager.Instance.add("ferram4", "FARDebugButtonBlizzy");
                         FARDebugButtonBlizzy.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
                         FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
-                        FARDebugButtonBlizzy.OnClick += (e) => debugMenu = !debugMenu;
+                        FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
                     }
                 }
             }
@@ -547,7 +549,7 @@ namespace FerramAerospaceResearch
 
         public static void LoadConfigs(ConfigNode node)
         {
-            config = KSP.IO.PluginConfiguration.CreateForType<FARSettingsScenarioModule>();
+            config = PluginConfiguration.CreateForType<FARSettingsScenarioModule>();
             config.load();
 
             bool tmp;
@@ -619,9 +621,9 @@ namespace FerramAerospaceResearch
     {
         //Right-click menu options
         public static bool allowStructuralFailures = true;
-        public static bool showMomentArrows = false;
+        public static bool showMomentArrows;
 
-        public static bool useBlizzyToolbar = false;
+        public static bool useBlizzyToolbar;
         public static bool aeroFailureExplosions = true;
     }
 }

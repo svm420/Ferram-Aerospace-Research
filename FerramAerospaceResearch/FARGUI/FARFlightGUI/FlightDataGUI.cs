@@ -44,10 +44,10 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System.Collections.Generic;
 using System.Text;
+using FerramAerospaceResearch.FARUtils;
+using KSP.Localization;
 using StringLeakTest;
 using UnityEngine;
-using KSP.Localization;
-using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
@@ -74,7 +74,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         GUIStyle buttonStyle;
         GUIStyle boxStyle;
 
-        int thisFrame = 0;
+        int thisFrame;
 
         public FlightDataGUI()
         {

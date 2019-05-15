@@ -43,8 +43,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using UnityEngine;
 using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {

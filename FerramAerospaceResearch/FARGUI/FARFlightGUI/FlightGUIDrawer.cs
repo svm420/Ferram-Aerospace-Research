@@ -64,8 +64,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 instance = this;
             else
             {
-                GameObject.Destroy(this);
-                return;
+                Destroy(this);
             }
         }
 

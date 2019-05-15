@@ -42,8 +42,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
@@ -70,7 +70,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 //            b.Add(1, 2, 3);
             this.endTime = endTime;
             this.dt = dt;
-            this.stateEquations = eqns;
+            stateEquations = eqns;
             this.initCond = initCond;
             soln = new double[initCond.Length, (int)Math.Ceiling(endTime / dt)];
             time = new double[(int)Math.Ceiling(endTime / dt)];

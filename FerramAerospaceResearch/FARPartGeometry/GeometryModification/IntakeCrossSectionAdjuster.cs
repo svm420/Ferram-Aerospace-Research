@@ -62,7 +62,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         ModuleResourceIntake intakeModule;
         AttachNode node;
 
-        double nodeOffsetArea = 0;      //used to handle intakes being on the side of fuselage parts
+        double nodeOffsetArea;      //used to handle intakes being on the side of fuselage parts
 
         //ModuleResourceIntake intake;
         //public ModuleResourceIntake IntakeModule
@@ -108,8 +108,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
         {
-            this.part = intake.part;
-            intakeModule = intake as ModuleResourceIntake;
+            part = intake.part;
+            intakeModule = intake;
             intakeTrans = intakeModule.intakeTransform;
             if (intakeTrans == null)
                 intakeTrans = intake.part.partTransform;
@@ -148,16 +148,14 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             double dot = Vector3.Dot(vehicleAxis, vehicleBasisForwardVector);
             if (dot > 0.9)
                 return intakeArea;
-            else
-                return 0;
+            return 0;
         }
 
         public double AreaRemovedFromCrossSection()
         {
             if (node == null || node.attachedPart == null)
                 return intakeArea * sign;
-            else
-                return 0;
+            return 0;
         }
 
 

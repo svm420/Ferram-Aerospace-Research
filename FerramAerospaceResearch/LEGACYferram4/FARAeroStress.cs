@@ -49,7 +49,7 @@ namespace FerramAerospaceResearch
     public static class FARAeroStress
     {
         public static List<FARPartStressTemplate> StressTemplates = new List<FARPartStressTemplate>();
-        public static bool loaded = false;
+        public static bool loaded;
 
 
 
@@ -115,7 +115,7 @@ namespace FerramAerospaceResearch
                 return;
             StressTemplates.Clear();
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARAeroStress"))
-                if((object)node != null)
+                if(node != null)
                     foreach(ConfigNode template in node.GetNodes("FARPartStressTemplate"))
                         StressTemplates.Add(CreateFARPartStressTemplate(template));
 

@@ -43,8 +43,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
@@ -96,12 +96,12 @@ namespace FerramAerospaceResearch
             if (newFunction == null)
             {
                 FARLogger.Info("[FARWind] Attempted to set a null wind function, using ZeroWind instead.");
-                FARWind.func = ZeroWind;
+                func = ZeroWind;
             }
             else
             {
                 FARLogger.Info("[FARWind] Setting wind function to " + newFunction.Method.Name);
-                FARWind.func = newFunction;
+                func = newFunction;
             }
         }
 

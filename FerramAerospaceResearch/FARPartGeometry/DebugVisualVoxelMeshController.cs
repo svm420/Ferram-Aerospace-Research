@@ -42,9 +42,9 @@ Copyright 2019, Daumantas Kavolis, aka dkavolis
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
@@ -55,7 +55,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public const int MAX_VOXELS_PER_SUBMESH = MAX_VERTS_PER_SUBMESH / 4;
         private List<DebugVisualVoxel> m_debugVoxels = new List<DebugVisualVoxel>();
         private List<DebugVisualVoxelSubmesh> m_submeshes = new List<DebugVisualVoxelSubmesh>();
-        private bool m_active = false;
+        private bool m_active;
 
         private Transform m_parent;
 
@@ -99,7 +99,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public void Rebuild()
         {
             FARLogger.Info("Rebuilding visual voxel mesh...");
-            Clear(false);
+            Clear();
             int submeshes = m_debugVoxels.Count / MAX_VOXELS_PER_SUBMESH + 1;
             FARLogger.Info("Voxel mesh contains " + m_debugVoxels.Count + " voxels in " + submeshes + " submeshes");
             SetupSubmeshes(submeshes);

@@ -47,12 +47,12 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
-    unsafe class VoxelChunk
+    class VoxelChunk
     {
         //private Part[] voxelPoints = null;
         //private float[] voxelSize = null;
-        private PartSizePair[] voxelPoints = null;
-        private DebugVisualVoxel[, ,] visualVoxels = null;
+        private PartSizePair[] voxelPoints;
+        private DebugVisualVoxel[, ,] visualVoxels;
         private HashSet<Part> overridingParts;
 
         double _size;
@@ -103,7 +103,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         //Use when locking is unnecessary and only to change size, not part
-        public unsafe void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             zeroBaseIndex -= offset;
             //voxelPoints[zeroBaseIndex].part = p;
@@ -111,31 +111,31 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         //Use when certain that locking is unnecessary and need to fill the location
-        public unsafe void SetVoxelPointPartOnlyGlobalIndexNoLock(int zeroBaseIndex, Part p)
+        public void SetVoxelPointPartOnlyGlobalIndexNoLock(int zeroBaseIndex, Part p)
         {
             zeroBaseIndex -= offset;
             SetPart(p, zeroBaseIndex, VoxelOrientationPlane.NONE, 0);
         }
 
-        public unsafe void SetVoxelPointPartOnlyGlobalIndexNoLock(int i, int j, int k, Part p)
+        public void SetVoxelPointPartOnlyGlobalIndexNoLock(int i, int j, int k, Part p)
         {
             int index = i + 8 * j + 64 * k - offset;
             SetPart(p, index, VoxelOrientationPlane.NONE, 0);
         }
         //Use when certain that locking is unnecessary and need to fill the location
-        public unsafe void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             zeroBaseIndex -= offset;
             SetPart(p, zeroBaseIndex, plane, location);
         }
 
-        public unsafe void SetVoxelPointGlobalIndexNoLock(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             int index = i + 8 * j + 64 * k - offset;
             SetPart(p, index, plane, location);
         }
         //Sets point and ensures that includedParts includes p
-        public unsafe void SetVoxelPointGlobalIndex(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndex(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             zeroBaseIndex -= offset;
 
@@ -145,7 +145,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        public unsafe void SetVoxelPointGlobalIndex(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndex(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             int index = i + 8 * j + 64 * k - offset;
 
@@ -155,7 +155,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        unsafe void SetPart(Part p, int index, VoxelOrientationPlane plane, byte location)
+        void SetPart(Part p, int index, VoxelOrientationPlane plane, byte location)
         {
             PartSizePair pair = voxelPoints[index];
 
@@ -167,30 +167,30 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         }
 
-        public unsafe bool VoxelPointExistsLocalIndex(int zeroBaseIndex)
+        public bool VoxelPointExistsLocalIndex(int zeroBaseIndex)
         {
             return (voxelPoints[zeroBaseIndex].GetSize() > 0);
         }
 
-        public unsafe bool VoxelPointExistsLocalIndex(int i, int j, int k)
+        public bool VoxelPointExistsLocalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k;
             return (voxelPoints[index].GetSize() > 0);
         }
 
-        public unsafe bool VoxelPointExistsGlobalIndex(int zeroBaseIndex)
+        public bool VoxelPointExistsGlobalIndex(int zeroBaseIndex)
         {
             return (voxelPoints[zeroBaseIndex - offset].GetSize() > 0);
         }
 
-        public unsafe bool VoxelPointExistsGlobalIndex(int i, int j, int k)
+        public bool VoxelPointExistsGlobalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k - offset;
             return (voxelPoints[index].GetSize() > 0);
         }
 
 
-        public unsafe Part GetVoxelPartGlobalIndex(int zeroBaseIndex)
+        public Part GetVoxelPartGlobalIndex(int zeroBaseIndex)
         {
             Part p = null;
             int index = zeroBaseIndex - offset;
@@ -198,7 +198,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return p;
         }
 
-        public unsafe Part GetVoxelPartGlobalIndex(int i, int j, int k)
+        public Part GetVoxelPartGlobalIndex(int i, int j, int k)
         {
             Part p = null;
 
@@ -208,13 +208,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return p;
         }
 
-        public unsafe PartSizePair GetVoxelPartSizePairGlobalIndex(int zeroBaseIndex)
+        public PartSizePair GetVoxelPartSizePairGlobalIndex(int zeroBaseIndex)
         {
             int index = zeroBaseIndex - offset;
             return voxelPoints[index];
         }
 
-        public unsafe PartSizePair GetVoxelPartSizePairGlobalIndex(int i, int j, int k)
+        public PartSizePair GetVoxelPartSizePairGlobalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k - offset;
 

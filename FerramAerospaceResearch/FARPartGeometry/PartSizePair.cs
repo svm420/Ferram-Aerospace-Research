@@ -49,8 +49,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public Part part;
         //byte xPlaneDown, yPlaneDown, zPlaneDown;
 
-        protected PartSizePair() { }
-
         public abstract void Clear();
 
         public abstract float GetSize();

@@ -43,11 +43,12 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using UnityEngine;
-using KSP.Localization;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARUtils;
+using KSP.IO;
+using KSP.Localization;
+using UnityEngine;
 
 namespace ferram4
 {
@@ -60,9 +61,9 @@ namespace ferram4
         public FARAction(string guiName, int actionIdentifier)
             : base(guiName)
         {
-            base.actionGroup = FARActionGroupConfiguration.map(actionIdentifier);
+            actionGroup = FARActionGroupConfiguration.map(actionIdentifier);
         }
-    };
+    }
 
 
 
@@ -112,7 +113,7 @@ namespace ferram4
                 agTypes[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), names[i]);
             }
             // straight forward, reading the (action name, action group) tuples
-            KSP.IO.PluginConfiguration config = FARDebugAndSettings.config;
+            PluginConfiguration config = FARDebugAndSettings.config;
             for (int i = 0; i < ACTION_COUNT; ++i)
             {
                 try
@@ -123,7 +124,7 @@ namespace ferram4
                 }
                 catch (Exception e)
                 {
-                    FARLogger.Warning("Error reading config key '" + configKeys[i] + "' with value '" + config.GetValue(configKeys[i], "n/a") + "' gave " + e.ToString());
+                    FARLogger.Warning("Error reading config key '" + configKeys[i] + "' with value '" + config.GetValue(configKeys[i], "n/a") + "' gave " + e);
                 }
                 int initIndex = 0;
                 for(int j = 0; j < agTypes.Length; j++)
@@ -141,7 +142,7 @@ namespace ferram4
 
         public static void SaveConfigruration()
         {
-            KSP.IO.PluginConfiguration config = FARDebugAndSettings.config;
+            PluginConfiguration config = FARDebugAndSettings.config;
             for (int i = 0; i < ACTION_COUNT; ++i)
             {
                 FARLogger.Info(String.Format("Save AG {0} as {1}", configKeys[i], id2actionGroup[i]));
@@ -156,13 +157,13 @@ namespace ferram4
             GUILayout.Label(Localizer.Format("FARActionDefaultLabel"));
             GUILayout.BeginHorizontal(); // left column: label, right column: text field
             GUILayout.BeginVertical();
-            for (int i = 0; i < FARActionGroupConfiguration.ACTION_COUNT; ++i)
+            for (int i = 0; i < ACTION_COUNT; ++i)
             {
-                GUILayout.Label(FARActionGroupConfiguration.guiLabels[i], label);
+                GUILayout.Label(guiLabels[i], label);
             }
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
-            for (int i = 0; i < FARActionGroupConfiguration.ACTION_COUNT; ++i)
+            for (int i = 0; i < ACTION_COUNT; ++i)
             {
                 actionGroupDropDown[i].GUIDropDownDisplay(GUILayout.Width(150));
                 id2actionGroup[i] = actionGroupDropDown[i].ActiveSelection;

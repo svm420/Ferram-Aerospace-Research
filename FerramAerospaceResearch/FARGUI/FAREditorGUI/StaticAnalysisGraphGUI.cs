@@ -46,10 +46,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEngine;
-using KSP.Localization;
-using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 using ferram4;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
+using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
@@ -58,7 +58,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         ferramGraph _graph = new ferramGraph(400, 350);
 
         double lastMaxBounds, lastMinBounds;
-        bool isMachMode = false;
+        bool isMachMode;
 
         GraphInputs aoASweepInputs, machSweepInputs;
         GUIDropDown<int> flapSettingDropdown;
@@ -66,12 +66,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         EditorSimManager simManager;
 
         Vector3 upperAoAVec, lowerAoAVec;
-        float pingPongAoAFactor = 0;
+        float pingPongAoAFactor;
 
         public StaticAnalysisGraphGUI(EditorSimManager simManager, GUIDropDown<int> flapSettingDropDown, GUIDropDown<CelestialBody> bodySettingDropdown)
         {
             this.simManager = simManager;
-            this.flapSettingDropdown = flapSettingDropDown;
+            flapSettingDropdown = flapSettingDropDown;
             this.bodySettingDropdown = bodySettingDropdown;
 
             //Set up defaults for AoA Sweep
@@ -218,11 +218,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 double lowerBound, upperBound, numPts, pitchSetting, otherInput;
 
                 lowerBound = double.Parse(input.lowerBound);
-                lowerBound = FARMathUtil.Clamp(lowerBound, -90, 90);
+                lowerBound = lowerBound.Clamp(-90, 90);
                 input.lowerBound = lowerBound.ToString();
 
                 upperBound = double.Parse(input.upperBound);
-                upperBound = FARMathUtil.Clamp(upperBound, lowerBound, 90);
+                upperBound = upperBound.Clamp(lowerBound, 90);
                 input.upperBound = upperBound.ToString();
 
                 numPts = double.Parse(input.numPts);
@@ -230,7 +230,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 input.numPts = numPts.ToString();
 
                 pitchSetting = double.Parse(input.pitchSetting);
-                pitchSetting = FARMathUtil.Clamp(pitchSetting, -1, 1);
+                pitchSetting = pitchSetting.Clamp(-1, 1);
                 input.pitchSetting = pitchSetting.ToString();
 
                 otherInput = double.Parse(input.otherInput);
@@ -321,7 +321,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if(xv_yvPairs.Count < 5)
                 for(int i = 0; i < xv_yvPairs.Count; i += 2)
                 {
-                    _graph.AddLine(key + (j++), new double[] { xv_yvPairs[i], xv_yvPairs[i] }, new double[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
+                    _graph.AddLine(key + (j++), new[] { xv_yvPairs[i], xv_yvPairs[i] }, new[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
                 }
         }
 

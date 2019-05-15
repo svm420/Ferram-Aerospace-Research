@@ -52,7 +52,7 @@ namespace FerramAerospaceResearch
         void Start()
         {
             FARSettingsScenarioModule.MainMenuBuildDefaultScenarioModule();
-            this.enabled = false;
+            enabled = false;
         }
     }
 }

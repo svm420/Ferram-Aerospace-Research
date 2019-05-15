@@ -44,9 +44,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Text.RegularExpressions;
-using UnityEngine;
-using KSP.Localization;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
+using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
@@ -60,7 +60,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         string altitude = "0";
         string machNumber = "0.35";
-        bool spoilersDeployed = false;
+        bool spoilersDeployed;
 
         EditorSimManager simManager;
 
@@ -227,7 +227,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             DrawTooltip();
         }
 
-        private enum CalcAndExportEnum { CalculateOnly, CalculateAndExport, LoopExport };
+        private enum CalcAndExportEnum { CalculateOnly, CalculateAndExport, LoopExport }
 
         private void StabDerivCalcButtonAction(CalcAndExportEnum exportflag)
         {

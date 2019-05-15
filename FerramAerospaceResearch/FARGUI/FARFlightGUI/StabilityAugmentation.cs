@@ -44,16 +44,16 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using KSP.Localization;
 using FerramAerospaceResearch.FARUtils;
+using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     class StabilityAugmentation
     {
         Vessel _vessel;
-        static string[] systemLabel = new string[] {
+        static string[] systemLabel = {
             Localizer.Format("FARFlightStabAugLabel0"),
             Localizer.Format("FARFlightStabAugLabel1"),
             Localizer.Format("FARFlightStabAugLabel2"),
@@ -61,7 +61,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightStabAugLabel4")
         };
 
-        static string[] systemLabelLong = new string[] {
+        static string[] systemLabelLong = {
             Localizer.Format("FARFlightStabAugLabelLong0"),
             Localizer.Format("FARFlightStabAugLabelLong1"),
             Localizer.Format("FARFlightStabAugLabelLong2"),
@@ -82,7 +82,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public StabilityAugmentation(Vessel vessel)
         {
             _vessel = vessel;
-            systemDropdown = new GUIDropDown<int>(systemLabel, new int[] { 0, 1, 2, 3, 4, 5 }, 0);
+            systemDropdown = new GUIDropDown<int>(systemLabel, new[] { 0, 1, 2, 3, 4, 5 }, 0);
             LoadSettings();
             systemInstances = new ControlSystem[systemTemplates.Length];
 
@@ -231,11 +231,11 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             {
                 if (info.aoA > aoAHighLim)
                 {
-                    state.pitch = (float)FARMathUtil.Clamp(ControlStateChange(sys, info.aoA - aoAHighLim), -1, 1) + state.pitchTrim;
+                    state.pitch = (float)ControlStateChange(sys, info.aoA - aoAHighLim).Clamp(-1, 1) + state.pitchTrim;
                 }
                 else if (info.aoA < aoALowLim)
                 {
-                    state.pitch = (float)FARMathUtil.Clamp(ControlStateChange(sys, info.aoA - aoALowLim), -1, 1) + state.pitchTrim;
+                    state.pitch = (float)ControlStateChange(sys, info.aoA - aoALowLim).Clamp(-1, 1) + state.pitchTrim;
                 }
             }
             else
@@ -406,7 +406,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             }
 
-            if (this._vessel == active_vessel)
+            if (_vessel == active_vessel)
             {
                 systemTemplates = systemInstances;
 
@@ -458,14 +458,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             public ControlSystem(ControlSystem sys)
             {
-                this.active = sys.active;
-                this.zeroPoint = sys.zeroPoint;
-                this.kP = sys.kP;
-                this.kD = sys.kD;
-                this.kI = sys.kI;
+                active = sys.active;
+                zeroPoint = sys.zeroPoint;
+                kP = sys.kP;
+                kD = sys.kD;
+                kI = sys.kI;
 
-                this.lastError = 0;
-                this.errorIntegral = 0;
+                lastError = 0;
+                errorIntegral = 0;
             }
 
             public ControlSystem() { }

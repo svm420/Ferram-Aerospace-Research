@@ -45,10 +45,11 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEngine;
-using FerramAerospaceResearch.FARThreading;
+using ferram4;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARPartGeometry.GeometryModification;
+using FerramAerospaceResearch.FARThreading;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
@@ -57,25 +58,25 @@ namespace FerramAerospaceResearch.FARAeroComponents
         static double[] indexSqrt = new double[1];
         static object _commonLocker = new object();
 
-        VehicleVoxel _voxel = null;
+        VehicleVoxel _voxel;
         VoxelCrossSection[] _vehicleCrossSection = new VoxelCrossSection[1];
         double[] _ductedAreaAdjustment = new double[1];
 
         int _voxelCount;
 
-        double _length = 0;
+        double _length;
         public double Length
         {
             get { return _length; }
         }
 
-        double _maxCrossSectionArea = 0;
+        double _maxCrossSectionArea;
         public double MaxCrossSectionArea
         {
             get { return _maxCrossSectionArea; }
         }
 
-        bool _calculationCompleted = false;
+        bool _calculationCompleted;
         public bool CalculationCompleted
         {
             get { return _calculationCompleted; }
@@ -119,7 +120,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         List<FARAeroSection> _currentAeroSections = new List<FARAeroSection>();
         List<FARAeroSection> _newAeroSections = new List<FARAeroSection>();
 
-        List<ferram4.FARWingAerodynamicModel> _legacyWingModels = new List<ferram4.FARWingAerodynamicModel>();
+        List<FARWingAerodynamicModel> _legacyWingModels = new List<FARWingAerodynamicModel>();
 
         List<ICrossSectionAdjuster> activeAdjusters = new List<ICrossSectionAdjuster>();
         //Dictionary<Part, double> adjusterAreaPerVoxelDict = new Dictionary<Part, double>();
@@ -132,8 +133,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         int validSectionCount;
         int firstSection;
 
-        bool visualizing = false;
-        bool voxelizing = false;
+        bool visualizing;
+        bool voxelizing;
 
         public VehicleAerodynamics()
         {
@@ -180,7 +181,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         //Used by other classes to update their aeroModule and aeroSection lists
         //When these functions fire, all the data that was once restricted to the voxelization thread is passed over to the main unity thread
 
-        public void GetNewAeroData(out List<FARAeroPartModule> aeroModules, out List<FARAeroPartModule> unusedAeroModules, out List<FARAeroSection> aeroSections, out List<ferram4.FARWingAerodynamicModel> legacyWingModel)
+        public void GetNewAeroData(out List<FARAeroPartModule> aeroModules, out List<FARAeroPartModule> unusedAeroModules, out List<FARAeroSection> aeroSections, out List<FARWingAerodynamicModel> legacyWingModel)
         {
             _calculationCompleted = false;
             List<FARAeroPartModule> tmpAeroModules = _currentAeroModules;
@@ -217,7 +218,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             LEGACY_UpdateWingAerodynamicModels();
         }
 
-        private List<ferram4.FARWingAerodynamicModel> LEGACY_UpdateWingAerodynamicModels()
+        private List<FARWingAerodynamicModel> LEGACY_UpdateWingAerodynamicModels()
         {
             _legacyWingModels.Clear();
             for (int i = 0; i < _currentAeroModules.Count; i++)
@@ -225,9 +226,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Part p = _currentAeroModules[i].part;
                 if (!p)
                     continue;
-                if (p.Modules.Contains<ferram4.FARWingAerodynamicModel>())
+                if (p.Modules.Contains<FARWingAerodynamicModel>())
                 {
-                    ferram4.FARWingAerodynamicModel w = p.Modules.GetModule<ferram4.FARWingAerodynamicModel>();
+                    FARWingAerodynamicModel w = p.Modules.GetModule<FARWingAerodynamicModel>();
                     if ((object)w != null)
                     {
                         w.isShielded = false;
@@ -235,9 +236,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         _legacyWingModels.Add(w);
                     }
                 }
-                else if (p.Modules.Contains<ferram4.FARControllableSurface>())
+                else if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    ferram4.FARWingAerodynamicModel w = p.Modules.GetModule<ferram4.FARControllableSurface>();
+                    FARWingAerodynamicModel w = p.Modules.GetModule<FARControllableSurface>();
                     if ((object)w != null)
                     {
                         w.isShielded = false;
@@ -255,18 +256,18 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             for (int i = 0; i < _legacyWingModels.Count; i++)
             {
-                ferram4.FARWingAerodynamicModel w = _legacyWingModels[i];
+                FARWingAerodynamicModel w = _legacyWingModels[i];
                 w.NUFAR_CalculateExposedAreaFactor();
             }
 
             for (int i = 0; i < _legacyWingModels.Count; i++)
             {
-                ferram4.FARWingAerodynamicModel w = _legacyWingModels[i];
+                FARWingAerodynamicModel w = _legacyWingModels[i];
                 w.NUFAR_SetExposedAreaFactor();
             }
             for (int i = 0; i < _legacyWingModels.Count; i++)
             {
-                ferram4.FARWingAerodynamicModel w = _legacyWingModels[i];
+                FARWingAerodynamicModel w = _legacyWingModels[i];
                 w.NUFAR_UpdateShieldingStateFromAreaFactor();
             }
             return _legacyWingModels;
@@ -378,10 +379,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     //Bunch of voxel setup data
                     _voxelCount = voxelCount;
 
-                    this._worldToLocalMatrix = worldToLocalMatrix;
-                    this._localToWorldMatrix = localToWorldMatrix;
-                    this._vehiclePartList = vehiclePartList;
-                    this._currentGeoModules = currentGeoModules;
+                    _worldToLocalMatrix = worldToLocalMatrix;
+                    _localToWorldMatrix = localToWorldMatrix;
+                    _vehiclePartList = vehiclePartList;
+                    _currentGeoModules = currentGeoModules;
 
                     _partWorldToLocalMatrixDict.Clear();
 
@@ -393,7 +394,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                             g.UpdateTransformMatrixList(_worldToLocalMatrix);
                     }
 
-                    this._vehicleMainAxis = CalculateVehicleMainAxis();
+                    _vehicleMainAxis = CalculateVehicleMainAxis();
                     //If the voxel still exists, cleanup everything so we can continue;
                     visualizing = false;
 
@@ -487,7 +488,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     if ((object)intakeTrans != null)
                         candVector = intakeTrans.TransformDirection(Vector3.forward);
                 }
-                else if (geoModule == null || geoModule.IgnoreForMainAxis || p.Modules.Contains<ferram4.FARWingAerodynamicModel>() || p.Modules.Contains<ferram4.FARControllableSurface>() || p.Modules.Contains<ModuleWheelBase>() || p.Modules.Contains("KSPWheelBase"))      //aggregate wings for later calc...
+                else if (geoModule == null || geoModule.IgnoreForMainAxis || p.Modules.Contains<FARWingAerodynamicModel>() || p.Modules.Contains<FARControllableSurface>() || p.Modules.Contains<ModuleWheelBase>() || p.Modules.Contains("KSPWheelBase"))      //aggregate wings for later calc...
                 {
                     continue;
                 }
@@ -570,8 +571,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 return axis.normalized;
             }
-            else
-                return Vector3.up;      //welp, no parts that we can rely on for determining the axis; fall back to up
+
+            return Vector3.up; //welp, no parts that we can rely on for determining the axis; fall back to up
         }
 
         //Smooths out area and area 2nd deriv distributions to deal with noise in the representation
@@ -829,7 +830,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return val;
         }
 
-        unsafe void AdjustCrossSectionForAirDucting(VoxelCrossSection[] vehicleCrossSection, List<GeometryPartModule> geometryModules, int front, int back, ref double maxCrossSectionArea)
+        void AdjustCrossSectionForAirDucting(VoxelCrossSection[] vehicleCrossSection, List<GeometryPartModule> geometryModules, int front, int back, ref double maxCrossSectionArea)
         {
 
             //double* areaAdjustment = stackalloc double[vehicleCrossSection.Length];
@@ -1121,7 +1122,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             viscousDragFactor = 60 / (finenessRatio * finenessRatio * finenessRatio) + 0.0025 * finenessRatio;     //pressure drag for a subsonic / transonic body due to skin friction
             viscousDragFactor++;
 
-            viscousDragFactor /= (double)numSections;   //fraction of viscous drag applied to each section
+            viscousDragFactor /= numSections;   //fraction of viscous drag applied to each section
 
             double criticalMachNumber = CalculateCriticalMachNumber(finenessRatio);
 
@@ -1358,7 +1359,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     xRefVector = _vehicleMainAxis;
                 else
                 {
-                    xRefVector = (Vector3)(_vehicleCrossSection[index - 1].centroid - _vehicleCrossSection[index + 1].centroid);
+                    xRefVector = _vehicleCrossSection[index - 1].centroid - _vehicleCrossSection[index + 1].centroid;
                     Vector3 offMainAxisVec = Vector3.ProjectOnPlane(xRefVector, _vehicleMainAxis);
                     float tanAoA = offMainAxisVec.magnitude / (2f * (float)_sectionThickness);
                     if (tanAoA > 0.17632698070846497347109038686862f)
@@ -1518,7 +1519,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void UpdateSonicDragArea()
         {
-            ferram4.FARCenterQuery center = new ferram4.FARCenterQuery();
+            FARCenterQuery center = new FARCenterQuery();
 
             Vector3 worldMainAxis = _localToWorldMatrix.MultiplyVector(_vehicleMainAxis);
             worldMainAxis.Normalize();
@@ -1971,7 +1972,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 return 0.025 * finenessRatio + 0.75;
             }
-            else if (finenessRatio < 3)
+
+            if (finenessRatio < 3)
                 return 0.33 * finenessRatio - 0.21;
 
             return 0.07 * finenessRatio + 0.57;

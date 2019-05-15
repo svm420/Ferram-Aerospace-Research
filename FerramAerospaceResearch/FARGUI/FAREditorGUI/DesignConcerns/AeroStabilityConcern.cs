@@ -42,9 +42,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
+using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 using KSP.Localization;
 using PreFlightTests;
-using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 {
@@ -97,10 +97,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
         {
             if (_editorFacility == EditorFacilities.VAB)
                 return DesignConcernSeverity.WARNING;
-            else if (_editorFacility == EditorFacilities.SPH)
+            if (_editorFacility == EditorFacilities.SPH)
                 return DesignConcernSeverity.CRITICAL;
-            else
-                return DesignConcernSeverity.WARNING;
+            return DesignConcernSeverity.WARNING;
         }
     }
 }

@@ -44,15 +44,16 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using FerramAerospaceResearch.FARAeroComponents;
 using ferram4;
+using FerramAerospaceResearch.FARAeroComponents;
+using KSP.UI.Screens.Flight;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     class PhysicsCalcs
     {
-        KSP.UI.Screens.Flight.NavBall _navball;
+        NavBall _navball;
         Vessel _vessel;
         FARVesselAero _vesselAero;
 
@@ -63,7 +64,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         int intakeAirId;
         double intakeAirDensity = 1;
         bool useWingArea;
-        double wingArea = 0;
+        double wingArea;
 
         VesselFlightInfo vesselInfo;
 
@@ -206,7 +207,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private void GetNavball()
         {
             if (HighLogic.LoadedSceneIsFlight)
-                _navball = GameObject.FindObjectOfType<KSP.UI.Screens.Flight.NavBall>();
+                _navball = GameObject.FindObjectOfType<NavBall>();
         }
 
         private void CalculateVesselOrientation(Vector3d velVectorNorm)

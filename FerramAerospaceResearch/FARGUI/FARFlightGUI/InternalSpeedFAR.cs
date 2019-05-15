@@ -73,7 +73,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
                     if (airspeedSettingsGUI.GetVelocityDisplayString(out value, out mode))
                     {
-                        this.textObject.text.SetText(shortCaptions[(int)mode] + value);
+                        textObject.text.SetText(shortCaptions[(int)mode] + value);
                         return; // we are done here
                     }
                 }

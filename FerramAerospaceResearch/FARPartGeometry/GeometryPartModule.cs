@@ -43,20 +43,22 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Text;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
-using UnityEngine;
-using KSP.UI.Screens;
-using FerramAerospaceResearch.FARUtils;
+using System.Text;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARPartGeometry.GeometryModification;
+using FerramAerospaceResearch.FARUtils;
+using KSP.UI.Screens;
+using TweakScale;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
-    public class GeometryPartModule : PartModule, TweakScale.IRescalable<GeometryPartModule>
+    public class GeometryPartModule : PartModule, IRescalable<GeometryPartModule>
     {
-        public bool destroyed = false;
+        public bool destroyed;
 
         public Transform partTransform;
         public Rigidbody partRigidBody;
@@ -103,14 +105,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private List<AnimationState> animStates;
         private List<float> animStateTime;
 
-        private bool _started = false;
-        private bool _ready = false;
-        private bool _sceneSetup = false;
+        private bool _started;
+        private bool _ready;
+        private bool _sceneSetup;
         public bool Ready
         {
             get { return _ready && _started && _sceneSetup; }
         }
-        private int _sendUpdateTick = 0;
+        private int _sendUpdateTick;
         private int _meshesToUpdate = -1;
 
         private bool _valid = true;
@@ -240,7 +242,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
             //RebuildAllMeshData();
@@ -259,7 +261,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             destroyed = true;
         }
 
-        public override void OnStart(PartModule.StartState state)
+        public override void OnStart(StartState state)
         {
             base.OnStart(state);
             _sceneSetup = true;     //this exists only to ensure that OnStart has occurred first
@@ -561,7 +563,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     AirbreathingEngineCrossSectonAdjuster engineAdjuster = new AirbreathingEngineCrossSectonAdjuster(engines, worldToVesselMatrix);
                     crossSectionAdjusters.Add(engineAdjuster);
                 }
-                return;
             }
         }
 
@@ -661,7 +662,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (HighLogic.LoadedSceneIsFlight)
                 vessel.SendMessage("AnimationVoxelUpdate");
             else if (HighLogic.LoadedSceneIsEditor)
-                FARGUI.FAREditorGUI.EditorGUI.RequestUpdateVoxel();
+                EditorGUI.RequestUpdateVoxel();
         }
 
         public void EditorUpdate()
@@ -802,18 +803,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 return new MeshData(m.vertices, m.triangles, m.bounds);
             }
-            else
-            {
-                SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
-                if (smr != null)
-                {
-                    m = new Mesh();
-                    smr.BakeMesh(m);
-                    MeshData md = new MeshData(m.vertices, m.triangles, m.bounds, true);
 
-                    UnityEngine.Object.Destroy(m);      //ensure that no memory is left over
-                    return md;
-                }
+            SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
+            if (smr != null)
+            {
+                m = new Mesh();
+                smr.BakeMesh(m);
+                MeshData md = new MeshData(m.vertices, m.triangles, m.bounds, true);
+
+                Destroy(m); //ensure that no memory is left over
+                return md;
             }
             return null;
         }
@@ -991,7 +990,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return CreateBoxMeshFromBoxCollider(new Vector3(0.5f, 0.8f, 0.5f), Vector3.zero);
         }
 
-        public void OnRescale(TweakScale.ScalingFactor factor)
+        public void OnRescale(ScalingFactor factor)
         {
             if (meshDataList == null)
                 return;

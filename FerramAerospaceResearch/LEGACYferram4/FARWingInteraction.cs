@@ -45,8 +45,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using FerramAerospaceResearch;
+using UnityEngine;
 
 namespace ferram4
 {
@@ -86,7 +86,7 @@ namespace ferram4
         private double effectiveUpstreamCd0;
         private double effectiveUpstreamInfluence;
 
-        private bool hasWingsUpstream = false;
+        private bool hasWingsUpstream;
 
         public double EffectiveUpstreamMAC { get { return effectiveUpstreamMAC; } private set { effectiveUpstreamMAC = value; } }
         public double EffectiveUpstreamb_2 { get { return effectiveUpstreamb_2; } private set { effectiveUpstreamb_2 = value; } }
@@ -103,8 +103,8 @@ namespace ferram4
 
 
 
-        private static FloatCurve wingCamberFactor = null;
-        private static FloatCurve wingCamberMoment = null;
+        private static FloatCurve wingCamberFactor;
+        private static FloatCurve wingCamberMoment;
 
         private double aRFactor = 1;
         private double clInterferenceFactor = 1;
@@ -362,7 +362,7 @@ namespace ferram4
                                 {
 
                                     double tmp = h.distance / dist;
-                                    tmp = FARMathUtil.Clamp(tmp, 0, 1);
+                                    tmp = tmp.Clamp(0, 1);
                                     double tmp2 = Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward, w.part.partTransform.forward));
                                     tmp = 1 - (1 - tmp) * tmp2;
                                     interferencevalue = Math.Min(tmp, interferencevalue);
@@ -617,19 +617,19 @@ namespace ferram4
                 UpdateUpstreamValuesFromWingModules(nearbyWingModulesLeftwardList, nearbyWingModulesLeftwardInfluence, wingRightwardDir, thisWingAoA);
             }
 
-            double MachCoeff = FARMathUtil.Clamp(1 - thisWingMachNumber * thisWingMachNumber, 0, 1);
+            double MachCoeff = (1 - thisWingMachNumber * thisWingMachNumber).Clamp(0, 1);
 
             if (!MachCoeff.NearlyEqual(0))
             {
-                double flapRatio = FARMathUtil.Clamp(thisWingMAC / (thisWingMAC + effectiveUpstreamMAC), 0, 1);
+                double flapRatio = (thisWingMAC / (thisWingMAC + effectiveUpstreamMAC)).Clamp(0, 1);
                 float flt_flapRatio = (float)flapRatio;
                 double flapFactor = wingCamberFactor.Evaluate(flt_flapRatio);        //Flap Effectiveness Factor
                 double dCm_dCl = wingCamberMoment.Evaluate(flt_flapRatio);           //Change in moment due to change in lift from flap
 
                 //This accounts for the wing possibly having a longer span than the flap
-                double WingFraction = FARMathUtil.Clamp(thisWingb_2 / effectiveUpstreamb_2, 0, 1);
+                double WingFraction = (thisWingb_2 / effectiveUpstreamb_2).Clamp(0, 1);
                 //This accounts for the flap possibly having a longer span than the wing it's attached to
-                double FlapFraction = FARMathUtil.Clamp(effectiveUpstreamb_2 / thisWingb_2, 0, 1);
+                double FlapFraction = (effectiveUpstreamb_2 / thisWingb_2).Clamp(0, 1);
 
                 double ClIncrement = flapFactor * effectiveUpstreamLiftSlope * effectiveUpstreamAoA;   //Lift created by the flap interaction
                 ClIncrement *= (parentWingModule.S * FlapFraction + effectiveUpstreamArea * WingFraction) / parentWingModule.S;                   //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
@@ -758,8 +758,7 @@ namespace ferram4
 
             if (effective_AR_modifier < 1)
                 return (effective_AR_modifier + 1);
-            else
-                return 2 * (2 - effective_AR_modifier) + 8 * (effective_AR_modifier - 1);
+            return 2 * (2 - effective_AR_modifier) + 8 * (effective_AR_modifier - 1);
         }
     }
 }

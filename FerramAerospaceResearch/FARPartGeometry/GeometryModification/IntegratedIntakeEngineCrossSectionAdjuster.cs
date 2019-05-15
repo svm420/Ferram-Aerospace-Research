@@ -42,8 +42,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
@@ -99,8 +99,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
         {
-            this.part = intake.part;
-            intakeModule = intake as ModuleResourceIntake;
+            part = intake.part;
+            intakeModule = intake;
             intakeTrans = intakeModule.intakeTransform;
             //ModuleResourceIntake intake = intake;
 
@@ -129,16 +129,14 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             double dot = Vector3.Dot(vehicleAxis, vehicleBasisForwardVector);
             if (dot > 0.9)
                 return intakeArea;
-            else
-                return 0;
+            return 0;
         }
 
         public double AreaRemovedFromCrossSection()
         {
             if (intakeModule.node == null || intakeModule.node.attachedPart == null)
                 return intakeArea * sign;
-            else
-                return -intakeArea * sign;      //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
+            return -intakeArea * sign; //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
         }
 
         public double AreaThreshold()

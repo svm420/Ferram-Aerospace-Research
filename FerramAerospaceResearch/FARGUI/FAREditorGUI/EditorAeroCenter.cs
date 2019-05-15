@@ -44,9 +44,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {

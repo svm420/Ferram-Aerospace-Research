@@ -44,16 +44,16 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
 {
     class GUIColors
     {
-        List<Color> colors = null;
+        List<Color> colors;
 
-        static GUIColors _instance = null;
+        static GUIColors _instance;
         public static GUIColors Instance
         {
             get

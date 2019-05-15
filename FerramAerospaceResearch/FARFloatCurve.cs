@@ -137,8 +137,7 @@ namespace FerramAerospaceResearch
             {
                 if (count > sections.Length)
                     throw new Exception();
-                else
-                    ++count;
+                ++count;
                 //curIndex = (highIndex + lowIndex) / 2;
                 int check = sections[curIndex].CheckRange(x);
                 if (check > 0)       //above of this cubic's range
@@ -150,13 +149,14 @@ namespace FerramAerospaceResearch
                         curIndex = sections[curIndex].nextIndex;    //otherwise, find next cubic to check and continue
                         continue;
                     }
-                else if (check < 0) //below this cubic's range
+
+                if (check < 0) //below this cubic's range
                     if (curIndex <= 0)
-                        return sections[curIndex].EvalLowerLim();   //at lower end of curve, return min val of first cubic
+                        return sections[curIndex].EvalLowerLim(); //at lower end of curve, return min val of first cubic
                     else
                     {
                         //highIndex = curIndex - 1;
-                        curIndex = sections[curIndex].prevIndex;    //otherwise, find next cubic to check and continue
+                        curIndex = sections[curIndex].prevIndex; //otherwise, find next cubic to check and continue
                         continue;
                     }
 

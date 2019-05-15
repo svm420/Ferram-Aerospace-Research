@@ -78,7 +78,7 @@ namespace FerramAerospaceResearch.FARThreading
 
         public static bool RunInMainThread = false;
 
-        private Thread _mainThread = null;
+        private Thread _mainThread;
 
         public bool inMainThread
         {

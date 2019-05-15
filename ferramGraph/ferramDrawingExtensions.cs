@@ -165,7 +165,7 @@ namespace ferram4
                 Swap(ref y0, ref y1);
             }
 
-            double grad = (double) dy / (double) dx;
+            double grad = dy / dx;
             double intery = y0 + rfpart(x0) * grad;
 
             // starting point
@@ -226,7 +226,7 @@ namespace ferram4
                     tex.SetPixelAA((int) intery, x, color, rfpart(intery));
                     tex.SetPixelAA((int) yhigh, x, color, fpart(yhigh));
                     for (int y = (int) intery + 1; y < (int) yhigh; y++)
-                        tex.SetPixelAA(y, x, color, 1.0);
+                        tex.SetPixelAA(y, x, color);
                     intery += grad;
                 }
             }
@@ -239,7 +239,7 @@ namespace ferram4
                     tex.SetPixelAA(x, (int) intery, color, rfpart(intery));
                     tex.SetPixelAA(x, (int) yhigh, color, fpart(yhigh));
                     for (int y = (int) intery + 1; y < (int) yhigh; y++)
-                        tex.SetPixelAA(x, y, color, 1.0);
+                        tex.SetPixelAA(x, y, color);
                     intery += grad;
                 }
             }
