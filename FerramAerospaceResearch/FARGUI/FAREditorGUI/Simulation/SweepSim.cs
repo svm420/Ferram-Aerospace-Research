@@ -42,11 +42,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 using KSP.Localization;
-using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {

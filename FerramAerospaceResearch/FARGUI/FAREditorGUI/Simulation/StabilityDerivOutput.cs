@@ -42,12 +42,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
     class StabilityDerivOutput

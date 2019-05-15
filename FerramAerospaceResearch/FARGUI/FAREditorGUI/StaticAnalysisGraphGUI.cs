@@ -49,7 +49,6 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KSP.Localization;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
-using FerramAerospaceResearch.FARAeroComponents;
 using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI

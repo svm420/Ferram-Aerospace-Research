@@ -43,13 +43,10 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using KSP.Localization;
-using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
-using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {

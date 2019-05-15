@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using FerramAerospaceResearch.PartExtensions;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARUtils;
 

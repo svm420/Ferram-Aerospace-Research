@@ -44,11 +44,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using FerramAerospaceResearch.FARPartGeometry;
-using FerramAerospaceResearch.FARUtils;
 using ferram4;
 
 namespace FerramAerospaceResearch.FARAeroComponents

@@ -46,7 +46,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using KSP.Localization;
-using ferram4;
 using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI

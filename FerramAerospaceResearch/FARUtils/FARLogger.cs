@@ -47,7 +47,6 @@ Copyright 2019, Daumantas Kavolis, aka dkavolis
 
 using System;
 using System.Diagnostics;
-using UnityEngine;
 
 namespace FerramAerospaceResearch.FARUtils
 {

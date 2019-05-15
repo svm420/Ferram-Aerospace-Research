@@ -45,9 +45,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using KSP.UI.Screens.Flight;
 using FerramAerospaceResearch.FARAeroComponents;
-using FerramAerospaceResearch.RealChuteLite;
 using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
+﻿namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
     class StabilityDerivExportVariables
     {

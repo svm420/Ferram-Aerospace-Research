@@ -42,14 +42,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using KSP;
-using KSP.UI.Screens;
-using FerramAerospaceResearch.FARAeroComponents;
-using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {

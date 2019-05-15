@@ -46,7 +46,6 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using KSP;
 using KSP.UI.Screens;
 using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARUtils;
