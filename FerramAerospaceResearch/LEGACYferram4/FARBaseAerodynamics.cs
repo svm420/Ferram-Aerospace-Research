@@ -98,25 +98,6 @@ namespace ferram4
 
         }
 
-        public override void Initialization()
-        {
-            base.Initialization();
-        }
-
-        /*public void ClearShielding()
-        {
-            isShielded = false;
-        }
-
-        public void ActivateShielding()
-        {
-            isShielded = true;
-            Cl = 0;
-            Cd = 0;
-            Cm = 0;
-        }*/
-
-
         public virtual Vector3d GetVelocity()
         {
             if (HighLogic.LoadedSceneIsFlight)

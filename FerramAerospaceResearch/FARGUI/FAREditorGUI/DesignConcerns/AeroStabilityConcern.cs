@@ -80,10 +80,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
             return true;
         }
 
-        public override EditorFacilities GetEditorFacilities()
-        {
-            return base.GetEditorFacilities();
-        }
         public override string GetConcernTitle()
         {
             return Localizer.Format("FARDesignConcernStabTitle");

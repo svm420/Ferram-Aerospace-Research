@@ -119,7 +119,7 @@ namespace ferram4
             {
                 try
                 {
-                    id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), config.GetValue(configKeys[i], id2actionGroup[i].ToString())); ;
+                    id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), config.GetValue(configKeys[i], id2actionGroup[i].ToString()));
                     currentGuiStrings[i] = id2actionGroup[i].ToString(); // don't forget to initialize the gui
                     FARLogger.Info(String.Format("Loaded AG {0} as {1}", configKeys[i], id2actionGroup[i]));
                 }

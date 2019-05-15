@@ -48,7 +48,7 @@ using UnityEngine;
 
 namespace ferram4
 {
-    public class FARControllableSurface : FARWingAerodynamicModel, ILiftProvider, ITorqueProvider
+    public class FARControllableSurface : FARWingAerodynamicModel, ITorqueProvider
     {
         protected Transform movableSection;
 

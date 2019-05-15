@@ -85,17 +85,13 @@ namespace FerramAerospaceResearch
             res.AddValue("rejectUnlistedResources", template.rejectUnlistedResources);
 
             //Make sure to update this whenever MM fixes how it goes through nodes and values
-            int i = template.resources.Count - 1;
             foreach (string s in template.resources)
             {
                 res.AddValue("res", s);
-                i--;
             }
-            i = template.excludeResources.Count - 1;
             foreach (string s in template.excludeResources)
             {
                 res.AddValue("excludeRes", s);
-                i++;
             }
 
             if (template.flowModeNeeded)

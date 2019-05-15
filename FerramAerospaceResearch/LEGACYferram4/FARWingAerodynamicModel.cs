@@ -60,7 +60,7 @@ using UnityEngine;
 
 namespace ferram4
 {
-    public class FARWingAerodynamicModel : FARBaseAerodynamics, IRescalable<FARWingAerodynamicModel>, ILiftProvider, IPartMassModifier
+    public class FARWingAerodynamicModel : FARBaseAerodynamics, IRescalable<FARWingAerodynamicModel>, IPartMassModifier
     {
         public double rawAoAmax = 15;
         private double AoAmax = 15;
