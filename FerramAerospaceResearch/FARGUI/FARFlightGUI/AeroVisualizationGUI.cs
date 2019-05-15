@@ -169,7 +169,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             node.AddValue("fullySaturatedStall", _fullySaturatedStall);
         }
 
-        void LoadSettings()
+        private void LoadSettings()
         {
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
 

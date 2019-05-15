@@ -50,13 +50,13 @@ namespace FerramAerospaceResearch.FARThreading
     //Is equivalent to the Barrier class from .NET 4.0
     public class ThreadBarrier
     {
-        object _lockerObject = new object();
-        int _threadParticipatingCount;
+        private object _lockerObject = new object();
+        private int _threadParticipatingCount;
 
-        int currentCountOdd;
-        int currentCountEven;
+        private int currentCountOdd;
+        private int currentCountEven;
 
-        bool useEvenCount;
+        private bool useEvenCount;
 
         public ThreadBarrier(int threadParticipatingCount)
         {

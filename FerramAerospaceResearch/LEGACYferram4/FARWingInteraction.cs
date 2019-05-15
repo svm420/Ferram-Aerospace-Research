@@ -52,7 +52,7 @@ namespace ferram4
 {
     public class FARWingInteraction
     {
-        static RaycastHitComparer _comparer = new RaycastHitComparer();
+        private static RaycastHitComparer _comparer = new RaycastHitComparer();
 
         private FARWingAerodynamicModel parentWingModule;
         private Part parentWingPart;

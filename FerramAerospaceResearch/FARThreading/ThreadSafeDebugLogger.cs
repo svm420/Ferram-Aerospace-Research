@@ -52,9 +52,9 @@ using UnityEngine;
 namespace FerramAerospaceResearch.FARThreading
 {
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
-    class ThreadSafeDebugLogger : MonoBehaviour
+    internal class ThreadSafeDebugLogger : MonoBehaviour
     {
-        static ThreadSafeDebugLogger _instance;
+        private static ThreadSafeDebugLogger _instance;
         public static ThreadSafeDebugLogger Instance
         {
             get
@@ -63,11 +63,11 @@ namespace FerramAerospaceResearch.FARThreading
             }
         }
 
-        List<Exception> _exceptionsThrown;
-        List<string> _infoMessages;
-        List<string> _debugMessages;
+        private List<Exception> _exceptionsThrown;
+        private List<string> _infoMessages;
+        private List<string> _debugMessages;
 
-        void Awake()
+        private void Awake()
         {
             _instance = this;
             _exceptionsThrown = new List<Exception>();
@@ -76,7 +76,7 @@ namespace FerramAerospaceResearch.FARThreading
             DontDestroyOnLoad(gameObject);
         }
 
-        void Update()
+        private void Update()
         {
             if (_exceptionsThrown.Count > 0)
             {

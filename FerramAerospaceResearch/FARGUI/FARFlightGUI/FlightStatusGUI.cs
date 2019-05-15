@@ -48,16 +48,16 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
-    class FlightStatusGUI
+    internal class FlightStatusGUI
     {
-        string statusString;
-        Color statusColor;
-        double statusOverrideTimer;
-        double statusBlinkerTimer;
-        bool statusBlinker;
-        GUIStyle stallStyle;
+        private string statusString;
+        private Color statusColor;
+        private double statusOverrideTimer;
+        private double statusBlinkerTimer;
+        private bool statusBlinker;
+        private GUIStyle stallStyle;
 
-        VesselFlightInfo infoParameters;
+        private VesselFlightInfo infoParameters;
 
 
         public void UpdateInfoParameters(VesselFlightInfo info)

@@ -47,12 +47,12 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
-    class DebugVisualVoxel
+    internal class DebugVisualVoxel
     {
         public static float globalScale = 0.9f;
-        float m_scale;
-        float m_extent;
-        Vector3 m_position;
+        private float m_scale;
+        private float m_extent;
+        private Vector3 m_position;
 
         public DebugVisualVoxel(Vector3 pos, double elementScale)
         {

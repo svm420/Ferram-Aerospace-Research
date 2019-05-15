@@ -46,11 +46,11 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class StockJettisonTransformGeoUpdater : IGeometryUpdater
+    internal class StockJettisonTransformGeoUpdater : IGeometryUpdater
     {
-        ModuleJettison engineFairing;
-        GeometryPartModule geoModule;
-        bool fairingVisible;
+        private ModuleJettison engineFairing;
+        private GeometryPartModule geoModule;
+        private bool fairingVisible;
 
         public StockJettisonTransformGeoUpdater(ModuleJettison engineFairing, GeometryPartModule geoModule)
         {

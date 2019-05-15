@@ -97,8 +97,9 @@ namespace ferram4
 
 //        protected int MovableSectionFlip = 1;
         [KSPField(guiName = "FARCtrlSurfStdTitle", guiActiveEditor = true, guiActive = true), UI_Toggle(affectSymCounterparts = UI_Scene.All, scene = UI_Scene.All, disabledText = "FARCtrlSurfStdText", enabledText = "FARCtrlSurfStdText")]
-        bool showStdCtrl = false;
-        bool prevStdCtrl = true;
+        private bool showStdCtrl = false;
+
+        private bool prevStdCtrl = true;
 
         [KSPField(guiName = "FARCtrlSurfPitch", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_FloatRange(affectSymCounterparts = UI_Scene.All, maxValue = 100.0f, minValue = -100f, scene = UI_Scene.All, stepIncrement = 5f)]
         public float pitchaxis = 100.0f;
@@ -119,16 +120,19 @@ namespace ferram4
         public float maxdeflect = 15;
 
         [KSPField(guiName = "FARCtrlSurfFlapSpoiler", guiActiveEditor = true, guiActive = true), UI_Toggle(affectSymCounterparts = UI_Scene.All, scene = UI_Scene.All, disabledText = "FARCtrlSurfStdText", enabledText = "FARCtrlSurfStdText")]
-        bool showFlpCtrl = false;
-        bool prevFlpCtrl = true;
+        private bool showFlpCtrl = false;
+
+        private bool prevFlpCtrl = true;
 
         [KSPField(guiName = "FARCtrlSurfFlap", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_Toggle(affectSymCounterparts = UI_Scene.All, enabledText = "FARCtrlSurfFlapActive", scene = UI_Scene.All, disabledText = "FARCtrlSurfFlapInActive")]
         public bool isFlap;
-        bool prevIsFlap;
+
+        private bool prevIsFlap;
 
         [KSPField(guiName = "FARCtrlSurfSpoiler", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_Toggle(affectSymCounterparts = UI_Scene.All, enabledText = "FARCtrlSurfFlapActive", scene = UI_Scene.All, disabledText = "FARCtrlSurfFlapInActive")]
         public bool isSpoiler;
-        bool prevIsSpoiler;
+
+        private bool prevIsSpoiler;
 
         [KSPField(isPersistant = true, guiName = "FARCtrlSurfFlapSetting")]
         public int flapDeflectionLevel = 2;
@@ -211,7 +215,7 @@ namespace ferram4
         }
 
         //[KSPEvent(guiName = "Std. Ctrl Settings", guiActiveEditor = true, guiActive = false)]
-        void CheckFieldVisibility()
+        private void CheckFieldVisibility()
         {
             if (showStdCtrl != prevStdCtrl)
             {
@@ -355,7 +359,7 @@ namespace ferram4
 
         }
 
-        void CheckShielded()
+        private void CheckShielded()
         {
             if (NUFAR_areaExposedFactor < 0.1 * S && !NUFAR_totalExposedAreaFactor.NearlyEqual(0))
             {

@@ -49,15 +49,15 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class EditorAreaRulingOverlay
+    internal class EditorAreaRulingOverlay
     {
         //VectorLine _areaLine;
         //VectorLine _derivLine;
         //List<VectorLine> _markingLines;
-        LineRenderer _areaRenderer;
-        LineRenderer _derivRenderer;
-        LineRenderer _coeffRenderer;
-        List<LineRenderer> _markingRenderers;
+        private LineRenderer _areaRenderer;
+        private LineRenderer _derivRenderer;
+        private LineRenderer _coeffRenderer;
+        private List<LineRenderer> _markingRenderers;
 
         public enum OverlayType
         {
@@ -66,14 +66,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             COEFF
         }
 
-        Color _axisColor;
-        Color _crossSectionColor;
-        Color _derivColor;
-        double _yScaleMaxDistance;
-        double _yAxisGridScale;
-        int _numGridLines;
+        private Color _axisColor;
+        private Color _crossSectionColor;
+        private Color _derivColor;
+        private double _yScaleMaxDistance;
+        private double _yAxisGridScale;
+        private int _numGridLines;
 
-        Material _rendererMaterial;
+        private Material _rendererMaterial;
         private static readonly int colorId = Shader.PropertyToID("_Color");
 
         public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(Color axisColor, Color crossSectionColor, Color derivColor, double yScaleMaxDistance, double yAxisGridScale)
@@ -143,7 +143,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             Initialize();
         }
 
-        LineRenderer CreateNewRenderer(Color color, float width, Material material)
+        private LineRenderer CreateNewRenderer(Color color, float width, Material material)
         {
             GameObject o = new GameObject();
 
@@ -327,12 +327,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         }*/
 
 
-        void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords)
+        private void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords)
         {
             UpdateRenderer(renderer, transformMatrix, xCoords, yCoords, 1);
         }
 
-        void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor)
+        private void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor)
         {
             // getting transform is internal call, cache
             Transform transform = renderer.transform;

@@ -46,11 +46,11 @@ using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class StockProcAsteroidGeoUpdater : IGeometryUpdater
+	internal class StockProcAsteroidGeoUpdater : IGeometryUpdater
     {
-        ModuleAsteroid asteroid;
-        GeometryPartModule geoModule;
-        bool hasLoaded;
+	    private ModuleAsteroid asteroid;
+	    private GeometryPartModule geoModule;
+	    private bool hasLoaded;
 
         public StockProcAsteroidGeoUpdater(ModuleAsteroid asteroid, GeometryPartModule geoModule)
         {

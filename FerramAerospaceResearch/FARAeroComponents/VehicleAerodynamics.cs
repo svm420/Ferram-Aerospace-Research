@@ -53,88 +53,88 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
-    class VehicleAerodynamics
+    internal class VehicleAerodynamics
     {
-        static double[] indexSqrt = new double[1];
-        static object _commonLocker = new object();
+        private static double[] indexSqrt = new double[1];
+        private static object _commonLocker = new object();
 
-        VehicleVoxel _voxel;
-        VoxelCrossSection[] _vehicleCrossSection = new VoxelCrossSection[1];
-        double[] _ductedAreaAdjustment = new double[1];
+        private VehicleVoxel _voxel;
+        private VoxelCrossSection[] _vehicleCrossSection = new VoxelCrossSection[1];
+        private double[] _ductedAreaAdjustment = new double[1];
 
-        int _voxelCount;
+        private int _voxelCount;
 
-        double _length;
+        private double _length;
         public double Length
         {
             get { return _length; }
         }
 
-        double _maxCrossSectionArea;
+        private double _maxCrossSectionArea;
         public double MaxCrossSectionArea
         {
             get { return _maxCrossSectionArea; }
         }
 
-        bool _calculationCompleted;
+        private bool _calculationCompleted;
         public bool CalculationCompleted
         {
             get { return _calculationCompleted; }
         }
 
-        double _sonicDragArea;
+        private double _sonicDragArea;
         public double SonicDragArea
         {
             get { return _sonicDragArea; }
         }
 
-        double _criticalMach;
+        private double _criticalMach;
         public double CriticalMach
         {
             get { return _criticalMach; }
         }
 
-        Matrix4x4 _worldToLocalMatrix, _localToWorldMatrix;
+        private Matrix4x4 _worldToLocalMatrix, _localToWorldMatrix;
 
-        Vector3d _voxelLowerRightCorner;
-        double _voxelElementSize;
-        double _sectionThickness;
+        private Vector3d _voxelLowerRightCorner;
+        private double _voxelElementSize;
+        private double _sectionThickness;
         public double SectionThickness
         {
             get { return _sectionThickness; }
         }
 
-        Vector3 _vehicleMainAxis;
-        List<Part> _vehiclePartList;
+        private Vector3 _vehicleMainAxis;
+        private List<Part> _vehiclePartList;
 
-        List<GeometryPartModule> _currentGeoModules;
-        Dictionary<Part, PartTransformInfo> _partWorldToLocalMatrixDict = new Dictionary<Part, PartTransformInfo>(ObjectReferenceEqualityComparer<Part>.Default);
-        Dictionary<FARAeroPartModule, FARAeroPartModule.ProjectedArea> _moduleAndAreasDict = new Dictionary<FARAeroPartModule, FARAeroPartModule.ProjectedArea>(ObjectReferenceEqualityComparer<FARAeroPartModule>.Default);
+        private List<GeometryPartModule> _currentGeoModules;
+        private Dictionary<Part, PartTransformInfo> _partWorldToLocalMatrixDict = new Dictionary<Part, PartTransformInfo>(ObjectReferenceEqualityComparer<Part>.Default);
+        private Dictionary<FARAeroPartModule, FARAeroPartModule.ProjectedArea> _moduleAndAreasDict = new Dictionary<FARAeroPartModule, FARAeroPartModule.ProjectedArea>(ObjectReferenceEqualityComparer<FARAeroPartModule>.Default);
 
-        List<FARAeroPartModule> _currentAeroModules = new List<FARAeroPartModule>();
-        List<FARAeroPartModule> _newAeroModules = new List<FARAeroPartModule>();
+        private List<FARAeroPartModule> _currentAeroModules = new List<FARAeroPartModule>();
+        private List<FARAeroPartModule> _newAeroModules = new List<FARAeroPartModule>();
 
-        List<FARAeroPartModule> _currentUnusedAeroModules = new List<FARAeroPartModule>();
-        List<FARAeroPartModule> _newUnusedAeroModules = new List<FARAeroPartModule>();
+        private List<FARAeroPartModule> _currentUnusedAeroModules = new List<FARAeroPartModule>();
+        private List<FARAeroPartModule> _newUnusedAeroModules = new List<FARAeroPartModule>();
 
-        List<FARAeroSection> _currentAeroSections = new List<FARAeroSection>();
-        List<FARAeroSection> _newAeroSections = new List<FARAeroSection>();
+        private List<FARAeroSection> _currentAeroSections = new List<FARAeroSection>();
+        private List<FARAeroSection> _newAeroSections = new List<FARAeroSection>();
 
-        List<FARWingAerodynamicModel> _legacyWingModels = new List<FARWingAerodynamicModel>();
+        private List<FARWingAerodynamicModel> _legacyWingModels = new List<FARWingAerodynamicModel>();
 
-        List<ICrossSectionAdjuster> activeAdjusters = new List<ICrossSectionAdjuster>();
+        private List<ICrossSectionAdjuster> activeAdjusters = new List<ICrossSectionAdjuster>();
         //Dictionary<Part, double> adjusterAreaPerVoxelDict = new Dictionary<Part, double>();
         //Dictionary<Part, ICrossSectionAdjuster> adjusterPartDict = new Dictionary<Part, ICrossSectionAdjuster>();
 
-        List<FARAeroPartModule> includedModules = new List<FARAeroPartModule>();
-        List<float> weighting = new List<float>();
-        static Stack<FARAeroSection> currentlyUnusedSections;
+        private List<FARAeroPartModule> includedModules = new List<FARAeroPartModule>();
+        private List<float> weighting = new List<float>();
+        private static Stack<FARAeroSection> currentlyUnusedSections;
 
-        int validSectionCount;
-        int firstSection;
+        private int validSectionCount;
+        private int firstSection;
 
-        bool visualizing;
-        bool voxelizing;
+        private bool visualizing;
+        private bool voxelizing;
 
         public VehicleAerodynamics()
         {
@@ -576,7 +576,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
 
         //Smooths out area and area 2nd deriv distributions to deal with noise in the representation
-        unsafe void GaussianSmoothCrossSections(VoxelCrossSection[] vehicleCrossSection, double stdDevCutoff, double lengthPercentFactor, double sectionThickness, double length, int frontIndex, int backIndex, int areaSmoothingIterations, int derivSmoothingIterations)
+        private unsafe void GaussianSmoothCrossSections(VoxelCrossSection[] vehicleCrossSection, double stdDevCutoff, double lengthPercentFactor, double sectionThickness, double length, int frontIndex, int backIndex, int areaSmoothingIterations, int derivSmoothingIterations)
         {
             double stdDev = length * lengthPercentFactor;
             int numVals = (int)Math.Ceiling(stdDevCutoff * stdDev / sectionThickness);
@@ -726,7 +726,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
 
         //Based on http://www.holoborodko.com/pavel/downloads/NoiseRobustSecondDerivative.pdf
-        unsafe void CalculateCrossSectionSecondDerivs(VoxelCrossSection[] vehicleCrossSection, int oneSidedFilterLength, int frontIndex, int backIndex, double sectionThickness)
+        private unsafe void CalculateCrossSectionSecondDerivs(VoxelCrossSection[] vehicleCrossSection, int oneSidedFilterLength, int frontIndex, int backIndex, double sectionThickness)
         {
             int M, N;
 
@@ -817,7 +817,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
 
-        long CalculateSk(long k, int M, int N)
+        private long CalculateSk(long k, int M, int N)
         {
             if (k > M)
                 return 0;
@@ -830,7 +830,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return val;
         }
 
-        void AdjustCrossSectionForAirDucting(VoxelCrossSection[] vehicleCrossSection, List<GeometryPartModule> geometryModules, int front, int back, ref double maxCrossSectionArea)
+        private void AdjustCrossSectionForAirDucting(VoxelCrossSection[] vehicleCrossSection, List<GeometryPartModule> geometryModules, int front, int back, ref double maxCrossSectionArea)
         {
 
             //double* areaAdjustment = stackalloc double[vehicleCrossSection.Length];
@@ -1764,7 +1764,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return cPPrandtlMeyerExpansion(freestreamMach, nuFreestream, deflectionAngle);
         }
 
-        double CalculateEquivalentDeflectionAngle(double linCp, double area, double firstDerivArea, double machNumber, double beta)
+        private double CalculateEquivalentDeflectionAngle(double linCp, double area, double firstDerivArea, double machNumber, double beta)
         {
             double turnAngle = area * Math.PI;
             turnAngle = 2.0 * Math.Sqrt(turnAngle);
@@ -1786,7 +1786,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return totalTurnAngle;
         }
 
-        double cPPrandtlMeyerExpansion(double machNumber, double nuFreestream, double deflectionAngle)
+        private double cPPrandtlMeyerExpansion(double machNumber, double nuFreestream, double deflectionAngle)
         {
             double nu = nuFreestream - deflectionAngle;
 
@@ -1809,7 +1809,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return cP;
         }
 
-        double StagPresRatio(double machNumber, double nu)
+        private double StagPresRatio(double machNumber, double nu)
         {
             double ratio = nu + Math.Acos(1 / machNumber);
             ratio *= 2.0 / Math.Sqrt(6.0);
@@ -1820,7 +1820,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return ratio;
         }
 
-        double PrandtlMeyerExpansionAngle(double localMach, double freestreamMach)
+        private double PrandtlMeyerExpansionAngle(double localMach, double freestreamMach)
         {
             double nu;
             if (localMach < 1.0)
@@ -2011,7 +2011,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
         #endregion
 
-        double MathClampAbs(double value, double abs)
+        private double MathClampAbs(double value, double abs)
         {
             if (value < -abs)
                 return -abs;
@@ -2020,7 +2020,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return value;
         }
 
-        struct CrossSectionAdjustData
+        private struct CrossSectionAdjustData
         {
             public double activeAreaRemoved;
             public int lastIndex;

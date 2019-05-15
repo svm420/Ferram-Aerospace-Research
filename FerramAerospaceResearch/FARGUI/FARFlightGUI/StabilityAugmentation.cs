@@ -50,10 +50,11 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
-    class StabilityAugmentation
+    internal class StabilityAugmentation
     {
-        Vessel _vessel;
-        static string[] systemLabel = {
+        private Vessel _vessel;
+
+        private static string[] systemLabel = {
             Localizer.Format("FARFlightStabAugLabel0"),
             Localizer.Format("FARFlightStabAugLabel1"),
             Localizer.Format("FARFlightStabAugLabel2"),
@@ -61,23 +62,24 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightStabAugLabel4")
         };
 
-        static string[] systemLabelLong = {
+        private static string[] systemLabelLong = {
             Localizer.Format("FARFlightStabAugLabelLong0"),
             Localizer.Format("FARFlightStabAugLabelLong1"),
             Localizer.Format("FARFlightStabAugLabelLong2"),
             Localizer.Format("FARFlightStabAugLabelLong3"),
             Localizer.Format("FARFlightStabAugLabelLong4")
         };
-        static ControlSystem[] systemTemplates;
-        ControlSystem[] systemInstances;
 
-        static double aoALowLim, aoAHighLim;
-        static double scalingDynPres;
-        VesselFlightInfo info;
+        private static ControlSystem[] systemTemplates;
+        private ControlSystem[] systemInstances;
 
-        GUIStyle buttonStyle;
-        GUIStyle boxStyle;
-        GUIDropDown<int> systemDropdown;
+        private static double aoALowLim, aoAHighLim;
+        private static double scalingDynPres;
+        private VesselFlightInfo info;
+
+        private GUIStyle buttonStyle;
+        private GUIStyle boxStyle;
+        private GUIDropDown<int> systemDropdown;
 
         public StabilityAugmentation(Vessel vessel)
         {
@@ -443,7 +445,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             return node;
         }
 
-        class ControlSystem
+        private class ControlSystem
         {
             public bool active;
 

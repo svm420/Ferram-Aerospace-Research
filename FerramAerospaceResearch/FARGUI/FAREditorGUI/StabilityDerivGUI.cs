@@ -50,21 +50,20 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class StabilityDerivGUI
+    internal class StabilityDerivGUI
     {
+        private GUIDropDown<int> _flapSettingDropdown;
+        private GUIDropDown<CelestialBody> _bodySettingDropdown;
 
-        GUIDropDown<int> _flapSettingDropdown;
-        GUIDropDown<CelestialBody> _bodySettingDropdown;
+        private StabilityDerivOutput stabDerivOutput;
 
-        StabilityDerivOutput stabDerivOutput;
+        private string altitude = "0";
+        private string machNumber = "0.35";
+        private bool spoilersDeployed;
 
-        string altitude = "0";
-        string machNumber = "0.35";
-        bool spoilersDeployed;
+        private EditorSimManager simManager;
 
-        EditorSimManager simManager;
-
-        Vector3 aoAVec;
+        private Vector3 aoAVec;
 
         public StabilityDerivGUI(EditorSimManager simManager, GUIDropDown<int> flapSettingDropDown, GUIDropDown<CelestialBody> bodySettingDropdown)
         {
@@ -81,7 +80,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //FARLogger.Info("" + velArrow.Direction);
         }
 
-        void SetAngleVectors(double aoA)
+        private void SetAngleVectors(double aoA)
         {
             aoA *= FARMathUtil.deg2rad;
 

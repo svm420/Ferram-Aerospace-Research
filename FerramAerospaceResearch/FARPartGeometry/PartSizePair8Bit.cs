@@ -46,11 +46,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class PartSizePair8Bit : PartSizePair
     {
-        const float AREA_SCALING = 1f / (255f * 255f * 255f);
-        const int LENGTH_OF_VOXEL = 255;
+        private const float AREA_SCALING = 1f / (255f * 255f * 255f);
+        private const int LENGTH_OF_VOXEL = 255;
 
-        byte xPlaneUp, yPlaneUp, zPlaneUp;
-        byte xPlaneDown, yPlaneDown, zPlaneDown;
+        private byte xPlaneUp, yPlaneUp, zPlaneUp;
+        private byte xPlaneDown, yPlaneDown, zPlaneDown;
 
         public override void Clear()
         {

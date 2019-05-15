@@ -56,50 +56,51 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class FlightGUI : VesselModule
     {
-        Vessel _vessel;
-        FARVesselAero _vesselAero;
+        private Vessel _vessel;
+        private FARVesselAero _vesselAero;
 
-        static bool showGUI;
+        private static bool showGUI;
         public static bool showAllGUI = true;
         public static bool savedShowGUI = true;
-        static Rect mainGuiRect;
-        static Rect dataGuiRect;
-        static Rect settingsGuiRect;
-        static IButton blizzyFlightGUIButton;
-        static int activeFlightGUICount;
-        static int frameCountForSaving;
+        private static Rect mainGuiRect;
+        private static Rect dataGuiRect;
+        private static Rect settingsGuiRect;
+        private static IButton blizzyFlightGUIButton;
+        private static int activeFlightGUICount;
+        private static int frameCountForSaving;
         public static Dictionary<Vessel, FlightGUI> vesselFlightGUI;
 
         private StringBuilder _strBuilder = new StringBuilder();
 
-        PhysicsCalcs _physicsCalcs;
-        VesselFlightInfo infoParameters;
+        private PhysicsCalcs _physicsCalcs;
+        private VesselFlightInfo infoParameters;
         public VesselFlightInfo InfoParameters
         {
             get { return infoParameters; }
         }
 
-        FlightStatusGUI _flightStatusGUI;
-        StabilityAugmentation _stabilityAugmentation;
-        FlightDataGUI _flightDataGUI;
-        AeroVisualizationGUI _aeroVizGUI;
+        private FlightStatusGUI _flightStatusGUI;
+        private StabilityAugmentation _stabilityAugmentation;
+        private FlightDataGUI _flightDataGUI;
+        private AeroVisualizationGUI _aeroVizGUI;
         public AeroVisualizationGUI AeroVizGUI
         {
             get { return _aeroVizGUI; }
         }
-        AirspeedSettingsGUI _airSpeedGUI;
+
+        private AirspeedSettingsGUI _airSpeedGUI;
         public AirspeedSettingsGUI airSpeedGUI
         {
             get { return _airSpeedGUI; }
         }
 
-        bool showFlightDataWindow;
-        bool showSettingsWindow;
+        private bool showFlightDataWindow;
+        private bool showSettingsWindow;
 
         internal static GUIStyle boxStyle;
         internal static GUIStyle buttonStyle;
 
-        GUIDropDown<int> settingsWindow;
+        private GUIDropDown<int> settingsWindow;
 
         protected override void OnAwake()
         {
@@ -158,7 +159,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GameEvents.onHideUI.Add(HideUI);
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             FlightGUIDrawer.SetGUIActive(this,false);
             GameEvents.onShowUI.Remove(ShowUI);
@@ -232,14 +233,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         }
 
         //Receives a message from any FARWingAerodynamicModel or FARAeroPartModule that has failed to update the GUI
-        void AerodynamicFailureStatus()
+        private void AerodynamicFailureStatus()
         {
             if(_flightStatusGUI != null)
                 _flightStatusGUI.AerodynamicFailureStatus();
         }
 
         #region PhysicsAndOrientationBlock
-        void FixedUpdate()
+
+        private void FixedUpdate()
         {
             if (_physicsCalcs == null)
                 return;
@@ -251,7 +253,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _flightDataGUI.UpdateInfoParameters(infoParameters);
         }
 
-        void Update()
+        private void Update()
         {
             FlightGUIDrawer.SetGUIActive(this,(_vessel == FlightGlobals.ActiveVessel && showGUI && showAllGUI));
             if (frameCountForSaving >= 120)
@@ -265,7 +267,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         #endregion
 
-        void LateUpdate()
+        private void LateUpdate()
         {
             //OnGUIAppLauncherReady();
             if (_airSpeedGUI != null)
@@ -315,7 +317,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
         }
 
-        void MainFlightGUIWindow(int windowId)
+        private void MainFlightGUIWindow(int windowId)
         {
             GUILayout.BeginVertical(GUILayout.Height(100));
             GUILayout.BeginHorizontal();
@@ -345,13 +347,13 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GUI.DragWindow();
         }
 
-        void FlightDataWindow(int windowId)
+        private void FlightDataWindow(int windowId)
         {
             _flightDataGUI.DataDisplay();
             GUI.DragWindow();
         }
 
-        void SettingsWindow(int windowId)
+        private void SettingsWindow(int windowId)
         {
             GUILayout.Label(Localizer.Format("FARFlightSettingsLabel"));
             settingsWindow.GUIDropDownDisplay();
@@ -411,7 +413,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         }
         #endregion
 
-        void SaveConfigs()
+        private void SaveConfigs()
         {
             if (FARDebugAndSettings.config != null)
             {
@@ -422,7 +424,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
         }
 
-        void LoadConfigs()
+        private void LoadConfigs()
         {
             PluginConfiguration config = FARDebugAndSettings.config;
             mainGuiRect = config.GetValue("flight_mainGuiRect", new Rect());

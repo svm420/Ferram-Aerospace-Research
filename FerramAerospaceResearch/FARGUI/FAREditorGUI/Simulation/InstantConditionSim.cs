@@ -50,11 +50,11 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class InstantConditionSim
+    internal class InstantConditionSim
     {
-        List<FARAeroSection> _currentAeroSections;
-        List<FARAeroPartModule> _currentAeroModules;
-        List<FARWingAerodynamicModel> _wingAerodynamicModel;
+        private List<FARAeroSection> _currentAeroSections;
+        private List<FARAeroPartModule> _currentAeroModules;
+        private List<FARWingAerodynamicModel> _wingAerodynamicModel;
 
         public double _maxCrossSectionFromBody;
         public double _bodyLength;

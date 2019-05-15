@@ -51,22 +51,22 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
-    class PhysicsCalcs
+    internal class PhysicsCalcs
     {
-        NavBall _navball;
-        Vessel _vessel;
-        FARVesselAero _vesselAero;
+        private NavBall _navball;
+        private Vessel _vessel;
+        private FARVesselAero _vesselAero;
 
-        List<FARAeroPartModule> _currentAeroModules;
-        List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
+        private List<FARAeroPartModule> _currentAeroModules;
+        private List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
 
-        FARCenterQuery aeroForces = new FARCenterQuery();
-        int intakeAirId;
-        double intakeAirDensity = 1;
-        bool useWingArea;
-        double wingArea;
+        private FARCenterQuery aeroForces = new FARCenterQuery();
+        private int intakeAirId;
+        private double intakeAirDensity = 1;
+        private bool useWingArea;
+        private double wingArea;
 
-        VesselFlightInfo vesselInfo;
+        private VesselFlightInfo vesselInfo;
 
         public PhysicsCalcs(Vessel vessel, FARVesselAero vesselAerodynamics)
         {

@@ -47,7 +47,7 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
 {
-    static class GUIUtils
+    internal static class GUIUtils
     {
         public static Rect ClampToScreen(Rect window)
         {

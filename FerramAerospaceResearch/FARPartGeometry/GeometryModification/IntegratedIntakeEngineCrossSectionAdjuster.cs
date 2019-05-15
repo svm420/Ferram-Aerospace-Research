@@ -47,20 +47,20 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class IntegratedIntakeEngineCrossSectionAdjuster : ICrossSectionAdjuster
+    internal class IntegratedIntakeEngineCrossSectionAdjuster : ICrossSectionAdjuster
     {
-        const double INTAKE_AREA_SCALAR = 100;
+        private const double INTAKE_AREA_SCALAR = 100;
 
-        Vector3 vehicleBasisForwardVector;
-        double intakeArea;
-        int sign = 1;
+        private Vector3 vehicleBasisForwardVector;
+        private double intakeArea;
+        private int sign = 1;
 
-        Matrix4x4 thisToVesselMatrix;
-        Matrix4x4 meshLocalToWorld;
-        ModuleResourceIntake intakeModule;
-        Transform intakeTrans;
+        private Matrix4x4 thisToVesselMatrix;
+        private Matrix4x4 meshLocalToWorld;
+        private ModuleResourceIntake intakeModule;
+        private Transform intakeTrans;
 
-        Part part;
+        private Part part;
         public Part GetPart()
         {
             return part;

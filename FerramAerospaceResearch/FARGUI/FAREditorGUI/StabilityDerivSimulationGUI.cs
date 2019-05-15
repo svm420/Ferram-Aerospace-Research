@@ -52,14 +52,14 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class StabilityDerivSimulationGUI : IDisposable
+    internal class StabilityDerivSimulationGUI : IDisposable
     {
 
         private SimMode simMode = 0;
 
-        EditorSimManager simManager;
-        InitialConditions lonConditions, latConditions;
-        ferramGraph _graph = new ferramGraph(400, 200);
+        private EditorSimManager simManager;
+        private InitialConditions lonConditions, latConditions;
+        private ferramGraph _graph = new ferramGraph(400, 200);
 
         private enum SimMode
         {
@@ -312,7 +312,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _graph.Update();
         }
 
-        class InitialConditions
+        private class InitialConditions
         {
             public string[] inits;
             public string[] names;

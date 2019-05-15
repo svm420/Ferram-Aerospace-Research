@@ -47,7 +47,7 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
-    class VoxelChunk
+    internal class VoxelChunk
     {
         //private Part[] voxelPoints = null;
         //private float[] voxelSize = null;
@@ -55,10 +55,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private DebugVisualVoxel[, ,] visualVoxels;
         private HashSet<Part> overridingParts;
 
-        double _size;
-        Vector3d lowerCorner;
+        private double _size;
+
+        private Vector3d lowerCorner;
         //int iOffset, jOffset, kOffset;
-        int offset;
+        private int offset;
 
         public VoxelChunk(double size, Vector3d lowerCorner, int iOffset, int jOffset, int kOffset, HashSet<Part> overridingParts, bool usePartSize256)
         {
@@ -155,7 +156,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        void SetPart(Part p, int index, VoxelOrientationPlane plane, byte location)
+        private void SetPart(Part p, int index, VoxelOrientationPlane plane, byte location)
         {
             PartSizePair pair = voxelPoints[index];
 

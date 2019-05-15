@@ -74,22 +74,23 @@ namespace ferram4
         public const int ID_DECREASE_FLAP_DEFLECTION = 2;
         public const int ACTION_COUNT = 3;
 
-        static Vector2 scrollPos = Vector2.zero;
+        private static Vector2 scrollPos = Vector2.zero;
         // private lookup tables
-        static KSPActionGroup[] id2actionGroup = { KSPActionGroup.Brakes, KSPActionGroup.None, KSPActionGroup.None };
+        private static KSPActionGroup[] id2actionGroup = { KSPActionGroup.Brakes, KSPActionGroup.None, KSPActionGroup.None };
         // keys in the configuration file
-        static string[] configKeys = {  "actionGroupSpoiler",
+        private static string[] configKeys = {  "actionGroupSpoiler",
                                         "actionGroupIncreaseFlapDeflection",
                                         "actionGroupDecreaseFlapDeflection" };
         // for the gui
-        static string[] guiLabels = { Localizer.Format("FARActionSpoilers"),
+        private static string[] guiLabels = { Localizer.Format("FARActionSpoilers"),
                                       Localizer.Format("FARActionIncreaseFlap"),
                                       Localizer.Format("FARActionDecreaseFlap") };
-        static string[] currentGuiStrings = { id2actionGroup[0].ToString(),
+
+        private static string[] currentGuiStrings = { id2actionGroup[0].ToString(),
                                               id2actionGroup[1].ToString(),
                                               id2actionGroup[2].ToString() };
 
-        static GUIDropDown<KSPActionGroup>[] actionGroupDropDown;
+        private static GUIDropDown<KSPActionGroup>[] actionGroupDropDown;
 
         public static KSPActionGroup map(int id)
         {

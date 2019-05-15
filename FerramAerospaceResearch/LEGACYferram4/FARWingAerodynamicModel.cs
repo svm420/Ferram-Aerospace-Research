@@ -120,7 +120,7 @@ namespace ferram4
         private ArrowPointer liftArrow;
         private ArrowPointer dragArrow;
 
-        bool fieldsVisible;
+        private bool fieldsVisible;
 
         [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiFormat = "F3", guiUnits = "FARUnitKN")]
         public float dragForceWing;
@@ -156,8 +156,8 @@ namespace ferram4
 
         private Vector3d ParallelInPlaneLocal = Vector3d.zero;
 
-        FARWingInteraction wingInteraction;
-        FARAeroPartModule aeroModule;
+        private FARWingInteraction wingInteraction;
+        private FARAeroPartModule aeroModule;
 
         public short srfAttachNegative = 1;
 
@@ -175,7 +175,7 @@ namespace ferram4
         protected double NUFAR_totalExposedAreaFactor;
 
         public bool ready;
-        bool massScaleReady;
+        private bool massScaleReady;
 
         public void NUFAR_ClearExposedAreaFactor()
         {

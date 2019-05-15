@@ -68,14 +68,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public Vector3 totalWorldSpaceAeroForce;
 
-        Vector3 partLocalForce;
-        Vector3 partLocalTorque;
+        private Vector3 partLocalForce;
+        private Vector3 partLocalTorque;
 
         public float hackWaterDragVal;
         public static float waterSlowDragNew = -1;
         public static float minVelVesselMultNew;
 
-        ProjectedArea projectedArea;
+        private ProjectedArea projectedArea;
 
         private bool partStressOverride = false;
         private double partStressMaxY = double.MaxValue;
@@ -87,7 +87,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private ArrowPointer dragArrow;
         private ArrowPointer momentArrow;
 
-        bool fieldsVisible;
+        private bool fieldsVisible;
 
         [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiFormat = "F3", guiUnits = "FARUnitKN")]
         public float dragForce;
@@ -273,7 +273,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 data.kN -= vector.z;
         }
 
-        void Start()
+        private void Start()
         {
             if (waterSlowDragNew < 0)
             {

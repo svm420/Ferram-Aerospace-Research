@@ -31,7 +31,7 @@ namespace ferram4
 {
     public class ferramGraph : IDisposable
     {
-        class ferramGraphLine
+        private class ferramGraphLine
         {
             private Texture2D lineDisplay;
             private Texture2D lineLegend;

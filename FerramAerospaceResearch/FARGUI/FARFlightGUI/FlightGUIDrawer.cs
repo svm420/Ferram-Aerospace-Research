@@ -58,7 +58,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             get { return instance; }
         }
 
-        void Start()
+        private void Start()
         {
             if (CompatibilityChecker.IsAllCompatible() && instance == null)
                 instance = this;
@@ -79,7 +79,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 activeGUIs.Remove(Gui);
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             for(int i = 0 ; i < activeGUIs.Count; ++i)
             {

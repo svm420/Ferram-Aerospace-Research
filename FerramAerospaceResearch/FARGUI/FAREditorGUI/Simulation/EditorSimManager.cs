@@ -48,28 +48,29 @@ using FerramAerospaceResearch.FARAeroComponents;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class EditorSimManager
+    internal class EditorSimManager
     {
-        InstantConditionSim _instantCondition;
+        private InstantConditionSim _instantCondition;
 
-        StabilityDerivCalculator _stabDerivCalculator;
+        private StabilityDerivCalculator _stabDerivCalculator;
         public StabilityDerivCalculator StabDerivCalculator
         {
             get { return _stabDerivCalculator; }
         }
 
-        StabilityDerivLinearSim _stabDerivLinearSim;
+        private StabilityDerivLinearSim _stabDerivLinearSim;
         public StabilityDerivLinearSim StabDerivLinearSim
         {
             get { return _stabDerivLinearSim; }
         }
 
-        SweepSim _sweepSim;
+        private SweepSim _sweepSim;
         public SweepSim SweepSim
         {
             get { return _sweepSim; }
         }
-        EditorAeroCenter _aeroCenter;
+
+        private EditorAeroCenter _aeroCenter;
 
         public StabilityDerivOutput vehicleData;
 

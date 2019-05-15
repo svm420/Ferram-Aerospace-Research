@@ -47,7 +47,7 @@ using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class SimMatrix
+    internal class SimMatrix
     {
         private double[,] matrix;
         public int m;

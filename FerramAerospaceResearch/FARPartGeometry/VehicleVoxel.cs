@@ -54,39 +54,41 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class VehicleVoxel
     {
-        static int MAX_CHUNKS_IN_QUEUE = 4500;
-        const int MAX_SWEEP_PLANES_IN_QUEUE = 8;
-        static Stack<VoxelChunk> clearedChunks = new Stack<VoxelChunk>();
-        static Stack<SweepPlanePoint[,]> clearedPlanes;
+        private static int MAX_CHUNKS_IN_QUEUE = 4500;
+        private const int MAX_SWEEP_PLANES_IN_QUEUE = 8;
+        private static Stack<VoxelChunk> clearedChunks = new Stack<VoxelChunk>();
+        private static Stack<SweepPlanePoint[,]> clearedPlanes;
 
-        static int MAX_CHUNKS_ALLOWED;
-        static int chunksInUse;
+        private static int MAX_CHUNKS_ALLOWED;
+        private static int chunksInUse;
 
-        static double maxLocation = 255;
-        static byte maxLocationByte = 255;
-        static bool useHigherResVoxels;
+        private static double maxLocation = 255;
+        private static byte maxLocationByte = 255;
+        private static bool useHigherResVoxels;
 
-        double elementSize;
+        private double elementSize;
         public double ElementSize
         {
             get { return elementSize; }
         }
-        double invElementSize;
-        VoxelChunk[, , ] voxelChunks;
-        DebugVisualVoxelMeshController voxelMesh;
-        HashSet<Part> overridingParts;
-        HashSet<Part> ductingParts;
-        int xLength, yLength, zLength;
-        int xCellLength, yCellLength, zCellLength;
-        int threadsQueued;
-        object _locker = new object();
 
-        Vector3d lowerRightCorner;
+        private double invElementSize;
+        private VoxelChunk[, , ] voxelChunks;
+        private DebugVisualVoxelMeshController voxelMesh;
+        private HashSet<Part> overridingParts;
+        private HashSet<Part> ductingParts;
+        private int xLength, yLength, zLength;
+        private int xCellLength, yCellLength, zCellLength;
+        private int threadsQueued;
+        private object _locker = new object();
+
+        private Vector3d lowerRightCorner;
         public Vector3d LocalLowerRightCorner
         {
             get { return lowerRightCorner; }
         }
-        const double RC = 0.5;
+
+        private const double RC = 0.5;
 
         public VoxelCrossSection[] EmptyCrossSectionArray
         {

@@ -53,20 +53,20 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class StaticAnalysisGraphGUI : IDisposable
+    internal class StaticAnalysisGraphGUI : IDisposable
     {
-        ferramGraph _graph = new ferramGraph(400, 350);
+        private ferramGraph _graph = new ferramGraph(400, 350);
 
-        double lastMaxBounds, lastMinBounds;
-        bool isMachMode;
+        private double lastMaxBounds, lastMinBounds;
+        private bool isMachMode;
 
-        GraphInputs aoASweepInputs, machSweepInputs;
-        GUIDropDown<int> flapSettingDropdown;
-        GUIDropDown<CelestialBody> bodySettingDropdown;
-        EditorSimManager simManager;
+        private GraphInputs aoASweepInputs, machSweepInputs;
+        private GUIDropDown<int> flapSettingDropdown;
+        private GUIDropDown<CelestialBody> bodySettingDropdown;
+        private EditorSimManager simManager;
 
-        Vector3 upperAoAVec, lowerAoAVec;
-        float pingPongAoAFactor;
+        private Vector3 upperAoAVec, lowerAoAVec;
+        private float pingPongAoAFactor;
 
         public StaticAnalysisGraphGUI(EditorSimManager simManager, GUIDropDown<int> flapSettingDropDown, GUIDropDown<CelestialBody> bodySettingDropdown)
         {
@@ -123,7 +123,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //FARLogger.Info("" + velArrow.Direction);
         }
 
-        void SetAngleVectors(double lowerAoA, double upperAoA)
+        private void SetAngleVectors(double lowerAoA, double upperAoA)
         {
             lowerAoA *= FARMathUtil.deg2rad;
             upperAoA *= FARMathUtil.deg2rad;
@@ -325,7 +325,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 }
         }
 
-        class GraphInputs
+        private class GraphInputs
         {
             public string lowerBound;
             public string upperBound;

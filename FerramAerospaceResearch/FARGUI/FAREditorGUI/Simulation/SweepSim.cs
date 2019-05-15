@@ -46,9 +46,9 @@ using KSP.Localization;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class SweepSim
+    internal class SweepSim
     {
-        InstantConditionSim _instantCondition;
+        private InstantConditionSim _instantCondition;
 
         public SweepSim(InstantConditionSim instantConditionSim)
         {

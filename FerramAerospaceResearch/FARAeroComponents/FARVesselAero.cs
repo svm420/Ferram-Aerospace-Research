@@ -54,8 +54,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 {
     public class FARVesselAero : VesselModule
     {
-        FlightGUI _flightGUI;
-        int _voxelCount;
+        private FlightGUI _flightGUI;
+        private int _voxelCount;
 
         public double Length
         {
@@ -72,32 +72,33 @@ namespace FerramAerospaceResearch.FARAeroComponents
             get { return _vehicleAero.MaxCrossSectionArea; }
         }
 
-        double machNumber;
+        private double machNumber;
         public double MachNumber
         {
             get { return machNumber; }
         }
-        double reynoldsNumber;
+
+        private double reynoldsNumber;
         public double ReynoldsNumber
         {
             get { return reynoldsNumber; }
         }
 
-        List<GeometryPartModule> _currentGeoModules;
-        int geoModulesReady;
+        private List<GeometryPartModule> _currentGeoModules;
+        private int geoModulesReady;
 
-        List<FARAeroPartModule> _currentAeroModules;
-        List<FARAeroPartModule> _unusedAeroModules;
-        List<FARAeroSection> _currentAeroSections;
-        List<FARWingAerodynamicModel> _legacyWingModels;
+        private List<FARAeroPartModule> _currentAeroModules;
+        private List<FARAeroPartModule> _unusedAeroModules;
+        private List<FARAeroSection> _currentAeroSections;
+        private List<FARWingAerodynamicModel> _legacyWingModels;
 
-        int _updateRateLimiter = 20;
-        bool _updateQueued = true;
-        bool _recalcGeoModules;
-        bool setup;
+        private int _updateRateLimiter = 20;
+        private bool _updateQueued = true;
+        private bool _recalcGeoModules;
+        private bool setup;
 
-        VehicleAerodynamics _vehicleAero;
-        VesselIntakeRamDrag _vesselIntakeRamDrag;
+        private VehicleAerodynamics _vehicleAero;
+        private VesselIntakeRamDrag _vesselIntakeRamDrag;
 
         protected override void OnStart()
         {

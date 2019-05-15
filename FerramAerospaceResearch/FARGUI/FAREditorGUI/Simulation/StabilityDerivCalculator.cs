@@ -50,9 +50,9 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class StabilityDerivCalculator
+    internal class StabilityDerivCalculator
     {
-        InstantConditionSim _instantCondition;
+        private InstantConditionSim _instantCondition;
 
         public StabilityDerivCalculator(InstantConditionSim instantConditionSim)
         {

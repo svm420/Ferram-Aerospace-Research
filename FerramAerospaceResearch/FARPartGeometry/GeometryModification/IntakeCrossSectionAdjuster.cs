@@ -48,28 +48,28 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class IntakeCrossSectionAdjuster : ICrossSectionAdjuster
+    internal class IntakeCrossSectionAdjuster : ICrossSectionAdjuster
     {
-        const double INTAKE_AREA_SCALAR = 100;
+        private const double INTAKE_AREA_SCALAR = 100;
 
-        Vector3 vehicleBasisForwardVector;
-        double intakeArea;
-        int sign = 1;
+        private Vector3 vehicleBasisForwardVector;
+        private double intakeArea;
+        private int sign = 1;
 
-        Matrix4x4 thisToVesselMatrix;
-        Matrix4x4 meshLocalToWorld;
-        Transform intakeTrans;
-        ModuleResourceIntake intakeModule;
-        AttachNode node;
+        private Matrix4x4 thisToVesselMatrix;
+        private Matrix4x4 meshLocalToWorld;
+        private Transform intakeTrans;
+        private ModuleResourceIntake intakeModule;
+        private AttachNode node;
 
-        double nodeOffsetArea;      //used to handle intakes being on the side of fuselage parts
+        private double nodeOffsetArea;      //used to handle intakes being on the side of fuselage parts
 
         //ModuleResourceIntake intake;
         //public ModuleResourceIntake IntakeModule
         //{
         //    get { return intake; }
         //}
-        Part part;
+        private Part part;
         public Part GetPart()
         {
             return part;

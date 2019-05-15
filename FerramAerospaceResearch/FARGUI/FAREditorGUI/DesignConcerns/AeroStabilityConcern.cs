@@ -48,7 +48,7 @@ using PreFlightTests;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 {
-    class AeroStabilityConcern : DesignConcernBase
+    internal class AeroStabilityConcern : DesignConcernBase
     {
         private InstantConditionSim _instantSim;
         private InstantConditionSimInput _simInput;

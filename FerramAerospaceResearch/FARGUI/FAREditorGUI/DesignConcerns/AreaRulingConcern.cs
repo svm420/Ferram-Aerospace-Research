@@ -48,7 +48,7 @@ using PreFlightTests;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 {
-    class AreaRulingConcern : DesignConcernBase
+    internal class AreaRulingConcern : DesignConcernBase
     {
         private VehicleAerodynamics _vesselAero;
 

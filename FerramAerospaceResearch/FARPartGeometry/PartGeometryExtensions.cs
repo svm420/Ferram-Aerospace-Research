@@ -110,7 +110,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return bounds;
         }
 
-        static void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
+        private static void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
         {
             Vector3 boundPt = new Vector3 (center.x + extX, center.y + extY, center.z + extZ);
             boundPt = matrix.MultiplyPoint3x4(boundPt);

@@ -47,22 +47,23 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class AirbreathingEngineCrossSectonAdjuster : ICrossSectionAdjuster
+    internal class AirbreathingEngineCrossSectonAdjuster : ICrossSectionAdjuster
     {
-        Vector3 vehicleBasisForwardVector;
+        private Vector3 vehicleBasisForwardVector;
 
-        double exitArea;
-        int sign = 1;
+        private double exitArea;
+        private int sign = 1;
 
-        Matrix4x4 thisToVesselMatrix;
-        Matrix4x4 meshLocalToWorld;
+        private Matrix4x4 thisToVesselMatrix;
+        private Matrix4x4 meshLocalToWorld;
 
-        ModuleEngines engine;
+        private ModuleEngines engine;
         public ModuleEngines EngineModule
         {
             get { return engine; }
         }
-        Part part;
+
+        private Part part;
         public Part GetPart()
         {
             return part;

@@ -85,11 +85,11 @@ namespace FerramAerospaceResearch
             }
         }
 
-        static List<string> presetNames;
+        private static List<string> presetNames;
 
         public int currentIndex;
 
-        static FARSettingsScenarioModule instance;
+        private static FARSettingsScenarioModule instance;
         public static FARSettingsScenarioModule Instance
         {
             get
@@ -97,7 +97,8 @@ namespace FerramAerospaceResearch
                 return instance;
             }
         }
-        GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
+
+        private GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
 
         public static void MainMenuBuildDefaultScenarioModule()
         {
@@ -109,12 +110,12 @@ namespace FerramAerospaceResearch
         }
 
 
-        FARSettingsScenarioModule()
+        private FARSettingsScenarioModule()
         {
             instance = this;
         }
 
-        void Start()
+        private void Start()
         {
             if (!CompatibilityChecker.IsAllCompatible())
             {

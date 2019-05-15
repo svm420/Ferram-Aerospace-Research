@@ -1,6 +1,6 @@
 ﻿namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class StabilityDerivExportVariables
+    internal class StabilityDerivExportVariables
     {
         public double craftmass;
 
@@ -15,7 +15,7 @@
         public double siteffg; // local gravity corrected for speed
     }
 
-    class StabilityDerivExportOutput
+    internal class StabilityDerivExportOutput
     {
         public StabilityDerivOutput outputvals;
         public StabilityDerivExportVariables exportvals;

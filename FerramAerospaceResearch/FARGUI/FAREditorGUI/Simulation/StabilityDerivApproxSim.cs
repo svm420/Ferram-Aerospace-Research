@@ -47,9 +47,9 @@ using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class StabilityDerivLinearSim
+    internal class StabilityDerivLinearSim
     {
-        InstantConditionSim _instantCondition;
+        private InstantConditionSim _instantCondition;
 
         public StabilityDerivLinearSim(InstantConditionSim instantConditionSim)
         {

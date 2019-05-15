@@ -99,7 +99,8 @@ namespace FerramAerospaceResearch
         private int atmBodyIndex = 1;
 
         #region Unity MonoBehaviour messages
-        void Awake()
+
+        private void Awake()
         {
             cLTexture = new Texture2D(25, 15);
             cDTexture = new Texture2D(25, 15);
@@ -109,7 +110,7 @@ namespace FerramAerospaceResearch
             GameEvents.onGUIApplicationLauncherReady.Add(OnAppLauncherReadySetup);
         }
 
-        void Start()
+        private void Start()
         {
             if (!CompatibilityChecker.IsAllCompatible())
             {
@@ -126,7 +127,7 @@ namespace FerramAerospaceResearch
             debugMenu = false;
         }
 
-        void Update()
+        private void Update()
         {
             if (hasScenarioChanged)
             {
@@ -136,7 +137,7 @@ namespace FerramAerospaceResearch
         }
         #endregion Unity MonoBehaviour messages
 
-        void OnSceneChange(GameEvents.FromToAction<GameScenes,GameScenes> fromToScenes)
+        private void OnSceneChange(GameEvents.FromToAction<GameScenes,GameScenes> fromToScenes)
         {
             FARLogger.Info("check scene");
             if(fromToScenes.to == GameScenes.SPACECENTER)
@@ -159,7 +160,7 @@ namespace FerramAerospaceResearch
             }
         }
 
-        void OnAppLauncherReadySetup()
+        private void OnAppLauncherReadySetup()
         {
             OnGUIAppLauncherReady();
             GameEvents.onGUIApplicationLauncherReady.Remove(OnAppLauncherReadySetup);
@@ -168,12 +169,12 @@ namespace FerramAerospaceResearch
             Toggle += FlightGUI.onAppLaunchToggle;
         }
 
-        void ToggleGUI()
+        private void ToggleGUI()
         {
             Toggle();
         }
 
-        void OnGUIAppLauncherReady()
+        private void OnGUIAppLauncherReady()
         {
             FARLogger.Info("Adding Debug Button");
             FARDebugButtonStock = ApplicationLauncher.Instance.AddModApplication(
@@ -187,7 +188,7 @@ namespace FerramAerospaceResearch
                 FARAssets.TextureCache.IconLarge);
         }
 
-        void onAppLaunchToggle()
+        private void onAppLaunchToggle()
         {
             debugMenu = !debugMenu;
         }
@@ -604,7 +605,8 @@ namespace FerramAerospaceResearch
             GUIColors.Instance.SaveColors();
             config.save();
         }
-        void OnDestroy()
+
+        private void OnDestroy()
         {
             if (!CompatibilityChecker.IsAllCompatible())
                 return;

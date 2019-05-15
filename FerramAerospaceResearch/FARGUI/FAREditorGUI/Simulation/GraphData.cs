@@ -47,7 +47,7 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class GraphData
+	internal class GraphData
     {
         public double[] xValues;
         public List<double[]> yValues;

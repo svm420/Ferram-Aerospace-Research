@@ -44,7 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    struct InstantConditionSimOutput
+	internal struct InstantConditionSimOutput
     {
         public double Cl;
         public double Cd;

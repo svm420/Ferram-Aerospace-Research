@@ -121,26 +121,20 @@ namespace FerramAerospaceResearch.FARPartGeometry
             get { return _valid; }
         }
 
-        static int ignoreLayer0 = -1;
+        private static int ignoreLayer0 = -1;
 
         private float currentScaleFactor = 1;
 
-        [SerializeField]
-        bool forceUseColliders;
-        [SerializeField]
-        bool forceUseMeshes;
-        [SerializeField]
-        bool ignoreForMainAxis;
-        [SerializeField]
-        List<string> ignoredTransforms,
+        [SerializeField] private bool forceUseColliders;
+        [SerializeField] private bool forceUseMeshes;
+        [SerializeField] private bool ignoreForMainAxis;
+        [SerializeField] private List<string> ignoredTransforms,
         unignoredTransforms;
-        [SerializeField]
-        bool ignoreIfNoRenderer;
-        [SerializeField]
-        bool rebuildOnAnimation;
+        [SerializeField] private bool ignoreIfNoRenderer;
+        [SerializeField] private bool rebuildOnAnimation;
 
 #if DEBUG
-        class DebugInfoBuilder
+        private class DebugInfoBuilder
         {
             public List<string> meshes, colliders, noRenderer;
 
@@ -180,7 +174,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 FARLogger.Debug(sb.ToStringAndRelease());
             }
         }
-        DebugInfoBuilder m_debugInfo = new DebugInfoBuilder();
+
+        private DebugInfoBuilder m_debugInfo = new DebugInfoBuilder();
 #endif
 
         [Conditional("DEBUG")]
@@ -236,7 +231,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             unignoredTransforms = new List<string>();
         }
 
-        void Start()
+        private void Start()
         {
             destroyed = false;
 
@@ -251,7 +246,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             GetAnimations();
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             meshDataList = null;
             geometryUpdaters = null;
@@ -269,7 +264,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 ignoreLayer0 = LayerMask.NameToLayer("TransparentFX");
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
             if (ReadyToBuildMesh())                //waiting prevents changes in physics in flight or in predictions because the voxel switches to colliders rather than meshes
             {
@@ -285,7 +280,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             //FARLogger.Info("Geo PM: " + vessel.CoM + " " + Planetarium.GetUniversalTime());
         }
 
-        bool ReadyToBuildMesh()
+        private bool ReadyToBuildMesh()
         {
             bool returnVal = !_started && _sceneSetup;
 

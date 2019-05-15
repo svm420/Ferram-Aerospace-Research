@@ -50,22 +50,22 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class EditorAeroCenter
+    internal class EditorAeroCenter
     {
-        static EditorAeroCenter instance;
+        private static EditorAeroCenter instance;
         public static EditorAeroCenter Instance
         {
             get { return instance; }
         }
 
-        Vector3 vesselRootLocalAeroCenter;
+        private Vector3 vesselRootLocalAeroCenter;
         public static Vector3 VesselRootLocalAeroCenter
         {
             get { return instance.vesselRootLocalAeroCenter; }
         }
 
-        List<FARAeroPartModule> _currentAeroModules;
-        List<FARAeroSection> _currentAeroSections;
+        private List<FARAeroPartModule> _currentAeroModules;
+        private List<FARAeroSection> _currentAeroSections;
 
         public EditorAeroCenter()
         {
@@ -79,7 +79,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             UpdateAerodynamicCenter();
         }
 
-        void UpdateAerodynamicCenter()
+        private void UpdateAerodynamicCenter()
         {
             FARCenterQuery aeroSection, dummy;
             aeroSection = new FARCenterQuery();

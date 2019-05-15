@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 namespace FerramAerospaceResearch
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
-    class FARAssets : MonoBehaviour
+    internal class FARAssets : MonoBehaviour
     {
         private static readonly string assetBundleRootPath = Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
         private const string AssetBundleExtension = ".far";
@@ -164,7 +164,7 @@ namespace FerramAerospaceResearch
         public static FARShaderCache ShaderCache { get; private set; }
         public static FARTextureCache TextureCache { get; private set; }
 
-        void Start()
+        private void Start()
         {
             ShaderCache = new FARShaderCache("farshaders");
             TextureCache = new FARTextureCache();

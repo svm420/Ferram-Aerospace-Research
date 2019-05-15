@@ -49,11 +49,11 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
 {
-    class GUIColors
+    internal class GUIColors
     {
-        List<Color> colors;
+        private List<Color> colors;
 
-        static GUIColors _instance;
+        private static GUIColors _instance;
         public static GUIColors Instance
         {
             get
@@ -64,7 +64,7 @@ namespace FerramAerospaceResearch.FARGUI
             }
         }
 
-        GUIColors()
+        private GUIColors()
         {
             LoadColors();
         }

@@ -47,18 +47,18 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class RungeKutta4
+    internal class RungeKutta4
     {
 //        Vector4 a = new Vector4(0, 0.5f, 0.5f, 1);
-        Vector4 c = new Vector4(1f / 6, 1f / 3, 1f / 3, 1f / 6);
+private Vector4 c = new Vector4(1f / 6, 1f / 3, 1f / 3, 1f / 6);
 
 //        FARMatrix b = new FARMatrix(3, 4);
 
-        double dt;
-        double endTime;
-        double[] initCond;
+private double dt;
+private double endTime;
+private double[] initCond;
 
-        SimMatrix stateEquations;
+private SimMatrix stateEquations;
 
         public double[,] soln;
         public double[] time;

@@ -50,27 +50,27 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
-    class FARAeroSection
+    internal class FARAeroSection
     {
-        static FloatCurve crossFlowDragMachCurve;
-        static FloatCurve crossFlowDragReynoldsCurve;
+        private static FloatCurve crossFlowDragMachCurve;
+        private static FloatCurve crossFlowDragReynoldsCurve;
 
         public FARFloatCurve xForcePressureAoA0;
         public FARFloatCurve xForcePressureAoA180;
         public FARFloatCurve xForceSkinFriction;
-        float potentialFlowNormalForce;
-        float viscCrossflowDrag;
-        float flatnessRatio;
-        float invFlatnessRatio;
-        float hypersonicMomentForward;
-        float hypersonicMomentBackward;
-        float diameter;
+        private float potentialFlowNormalForce;
+        private float viscCrossflowDrag;
+        private float flatnessRatio;
+        private float invFlatnessRatio;
+        private float hypersonicMomentForward;
+        private float hypersonicMomentBackward;
+        private float diameter;
 
-        float mergeFactor;
-        Vector3 worldNormalVector;
+        private float mergeFactor;
+        private Vector3 worldNormalVector;
 
-        List<PartData> partData;
-        Dictionary<FARAeroPartModule, int> handledAeroModulesIndexDict;
+        private List<PartData> partData;
+        private Dictionary<FARAeroPartModule, int> handledAeroModulesIndexDict;
 
         public struct PartData
         {

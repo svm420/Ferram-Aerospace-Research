@@ -44,12 +44,12 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class CompoundPartGeoUpdater : IGeometryUpdater
+    internal class CompoundPartGeoUpdater : IGeometryUpdater
     {
-        CompoundPart part;
-        GeometryPartModule geoModule;
-        CompoundPart.AttachState lastAttachState;
-        Part lastTarget;
+        private CompoundPart part;
+        private GeometryPartModule geoModule;
+        private CompoundPart.AttachState lastAttachState;
+        private Part lastTarget;
 
         public CompoundPartGeoUpdater(CompoundPart part, GeometryPartModule geoModule)
         {

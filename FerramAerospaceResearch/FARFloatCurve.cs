@@ -3,9 +3,9 @@
 namespace FerramAerospaceResearch
 {
     //recyclable float curve
-    class FARFloatCurve
+    internal class FARFloatCurve
     {
-        struct CubicSection
+        private struct CubicSection
         {
             public double a, b, c, d;
             public double upperLim, lowerLim;
@@ -78,9 +78,9 @@ namespace FerramAerospaceResearch
             }
         }
 
-        Vector3d[] controlPoints;
-        CubicSection[] sections;
-        int centerIndex;
+        private Vector3d[] controlPoints;
+        private CubicSection[] sections;
+        private int centerIndex;
 
         private FARFloatCurve() { }
         public FARFloatCurve(int numControlPoints)

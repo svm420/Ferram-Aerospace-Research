@@ -47,9 +47,9 @@ using UnityEngine;
 namespace FerramAerospaceResearch
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
-    class FARKSPAddonMainMenuSetup : MonoBehaviour
+    internal class FARKSPAddonMainMenuSetup : MonoBehaviour
     {
-        void Start()
+	    private void Start()
         {
             FARSettingsScenarioModule.MainMenuBuildDefaultScenarioModule();
             enabled = false;

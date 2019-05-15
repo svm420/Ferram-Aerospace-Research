@@ -54,8 +54,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
     public class AirspeedSettingsGUI
     {
         public static bool allEnabled = true;
-        Vessel _vessel;
-        GUIStyle buttonStyle;
+        private Vessel _vessel;
+        private GUIStyle buttonStyle;
         public bool enabled
         {
             get;
@@ -101,11 +101,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightAirspeedKMH")
         };
 
-        SurfaceVelMode velMode = SurfaceVelMode.TAS;
-        SurfaceVelUnit unitMode = SurfaceVelUnit.M_S;
+        private SurfaceVelMode velMode = SurfaceVelMode.TAS;
+
+        private SurfaceVelUnit unitMode = SurfaceVelUnit.M_S;
         // DaMichel: cache the velocity display string for retrieval in GetVelocityDisplayString
-        string velString;
-        bool active; // Have we actually generated the string?
+        private string velString;
+        private bool active; // Have we actually generated the string?
 
         public void AirSpeedSettings()
         {
@@ -252,7 +253,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             node.AddValue("velTypeIndex", (int)velMode);
         }
 
-        void LoadSettings()
+        private void LoadSettings()
         {
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
 

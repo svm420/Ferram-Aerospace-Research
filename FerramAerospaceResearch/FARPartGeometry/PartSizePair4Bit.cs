@@ -46,12 +46,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class PartSizePair4Bit : PartSizePair
     {
-        const float AREA_SCALING = 1f / (15f * 15f * 15f);
-        const int LENGTH_OF_VOXEL = 15;
-        const byte UP_MASK = 0xF0;
-        const byte DOWN_MASK = 0x0F;
+        private const float AREA_SCALING = 1f / (15f * 15f * 15f);
+        private const int LENGTH_OF_VOXEL = 15;
+        private const byte UP_MASK = 0xF0;
+        private const byte DOWN_MASK = 0x0F;
 
-        byte xPlane, yPlane, zPlane;
+        private byte xPlane, yPlane, zPlane;
         //byte xPlaneDown, yPlaneDown, zPlaneDown;
 
         public override void Clear()

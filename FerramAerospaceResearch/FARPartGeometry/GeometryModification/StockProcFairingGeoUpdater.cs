@@ -50,12 +50,13 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class StockProcFairingGeoUpdater : IGeometryUpdater
+    internal class StockProcFairingGeoUpdater : IGeometryUpdater
     {
-        ModuleProceduralFairing fairing;
-        GeometryPartModule geoModule;
-        static Dictionary<Part, GeometryPartModule> validParts;
-        List<Bounds> prevPanelBounds;
+        private ModuleProceduralFairing fairing;
+        private GeometryPartModule geoModule;
+        private static Dictionary<Part, GeometryPartModule> validParts;
+
+        private List<Bounds> prevPanelBounds;
         //KFSMEvent deployEvent;
         //KFSMEvent breakEvent;
 
