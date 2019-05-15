@@ -399,6 +399,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 nRefVector = data.nRefVectorPartSpace;
 
                 Vector3 velLocal = forceContext.LocalVelocity(data);
+                // Rejects both negligable speed and invalid simulation cases
+                if (FARMathUtil.NearlyEqual(velLocal.sqrMagnitude, 0.0f)) 
+                {
+                    continue;
+                }
 
                 Vector3 angVelLocal = aeroModule.partLocalAngVel;
 
