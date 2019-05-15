@@ -12,6 +12,8 @@ using System;
 using System.Diagnostics;
 using System.Text;
 
+// ReSharper disable All
+
 namespace StringLeakTest
 {
 	public static class StringBuilderExtensions

@@ -28,6 +28,8 @@ using System.Reflection;
 using KSP.Localization;
 using UnityEngine;
 
+// ReSharper disable All
+
 /*-----------------------------------------*\
 |   SUBSTITUTE YOUR MOD'S NAMESPACE HERE.   |
 \*-----------------------------------------*/

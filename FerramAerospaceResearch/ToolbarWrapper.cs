@@ -30,6 +30,8 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
+// ReSharper disable All
+
 
 // TODO: Change to your plugin's namespace here.
 namespace FerramAerospaceResearch {
