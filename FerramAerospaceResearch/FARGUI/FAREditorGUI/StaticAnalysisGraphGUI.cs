@@ -44,6 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ferram4;
@@ -219,19 +220,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
                 lowerBound = double.Parse(input.lowerBound);
                 lowerBound = lowerBound.Clamp(-90, 90);
-                input.lowerBound = lowerBound.ToString();
+                input.lowerBound = lowerBound.ToString(CultureInfo.InvariantCulture);
 
                 upperBound = double.Parse(input.upperBound);
                 upperBound = upperBound.Clamp(lowerBound, 90);
-                input.upperBound = upperBound.ToString();
+                input.upperBound = upperBound.ToString(CultureInfo.InvariantCulture);
 
                 numPts = double.Parse(input.numPts);
                 numPts = Math.Ceiling(numPts);
-                input.numPts = numPts.ToString();
+                input.numPts = numPts.ToString(CultureInfo.InvariantCulture);
 
                 pitchSetting = double.Parse(input.pitchSetting);
                 pitchSetting = pitchSetting.Clamp(-1, 1);
-                input.pitchSetting = pitchSetting.ToString();
+                input.pitchSetting = pitchSetting.ToString(CultureInfo.InvariantCulture);
 
                 otherInput = double.Parse(input.otherInput);
 

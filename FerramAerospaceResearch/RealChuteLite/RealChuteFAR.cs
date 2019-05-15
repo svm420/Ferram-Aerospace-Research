@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using FerramAerospaceResearch.PartExtensions;
@@ -844,7 +845,7 @@ namespace FerramAerospaceResearch.RealChuteLite
 
             //Temperature info
             b = new StringBuilder();
-            b.AppendLine(Localizer.Format("RCLGUI11", (maxTemp + absoluteZero).ToString()));
+            b.AppendLine(Localizer.Format("RCLGUI11", (maxTemp + absoluteZero).ToString(CultureInfo.InvariantCulture)));
             b.AppendLine(Localizer.Format("RCLGUI12", Math.Round(chuteTemperature + absoluteZero, 1, MidpointRounding.AwayFromZero)));
             GUILayout.Label(b.ToString(), chuteTemperature / maxTemp > 0.85 ? RedLabel : GUI.skin.label);
 

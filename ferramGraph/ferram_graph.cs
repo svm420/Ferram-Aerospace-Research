@@ -24,6 +24,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -227,10 +228,10 @@ namespace ferram4
         public void SetBoundaries(Vector4d boundaries)
         {
             bounds = boundaries;
-            leftBound = bounds.x.ToString();
-            rightBound = bounds.y.ToString();
-            topBound = bounds.w.ToString();
-            bottomBound = bounds.z.ToString();
+            leftBound = bounds.x.ToString(CultureInfo.InvariantCulture);
+            rightBound = bounds.y.ToString(CultureInfo.InvariantCulture);
+            topBound = bounds.w.ToString(CultureInfo.InvariantCulture);
+            bottomBound = bounds.z.ToString(CultureInfo.InvariantCulture);
             foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
                 pair.Value.SetBoundaries(bounds);
         }
