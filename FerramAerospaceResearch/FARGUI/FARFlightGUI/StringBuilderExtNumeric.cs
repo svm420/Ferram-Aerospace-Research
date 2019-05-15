@@ -3,7 +3,7 @@
 // Date:	2017
 // Author:	Virindi, modified from original byu Gavin Pugh
 // Details:	Extension methods for the 'StringBuilder' standard .NET class, to allow garbage-free concatenation of
-//			a selection of simple numeric types.  
+//			a selection of simple numeric types.
 //
 // Copyright (c) Virindi 2017, modified from Gavin Pugh 2010 - Released under the zlib license: http://www.opensource.org/licenses/zlib-license.php
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,7 @@ namespace StringLeakTest
 {
 	public static class StringBuilderExtensions
 	{
-		// These digits are here in a static array to support hex with simple, easily-understandable code. 
+		// These digits are here in a static array to support hex with simple, easily-understandable code.
 		// Since A-Z don't sit next to 0-9 in the ascii table.
 		private static readonly char[]	ms_digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
@@ -271,7 +271,7 @@ namespace StringLeakTest
 			}
 			return string_builder;
 		}
-		
+
 		//! Convert a given float value to a string and concatenate onto the stringbuilder. Assumes five decimal places, and no padding.
 		public static StringBuilder Concat(this StringBuilder string_builder, float float_val)
 		{

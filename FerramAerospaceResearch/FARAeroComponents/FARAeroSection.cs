@@ -317,7 +317,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             /// The atmospheric density that the force is being simulated at
             /// </summary>
             private float atmDensity;
-            
+
             public SimulatedForceContext(Vector3 worldVel, FARCenterQuery center, float atmDensity)
             {
                 this.worldVel = worldVel;
@@ -374,7 +374,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
         #endregion
 
-        private void CalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, 
+        private void CalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag,
             IForceContext forceContext)
         {
             double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);      //this will be the same for each part, so why recalc it multiple times?
@@ -395,7 +395,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 velLocal = forceContext.LocalVelocity(data);
                 // Rejects both negligable speed and invalid simulation cases
-                if (velLocal.sqrMagnitude.NearlyEqual(0.0f)) 
+                if (velLocal.sqrMagnitude.NearlyEqual(0.0f))
                 {
                     continue;
                 }
@@ -514,7 +514,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 forceContext.ApplyForce(data, velLocal, forceVector, torqueVector);
             }
         }
-        
+
         private SimulatedForceContext simContext = new SimulatedForceContext(Vector3.zero, new FARCenterQuery(), 0.0f);
         public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, FARCenterQuery center)
         {

@@ -73,6 +73,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public double ballisticCoeff;
         public double termVelEst;
 
-        public double stallFraction; 
+        public double stallFraction;
     }
 }
