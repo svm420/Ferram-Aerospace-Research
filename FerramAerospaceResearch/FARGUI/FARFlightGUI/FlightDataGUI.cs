@@ -53,10 +53,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     internal class FlightDataGUI
     {
-        private bool[] activeFlightDataSections = new bool[9] { true, true, true, true, true, true, true, true, true };
-        private bool[] oldFlightDataSections = new bool[9] { false, false, false, false, false, false, false, false, false };
+        private bool[] activeFlightDataSections = { true, true, true, true, true, true, true, true, true };
+        private bool[] oldFlightDataSections = { false, false, false, false, false, false, false, false, false };
 
-        private string[] flightDataOptionLabels = new string[9]{
+        private string[] flightDataOptionLabels = {
             Localizer.Format("FARFlightDataOption0"),
             Localizer.Format("FARFlightDataOption1"),
             Localizer.Format("FARFlightDataOption2"),

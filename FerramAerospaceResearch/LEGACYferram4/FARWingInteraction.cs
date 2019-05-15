@@ -485,7 +485,7 @@ namespace ferram4
                             }
                         }
                         else
-                            colliders = new Collider[1] { p.collider };
+                            colliders = new[] { p.collider };
 
                         for (int l = 0; l < colliders.Length; l++)
                             if (h.collider == colliders[l] && h.distance > 0)

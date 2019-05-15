@@ -88,7 +88,7 @@ namespace FerramAerospaceResearch
                 {   //FIXME
                     //Fail silently because it's the only way to avoid issues with pWings
                     //Debug.LogException(e);
-                    colliders = new Collider[1] { part.collider };
+                    colliders = new[] { part.collider };
                 }
 
                 return colliders;
