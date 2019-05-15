@@ -344,8 +344,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             public void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector)
             {
-                if (pd.aeroModule.part == null || pd.aeroModule.part.partTransform == null)
-                    return;
                 var tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
                 var dynamicPressurekPa = tmp * atmDensity;
                 var dragFactor = dynamicPressurekPa * Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
