@@ -113,7 +113,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
 
             CalculateTotalAeroForce();
-            CalculateForceBreakdown(velVectorNorm, velVector);
+            CalculateForceBreakdown(velVectorNorm);
             CalculateVesselOrientation(velVectorNorm);
             CalculateEngineAndIntakeBasedParameters(vesselSpeed);
             CalculateBallisticCoefficientAndTermVel();
@@ -163,7 +163,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }*/
         }
 
-        private void CalculateForceBreakdown(Vector3d velVectorNorm, Vector3d velVector)
+        private void CalculateForceBreakdown(Vector3d velVectorNorm)
         {
             if (useWingArea)
                 vesselInfo.refArea = wingArea;

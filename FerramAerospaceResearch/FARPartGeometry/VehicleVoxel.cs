@@ -159,16 +159,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        public static VehicleVoxel CreateNewVoxel(List<Part> partList, List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded = true, bool solidify = true)
+        public static VehicleVoxel CreateNewVoxel(List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded = true, bool solidify = true)
         {
             VehicleVoxel newVoxel = new VehicleVoxel();
 
-            newVoxel.CreateVoxel(partList, geoModules, elementCount, multiThreaded, solidify);
+            newVoxel.CreateVoxel(geoModules, elementCount, multiThreaded, solidify);
 
             return newVoxel;
         }
 
-        private void CreateVoxel(List<Part> partList, List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded, bool solidify)
+        private void CreateVoxel(List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded, bool solidify)
         {
             Vector3d min = new Vector3d(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity);
             Vector3d max = new Vector3d(double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity);

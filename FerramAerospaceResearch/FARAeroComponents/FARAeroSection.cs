@@ -374,7 +374,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
         #endregion
 
-        private void CalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag,
+        private void CalculateAeroForces(
+            float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag,
             IForceContext forceContext)
         {
             double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);      //this will be the same for each part, so why recalc it multiple times?
@@ -519,13 +520,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, FARCenterQuery center)
         {
             simContext.UpdateSimulationContext(vel, center, atmDensity);
-            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);
+            CalculateAeroForces(machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);
         }
 
         private FlightForceContext flightContext = new FlightForceContext();
-        public void FlightCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
+        public void FlightCalculateAeroForces(float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
         {
-            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, flightContext);
+            CalculateAeroForces(machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, flightContext);
 
         }
 

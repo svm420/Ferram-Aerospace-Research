@@ -222,9 +222,9 @@ namespace ferram4
             }
             else
             {
-                forwardExposure = ExposureInChordDirection(out nearbyWingModulesForward, up, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
+                forwardExposure = ExposureInChordDirection(out nearbyWingModulesForward, up, VesselPartList, flt_b_2, flt_MAC, flt_MidChordSweep);
 
-                backwardExposure = ExposureInChordDirection(out nearbyWingModulesBackward, -up, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
+                backwardExposure = ExposureInChordDirection(out nearbyWingModulesBackward, -up, VesselPartList, flt_b_2, flt_MAC, flt_MidChordSweep);
 
                 leftwardExposure = ExposureInSpanDirection(out nearbyWingModulesLeftward, -right, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
 
@@ -380,7 +380,7 @@ namespace ferram4
         }
 
         #region StandardWingExposureDetection
-        private double ExposureInChordDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float TaperRatio, float MidChordSweep)
+        private double ExposureInChordDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float MidChordSweep)
         {
             Ray ray = new Ray();
             ray.direction = rayDirection;

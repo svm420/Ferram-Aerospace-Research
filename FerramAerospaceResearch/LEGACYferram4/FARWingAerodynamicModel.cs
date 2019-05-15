@@ -922,7 +922,7 @@ namespace ferram4
         #endregion
 
         //Calculates current stall fraction based on previous stall fraction and current data.
-        private void DetermineStall(double MachNumber, double AoA)
+        private void DetermineStall(double AoA)
         {
             double lastStall = stall;
             double effectiveUpstreamStall = wingInteraction.EffectiveUpstreamStall;
@@ -969,7 +969,7 @@ namespace ferram4
 
             double ACshift = 0, ACweight = 0;
             CalculateWingCamberInteractions(MachNumber, AoA, out ACshift, out ACweight);
-            DetermineStall(MachNumber, AoA);
+            DetermineStall(AoA);
 
             double beta = Math.Sqrt(MachNumber * MachNumber - 1);
             if (double.IsNaN(beta) || beta < 0.66332495807107996982298654733414)

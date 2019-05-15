@@ -425,7 +425,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 try
                 {
                     //Actually voxelize it
-                    _voxel = VehicleVoxel.CreateNewVoxel(_vehiclePartList, _currentGeoModules, _voxelCount);
+                    _voxel = VehicleVoxel.CreateNewVoxel(_currentGeoModules, _voxelCount);
                     if (_vehicleCrossSection.Length < _voxel.MaxArrayLength)
                         _vehicleCrossSection = _voxel.EmptyCrossSectionArray;
 
@@ -1107,7 +1107,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             GaussianSmoothCrossSections(_vehicleCrossSection, stdDevCutoff, FARSettingsScenarioModule.Settings.gaussianVehicleLengthFractionForSmoothing, _sectionThickness, _length, front, back, FARSettingsScenarioModule.Settings.numAreaSmoothingPasses + extraAreaSmoothingPasses, FARSettingsScenarioModule.Settings.numDerivSmoothingPasses + extraLowFinessRatioDerivSmoothingPasses);
 
-            CalculateSonicPressure(_vehicleCrossSection, front, back, _sectionThickness, _maxCrossSectionArea);
+            CalculateSonicPressure(_vehicleCrossSection, front, back, _sectionThickness);
 
             validSectionCount = numSections;
             firstSection = front;
@@ -1555,7 +1555,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         #region AreaRulingCalculations
 
-        private void CalculateSonicPressure(VoxelCrossSection[] vehicleCrossSection, int front, int back, double sectionThickness, double maxCrossSection)
+        private void CalculateSonicPressure(VoxelCrossSection[] vehicleCrossSection, int front, int back, double sectionThickness)
         {
             lock (_commonLocker)
                 if (vehicleCrossSection.Length > indexSqrt.Length + 1)

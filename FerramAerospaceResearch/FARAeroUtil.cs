@@ -422,7 +422,7 @@ namespace FerramAerospaceResearch
             get
             {
                 if (curEditorWingCache == null)
-                    curEditorWingCache = ListEditorWings(false);
+                    curEditorWingCache = ListEditorWings();
                 return curEditorWingCache;
             }
         }
@@ -488,7 +488,7 @@ namespace FerramAerospaceResearch
             return list;
         }
 
-        public static List<FARWingAerodynamicModel> ListEditorWings(bool include_selected)
+        public static List<FARWingAerodynamicModel> ListEditorWings()
         {
             List<Part> list = CurEditorParts;
 

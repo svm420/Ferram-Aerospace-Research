@@ -61,7 +61,7 @@ namespace FerramAerospaceResearch
 
             foreach (FARPartStressTemplate template in StressTemplates)
             {
-                node.AddNode(CreateAeroStressConfigNode(template, i));
+                node.AddNode(CreateAeroStressConfigNode(template));
                 i++;
             }
 
@@ -70,7 +70,7 @@ namespace FerramAerospaceResearch
             saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARAeroStress.cfg");
         }
 
-        private static ConfigNode CreateAeroStressConfigNode(FARPartStressTemplate template, int index)
+        private static ConfigNode CreateAeroStressConfigNode(FARPartStressTemplate template)
         {
             ConfigNode node = new ConfigNode("FARPartStressTemplate");
             node.AddValue("name", template.name);

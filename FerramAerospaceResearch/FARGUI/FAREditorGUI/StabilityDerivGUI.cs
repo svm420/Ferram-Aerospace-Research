@@ -118,14 +118,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(Localizer.Format("FAREditorStabDerivCalcButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(CalcAndExportEnum.CalculateOnly);
-            // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-            /*
-            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivSaveButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(CalcAndExportEnum.CalculateAndExport);
-            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivLoopButton"), GUILayout.Width(175.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(CalcAndExportEnum.LoopExport);
-             */
+                StabDerivCalcButtonAction();
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -226,9 +219,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             DrawTooltip();
         }
 
-        private enum CalcAndExportEnum { CalculateOnly, CalculateAndExport, LoopExport }
-
-        private void StabDerivCalcButtonAction(CalcAndExportEnum exportflag)
+        private void StabDerivCalcButtonAction()
         {
             CelestialBody body = _bodySettingDropdown.ActiveSelection;
             FARAeroUtil.UpdateCurrentActiveBody(body);
@@ -239,23 +230,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             int flapsettingInt = _flapSettingDropdown.ActiveSelection;
             bool spoilersDeployedBool = spoilersDeployed;
 
-            // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-            // if (exportflag == CalcAndExportEnum.LoopExport ...
-
             if (body.GetPressure(altitudeDouble) > 0)
             {
                 StabilityDerivExportOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool, 0, 0, 0);
-                // if (stabDerivResult.outputvals.stableAoAState == "")
-                // {
                 stabDerivOutput = stabDerivResult.outputvals;
                 simManager.vehicleData = stabDerivResult.outputvals;
                 SetAngleVectors(stabDerivResult.outputvals.stableAoA);
 
-                    // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-                    // if (exportflag == CalcAndExportEnum.CalculateAndExport ...
-                // }
-                // else
-                //     PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
             }
             else
                 PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);

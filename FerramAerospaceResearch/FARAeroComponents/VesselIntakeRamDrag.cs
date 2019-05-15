@@ -64,7 +64,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private List<Transform> _intakeTransforms = new List<Transform>();
         private List<ModuleEngines> _airBreathingEngines = new List<ModuleEngines>();
 
-        public void UpdateAeroData(List<FARAeroPartModule> allUsedAeroModules, List<FARAeroPartModule> allUnusedAeroModules)
+        public void UpdateAeroData(List<FARAeroPartModule> allUsedAeroModules)
         {
             _aeroModulesWithIntakes.Clear();
             _intakeModules.Clear();
@@ -136,10 +136,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
 
-        public void ApplyIntakeRamDrag(float machNumber, Vector3 vesselVelNorm, float dynPres)
+        public void ApplyIntakeRamDrag(float machNumber, Vector3 vesselVelNorm)
         {
             float currentRamDrag = CalculateRamDrag(machNumber);
-            ApplyIntakeDrag(currentRamDrag, vesselVelNorm, dynPres);
+            ApplyIntakeDrag(currentRamDrag, vesselVelNorm);
         }
 
         private float CalculateRamDrag(float machNumber)
@@ -165,7 +165,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return currentRamDrag;
         }
 
-        private void ApplyIntakeDrag(float currentRamDrag, Vector3 vesselVelNorm, float dynPres)
+        private void ApplyIntakeDrag(float currentRamDrag, Vector3 vesselVelNorm)
         {
             for (int i = _intakeTransforms.Count - 1; i >= 0; i--)
             {

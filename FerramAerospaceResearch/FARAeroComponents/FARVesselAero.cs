@@ -241,7 +241,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     //FARLogger.Info("" + a.part.partInfo.title + " unshielded, area: " + a.ProjectedAreas.totalArea);
                 }
 
-                _vesselIntakeRamDrag.UpdateAeroData(_currentAeroModules, _unusedAeroModules);
+                _vesselIntakeRamDrag.UpdateAeroData(_currentAeroModules);
             }
             if (FlightGlobals.ready && _currentAeroSections != null && vessel)
                 CalculateAndApplyVesselAeroProperties();
@@ -296,9 +296,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }*/
 
             for (int i = 0; i < _currentAeroSections.Count; i++)
-                _currentAeroSections[i].FlightCalculateAeroForces(atmDensity, (float)machNumber, (float)(reynoldsNumber / Length), pseudoKnudsenNumber, skinFrictionDragCoefficient);
+                _currentAeroSections[i].FlightCalculateAeroForces((float)machNumber, (float)(reynoldsNumber / Length), pseudoKnudsenNumber, skinFrictionDragCoefficient);
 
-            _vesselIntakeRamDrag.ApplyIntakeRamDrag((float)machNumber, vessel.srf_velocity.normalized, (float)vessel.dynamicPressurekPa);
+            _vesselIntakeRamDrag.ApplyIntakeRamDrag((float)machNumber, vessel.srf_velocity.normalized);
 
             for (int i = 0; i < _currentAeroModules.Count; i++)
             {

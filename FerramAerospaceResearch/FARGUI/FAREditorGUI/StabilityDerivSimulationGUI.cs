@@ -116,7 +116,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
-            _graph.Display(BackgroundStyle, 0, 0);
+            _graph.Display(0, 0);
             //graph.Display(GUILayout.Width(540), GUILayout.Height(300));
 
             DrawTooltip();

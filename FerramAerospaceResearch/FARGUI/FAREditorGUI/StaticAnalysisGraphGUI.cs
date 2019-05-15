@@ -171,7 +171,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(540));
 
-            _graph.Display(graphBackingStyle, 0, 0);
+            _graph.Display(0, 0);
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
@@ -289,7 +289,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
             for (int i = 0; i < data.yValues.Count; i++)
             {
-                AddZeroMarks(data.lineNames[i], data.xValues, data.yValues[i], upperBound - lowerBound, realMax - realMin, data.lineColors[i]);
+                AddZeroMarks(data.lineNames[i], data.xValues, data.yValues[i], realMax - realMin, data.lineColors[i]);
             }
 
             _graph.horizontalLabel = horizontalLabel;
@@ -297,7 +297,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _graph.Update();
         }
 
-        private void AddZeroMarks(String key, double[] x, double[] y, double xsize, double ysize, Color color)
+        private void AddZeroMarks(String key, double[] x, double[] y, double ysize, Color color)
         {
             int j = 0;
 
@@ -307,12 +307,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             {
                 if (Math.Sign(y[i]) == Math.Sign(y[i + 1]))
                     continue;
-
-                /*// Don't display if slope is good enough?..
-                float dx = Mathf.Abs(x[i+1]-x[i])*400/xsize;
-                float dy = Mathf.Abs(y[i+1]-y[i])*275/ysize;
-                if (dx <= 2*dy)
-                    continue;*/
 
                 double xv = x[i] + Math.Abs(y[i]) * (x[i + 1] - x[i]) / Math.Abs(y[i + 1] - y[i]);
                 double yv = ysize * 3 / 275;

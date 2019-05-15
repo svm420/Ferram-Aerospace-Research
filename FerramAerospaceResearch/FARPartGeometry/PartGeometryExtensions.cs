@@ -134,7 +134,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             TransformedPointBounds(matrix, center, -extents.x, +extents.y, +extents.z, ref lower, ref upper);
         }
 
-        public static Bounds GetPartColliderBoundsInBasis(this Part part, Matrix4x4 worldToBasisMatrix, int excessiveVerts = 2500)
+        public static Bounds GetPartColliderBoundsInBasis(this Part part, Matrix4x4 worldToBasisMatrix)
         {
             var transforms = part.FindModelComponents<Transform>();
             Bounds bounds = new Bounds();

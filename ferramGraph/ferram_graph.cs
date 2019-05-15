@@ -530,7 +530,7 @@ namespace ferram4
         /// <summary>
         /// This displays the graph
         /// </summary>
-        public void Display(GUIStyle AreaStyle, int horizontalBorder, int verticalBorder)
+        public void Display(int horizontalBorder, int verticalBorder)
         {
             ScrollView = GUILayout.BeginScrollView(ScrollView, false, false);
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
