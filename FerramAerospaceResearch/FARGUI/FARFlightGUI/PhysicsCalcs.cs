@@ -61,7 +61,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         List<FARAeroPartModule> _currentAeroModules;
         List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
 
-        Vector3 totalAeroForceVector;
+        FARCenterQuery aeroForces = new FARCenterQuery();
         int intakeAirId;
         double intakeAirDensity = 1;
         bool useWingArea;
@@ -124,7 +124,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void CalculateTotalAeroForce()
         {
-            totalAeroForceVector = Vector3.zero;
+            aeroForces.ClearAll();
+
 
             if (_vessel.dynamicPressurekPa <= 0.00001)
                 return;
@@ -134,17 +135,26 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 for (int i = 0; i < _currentAeroModules.Count; i++)
                 {
                     FARAeroPartModule m = _currentAeroModules[i];
-                    if ((object)m != null)
-                        totalAeroForceVector += m.totalWorldSpaceAeroForce;
+                    if ((object)m != null) {
+                        aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
+                        aeroForces.AddTorque(m.worldSpaceTorque);
+                    }   
                 }
             }
 
-            /*for (int i = 0; i < _LEGACY_currentWingAeroModel.Count; i++)
+            /*
+            for (int i = 0; i < _LEGACY_currentWingAeroModel.Count; i++)
             {
                 FARWingAerodynamicModel w = _LEGACY_currentWingAeroModel[i];
-                if ((object)w != null)
-                    totalAeroForceVector += w.worldSpaceForce;
-            }*/
+                if ((object)w == null)
+                    continue;
+                totalAeroForceVector += w.worldSpaceForce;
+                aeroForces.AddForce(w.AerodynamicCenter, w.worldSpaceForce);
+
+                totalAeroForceVector += w.worldSpaceForce;
+                totalAeroTorqueVector += Vector3.Cross(w.AerodynamicCenter - _vessel.CoM, w.worldSpaceForce);
+            }
+            */
 
             /*for(int i = 0; i < _vessel.parts.Count; i++)
             {
@@ -171,10 +181,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 vesselInfo.liftToDragRatio = 0;
                 return;
             }
+            
+            var com_frc = aeroForces.force;
+            var com_trq = aeroForces.TorqueAt(_vessel.CoM);
 
-            vesselInfo.dragForce = -Vector3d.Dot(totalAeroForceVector, velVectorNorm);     //reverse along vel normal will be drag
+            vesselInfo.aerodynamicForce = com_frc;
+            vesselInfo.aerodynamicTorque = com_trq;
+            vesselInfo.dragForce = -Vector3d.Dot(com_frc, velVectorNorm);     //reverse along vel normal will be drag
 
-            Vector3d remainderVector = totalAeroForceVector + velVectorNorm * vesselInfo.dragForce;
+            Vector3d remainderVector = com_frc + velVectorNorm * vesselInfo.dragForce;
 
             vesselInfo.liftForce = -Vector3d.Dot(remainderVector, _vessel.ReferenceTransform.forward);     //forward points down for the vessel, so reverse along that will be lift
             vesselInfo.sideForce = Vector3d.Dot(remainderVector, _vessel.ReferenceTransform.right);        //and the side force

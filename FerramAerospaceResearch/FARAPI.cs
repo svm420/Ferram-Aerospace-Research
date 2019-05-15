@@ -382,6 +382,43 @@ namespace FerramAerospaceResearch
             return false;
         }
 
+        /// <summary>
+        /// Returns the current aerodynamic force being experienced by the vehicle in world space
+        /// </summary>
+        /// <param name="v">The vessel that force is being queried</param>
+        /// <returns>The force on the vessel in world space</returns>
+        public static Vector3 VesselAerodynamicForce(Vessel v)
+        {
+            return VesselFlightInfo(v)?.InfoParameters.aerodynamicForce ?? Vector3.zero;
+        }
+
+        /// <summary>
+        /// Returns the current aerodynamic torque being experienced by the vehicle in world space
+        /// </summary>
+        /// <param name="v">The vessel that force is being queried</param>
+        /// <returns>The torque on the vessel in world space</returns>
+        public static Vector3 VesselAerodynamicTorque(Vessel v)
+        {
+            return VesselFlightInfo(v)?.InfoParameters.aerodynamicTorque ?? Vector3.zero;
+        }
+
+        /// <summary>
+        /// Returns the current aerodynamic force being experienced by the active vehicle in world space
+        /// </summary>
+        /// <returns>The force on the vessel in world space</returns>
+        public static Vector3 ActiveVesselAerodynamicForce()
+        {
+            return VesselAerodynamicForce(FlightGlobals.ActiveVessel);
+        }
+
+        /// <summary>
+        /// Returns the current aerodynamic torque being experienced by the active vehicle in world space
+        /// </summary>
+        /// <returns>The torque on the vessel in world space</returns>
+        public static Vector3 ActiveVesselAerodynamicTorque()
+        {
+            return VesselAerodynamicTorque(FlightGlobals.ActiveVessel);
+        }
         #endregion
 
         #region AeroPredictions
