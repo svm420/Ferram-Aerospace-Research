@@ -175,7 +175,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             int i = 0;
             int j = 0;
             int num = 0;
-            double[] Derivs = new double[27];
 
             for (int k = 0; k < vehicleData.stabDerivs.Length; k++)
             {

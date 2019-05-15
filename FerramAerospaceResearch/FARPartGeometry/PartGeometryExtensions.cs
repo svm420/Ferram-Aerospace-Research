@@ -87,7 +87,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (mf != null)
                 {
                     m = mf.sharedMesh;
-                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
                     if ((t.gameObject.layer == ignoreLayers))
                         m = null;
                 }

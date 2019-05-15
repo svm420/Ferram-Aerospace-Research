@@ -137,7 +137,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     if ((object)m != null) {
                         aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
                         aeroForces.AddTorque(m.worldSpaceTorque);
-                    }   
+                    }
                 }
             }
 
@@ -180,7 +180,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 vesselInfo.liftToDragRatio = 0;
                 return;
             }
-            
+
             var com_frc = aeroForces.force;
             var com_trq = aeroForces.TorqueAt(_vessel.CoM);
 
@@ -253,7 +253,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             double airAvailableVol = 0;
 
             double invDeltaTime = 1 / TimeWarp.fixedDeltaTime;
-            PartResourceLibrary resLibrary = PartResourceLibrary.Instance;
 
 
             List<Part> partsList = _vessel.Parts;

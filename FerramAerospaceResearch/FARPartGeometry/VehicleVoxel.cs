@@ -543,20 +543,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 sectionThickness *= y * invMag;
 
-                double xNorm, yNorm, zNorm;
-                xNorm = plane.x * invMag;
-                yNorm = plane.y * invMag;
-                zNorm = plane.z * invMag;
-
-                double yAbsNorm = Math.Abs(yNorm);
-
-                int xSectArrayLength = (int)(xCellLength * yAbsNorm + yCellLength * Math.Abs(xNorm) + 1);
-                //Stack allocation of array allows removal of garbage collection issues
-
-                //bool* sectionArray = stackalloc bool[xSectArrayLength * (int)(zCellLength * yAbsNorm + yCellLength * Math.Abs(zNorm) + 1)];
-
-                //bool[,] sectionRepresentation = new bool[(int)Math.Ceiling(xCellLength * Math.Abs(yNorm) + yCellLength * Math.Abs(xNorm)), (int)Math.Ceiling(zCellLength * Math.Abs(yNorm) + yCellLength * Math.Abs(zNorm))];
-
                 double invYPlane = 1 / plane.y;
 
                 plane.x *= invYPlane;
@@ -814,20 +800,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 sectionThickness *= x * invMag;
 
-                double xNorm, yNorm, zNorm;
-                xNorm = plane.x * invMag;
-                yNorm = plane.y * invMag;
-                zNorm = plane.z * invMag;
-
-                double xAbsNorm = Math.Abs(xNorm);
-
                 double i_xx = 0, i_xy = 0, i_yy = 0;
-
-                int ySectArrayLength = (int)(xCellLength * Math.Abs(yNorm) + yCellLength * xAbsNorm + 1);
-                //Stack allocation of array allows removal of garbage collection issues
-                //bool* sectionArray = stackalloc bool[ySectArrayLength * (int)(zCellLength * xAbsNorm + xCellLength * Math.Abs(zNorm) + 1)];
-
-                //bool[,] sectionRepresentation = new bool[(int)Math.Ceiling(xCellLength * Math.Abs(yNorm) + yCellLength * Math.Abs(xNorm)), (int)Math.Ceiling(zCellLength * Math.Abs(xNorm) + xCellLength * Math.Abs(zNorm))];
 
                 double invXPlane = 1 / plane.x;
 
@@ -1085,20 +1058,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 sectionThickness *= z * invMag;
 
-                double xNorm, yNorm, zNorm;
-                xNorm = plane.x * invMag;
-                yNorm = plane.y * invMag;
-                zNorm = plane.z * invMag;
-
-                double zAbsNorm = Math.Abs(zNorm);
-
                 double i_xx = 0, i_xy = 0, i_yy = 0;
-
-                int xSectArrayLength = (int)(xCellLength * zAbsNorm + zCellLength * Math.Abs(xNorm) + 1);
-                //Stack allocation of array allows removal of garbage collection issues
-                //bool* sectionArray = stackalloc bool[xSectArrayLength * (int)(yCellLength * zAbsNorm + zCellLength * Math.Abs(yNorm) + 1)];
-
-                //bool[,] sectionRepresentation = new bool[(int)Math.Ceiling(xCellLength * Math.Abs(zNorm) + zCellLength * Math.Abs(xNorm)), (int)Math.Ceiling(yCellLength * Math.Abs(zNorm) + zCellLength * Math.Abs(yNorm))];
 
                 double invZPlane = 1 / plane.z;
 

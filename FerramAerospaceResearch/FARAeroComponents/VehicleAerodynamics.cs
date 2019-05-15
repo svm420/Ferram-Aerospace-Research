@@ -1501,7 +1501,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             _newUnusedAeroModules.Clear();
 
-            var existingParts = new bool[_currentGeoModules.Count];
             VoxelizationThreadpool.Instance.RunOnMainThread(() =>
             {
                 for (int i = 0; i < _currentGeoModules.Count; i++)

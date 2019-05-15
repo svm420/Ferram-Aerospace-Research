@@ -65,7 +65,6 @@ namespace ferram4
 
             public void InputData(double[] xValues, double[] yValues)
             {
-                int elements = xValues.Length;
                 rawDataX = xValues.replaceNaNs(0, "xValues");
                 rawDataY = yValues.replaceNaNs(0, "yValues");
                 ConvertRawToPixels(false);
@@ -313,8 +312,6 @@ namespace ferram4
             {
                 for (int j = 0; j < graph.height; j++)
                 {
-
-                    Color grid = new Color(0.42f, 0.35f, 0.11f, 1);
                     if (i - horizontalAxis == 0 || j - verticalAxis == 0)
                         graph.SetPixel(i, j, axisColor);
                     else if ((i - horizontalAxis) % widthSize == 0 || (j - verticalAxis) % heightSize == 0)
@@ -605,7 +602,6 @@ namespace ferram4
             }
             GUILayout.EndVertical();
 
-            int rightofarea = (int)displayRect.width + 2 * horizontalBorder + 30;
             int bottomofarea = (int)displayRect.height + 2 * verticalBorder + 30;
 
             GUILayout.Space(bottomofarea);
