@@ -48,6 +48,7 @@ using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using KSP.UI.Screens.Flight;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
@@ -207,7 +208,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private void GetNavball()
         {
             if (HighLogic.LoadedSceneIsFlight)
-                _navball = GameObject.FindObjectOfType<NavBall>();
+                _navball = Object.FindObjectOfType<NavBall>();
         }
 
         private void CalculateVesselOrientation(Vector3d velVectorNorm)

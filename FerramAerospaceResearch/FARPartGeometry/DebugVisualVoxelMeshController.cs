@@ -45,6 +45,7 @@ using System.Collections.Generic;
 using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
@@ -154,7 +155,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
             {
-                MonoBehaviour.Destroy(submesh);
+                Object.Destroy(submesh);
             }
         }
 

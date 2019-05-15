@@ -46,6 +46,7 @@ using System;
 using System.Collections.Generic;
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
@@ -119,21 +120,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         public void Cleanup()
         {
             if (_areaRenderer)
-                GameObject.Destroy(_areaRenderer.gameObject);
+                Object.Destroy(_areaRenderer.gameObject);
             if (_derivRenderer)
-                GameObject.Destroy(_derivRenderer.gameObject);
+                Object.Destroy(_derivRenderer.gameObject);
             if (_coeffRenderer)
-                GameObject.Destroy(_coeffRenderer.gameObject);
+                Object.Destroy(_coeffRenderer.gameObject);
             if (_markingRenderers != null)
                 for (int i = 0; i < _markingRenderers.Count; i++)
                 {
                     if (_markingRenderers[i])
-                        GameObject.Destroy(_markingRenderers[i].gameObject);
+                        Object.Destroy(_markingRenderers[i].gameObject);
                 }
 
             _markingRenderers = null;
 
-            GameObject.Destroy(_rendererMaterial);
+            Object.Destroy(_rendererMaterial);
             _rendererMaterial = null;
         }
 

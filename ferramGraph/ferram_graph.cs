@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ferram4
 {
@@ -168,8 +169,8 @@ namespace ferram4
 
             public void ClearTextures()
             {
-                GameObject.Destroy(lineLegend);
-                GameObject.Destroy(lineDisplay);
+                Object.Destroy(lineLegend);
+                Object.Destroy(lineDisplay);
                 lineDisplay = null;
                 lineLegend = null;
             }
