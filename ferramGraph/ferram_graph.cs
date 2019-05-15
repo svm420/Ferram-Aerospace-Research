@@ -177,7 +177,7 @@ namespace ferram4
 
 
         protected Texture2D graph;
-        protected Rect displayRect = new Rect(0, 0, 0, 0);
+        protected Rect displayRect;
 
         private Dictionary<string, ferramGraphLine> allLines = new Dictionary<string, ferramGraphLine>();
 
