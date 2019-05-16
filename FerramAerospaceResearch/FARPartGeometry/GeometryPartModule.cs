@@ -175,14 +175,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private DebugInfoBuilder m_debugInfo = new DebugInfoBuilder();
+        private DebugInfoBuilder debugInfo = new DebugInfoBuilder();
 #endif
 
         [Conditional("DEBUG")]
         private void DebugAddMesh(Transform t)
         {
 #if DEBUG
-            m_debugInfo.meshes.Add(t.name);
+            debugInfo.meshes.Add(t.name);
 #endif
         }
 
@@ -190,7 +190,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void DebugAddCollider(Transform t)
         {
 #if DEBUG
-            m_debugInfo.colliders.Add(t.name);
+            debugInfo.colliders.Add(t.name);
 #endif
         }
 
@@ -198,7 +198,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void DebugAddNoRenderer(Transform t)
         {
 #if DEBUG
-            m_debugInfo.noRenderer.Add(t.name);
+            debugInfo.noRenderer.Add(t.name);
 #endif
         }
 
@@ -206,7 +206,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void DebugClear()
         {
 #if DEBUG
-            m_debugInfo.Clear();
+            debugInfo.Clear();
 #endif
         }
 
@@ -214,7 +214,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void DebugPrint()
         {
 #if DEBUG
-            m_debugInfo.Print(part);
+            debugInfo.Print(part);
 #endif
         }
 

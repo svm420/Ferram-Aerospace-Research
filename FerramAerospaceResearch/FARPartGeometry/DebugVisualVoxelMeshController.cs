@@ -51,27 +51,27 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class DebugVisualVoxelMeshController : IDisposable
     {
-        // limit of verts in each mesh imposed by Unity
-        public const int MAX_VERTS_PER_SUBMESH = 65000;
-        public const int MAX_VOXELS_PER_SUBMESH = MAX_VERTS_PER_SUBMESH / 4;
-        private List<DebugVisualVoxel> m_debugVoxels = new List<DebugVisualVoxel>();
-        private List<DebugVisualVoxelSubmesh> m_submeshes = new List<DebugVisualVoxelSubmesh>();
-        private bool m_active;
+        // limit of vertices in each mesh imposed by Unity
+        public const int MaxVerticesPerSubmesh = 65000;
+        public const int MaxVoxelsPerSubmesh = MaxVerticesPerSubmesh / 4;
+        private List<DebugVisualVoxel> debugVoxels = new List<DebugVisualVoxel>();
+        private List<DebugVisualVoxelSubmesh> submeshes = new List<DebugVisualVoxelSubmesh>();
+        private bool active;
 
         public DebugVisualVoxelMeshController(Transform parent = null)
         {
             Parent = parent;
         }
 
-        public bool active
+        public bool Active
         {
             // ReSharper disable once UnusedMember.Global
-            get => m_active;
+            get => active;
             set
             {
-                if (m_active != value)
+                if (active != value)
                 {
-                    m_active = value;
+                    active = value;
                     QueueMainThreadTask(UpdateActive);
                 }
             }
@@ -79,16 +79,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         internal List<DebugVisualVoxel> DebugVoxels
         {
-            get => m_debugVoxels;
+            get => debugVoxels;
         }
         public Transform Parent { get; }
 
         private void UpdateActive()
         {
-            foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
+            foreach (DebugVisualVoxelSubmesh submesh in submeshes)
             {
                 if (submesh != null)
-                    submesh.active = m_active;
+                    submesh.Active = active;
             }
         }
 
@@ -96,17 +96,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             FARLogger.Info("Rebuilding visual voxel mesh...");
             Clear();
-            int submeshes = m_debugVoxels.Count / MAX_VOXELS_PER_SUBMESH + 1;
-            FARLogger.Info("Voxel mesh contains " + m_debugVoxels.Count + " voxels in " + submeshes + " submeshes");
-            SetupSubmeshes(submeshes);
-            int indexOffset = 0;
-            for (int i = 0; i < submeshes; i++)
+            int meshes = debugVoxels.Count / MaxVoxelsPerSubmesh + 1;
+            FARLogger.Info("Voxel mesh contains " + debugVoxels.Count + " voxels in " + meshes + " submeshes");
+            SetupSubmeshes(meshes);
+            for (int i = 0; i < meshes; i++)
             {
-                for (int j = i * MAX_VOXELS_PER_SUBMESH; j < Math.Min((i + 1) * MAX_VOXELS_PER_SUBMESH, m_debugVoxels.Count); j++)
+                for (int j = i * MaxVoxelsPerSubmesh; j < Math.Min((i + 1) * MaxVoxelsPerSubmesh, debugVoxels.Count); j++)
                 {
-                    m_debugVoxels[j].AddToMesh(m_submeshes[i].Vertices, m_submeshes[i].Uvs, m_submeshes[i].Triangles, indexOffset);
+                    debugVoxels[j].AddToMesh(submeshes[i].Vertices, submeshes[i].Uvs, submeshes[i].Triangles);
                 }
-                m_submeshes[i].Rebuild();
+                submeshes[i].Rebuild();
             }
             FARLogger.Info("Finished rebuilding visual voxel mesh.");
         }
@@ -118,21 +117,21 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public void Clear(bool clearVoxels = false)
         {
-            foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
+            foreach (DebugVisualVoxelSubmesh submesh in submeshes)
             {
                 submesh.Clear();
             }
             if (clearVoxels)
             {
-                m_debugVoxels.Clear();
+                debugVoxels.Clear();
             }
         }
 
-        private void SetupSubmeshes(int submeshes)
+        private void SetupSubmeshes(int meshes)
         {
-            for (int i = m_submeshes.Count; i < submeshes; i++)
+            for (int i = submeshes.Count; i < meshes; i++)
             {
-                m_submeshes.Add(DebugVisualVoxelSubmesh.Create(Parent, m_active));
+                submeshes.Add(DebugVisualVoxelSubmesh.Create(Parent, active));
             }
         }
 
@@ -143,7 +142,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void DisposeSafe()
         {
-            foreach (DebugVisualVoxelSubmesh submesh in m_submeshes)
+            foreach (DebugVisualVoxelSubmesh submesh in submeshes)
             {
                 Object.Destroy(submesh);
             }

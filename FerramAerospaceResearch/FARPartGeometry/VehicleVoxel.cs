@@ -276,7 +276,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private VehicleVoxel()
         {
             voxelMesh = new DebugVisualVoxelMeshController();
-            voxelMesh.active = false;
+            voxelMesh.Active = false;
         }
 
         /*public VehicleVoxel(List<Part> partList, List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded = true, bool solidify = true)
@@ -1445,7 +1445,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public void ClearVisualVoxels()
         {
             FARLogger.Debug("Clearing visual voxels");
-            voxelMesh.active = false;
+            voxelMesh.Active = false;
             for (int i = 0; i < xLength; i++)
             {
                 for (int j = 0; j < yLength; j++)
@@ -1473,7 +1473,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
             }
             voxelMesh.RebuildSafe();
-            voxelMesh.active = true;
+            voxelMesh.Active = true;
         }
         #endregion
 

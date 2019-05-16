@@ -50,7 +50,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
     [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer))]
     public class DebugVisualVoxelSubmesh : MonoBehaviour
     {
-        private MeshFilter m_meshFilter;
+        private MeshFilter meshFilter;
 
         public static DebugVisualVoxelSubmesh Create(Transform parent = null, bool active = true)
         {
@@ -62,7 +62,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return component;
         }
 
-        public bool active
+        public bool Active
         {
             // ReSharper disable once UnusedMember.Global
             get => gameObject.activeSelf;
@@ -86,16 +86,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             FARLogger.Debug("Setting up debug voxel submesh");
             Mesh = new Mesh();
-            m_meshFilter = GetComponent<MeshFilter>();
+            meshFilter = GetComponent<MeshFilter>();
             MeshRenderer = GetComponent<MeshRenderer>();
 
-            m_meshFilter.mesh = Mesh;
+            meshFilter.mesh = Mesh;
             MeshRenderer.material = FARAssets.ShaderCache.DebugVoxels.Material;
             MeshRenderer.material.mainTexture = FARAssets.TextureCache.VoxelTexture;
-            setupMeshRenderer();
+            SetupMeshRenderer();
         }
 
-        private void setupMeshRenderer()
+        private void SetupMeshRenderer()
         {
             MeshRenderer.lightProbeUsage = LightProbeUsage.Off;
             MeshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
