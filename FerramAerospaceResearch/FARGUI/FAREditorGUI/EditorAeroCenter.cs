@@ -85,7 +85,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             aeroSection = new FARCenterQuery();
             dummy = new FARCenterQuery();
 
-            if((object)EditorLogic.RootPart == null)
+            if(EditorLogic.RootPart is null)
                 return;
 
             Vector3 vel_base, vel_fuzz;

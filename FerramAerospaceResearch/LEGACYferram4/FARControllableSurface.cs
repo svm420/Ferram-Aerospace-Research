@@ -329,11 +329,11 @@ namespace ferram4
             if (justStarted)
                 CalculateSurfaceFunctions();
 
-            if (HighLogic.LoadedSceneIsFlight && (object)part != null && (object)vessel != null)
+            if (HighLogic.LoadedSceneIsFlight && !(part is null) && !(vessel is null))
             {
                 bool process = part.isControllable || (justStarted && isFlap);
 
-                if (process && (object)MovableSection != null && part.Rigidbody)
+                if (process && !(MovableSection is null) && part.Rigidbody)
                 {
                     // Set member vars for desired AoA
                     if (isSpoiler)
@@ -374,7 +374,7 @@ namespace ferram4
 
         public void CalculateSurfaceFunctions()
         {
-            if (HighLogic.LoadedSceneIsEditor && (!FlightGlobals.ready || (object)vessel == null || (object)part.partTransform == null))
+            if (HighLogic.LoadedSceneIsEditor && (!FlightGlobals.ready || vessel is null || part.partTransform is null))
                 return;
 
             // use caching to improve performance since all vector properties call into native code
@@ -467,7 +467,7 @@ namespace ferram4
         private void AoAOffsetFromControl()
         {
             AoAdesiredControl = 0;
-            if ((object)vessel != null && vessel.atmDensity > 0)
+            if (!(vessel is null) && vessel.atmDensity > 0)
             {
                 if (!pitchaxis.NearlyEqual(0))
                 {

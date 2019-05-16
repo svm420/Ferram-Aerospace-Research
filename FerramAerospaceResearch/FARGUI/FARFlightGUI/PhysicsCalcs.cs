@@ -92,7 +92,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             for (int i = 0; i < legacyWingModels.Count; i++)
             {
                 FARWingAerodynamicModel w = legacyWingModels[i];
-                if ((object)w != null)
+                if (!(w is null))
                 {
                     useWingArea = true;
                     wingArea += w.S;
@@ -135,7 +135,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 for (int i = 0; i < _currentAeroModules.Count; i++)
                 {
                     FARAeroPartModule m = _currentAeroModules[i];
-                    if ((object)m != null) {
+                    if (!(m is null)) {
                         aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
                         aeroForces.AddTorque(m.worldSpaceTorque);
                     }
@@ -146,7 +146,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             for (int i = 0; i < _LEGACY_currentWingAeroModel.Count; i++)
             {
                 FARWingAerodynamicModel w = _LEGACY_currentWingAeroModel[i];
-                if ((object)w == null)
+                if (w is null)
                     continue;
                 totalAeroForceVector += w.worldSpaceForce;
                 aeroForces.AddForce(w.AerodynamicCenter, w.worldSpaceForce);

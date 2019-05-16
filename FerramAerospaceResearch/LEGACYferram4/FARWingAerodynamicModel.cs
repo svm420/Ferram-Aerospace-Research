@@ -551,7 +551,7 @@ namespace ferram4
         public virtual void FixedUpdate()
         {
             // With unity objects, "foo" or "foo != null" calls a method to check if
-            // it's destroyed. (object)foo != null just checks if it is actually null.
+            // it's destroyed. !(foo is null) just checks if it is actually null.
             if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready && !isShielded)
             {
                 Rigidbody rb = part.Rigidbody;
@@ -694,12 +694,12 @@ namespace ferram4
                 {
                     Cl = Cd = Cm = stall = 0;
                 }
-                if ((object)liftArrow != null)
+                if (!(liftArrow is null))
                 {
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
-                if ((object)dragArrow != null)
+                if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
                     dragArrow = null;
@@ -822,7 +822,7 @@ namespace ferram4
 
         public void OnWingDetach()
         {
-            if ((object)parentWing != null)
+            if (!(parentWing is null))
                 parentWing.updateMassNextFrame = true;
 
         }
@@ -830,7 +830,7 @@ namespace ferram4
         private void UpdateMassToAccountForArea()
         {
             float supportedArea = (float)(refAreaChildren + S);
-            if ((object)parentWing != null)
+            if (!(parentWing is null))
                 supportedArea *= 0.66666667f;   //if any supported area has been transfered to another part, we must remove it from here
             curWingMass = supportedArea * (float)FARAeroUtil.massPerWingAreaSupported * massMultiplier;
 
@@ -847,14 +847,14 @@ namespace ferram4
             {
                 Part p = part.children[i];
                 FARWingAerodynamicModel childWing = p.GetComponent<FARWingAerodynamicModel>();
-                if ((object)childWing == null)
+                if (childWing is null)
                     continue;
 
                 refAreaChildren += (childWing.refAreaChildren + childWing.S) * 0.33333333333333333333;//Take 1/3 of the area of the child wings
                 //refAreaChildren += childWing.refAreaChildren + childWing.S;
             }
 
-            if ((object)parentWing != null)
+            if (!(parentWing is null))
             {
                 parentWing.GetRefAreaChildren();
                 parentWing.UpdateMassToAccountForArea();
@@ -1522,12 +1522,12 @@ namespace ferram4
             }
             else
             {
-                if ((object)liftArrow != null)
+                if (!(liftArrow is null))
                 {
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
-                if ((object)dragArrow != null)
+                if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
                     dragArrow = null;

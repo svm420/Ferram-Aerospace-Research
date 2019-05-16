@@ -221,17 +221,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     Fields["liftForce"].guiActive = false;
                     fieldsVisible = false;
                 }
-                if ((object)liftArrow != null)
+                if (!(liftArrow is null))
                 {
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
-                if ((object)dragArrow != null)
+                if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
                     dragArrow = null;
                 }
-                if ((object)momentArrow != null)
+                if (!(momentArrow is null))
                 {
                     Destroy(momentArrow);
                     momentArrow = null;
@@ -554,7 +554,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void UpdateVelocityAndAngVelocity(Vector3 frameVel)
         {
-            if ((object)partTransform == null)
+            if (partTransform is null)
                 if (part != null)
                     partTransform = part.partTransform;
                 else
@@ -702,17 +702,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
             else
             {
-                if ((object)liftArrow != null)
+                if (!(liftArrow is null))
                 {
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
-                if ((object)dragArrow != null)
+                if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
                     dragArrow = null;
                 }
-                if ((object)momentArrow != null)
+                if (!(momentArrow is null))
                 {
                     Destroy(momentArrow);
                     momentArrow = null;

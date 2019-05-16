@@ -144,7 +144,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 p.bodyLiftScalar = 0;*/
 
                 GeometryPartModule g = p.GetComponent<GeometryPartModule>();
-                if ((object)g != null)
+                if (!(g is null))
                 {
                     _currentGeoModules.Add(g);
                     if (g.Ready)
@@ -219,7 +219,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 _vehicleAero.GetNewAeroData(out _currentAeroModules, out _unusedAeroModules, out _currentAeroSections, out _legacyWingModels);
 
-                if ((object)_flightGUI == null)
+                if (_flightGUI is null)
                     _flightGUI = vessel.GetComponent<FlightGUI>();
 
                 _flightGUI.UpdateAeroModules(_currentAeroModules, _legacyWingModels);
@@ -351,7 +351,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 for (int i = 0; i < _legacyWingModels.Count; i++)
                 {
                     FARWingAerodynamicModel curWing = _legacyWingModels[i];
-                    if ((object)curWing != null)
+                    if (!(curWing is null))
                         center.AddForce(curWing.transform.position, curWing.PrecomputeCenterOfLift(velocityWorldVector, machNumber, density, dummy));
                 }
             }
@@ -451,7 +451,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                  {
                      Part p = vessel.Parts[i];
                      GeometryPartModule g = p.Modules.GetModule<GeometryPartModule>();
-                     if ((object)g != null)
+                     if (!(g is null))
                      {
                          _currentGeoModules.Add(g);
                          if (g.Ready)

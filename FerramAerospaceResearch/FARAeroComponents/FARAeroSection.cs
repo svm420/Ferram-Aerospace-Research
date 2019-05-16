@@ -386,7 +386,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 PartData data = partData[i];
                 FARAeroPartModule aeroModule = data.aeroModule;
-                if ((object)aeroModule == null)
+                if (aeroModule is null)
                 {
                     continue;
                 }

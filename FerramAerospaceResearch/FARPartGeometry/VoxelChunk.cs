@@ -163,7 +163,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Part currentPart = pair.part;
             //if we update the plane location with this, then we can consider replacing the part here.  Otherwise, we don't
             bool largerThanLast = pair.SetPlaneLocation(plane, location);
-            if ((object)currentPart == null || overridingParts.Contains(p) || (largerThanLast && !overridingParts.Contains(currentPart)))
+            if (currentPart is null || overridingParts.Contains(p) || (largerThanLast && !overridingParts.Contains(currentPart)))
                 pair.part = p;
 
         }

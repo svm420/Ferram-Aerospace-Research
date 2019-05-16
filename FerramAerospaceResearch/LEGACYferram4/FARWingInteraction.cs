@@ -475,7 +475,7 @@ namespace ferram4
 
                         Collider[] colliders;
 
-                        if ((object)farModule != null)
+                        if (!(farModule is null))
                         {
                             colliders = farModule.PartColliders;
                             if (colliders == null)

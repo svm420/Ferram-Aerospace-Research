@@ -790,7 +790,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (!part.Modules.Contains<ModuleProceduralFairing>() && !part.Modules.Contains<ModuleAsteroid>())
                 {
                     Transform prefabTransform = part.partInfo.partPrefab.FindModelTransform(t.gameObject.name);
-                    if ((object)prefabTransform != null && prefabTransform.gameObject.layer == ignoreLayer0)
+                    if (!(prefabTransform is null) && prefabTransform.gameObject.layer == ignoreLayer0)
                     {
                         return null;
                     }

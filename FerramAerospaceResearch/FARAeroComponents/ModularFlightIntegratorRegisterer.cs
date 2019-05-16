@@ -162,7 +162,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
             //double dragCubeExposed = fi.BaseFICalculateAreaExposed(part);
-            if ((object)aeroModule != null)
+            if (!(aeroModule is null))
             {
                 double radArea = aeroModule.ProjectedAreas.totalArea;
 
@@ -186,7 +186,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private double CalculateAreaExposed(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
-            if ((object)aeroModule != null)
+            if (!(aeroModule is null))
             {
                 double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
 
@@ -211,7 +211,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (ptd.part.Modules.Contains<FARAeroPartModule>())
                 module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
-            if ((object)module != null)
+            if (!(module is null))
             {
                 double sunArea = module.ProjectedAreaWorld(fi.sunVector) * ptd.sunAreaMultiplier;
 
@@ -229,7 +229,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (ptd.part.Modules.Contains<FARAeroPartModule>())
                 module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
-            if ((object)module != null)
+            if (!(module is null))
             {
                 double bodyArea = module.ProjectedAreaWorld(-fi.Vessel.upAxis) * ptd.bodyAreaMultiplier;
 

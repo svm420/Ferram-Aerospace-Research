@@ -71,7 +71,7 @@ namespace FerramAerospaceResearch
         {
             get
             {
-                if ((object)currentBody == null)
+                if (currentBody is null)
                 {
                     if (FlightGlobals.Bodies[1] || !FlightGlobals.ActiveVessel)
                         currentBody = FlightGlobals.Bodies[1];
@@ -497,7 +497,7 @@ namespace FerramAerospaceResearch
             {
                 Part p = list[i];
                 FARWingAerodynamicModel wing = p.GetComponent<FARWingAerodynamicModel>();
-                if ((object)wing != null)
+                if (!(wing is null))
                     wings.Add(wing);
             }
             return wings;
@@ -680,7 +680,7 @@ namespace FerramAerospaceResearch
 
         public static void UpdateCurrentActiveBody(CelestialBody body)
         {
-            if ((object)body != null && body.flightGlobalsIndex != prevBodyIndex)
+            if (!(body is null) && body.flightGlobalsIndex != prevBodyIndex)
             {
                 UpdateCurrentActiveBody(body.flightGlobalsIndex, body);
             }

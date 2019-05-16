@@ -180,7 +180,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 GeometryPartModule m = geoModules[i];
 
-                if ((object)m != null)
+                if (!(m is null))
                 {
                     bool cont = true;
                     while (!m.Ready)
@@ -293,7 +293,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 GeometryPartModule m = geoModules[i];
 
-                if ((object)m != null)
+                if (!(m is null))
                 {
                     bool cont = true;
                     while (!m.Ready)
@@ -383,7 +383,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private bool CheckPartForOverridingPartList(GeometryPartModule g)
         {
-            if ((object)g.part == null)
+            if (g.part is null)
                 return false;
 
             PartModuleList modules = g.part.Modules;
@@ -2517,7 +2517,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     if (pt == null) //If there is a section of voxel there, but no pt, add a new voxel shell pt to the sweep plane
                     {
-                        if ((object)p != null)
+                        if (!(p is null))
                         {
                             pt = new SweepPlanePoint(p, i, k);
                             pt.jLastInactive = j;
@@ -2526,7 +2526,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                     else
                     {
-                        if ((object)p == null) //If there is a pt there, but no part listed, this is an interior pt or the cross-section is shrinking
+                        if (p is null) //If there is a pt there, but no part listed, this is an interior pt or the cross-section is shrinking
                         {
                             if (pt.mark == SweepPlanePoint.MarkingType.VoxelShell) //label it as active so that it can be determined if it is interior or not once all the points have been updated
                             {

@@ -1073,7 +1073,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             }
             float tmpPartMass = TotalMass;
             massDelta = 0;
-            if (part.partInfo != null && (object)part.partInfo.partPrefab != null)
+            if (part.partInfo != null && !(part.partInfo.partPrefab is null))
             {
                 massDelta = tmpPartMass - part.partInfo.partPrefab.mass;
             }
@@ -1163,7 +1163,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             //Info in the editor part window
             float tmpPartMass = TotalMass;
             massDelta = 0;
-            if (part.partInfo != null && (object)part.partInfo.partPrefab != null)
+            if (part.partInfo != null && !(part.partInfo.partPrefab is null))
             {
                 massDelta = tmpPartMass - part.partInfo.partPrefab.mass;
             }
