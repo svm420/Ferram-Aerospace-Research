@@ -568,8 +568,9 @@ namespace ferram4
         /// </summary>
         /// <param name="thisWingAoA">AoA of this wing in rad</param>
         /// <param name="thisWingMachNumber">Mach Number of this wing in rad</param>
-        /// <param name="ACWeight">Weighting value for applying ACshift</param>
-        /// <param name="ACShift">Value used to shift the wing AC due to interactive effects</param>
+        /// <param name="parallelInPlaneLocal">Local coordinate system (right, forward, ..)</param>
+        /// <param name="ACweight">Weighting value for applying ACshift</param>
+        /// <param name="ACshift">Value used to shift the wing AC due to interactive effects</param>
         /// <param name="ClIncrementFromRear">Increase in Cl due to this</param>
         /// <returns></returns>
         public void CalculateEffectsOfUpstreamWing(double thisWingAoA, double thisWingMachNumber, Vector3d parallelInPlaneLocal,

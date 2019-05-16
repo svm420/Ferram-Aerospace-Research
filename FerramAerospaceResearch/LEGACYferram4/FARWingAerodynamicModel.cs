@@ -52,14 +52,14 @@ using KSP.Localization;
 using TweakScale;
 using UnityEngine;
 
-/// <summary>
-/// This calculates the lift and drag on a wing in the atmosphere
-///
-/// It uses Prandtl lifting line theory to calculate the basic lift and drag coefficients and includes compressibility corrections for subsonic and supersonic flows; transsonic regime has placeholder
-/// </summary>
 
 namespace ferram4
 {
+    /// <summary>
+    /// This calculates the lift and drag on a wing in the atmosphere
+    ///
+    /// It uses Prandtl lifting line theory to calculate the basic lift and drag coefficients and includes compressibility corrections for subsonic and supersonic flows; transsonic regime has placeholder
+    /// </summary>
     public class FARWingAerodynamicModel : FARBaseAerodynamics, IRescalable<FARWingAerodynamicModel>, IPartMassModifier
     {
         public double rawAoAmax = 15;

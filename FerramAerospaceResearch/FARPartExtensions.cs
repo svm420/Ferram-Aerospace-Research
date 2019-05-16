@@ -140,6 +140,7 @@ namespace FerramAerospaceResearch
             /// <summary>
             /// Initiates an animation for later use
             /// </summary>
+            /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation</param>
             public static void InitiateAnimation(this Part part, string animationName)
             {
@@ -157,6 +158,7 @@ namespace FerramAerospaceResearch
             /// <summary>
             /// Plays an animation at a given speed
             /// </summary>
+            /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation</param>
             /// <param name="animationSpeed">Speed to play the animation at</param>
             public static void PlayAnimation(this Part part, string animationName, float animationSpeed)
@@ -174,6 +176,7 @@ namespace FerramAerospaceResearch
             /// <summary>
             /// Skips directly to the given time of the animation
             /// </summary>
+            /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation to skip to</param>
             /// <param name="animationSpeed">Speed of the animation after the skip</param>
             /// <param name="animationTime">Normalized time skip</param>
