@@ -54,7 +54,7 @@ namespace FerramAerospaceResearch
 {
     public static class FARAPI
     {
-        public static FARVersion Version { get; } = new FARVersion(); 
+        public static FARVersion Version { get; } = new FARVersion();
 
         #region CurrentFlightInfo
 
@@ -407,7 +407,7 @@ namespace FerramAerospaceResearch
 
             if (vesselAero == null)
             {
-                FARLogger.Error("API Error: vessel does not have FARVesselAero aerocomponent for simulation");
+                FARLogger.Error($"API Error: vessel {vessel} does not have FARVesselAero aerocomponent for simulation");
                 return;
             }
 
