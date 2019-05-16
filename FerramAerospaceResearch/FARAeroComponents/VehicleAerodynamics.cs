@@ -1720,6 +1720,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return cP;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private double CalculateCpNoseDiscont(int index, double noseAreaSlope, double sectionThickness)
         {
             double cP_noseDiscont = index * sectionThickness * Math.PI;
@@ -1862,6 +1863,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return -drag;        //force is negative
         }
 
+        // ReSharper disable once UnusedMember.Local
         private double CalcAllTransonicWaveDrag(VoxelCrossSection[] sections, int front, int numSections, double sectionThickness)
         {
             double drag = 0;
@@ -1887,6 +1889,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return drag;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private double CalculateTransonicWaveDrag(int i, int index, int numSections, int front, double sectionThickness, double cutoff)
         {
             double currentSectAreaCrossSection = MathClampAbs(_vehicleCrossSection[index].secondAreaDeriv, cutoff);
@@ -2018,20 +2021,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (value > abs)
                 return abs;
             return value;
-        }
-
-        private struct CrossSectionAdjustData
-        {
-            public double activeAreaRemoved;
-            public int lastIndex;
-            public int counter;
-
-            public CrossSectionAdjustData(double activeAreaRemoved, int lastIndex)
-            {
-                this.activeAreaRemoved = activeAreaRemoved;
-                this.lastIndex = lastIndex;
-                counter = 0;
-            }
         }
     }
 }

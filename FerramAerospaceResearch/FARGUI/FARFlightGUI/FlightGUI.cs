@@ -233,6 +233,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         }
 
         //Receives a message from any FARWingAerodynamicModel or FARAeroPartModule that has failed to update the GUI
+        // ReSharper disable once UnusedMember.Local
         private void AerodynamicFailureStatus()
         {
             if(_flightStatusGUI != null)

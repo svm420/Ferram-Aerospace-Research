@@ -53,8 +53,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public Bounds bounds;
         public bool isSkinned;
 
-        private MeshData() { }
-
         public MeshData(Vector3[] vertices, int[] tris, Bounds bounds, bool isSkinned = false)
         {
             this.vertices = vertices;

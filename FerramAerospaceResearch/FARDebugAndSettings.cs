@@ -73,6 +73,7 @@ namespace FerramAerospaceResearch
         private Texture2D cMTexture;
         private Texture2D l_DTexture;
 
+        // ReSharper disable once UnusedMember.Local -> AtmComposition
         private enum MenuTab
         {
             DebugAndData,

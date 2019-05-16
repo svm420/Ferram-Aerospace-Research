@@ -56,13 +56,11 @@ namespace FerramAerospaceResearch
         public static void SaveCustomStressTemplates()
         {
             ConfigNode node = new ConfigNode("@FARAeroStress[default]:FOR[FerramAerospaceResearch]");
-            int i = 0;
             node.AddNode(new ConfigNode("!FARPartStressTemplate,*"));
 
             foreach (FARPartStressTemplate template in StressTemplates)
             {
                 node.AddNode(CreateAeroStressConfigNode(template));
-                i++;
             }
 
             ConfigNode saveNode = new ConfigNode();

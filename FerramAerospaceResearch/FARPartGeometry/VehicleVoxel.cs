@@ -187,9 +187,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         Thread.SpinWait(5);
 
-                        bool test = false;
+                        bool test;
                         if (VoxelizationThreadpool.RunInMainThread)
-                            test = (object)m == null || m.destroyed;
+                            test = m.destroyed;
                         else
                             test = m == null;
 
@@ -1513,6 +1513,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         //Use when guaranteed that you will not attempt to write to the same section simultaneously
+        // ReSharper disable once UnusedMember.Local
         private void SetVoxelPointPartOnlyNoLock(int i, int j, int k, Part part)
         {
             int iSec, jSec, kSec;
@@ -1619,6 +1620,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             section.SetVoxelPointGlobalIndex(i + j * 8 + k * 64, part, location, plane);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private VoxelChunk GetVoxelChunk(int i, int j, int k)
         {
             int iSec, jSec, kSec;
@@ -1675,6 +1677,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return section.GetVoxelPartGlobalIndex(i + j * 8 + k * 64);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private Part GetPartAtVoxelPos(int i, int j, int k, ref VoxelChunk section)
         {
             return section.GetVoxelPartGlobalIndex(i + j * 8 + k * 64);
@@ -1775,6 +1778,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void CalculateVoxelShellFromTinyMesh(Vector3 minMesh, Vector3 maxMesh, Part part)
         {
             int lowerI, lowerJ, lowerK;
@@ -2388,6 +2392,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
 
+        // ReSharper disable once UnusedMember.Local
         private Vector4d CalculateEquationOfPlane(Vector3d pt1, Vector3d pt2, Vector3d pt3)
         {
             Vector3d p1p2 = pt2 - pt1;
@@ -2402,6 +2407,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return result;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private Vector4d TransformPlaneToIndices(Vector4d plane)
         {
             Vector4d newPlane = new Vector4d();
@@ -2468,12 +2474,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         SolidifyLoop(j, j + 1, plane, activePts, inactiveInteriorPts, neighboringSweepPlanePts);
                     }
-
-                //Cleanup
-                //sweepPlane = null;
-                activePts = null;
-                inactiveInteriorPts = null;
-                neighboringSweepPlanePts = null;
             }
             catch (Exception e)
             {

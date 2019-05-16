@@ -74,7 +74,6 @@ namespace ferram4
         public const int ID_DECREASE_FLAP_DEFLECTION = 2;
         public const int ACTION_COUNT = 3;
 
-        private static Vector2 scrollPos = Vector2.zero;
         // private lookup tables
         private static KSPActionGroup[] id2actionGroup = { KSPActionGroup.Brakes, KSPActionGroup.None, KSPActionGroup.None };
         // keys in the configuration file
@@ -168,34 +167,9 @@ namespace ferram4
             {
                 actionGroupDropDown[i].GUIDropDownDisplay(GUILayout.Width(150));
                 id2actionGroup[i] = actionGroupDropDown[i].ActiveSelection;
-                /*                GUILayout.BeginHorizontal();
-                                currentGuiStrings[i] = GUILayout.TextField(currentGuiStrings[i], GUILayout.Width(150));
-                                bool ok = false;
-                                try
-                                {
-                                    id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), currentGuiStrings[i]);
-                                    ok = true;
-                                    //FARLogger.Info(String.Format("Set AG {0} to {1}", guiLabels[i], id2actionGroup[i]));
-                                }
-                                catch   //FIXME with a dropdown list
-                                {
-                                }
-                                GUILayout.Label(ok ? " Ok" : " Invalid", GUILayout.Width(50));
-                                GUILayout.EndHorizontal();*/
             }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal(); // end of columns
-/*            GUILayout.BeginHorizontal(); // list admissible entries for ease of use. Unity has no comboboxes, so this has to do for now ...
-            GUILayout.Label("Admissible Entries ", label);
-            string[] names = Enum.GetNames(typeof(KSPActionGroup));
-            var sb = new System.Text.StringBuilder(256);
-            for (int i = 0; i < names.Length; ++i)
-            {
-                sb.Append(names[i]);
-                if (i < names.Length - 1) sb.Append(',');
-            }
-            GUILayout.Label(sb.ToString());
-            GUILayout.EndHorizontal();*/
         }
     }
 }

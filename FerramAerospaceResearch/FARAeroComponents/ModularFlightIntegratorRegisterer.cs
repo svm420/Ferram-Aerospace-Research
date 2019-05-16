@@ -174,6 +174,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return fi.BaseFICalculateAreaRadiative(part);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private double CalculateAreaExposed(ModularFlightIntegrator fi, Part part)
         {
             FARAeroPartModule module = null;

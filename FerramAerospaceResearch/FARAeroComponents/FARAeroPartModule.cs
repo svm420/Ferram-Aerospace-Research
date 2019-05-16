@@ -418,7 +418,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 visualizationCd = worldDragArrow.magnitude * invAndDynPresArea;
             }
 
-            double fullSatCl = 0, satCl = 0, fullSatCd = 0, satCd = 0;
+            double fullSatCl, satCl = 0, fullSatCd, satCd = 0;
 
             if (legacyWingModel != null)
             {

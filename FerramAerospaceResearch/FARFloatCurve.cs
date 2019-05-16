@@ -82,7 +82,6 @@ namespace FerramAerospaceResearch
         private CubicSection[] sections;
         private int centerIndex;
 
-        private FARFloatCurve() { }
         public FARFloatCurve(int numControlPoints)
         {
             controlPoints = new Vector3d[numControlPoints];

@@ -62,6 +62,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightStabAugLabel4")
         };
 
+        // ReSharper disable once UnusedMember.Local
         private static string[] systemLabelLong = {
             Localizer.Format("FARFlightStabAugLabelLong0"),
             Localizer.Format("FARFlightStabAugLabelLong1"),

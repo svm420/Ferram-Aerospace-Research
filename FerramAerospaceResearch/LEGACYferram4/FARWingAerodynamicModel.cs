@@ -97,7 +97,6 @@ namespace ferram4
 
         private double minStall;
 
-        private const double twopi = Math.PI * 2;   //lift slope
         private double piARe = 1;    //induced drag factor
 
         [KSPField(isPersistant = false)]
@@ -626,7 +625,7 @@ namespace ferram4
                                 waterLiftForce *= (float)(part.partBuoyancy.splashedCounter / PhysicsGlobals.BuoyancyWaterDragTimer);
                             }
 
-                            double waterLiftScalar = 1;
+                            double waterLiftScalar;
                             //reduce lift drastically when wing is in water
                             if (part.submergedPortion < 0.05)
                             {
@@ -892,7 +891,7 @@ namespace ferram4
             ClIncrementFromRear = 0;
 
             rawAoAmax = CalculateAoAmax(MachNumber);
-            double effectiveUpstreamInfluence = 0;
+            double effectiveUpstreamInfluence;
 
             liftslope = rawLiftSlope;
             wingInteraction.UpdateOrientationForInteraction(ParallelInPlaneLocal);
@@ -967,7 +966,7 @@ namespace ferram4
             rawLiftSlope = CalculateSubsonicLiftSlope(MachNumber);// / AoA;     //Prandtl lifting Line
 
 
-            double ACshift = 0, ACweight = 0;
+            double ACshift, ACweight;
             CalculateWingCamberInteractions(MachNumber, AoA, out ACshift, out ACweight);
             DetermineStall(AoA);
 
@@ -1113,7 +1112,7 @@ namespace ferram4
         //Calculates effect of the Mach cone being in front of, along, or behind the leading edge of the wing
         private double CalculateSupersonicLEFactor(double beta, double TanSweep, double beta_TanSweep)
         {
-            double SupersonicLEFactor = 1;
+            double SupersonicLEFactor;
             double ARTanSweep = effective_AR * TanSweep;
 
             if (beta_TanSweep < 1)   //"subsonic" leading edge, scales with Tan Sweep
@@ -1271,7 +1270,7 @@ namespace ferram4
         //Calculates subsonic liftslope
         private double CalculateSubsonicLiftSlope(double MachNumber)
         {
-            double sweepHalfChord = MidChordSweep * FARMathUtil.deg2rad;
+            double sweepHalfChord;
 
             double CosPartAngle = Vector3.Dot(sweepPerpLocal, ParallelInPlaneLocal).Clamp(-1, 1);
             double tmp = Vector3.Dot(sweepPerp2Local, ParallelInPlaneLocal).Clamp(-1, 1);

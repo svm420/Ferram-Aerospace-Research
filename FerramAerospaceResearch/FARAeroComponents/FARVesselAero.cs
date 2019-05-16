@@ -338,7 +338,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             float skinFriction = (float)FARAeroUtil.SkinFrictionDrag(reynoldsNumber, machNumber);
 
             float pseudoKnudsenNumber = machNumber / (reynoldsNumber + machNumber);
-            
+
             if (_currentAeroSections != null)
             {
                 for (int i = 0; i < _currentAeroSections.Count; i++)

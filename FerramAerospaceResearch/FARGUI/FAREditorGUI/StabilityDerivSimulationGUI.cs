@@ -61,6 +61,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private InitialConditions lonConditions, latConditions;
         private ferramGraph _graph = new ferramGraph(400, 200);
 
+        // ReSharper disable once UnusedMember.Local
         private enum SimMode
         {
             LONG,

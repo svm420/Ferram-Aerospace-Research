@@ -452,7 +452,7 @@ namespace ferram4
 
         private FARWingAerodynamicModel ExposureHitDetectionAndWingDetection(RaycastHit[] hits, List<Part> vesselPartList, ref double exposure, double exposureDecreasePerHit)
         {
-            bool gotSomething = false;
+            bool gotSomething;
             bool firstHit = true;
             double wingInteractionFactor = 0;
 
