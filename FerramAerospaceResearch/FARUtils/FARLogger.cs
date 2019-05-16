@@ -272,7 +272,7 @@ namespace FerramAerospaceResearch.FARUtils
             }
             string[] lines = trace.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             string caller = lines[3].Trim();
-            return caller.Substring(0, caller.IndexOf("("));
+            return caller.Substring(0, caller.IndexOf("(", StringComparison.Ordinal));
         }
 
 #if NET_NEWER_4_5
