@@ -52,41 +52,11 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
-    public class FARAPI
+    public static class FARAPI
     {
-        private static FARAPI instance;
-        private static FARAPI Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new FARAPI();
-                return instance;
-            }
-        }
-
-        private static FARVersion version;
-
-        public static FARVersion Version
-        {
-            get
-            {
-                if (version == null)
-                    version = new FARVersion();
-                return version;
-            }
-        }
-
+        public static FARVersion Version { get; } = new FARVersion(); 
 
         #region CurrentFlightInfo
-
-        private FlightGUI GetFlightInfo(Vessel v)
-        {
-            FlightGUI gui = null;
-            FlightGUI.vesselFlightGUI.TryGetValue(v, out gui);
-
-            return gui;
-        }
 
         /// <summary>
         /// Toggle or enable/disable FAR speed display.
@@ -131,7 +101,8 @@ namespace FerramAerospaceResearch
 
         public static FlightGUI VesselFlightInfo(Vessel v)
         {
-            return Instance.GetFlightInfo(v);
+            FlightGUI.vesselFlightGUI.TryGetValue(v, out FlightGUI gui);
+            return gui;
         }
 
         public static double ActiveVesselIAS()
@@ -415,7 +386,15 @@ namespace FerramAerospaceResearch
 
         #region AeroPredictions
 
-        private void InstanceCalcVesselAeroForces(Vessel vessel, out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
+        /// <summary>
+        /// Calculates the forces and torque on a vessel at a given condition at the CoM
+        /// </summary>
+        /// <param name="vessel">Vessel in question</param>
+        /// <param name="aeroForce">Total aerodynamic force at CoM, in kN</param>
+        /// <param name="aeroTorque">Total aerodynamic torque at CoM, in kN * m</param>
+        /// <param name="velocityWorldVector">Velocity vector in worldspace relative to the atmosphere for CURRENT vessel orientation, m/s</param>
+        /// <param name="altitude">Vessel altitude, in m</param>
+        public static void CalculateVesselAeroForces(Vessel vessel, out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
         {
             aeroForce = aeroTorque = Vector3.zero;
             if (vessel == null)
@@ -433,19 +412,6 @@ namespace FerramAerospaceResearch
             }
 
             vesselAero.SimulateAeroProperties(out aeroForce, out aeroTorque, velocityWorldVector, altitude);
-        }
-
-        /// <summary>
-        /// Calculates the forces and torque on a vessel at a given condition at the CoM
-        /// </summary>
-        /// <param name="vessel">Vessel in question</param>
-        /// <param name="aeroForce">Total aerodynamic force at CoM, in kN</param>
-        /// <param name="aeroTorque">Total aerodynamic torque at CoM, in kN * m</param>
-        /// <param name="velocityWorldVector">Velocity vector in worldspace relative to the atmosphere for CURRENT vessel orientation, m/s</param>
-        /// <param name="altitude">Vessel altitude, in m</param>
-        public static void CalculateVesselAeroForces(Vessel vessel, out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
-        {
-            Instance.InstanceCalcVesselAeroForces(vessel, out aeroForce, out aeroTorque, velocityWorldVector, altitude);
         }
         #endregion
 
