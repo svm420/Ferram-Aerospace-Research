@@ -193,7 +193,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 FARAeroPartModule aeroModule = _aeroModulesWithIntakes[i];
 
 
-                Vector3 force = -aeroModule.partLocalVelNorm * cosAoA * currentRamDrag * (float)intake.area * 100f;
+                Vector3 force = cosAoA * currentRamDrag * (float)intake.area * 100f * -aeroModule.partLocalVelNorm;
                 //if(float.IsNaN(force.sqrMagnitude))
                 //    force = Vector3.zero;
                 aeroModule.AddLocalForce(force, Vector3.zero);

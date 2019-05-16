@@ -167,7 +167,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //float dist = deltaMomentPerp.magnitude / deltaForcePerpMag;
             //vesselRootLocalAeroCenter = vel_base * dist;
 
-            vesselRootLocalAeroCenter = deltaMomentPerp.magnitude / deltaForcePerpMag * vel_base * Math.Sign(Vector3.Dot(Vector3.Cross(deltaForce, deltaMoment), vel_base));
+            vesselRootLocalAeroCenter = deltaMomentPerp.magnitude / deltaForcePerpMag * Math.Sign(Vector3.Dot(Vector3.Cross(deltaForce, deltaMoment), vel_base)) * vel_base;
 
             //FARLogger.Info("" + dist + " " + deltaMomentPerp.magnitude + " " + deltaForcePerpMag);
             //vesselRootLocalAeroCenter += avgForcePos;

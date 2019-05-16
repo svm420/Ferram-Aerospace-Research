@@ -544,7 +544,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 size = geoModule.overallMeshBounds.size;
 
-                axis += candVector * size.x * size.y * size.z;// *(1 + p.symmetryCounterparts.Count);    //scale part influence by approximate size
+                axis += size.x * size.y * size.z * candVector;// *(1 + p.symmetryCounterparts.Count);    //scale part influence by approximate size
             }
 
             if (axis == Vector3.zero)
