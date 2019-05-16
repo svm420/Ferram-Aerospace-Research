@@ -556,15 +556,15 @@ namespace ferram4
             if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready && !isShielded)
             {
                 Rigidbody rb = part.Rigidbody;
-                Vessel vessel = part.vessel;
+                Vessel partVessel = part.vessel;
 
-                if (!rb || !vessel || vessel.packed)
+                if (!rb || !partVessel || partVessel.packed)
                     return;
 
                 //bool set_vel = false;
 
                 // Check that rb is not destroyed, but vessel is just not null
-                if (vessel.atmDensity > 0)
+                if (partVessel.atmDensity > 0)
                 {
                     CurWingCentroid = WingCentroid();
 
@@ -573,16 +573,16 @@ namespace ferram4
 
                     double machNumber, v_scalar = velocity.magnitude;
 
-                    if (vessel.mainBody.ocean)
-                        rho = (vessel.mainBody.oceanDensity * 1000 * part.submergedPortion + part.atmDensity * (1 - part.submergedPortion));
+                    if (partVessel.mainBody.ocean)
+                        rho = (partVessel.mainBody.oceanDensity * 1000 * part.submergedPortion + part.atmDensity * (1 - part.submergedPortion));
                     else
                         rho = part.atmDensity;
 
-                    machNumber = vessel.mach;
+                    machNumber = partVessel.mach;
                     if (rho > 0 && v_scalar > 0.1)
                     {
                         double AoA = CalculateAoA(velocity);
-                        double failureForceScaling = FARAeroUtil.GetFailureForceScaling(vessel);
+                        double failureForceScaling = FARAeroUtil.GetFailureForceScaling(partVessel);
                         Vector3d force = DoCalculateForces(velocity, machNumber, AoA, rho, failureForceScaling);
 
                         worldSpaceForce = force;
@@ -663,9 +663,9 @@ namespace ferram4
                         Vector3d forwardScaledForce = forwardScaledForceMag * (Vector3d)forward;
 
                         if (Math.Abs(forwardScaledForceMag) > YmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000) || (scaledForce - forwardScaledForce).magnitude > XZmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000))
-                            if (part.parent && !vessel.packed)
+                            if (part.parent && !partVessel.packed)
                             {
-                                vessel.SendMessage("AerodynamicFailureStatus");
+                                partVessel.SendMessage("AerodynamicFailureStatus");
                                 string msg = String.Format(Localizer.Format("FARFlightLogAeroFailure"),
                                                            KSPUtil.PrintTimeStamp(FlightLogger.met), part.partInfo.title);
                                 FlightLogger.eventLog.Add(msg);
@@ -1322,14 +1322,7 @@ namespace ferram4
             tmp = 1 / tmp;
             tmp *= 2 * Math.PI;
 
-            double liftslope = tmp * effective_AR;
-
-            /*float liftslope = Mathf.Pow(effective_AR / FARAeroUtil.FastCos(sweepHalfChord), 2) + 4 - Mathf.Pow(effective_AR * tmp, 2);
-            liftslope = 2 + Mathf.Sqrt(Mathf.Clamp(liftslope, 0, Mathf.Infinity));
-            liftslope = twopi / liftslope * effective_AR;*/
-
-            return liftslope;
-
+            return tmp * effective_AR;
         }
 
         //Transforms cos sweep of the midchord to cosine(sweep of the leading edge)

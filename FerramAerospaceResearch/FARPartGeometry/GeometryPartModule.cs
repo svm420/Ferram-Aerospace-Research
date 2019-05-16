@@ -863,9 +863,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     if (variants)
                     {
                         // with part variants, jettison name is a comma separated list of transform names
-                        foreach (string name in j.jettisonName.Split(','))
+                        foreach (string transformName in j.jettisonName.Split(','))
                         {
-                            jettisonTransforms.Add(name);
+                            jettisonTransforms.Add(transformName);
                         }
                     }
                     else

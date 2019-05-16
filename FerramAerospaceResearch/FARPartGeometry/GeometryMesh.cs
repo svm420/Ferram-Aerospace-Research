@@ -213,9 +213,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             TransformedPointBounds(matrix, center, -extents.x, +extents.y, -extents.z, ref lower, ref upper);
             TransformedPointBounds(matrix, center, -extents.x, +extents.y, +extents.z, ref lower, ref upper);
 
-            Bounds bounds = new Bounds((lower + upper) * 0.5f, upper - lower);
-            //FARThreading.ThreadSafeDebugLogger.Instance.RegisterMessage("Bounds center: " + bounds.center + " extents: " + bounds.extents);
-            return bounds;
+            return new Bounds((lower + upper) * 0.5f, upper - lower);
         }
 
         private void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)

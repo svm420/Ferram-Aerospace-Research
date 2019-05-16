@@ -72,17 +72,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
             get { return _vehicleAero.MaxCrossSectionArea; }
         }
 
-        private double machNumber;
-        public double MachNumber
-        {
-            get { return machNumber; }
-        }
+        public double MachNumber { get; private set; }
 
-        private double reynoldsNumber;
-        public double ReynoldsNumber
-        {
-            get { return reynoldsNumber; }
-        }
+        public double ReynoldsNumber { get; private set; }
 
         private List<GeometryPartModule> _currentGeoModules;
         private int geoModulesReady;
@@ -263,16 +255,16 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             if (atmDensity <= 0)
             {
-                machNumber = 0;
-                reynoldsNumber = 0;
+                MachNumber = 0;
+                ReynoldsNumber = 0;
                 return;
             }
 
-            machNumber = vessel.mach;
-            reynoldsNumber = FARAeroUtil.CalculateReynoldsNumber(vessel.atmDensity, Length, vessel.srfSpeed, machNumber, FlightGlobals.getExternalTemperature((float)vessel.altitude, vessel.mainBody), vessel.mainBody.atmosphereAdiabaticIndex);
-            float skinFrictionDragCoefficient = (float)FARAeroUtil.SkinFrictionDrag(reynoldsNumber, machNumber);
+            MachNumber = vessel.mach;
+            ReynoldsNumber = FARAeroUtil.CalculateReynoldsNumber(vessel.atmDensity, Length, vessel.srfSpeed, MachNumber, FlightGlobals.getExternalTemperature((float)vessel.altitude, vessel.mainBody), vessel.mainBody.atmosphereAdiabaticIndex);
+            float skinFrictionDragCoefficient = (float)FARAeroUtil.SkinFrictionDrag(ReynoldsNumber, MachNumber);
 
-            float pseudoKnudsenNumber = (float)(machNumber / (reynoldsNumber + machNumber));
+            float pseudoKnudsenNumber = (float)(MachNumber / (ReynoldsNumber + MachNumber));
 
             Vector3 frameVel = Krakensbane.GetFrameVelocityV3f();
 
@@ -296,9 +288,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }*/
 
             for (int i = 0; i < _currentAeroSections.Count; i++)
-                _currentAeroSections[i].FlightCalculateAeroForces((float)machNumber, (float)(reynoldsNumber / Length), pseudoKnudsenNumber, skinFrictionDragCoefficient);
+                _currentAeroSections[i].FlightCalculateAeroForces((float)MachNumber, (float)(ReynoldsNumber / Length), pseudoKnudsenNumber, skinFrictionDragCoefficient);
 
-            _vesselIntakeRamDrag.ApplyIntakeRamDrag((float)machNumber, vessel.srf_velocity.normalized);
+            _vesselIntakeRamDrag.ApplyIntakeRamDrag((float)MachNumber, vessel.srf_velocity.normalized);
 
             for (int i = 0; i < _currentAeroModules.Count; i++)
             {

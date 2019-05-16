@@ -911,8 +911,8 @@ namespace FerramAerospaceResearch.RealChuteLite
             //Makes the chute icon blink if failed
             if (failedTimer.IsRunning)
             {
-                double time = failedTimer.Elapsed.TotalSeconds;
-                if (time <= 2.5)
+                double totalSeconds = failedTimer.Elapsed.TotalSeconds;
+                if (totalSeconds <= 2.5)
                 {
                     if (!displayed)
                     {
@@ -923,7 +923,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                         else { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailOther"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
                         displayed = true;
                     }
-                    if (time < 0.5 || time >= 1 && time < 1.5 || time >= 2) { part.stackIcon.SetIconColor(XKCDColors.Red); }
+                    if (totalSeconds < 0.5 || totalSeconds >= 1 && totalSeconds < 1.5 || totalSeconds >= 2) { part.stackIcon.SetIconColor(XKCDColors.Red); }
                     else { part.stackIcon.SetIconColor(XKCDColors.White); }
                 }
                 else

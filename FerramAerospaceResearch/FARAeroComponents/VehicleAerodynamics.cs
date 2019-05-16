@@ -168,13 +168,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
             activeAdjusters = null;
         }
 
-        private double[] GenerateIndexSqrtLookup(int numStations)
+        private static void GenerateIndexSqrtLookup(int numStations)
         {
-            double[] indexSqrt = new double[numStations];
+            indexSqrt = new double[numStations];
             for (int i = 0; i < numStations; i++)
                 indexSqrt[i] = Math.Sqrt(i);
-
-            return indexSqrt;
         }
 
         #region UpdateAeroData
@@ -1558,7 +1556,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             lock (_commonLocker)
                 if (vehicleCrossSection.Length > indexSqrt.Length + 1)
-                    indexSqrt = GenerateIndexSqrtLookup(vehicleCrossSection.Length + 2);
+                    GenerateIndexSqrtLookup(vehicleCrossSection.Length + 2);
 
             double machTest = 1.2;
             double beta = Math.Sqrt(machTest * machTest - 1);

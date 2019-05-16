@@ -2453,10 +2453,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             try
             {
-                int xLength = plane.GetLength(0);
-                int zLength = plane.GetLength(1);
-                if (xLength < xCellLength || zLength < zCellLength)
-                    plane = new SweepPlanePoint[Math.Max(xCellLength, xLength), Math.Max(zCellLength, zLength)];
+                int xLen = plane.GetLength(0);
+                int zLen = plane.GetLength(1);
+                if (xLen < xCellLength || zLen < zCellLength)
+                    plane = new SweepPlanePoint[Math.Max(xCellLength, xLen), Math.Max(zCellLength, zLen)];
 
 
                 //SweepPlanePoint[,] sweepPlane = new SweepPlanePoint[xCellLength, zCellLength];
