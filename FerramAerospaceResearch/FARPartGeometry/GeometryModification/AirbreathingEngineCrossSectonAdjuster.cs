@@ -84,7 +84,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             vehicleBasisForwardVector *= -1f;
 
 
-            this.EngineModule = engine;
+            EngineModule = engine;
             part = engine.part;
 
             Bounds partBounds = part.GetPartColliderBoundsInBasis(Matrix4x4.identity);

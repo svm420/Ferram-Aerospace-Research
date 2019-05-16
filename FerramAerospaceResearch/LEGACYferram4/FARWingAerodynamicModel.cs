@@ -52,7 +52,6 @@ using KSP.Localization;
 using TweakScale;
 using UnityEngine;
 
-
 namespace ferram4
 {
     /// <summary>
