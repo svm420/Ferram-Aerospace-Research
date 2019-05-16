@@ -47,6 +47,7 @@ using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     public class FARBaseAerodynamics : FARPartModule, ILiftProvider

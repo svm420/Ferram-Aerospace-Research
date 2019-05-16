@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+// ReSharper disable once CheckNamespace
 namespace FerramAerospaceResearch
 {
     public static class FARAnimOverrides

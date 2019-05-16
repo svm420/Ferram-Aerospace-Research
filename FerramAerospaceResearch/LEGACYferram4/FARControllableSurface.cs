@@ -46,6 +46,7 @@ using System;
 using FerramAerospaceResearch;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     public class FARControllableSurface : FARWingAerodynamicModel, ITorqueProvider

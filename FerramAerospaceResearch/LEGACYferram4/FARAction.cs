@@ -50,6 +50,7 @@ using KSP.IO;
 using KSP.Localization;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     //Added by DaMichel:

@@ -52,6 +52,7 @@ using KSP.Localization;
 using TweakScale;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     /// <summary>

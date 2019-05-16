@@ -44,6 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     // An accumulator class for summarizing a set of forces acting on the body and calculating the AerodynamicCenter
