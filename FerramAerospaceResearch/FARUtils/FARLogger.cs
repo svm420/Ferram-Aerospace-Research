@@ -62,124 +62,249 @@ namespace FerramAerospaceResearch.FARUtils
 
         #region Info
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void Info(object message) => UnityEngine.Debug.Log(Tag + " " + message);
+        public static void Info(object message)
+        {
+            UnityEngine.Debug.Log(Tag + " " + message);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void Info(object message, Object context) => UnityEngine.Debug.Log(Tag + " " + message, context);
+        public static void Info(object message, Object context)
+        {
+            UnityEngine.Debug.Log(Tag + " " + message, context);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void InfoFormat(string format, params object[] args) => UnityEngine.Debug.LogFormat(Tag + " " + format, args);
+        public static void InfoFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void InfoFormat(Object context, string format, params object[] args) => UnityEngine.Debug.LogFormat(context, Tag + " " + format, args);
+        public static void InfoFormat(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(context, Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void InfoWithCaller(object message) => UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message);
+        public static void InfoWithCaller(object message)
+        {
+            UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void InfoWithCaller(object message, Object context) => UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message, context);
+        public static void InfoWithCaller(object message, Object context)
+        {
+            UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message, context);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void InfoFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void InfoFormatWithCaller(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO")]
-        public static void InfoFormatWithCaller(Object context, string format, params object[] args) => UnityEngine.Debug.LogFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void InfoFormatWithCaller(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
+
         #endregion // Info
 
         #region Debug
         [Conditional("DEBUG")]
-        public static void Debug(object message) => UnityEngine.Debug.Log(Tag + " " + message);
+        public static void Debug(object message)
+        {
+            UnityEngine.Debug.Log(Tag + " " + message);
+        }
 
         [Conditional("DEBUG")]
-        public static void Debug(object message, Object context) => UnityEngine.Debug.Log(Tag + " " + message, context);
+        public static void Debug(object message, Object context)
+        {
+            UnityEngine.Debug.Log(Tag + " " + message, context);
+        }
 
         [Conditional("DEBUG")]
-        public static void DebugFormat(string format, params object[] args) => UnityEngine.Debug.LogFormat(Tag + " " + format, args);
+        public static void DebugFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG")]
-        public static void DebugFormat(Object context, string format, params object[] args) => UnityEngine.Debug.LogFormat(context, Tag + " " + format, args);
+        public static void DebugFormat(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(context, Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG")]
-        public static void DebugWithCaller(object message) => UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message);
+        public static void DebugWithCaller(object message)
+        {
+            UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message);
+        }
 
         [Conditional("DEBUG")]
-        public static void DebugWithCaller(object message, Object context) => UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message, context);
+        public static void DebugWithCaller(object message, Object context)
+        {
+            UnityEngine.Debug.Log(Tag + " " + GetCallerInfo() + " - " + message, context);
+        }
 
         [Conditional("DEBUG")]
-        public static void DebugFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void DebugFormatWithCaller(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
 
         [Conditional("DEBUG")]
-        public static void DebugFormatWithCaller(Object context, string format, params object[] args) => UnityEngine.Debug.LogFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void DebugFormatWithCaller(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
+
         #endregion // Debug
 
         #region Warning
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void Warning(object message) => UnityEngine.Debug.LogWarning(Tag + " " + message);
+        public static void Warning(object message)
+        {
+            UnityEngine.Debug.LogWarning(Tag + " " + message);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void Warning(object message, Object context) => UnityEngine.Debug.LogWarning(Tag + " " + message, context);
+        public static void Warning(object message, Object context)
+        {
+            UnityEngine.Debug.LogWarning(Tag + " " + message, context);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void WarningFormat(string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(Tag + " " + format, args);
+        public static void WarningFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogWarningFormat(Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void WarningFormat(Object context, string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(context, Tag + " " + format, args);
+        public static void WarningFormat(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogWarningFormat(context, Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void WarningWithCaller(object message) => UnityEngine.Debug.LogWarning(Tag + " " + GetCallerInfo() + " - " + message);
+        public static void WarningWithCaller(object message)
+        {
+            UnityEngine.Debug.LogWarning(Tag + " " + GetCallerInfo() + " - " + message);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void WarningWithCaller(object message, Object context) => UnityEngine.Debug.LogWarning(Tag + " " + GetCallerInfo() + " - " + message, context);
+        public static void WarningWithCaller(object message, Object context)
+        {
+            UnityEngine.Debug.LogWarning(Tag + " " + GetCallerInfo() + " - " + message, context);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void WarningFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void WarningFormatWithCaller(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogWarningFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
-        public static void WarningFormatWithCaller(Object context, string format, params object[] args) => UnityEngine.Debug.LogWarningFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void WarningFormatWithCaller(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogWarningFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
+
         #endregion // Warning
 
         #region Error
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void Error(object message) => UnityEngine.Debug.LogError(Tag + " " + message);
+        public static void Error(object message)
+        {
+            UnityEngine.Debug.LogError(Tag + " " + message);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void Error(object message, Object context) => UnityEngine.Debug.LogError(Tag + " " + message, context);
+        public static void Error(object message, Object context)
+        {
+            UnityEngine.Debug.LogError(Tag + " " + message, context);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void ErrorFormat(string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(Tag + " " + format, args);
+        public static void ErrorFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogErrorFormat(Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void ErrorFormat(Object context, string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(context, Tag + " " + format, args);
+        public static void ErrorFormat(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogErrorFormat(context, Tag + " " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void ErrorWithCaller(object message) => UnityEngine.Debug.LogError(Tag + " " + GetCallerInfo() + " - " + message);
+        public static void ErrorWithCaller(object message)
+        {
+            UnityEngine.Debug.LogError(Tag + " " + GetCallerInfo() + " - " + message);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void ErrorWithCaller(object message, Object context) => UnityEngine.Debug.LogError(Tag + " " + GetCallerInfo() + " - " + message, context);
+        public static void ErrorWithCaller(object message, Object context)
+        {
+            UnityEngine.Debug.LogError(Tag + " " + GetCallerInfo() + " - " + message, context);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void ErrorFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void ErrorFormatWithCaller(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogErrorFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
-        public static void ErrorFormatWithCaller(Object context, string format, params object[] args) => UnityEngine.Debug.LogErrorFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void ErrorFormatWithCaller(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogErrorFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
+
         #endregion // Error
 
         #region Assertion
-        public static void Assertion(object message) => UnityEngine.Debug.LogAssertion(Tag + " " + message);
+        public static void Assertion(object message)
+        {
+            UnityEngine.Debug.LogAssertion(Tag + " " + message);
+        }
 
-        public static void Assertion(object message, Object context) => UnityEngine.Debug.LogAssertion(Tag + " " + message, context);
+        public static void Assertion(object message, Object context)
+        {
+            UnityEngine.Debug.LogAssertion(Tag + " " + message, context);
+        }
 
-        public static void AssertionFormat(string format, params object[] args) => UnityEngine.Debug.LogAssertionFormat(Tag + " " + format, args);
+        public static void AssertionFormat(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogAssertionFormat(Tag + " " + format, args);
+        }
 
-        public static void AssertionFormat(Object context, string format, params object[] args) => UnityEngine.Debug.LogAssertionFormat(context, Tag + " " + format, args);
+        public static void AssertionFormat(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogAssertionFormat(context, Tag + " " + format, args);
+        }
 
-        public static void AssertionWithCaller(object message) => UnityEngine.Debug.LogAssertion(Tag + " " + GetCallerInfo() + " - " + message);
+        public static void AssertionWithCaller(object message)
+        {
+            UnityEngine.Debug.LogAssertion(Tag + " " + GetCallerInfo() + " - " + message);
+        }
 
-        public static void AssertionWithCaller(object message, Object context) => UnityEngine.Debug.LogAssertion(Tag + " " + GetCallerInfo() + " - " + message, context);
+        public static void AssertionWithCaller(object message, Object context)
+        {
+            UnityEngine.Debug.LogAssertion(Tag + " " + GetCallerInfo() + " - " + message, context);
+        }
 
-        public static void AssertionFormatWithCaller(string format, params object[] args) => UnityEngine.Debug.LogAssertionFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void AssertionFormatWithCaller(string format, params object[] args)
+        {
+            UnityEngine.Debug.LogAssertionFormat(Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
 
-        public static void AssertionFormatWithCaller(Object context, string format, params object[] args) => UnityEngine.Debug.LogAssertionFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        public static void AssertionFormatWithCaller(Object context, string format, params object[] args)
+        {
+            UnityEngine.Debug.LogAssertionFormat(context, Tag + " " + GetCallerInfo() + " - " + format, args);
+        }
+
         #endregion // Assertion
 
         #region Exception
