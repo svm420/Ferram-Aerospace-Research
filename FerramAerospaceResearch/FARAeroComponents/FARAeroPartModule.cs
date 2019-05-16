@@ -104,11 +104,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private Transform partTransform;
 
         private MaterialColorUpdater materialColorUpdater;
-        private FARWingAerodynamicModel legacyWingModel;
-        public FARWingAerodynamicModel LegacyWingModel
-        {
-            get { return legacyWingModel; }
-        }
+        public FARWingAerodynamicModel LegacyWingModel { get; private set; }
         private ModuleLiftingSurface stockAeroSurfaceModule;
         private bool updateVisualization;
 
@@ -189,8 +185,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void ForceLegacyAeroUpdates()
         {
-            if (legacyWingModel != null)
-                legacyWingModel.ForceOnVesselPartsChange();
+            if (LegacyWingModel != null)
+                LegacyWingModel.ForceOnVesselPartsChange();
         }
 
 
@@ -307,11 +303,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             materialColorUpdater = new MaterialColorUpdater(partTransform, PhysicsGlobals.TemperaturePropertyID);
             if (part.Modules.Contains<FARWingAerodynamicModel>())
-                legacyWingModel = part.Modules.GetModule<FARWingAerodynamicModel>();
+                LegacyWingModel = part.Modules.GetModule<FARWingAerodynamicModel>();
             else if (part.Modules.Contains<FARControllableSurface>())
-                legacyWingModel = part.Modules.GetModule<FARControllableSurface>();
+                LegacyWingModel = part.Modules.GetModule<FARControllableSurface>();
             else
-                legacyWingModel = null;
+                LegacyWingModel = null;
 
             // For handling airbrakes aero visualization
             if (part.Modules.Contains<ModuleAeroSurface>())
@@ -377,8 +373,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 totalWorldSpaceAeroForce = worldSpaceAeroForce;
 
                 // Combine forces from legacy wing model
-                if (legacyWingModel != null)
-                    totalWorldSpaceAeroForce += legacyWingModel.worldSpaceForce;
+                if (LegacyWingModel != null)
+                    totalWorldSpaceAeroForce += LegacyWingModel.worldSpaceForce;
 
                 // Combine forces from stock code
                 //totalWorldSpaceAeroForce += -part.dragVectorDir * part.dragScalar; // dragVectorDir is actually the velocity vector direction
@@ -397,8 +393,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 return new Color(0, 0, 0, 0);
 
             // Stall tinting overrides Cl / Cd tinting
-            if (legacyWingModel != null && aeroVizGUI.TintForStall)
-                return new Color((float)((legacyWingModel.GetStall() * 100.0) / aeroVizGUI.FullySaturatedStall), 0f, 0f, 0.5f);
+            if (LegacyWingModel != null && aeroVizGUI.TintForStall)
+                return new Color((float)((LegacyWingModel.GetStall() * 100.0) / aeroVizGUI.FullySaturatedStall), 0f, 0f, 0.5f);
 
             if (!aeroVizGUI.TintForCl && !aeroVizGUI.TintForCd)
                 return new Color(0, 0, 0, 0);
@@ -411,7 +407,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 worldDragArrow = Vector3.Dot(totalWorldSpaceAeroForce, worldVelNorm) * worldVelNorm;
                 Vector3 worldLiftArrow = totalWorldSpaceAeroForce - worldDragArrow;
 
-                double invAndDynPresArea = legacyWingModel != null ? legacyWingModel.S : projectedArea.totalArea;
+                double invAndDynPresArea = LegacyWingModel != null ? LegacyWingModel.S : projectedArea.totalArea;
                 invAndDynPresArea *= vessel.dynamicPressurekPa;
                 invAndDynPresArea = 1 / invAndDynPresArea;
                 visualizationCl = worldLiftArrow.magnitude * invAndDynPresArea;
@@ -420,7 +416,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             double fullSatCl, satCl = 0, fullSatCd, satCd = 0;
 
-            if (legacyWingModel != null)
+            if (LegacyWingModel != null)
             {
                 fullSatCl = aeroVizGUI.FullySaturatedCl;
                 fullSatCd = aeroVizGUI.FullySaturatedCd;
@@ -780,7 +776,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Destroy(momentArrow);
                 momentArrow = null;
             }
-            legacyWingModel = null;
+            LegacyWingModel = null;
             stockAeroSurfaceModule = null;
         }
     }

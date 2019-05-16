@@ -229,6 +229,7 @@ namespace FerramAerospaceResearch
                 massStressPower = 1.2;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static double MaxPressureCoefficientCalc(double M)
         {
             double gamma = CurrentBody.atmosphereAdiabaticIndex;
@@ -417,6 +418,7 @@ namespace FerramAerospaceResearch
 
         private static List<FARWingAerodynamicModel> curEditorWingCache;
 
+        // ReSharper disable once UnusedMember.Global
         public static List<FARWingAerodynamicModel> CurEditorWings
         {
             get
@@ -558,6 +560,7 @@ namespace FerramAerospaceResearch
             return exp;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static double GetFailureForceScaling(CelestialBody body, double altitude)
         {
             if (!body.ocean || altitude > 0)
@@ -762,6 +765,7 @@ namespace FerramAerospaceResearch
             return Math.Sqrt(sin2def);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static double MaxShockAngleCheck(double MachNumber, double gamma, out bool attachedShock)
         {
             double M2 = MachNumber * MachNumber;
@@ -787,6 +791,7 @@ namespace FerramAerospaceResearch
         }
 
         //Calculates Oswald's Efficiency e using Shevell's Method
+        // ReSharper disable once UnusedMember.Global
         public static double CalculateOswaldsEfficiency(double AR, double CosSweepAngle, double Cd0)
         {
             double e = 1 - 0.02 * FARMathUtil.PowApprox(AR, 0.7) * FARMathUtil.PowApprox(Math.Acos(CosSweepAngle), 2.2);

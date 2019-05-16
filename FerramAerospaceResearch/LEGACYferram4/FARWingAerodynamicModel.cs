@@ -256,6 +256,7 @@ namespace ferram4
             return stall;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public double GetCl()
         {
 
@@ -267,6 +268,7 @@ namespace ferram4
             return ClUpwards;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public double GetCd()
         {
             return Cd;

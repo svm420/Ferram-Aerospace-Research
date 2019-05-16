@@ -48,6 +48,7 @@ namespace FerramAerospaceResearch.FARThreading
 {
     //Allows multiple threads to wait before continuing
     //Is equivalent to the Barrier class from .NET 4.0
+    // ReSharper disable once UnusedMember.Global
     public class ThreadBarrier
     {
         private object _lockerObject = new object();
@@ -63,6 +64,7 @@ namespace FerramAerospaceResearch.FARThreading
             _threadParticipatingCount = threadParticipatingCount;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SignalAndWait()
         {
             lock (_lockerObject)
@@ -93,29 +95,5 @@ namespace FerramAerospaceResearch.FARThreading
                 }
             }
         }
-        /*
-
-
-                        lock (sweepPlane)           //Used as generic locker in solidification; due to careful design, locks are not needed for reading and writing to indices, so this slows nothing
-                {
-                    FARLogger.Info("Entered 1 " + threadInd);
-                    synced = false;         //first, identify that we are not synced
-                    threadsQueued--;          //Decrement items queued, since we are completed
-
-                    Monitor.PulseAll(sweepPlane);       //Pulse everything waiting on sweepPlane, since we've updated the blocking condition; this is to let thread 0 go if it completed early
-
-                    while ((threadsQueued > 0 && threadInd == 0) || (!synced && threadInd != 0))   //Then, check if there are still items to complete and if it is synced or not
-                        Monitor.Wait(sweepPlane);                           //If all items are completed, but it is not synced, the 0th thread may continue
-                                                                            //Other threads only care about being synced, but since entering this block automatically indicates not synced, this is not a problem
-                    if (threadInd == 0)
-                    {                                //If all items are completed, then the 0th thread continues
-                        threadsQueued = 4;               //It then increments itemsQueued to the number of total threads
-                        synced = true;                  //And indicates that we are synced
-                        FARLogger.Info("bleh");
-                    }
-                    Monitor.PulseAll(sweepPlane);   //And pulses all the others so that work may continue
-                    FARLogger.Info("Leaving 1 " + threadInd);
-                }*/
-
     }
 }

@@ -185,6 +185,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void MultithreadTransformBasis(object newThisToVesselMatrixObj)
         {
             lock(this)

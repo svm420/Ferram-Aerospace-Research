@@ -58,15 +58,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private List<DebugVisualVoxelSubmesh> m_submeshes = new List<DebugVisualVoxelSubmesh>();
         private bool m_active;
 
-        private Transform m_parent;
-
         public DebugVisualVoxelMeshController(Transform parent = null)
         {
-            m_parent = parent;
+            Parent = parent;
         }
 
         public bool active
         {
+            // ReSharper disable once UnusedMember.Global
             get => m_active;
             set
             {
@@ -82,11 +81,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             get => m_debugVoxels;
         }
-        public Transform Parent
-        {
-            get => m_parent;
-            set => m_parent = value;
-        }
+        public Transform Parent { get; }
 
         private void UpdateActive()
         {
@@ -133,16 +128,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        public void ClearSafe(bool clearVoxels = false)
-        {
-            QueueMainThreadTask(() => Clear(clearVoxels));
-        }
-
         private void SetupSubmeshes(int submeshes)
         {
             for (int i = m_submeshes.Count; i < submeshes; i++)
             {
-                m_submeshes.Add(DebugVisualVoxelSubmesh.Create(m_parent, m_active));
+                m_submeshes.Add(DebugVisualVoxelSubmesh.Create(Parent, m_active));
             }
         }
 

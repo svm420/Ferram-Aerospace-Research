@@ -94,6 +94,7 @@ namespace FerramAerospaceResearch
         }
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
+        // ReSharper disable once UnusedMember.Global
         public static double Lerp(double x1, double x2, double y1, double y2, double x)
         {
             double y = (y2 - y1) / (x2 - x1);
@@ -109,14 +110,7 @@ namespace FerramAerospaceResearch
             return val;
         }
 
-        public static bool Approximately(double p, double q)
-        {
-            if (Math.Abs(p - q) < double.Epsilon)
-                return true;
-            return false;
-        }
-
-        public static bool Approximately(double p, double q, double error)
+        public static bool Approximately(double p, double q, double error = double.Epsilon)
         {
             if (Math.Abs(p - q) < error)
                 return true;
@@ -148,6 +142,7 @@ namespace FerramAerospaceResearch
             return (a + b) * 0.5;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static double CompleteEllipticIntegralSecondKind(double k, double error)
         {
             double value = 2 * ArithmeticGeometricMean(1, k, error);

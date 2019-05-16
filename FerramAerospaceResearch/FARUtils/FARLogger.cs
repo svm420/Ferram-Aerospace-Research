@@ -49,6 +49,8 @@ using System;
 using System.Diagnostics;
 using Object = UnityEngine.Object;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FerramAerospaceResearch.FARUtils
 {
     public static class FARLogger
@@ -56,49 +58,7 @@ namespace FerramAerospaceResearch.FARUtils
 
         public static string defaultTag = $"[FAR {FARVersion.String}]";
 
-        private static string _tag = defaultTag;
-
-        public static string Tag
-        {
-            get
-            {
-                return _tag;
-            }
-            set
-            {
-                SetTag(value);
-            }
-        }
-
-        public static string GetTag()
-        {
-            return _tag;
-        }
-
-        public static string GetTag(string tag)
-        {
-            return "[" + tag + "]";
-        }
-
-        public static string GetTag(string[] tags)
-        {
-            return GetTag(String.Join("] [", tags));
-        }
-
-        public static void SetTag()
-        {
-            _tag = defaultTag;
-        }
-
-        public static void SetTag(string tag)
-        {
-            _tag = GetTag(tag);
-        }
-
-        public static void SetTag(string[] tags)
-        {
-            _tag = GetTag(tags);
-        }
+        public static string Tag { get; } = defaultTag;
 
         #region Info
         [Conditional("DEBUG"), Conditional("INFO")]

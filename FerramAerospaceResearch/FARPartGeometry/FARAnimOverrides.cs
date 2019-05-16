@@ -19,6 +19,7 @@ namespace FerramAerospaceResearch
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static bool OverrideExists(string moduleName)
         {
             return animOverrides.ContainsKey(moduleName);

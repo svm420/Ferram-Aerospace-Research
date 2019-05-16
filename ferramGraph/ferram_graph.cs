@@ -199,15 +199,8 @@ namespace ferram4
         private Vector2 ScrollView = Vector2.zero;
 
         #region Constructors
-        public ferramGraph(int width, int height)
-        {
-            graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
-            SetBoundaries(0, 1, 0, 1);
-            displayRect = new Rect(1, 1, graph.width, graph.height);
-            GridInit();
-        }
 
-        public ferramGraph(int width, int height, double minx, double maxx, double miny, double maxy)
+        public ferramGraph(int width, int height, double minx = 0, double maxx = 1, double miny = 0, double maxy = 1)
         {
             graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
             SetBoundaries(minx, maxx, miny, maxy);
@@ -267,6 +260,7 @@ namespace ferram4
 
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetLineVerticalScaling(string lineName, double scaling)
         {
             if (!allLines.ContainsKey(lineName))
@@ -280,6 +274,7 @@ namespace ferram4
         }
 
 
+        // ReSharper disable once UnusedMember.Global
         public void SetLineHorizontalScaling(string lineName, double scaling)
         {
             if (!allLines.ContainsKey(lineName))
@@ -329,6 +324,7 @@ namespace ferram4
 
         #region Add / Remove Line Functions
 
+        // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName)
         {
             if (allLines.ContainsKey(lineName))
@@ -342,12 +338,14 @@ namespace ferram4
             Update();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName, double[] xValues, double[] yValues)
         {
             int lineThickness = 1;
             AddLine(lineName, xValues, yValues, lineThickness);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName, double[] xValues, double[] yValues, Color lineColor)
         {
             int lineThickness = 1;
@@ -391,6 +389,7 @@ namespace ferram4
             Update();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void RemoveLine(string lineName)
         {
             if (!allLines.ContainsKey(lineName))
@@ -421,6 +420,7 @@ namespace ferram4
 
         #region Update Data Functions
 
+        // ReSharper disable once UnusedMember.Global
         public void UpdateLineData(string lineName, double[] xValues, double[] yValues)
         {
             if (xValues.Length != yValues.Length)
@@ -496,6 +496,7 @@ namespace ferram4
 
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void LineColor(string lineName, Color newColor)
         {
             ferramGraphLine line;
@@ -509,6 +510,7 @@ namespace ferram4
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void LineThickness(string lineName, int thickness)
         {
             ferramGraphLine line;

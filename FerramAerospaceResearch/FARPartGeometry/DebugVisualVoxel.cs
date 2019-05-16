@@ -51,13 +51,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
     {
         public static float globalScale = 0.9f;
         private float m_scale;
-        private float m_extent;
-        private Vector3 m_position;
 
         public DebugVisualVoxel(Vector3 pos, double elementScale)
         {
             Scale = (float) elementScale;
-            m_position = pos;
+            Position = pos;
         }
 
         public float Scale
@@ -66,19 +64,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             set
             {
                 m_scale = value;
-                m_extent = value * globalScale;
+                Extent = value * globalScale;
             }
         }
-        public float Extent
-        {
-            get => m_extent;
-            set => Scale = value / globalScale;
-        }
-        public Vector3 Position
-        {
-            get => m_position;
-            set => m_position = value;
-        }
+        public float Extent { get; private set; }
+
+        public Vector3 Position { get; }
+
         public Vector3 BottomLeft
         {
             get => new Vector3(Position.x - Extent, Position.y - Extent, Position.z);
@@ -102,7 +94,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             int counter = vertices.Count - indexOffset;
 
             // update extent in case globalScale changed
-            m_extent = m_scale * globalScale;
+            Extent = Scale * globalScale;
 
             vertices.Add(BottomLeft);
             uvs.Add(new Vector2(0, 0));

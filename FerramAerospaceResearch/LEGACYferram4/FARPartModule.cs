@@ -56,7 +56,7 @@ namespace ferram4
         public List<Part> VesselPartList;
         private Collider[] partColliders;
 
-        public Collider[] PartColliders { get { if(partColliders == null) TriggerPartColliderUpdate(); return partColliders; } protected set { partColliders = value; } }
+        public Collider[] PartColliders { get { if(partColliders == null) TriggerPartColliderUpdate(); return partColliders; } }
 
         public void ForceOnVesselPartsChange()
         {

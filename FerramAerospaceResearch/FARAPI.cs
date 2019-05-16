@@ -48,6 +48,8 @@ using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FerramAerospaceResearch
 {
     public class FARAPI

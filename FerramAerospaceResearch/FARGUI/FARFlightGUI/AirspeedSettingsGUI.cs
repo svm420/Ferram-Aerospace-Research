@@ -69,6 +69,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             LoadSettings();
         }
 
+        // ReSharper disable once UnusedMember.Global -> MACH
         public enum SurfaceVelMode
         {
             TAS,

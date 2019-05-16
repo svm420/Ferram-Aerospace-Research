@@ -48,23 +48,6 @@ namespace ferram4
             return other;
         }
 
-        public static int[] toPixels(this double[] raw, double zeroValue, double scale, double scaling = 1.0)
-        {
-            int elements = raw.Length;
-            int[] pixels = new int[elements];
-            double tmp;
-            for (int i = 0; i < elements; i++)
-            {
-                tmp = raw[i] * scale;
-                tmp -= zeroValue;
-                tmp *= scaling;
-
-                pixels[i] = (int) Math.Round(tmp);
-            }
-
-            return pixels;
-        }
-
         public static double[] toPixelsF(this double[] raw, double zeroValue, double scale, double scaling = 1.0)
         {
             int elements = raw.Length;
@@ -94,6 +77,7 @@ namespace ferram4
             return (i >= 0 && i < tex.width) && (j >= 0 && j < tex.height);
         }
 
+        // ReSharper disable once UnusedMember.Global -> for reference
         /// <summary>
         /// Bresenham line drawing algorithm (quick)
         /// </summary>

@@ -65,11 +65,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class EditorGUI : MonoBehaviour
     {
-        private static EditorGUI instance;
-        public static EditorGUI Instance
-        {
-            get { return instance; }
-        }
+        public static EditorGUI Instance { get; private set; }
 
         private int _updateRateLimiter;
         private bool _updateQueued = true;
@@ -79,7 +75,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private Rect guiRect;
         public static Rect GUIRect
         {
-            get { return instance.guiRect; }
+            get { return Instance.guiRect; }
         }
 
         private static IButton blizzyEditorGUIButton;
@@ -130,8 +126,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void Start()
         {
-            if (CompatibilityChecker.IsAllCompatible() && instance == null)
-                instance = this;
+            if (CompatibilityChecker.IsAllCompatible() && Instance == null)
+                Instance = this;
             else
             {
                 Destroy(this);
@@ -251,7 +247,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         public static void ResetEditor()
         {
-            instance._areaRulingOverlay.RestartOverlay();
+            Instance._areaRulingOverlay.RestartOverlay();
             RequestUpdateVoxel();
         }
 
@@ -381,9 +377,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         #region voxel
         public static void RequestUpdateVoxel()
         {
-            if (instance._updateRateLimiter > FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)
-                instance._updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
-            instance._updateQueued = true;
+            if (Instance._updateRateLimiter > FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)
+                Instance._updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
+            Instance._updateQueued = true;
             //instance._areaRulingOverlay.SetVisibility(false);
 
         }

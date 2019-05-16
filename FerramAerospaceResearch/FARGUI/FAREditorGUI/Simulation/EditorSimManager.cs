@@ -74,16 +74,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public StabilityDerivOutput vehicleData;
 
-        public EditorSimManager()
-        {
-            _instantCondition = new InstantConditionSim();
-            _stabDerivCalculator = new StabilityDerivCalculator(_instantCondition);
-            _stabDerivLinearSim = new StabilityDerivLinearSim(_instantCondition);
-            _sweepSim = new SweepSim(_instantCondition);
-            _aeroCenter = new EditorAeroCenter();
-            vehicleData = new StabilityDerivOutput();
-        }
-
         public EditorSimManager(InstantConditionSim _instantSim)
         {
             _instantCondition = _instantSim;

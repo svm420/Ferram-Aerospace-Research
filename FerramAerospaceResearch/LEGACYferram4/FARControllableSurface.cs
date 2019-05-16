@@ -513,6 +513,7 @@ namespace ferram4
         }
 
         // Had to add this one since the parent class don't use AoAoffset and adding it would break GetWingInFrontOf
+        // ReSharper disable once UnusedMember.Global
         public double CalculateAoA(Vector3d velocity, double AoAoffset)
         {
             double radAoAoffset = AoAoffset * FARMathUtil.deg2rad * ctrlSurfFrac;

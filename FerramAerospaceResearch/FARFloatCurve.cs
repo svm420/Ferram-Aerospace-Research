@@ -163,6 +163,7 @@ namespace FerramAerospaceResearch
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void Scale(double scalar)
         {
             for(int i = 0; i < sections.Length; ++i)

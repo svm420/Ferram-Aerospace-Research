@@ -22,6 +22,7 @@ namespace FerramAerospaceResearch
 
             public string BundleName
             {
+                // ReSharper disable once UnusedMember.Global
                 get { return bundleName; }
                 private set
                 {

@@ -44,6 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 namespace FerramAerospaceResearch {
 	public class FARPM : PartModule {
+		// ReSharper disable once UnusedMember.Global
 		public object ProcessVariable(string variable) {
 			switch(variable) {
 				case "FARPM_DYNAMIC_PRESSURE_Q":

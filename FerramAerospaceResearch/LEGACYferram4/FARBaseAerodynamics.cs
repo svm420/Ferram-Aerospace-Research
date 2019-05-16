@@ -63,9 +63,6 @@ namespace ferram4
 
         protected Transform part_transform;
 
-        protected static Ray ray;
-        protected static RaycastHit hit;
-
         //Reset tinting for this part and its children
  //       private bool resetTinting;
 
@@ -98,7 +95,7 @@ namespace ferram4
 
         }
 
-        public virtual Vector3d GetVelocity()
+        public Vector3d GetVelocity()
         {
             if (HighLogic.LoadedSceneIsFlight)
                 return part.Rigidbody.velocity + Krakensbane.GetFrameVelocityV3f()
@@ -106,6 +103,7 @@ namespace ferram4
             return velocityEditor;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public Vector3d GetVelocity(Vector3 refPoint)
         {
             Vector3d velocity = Vector3.zero;

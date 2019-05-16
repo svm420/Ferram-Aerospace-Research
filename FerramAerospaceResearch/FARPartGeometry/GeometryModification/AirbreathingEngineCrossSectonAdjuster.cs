@@ -57,11 +57,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         private Matrix4x4 thisToVesselMatrix;
         private Matrix4x4 meshLocalToWorld;
 
-        private ModuleEngines engine;
-        public ModuleEngines EngineModule
-        {
-            get { return engine; }
-        }
+        public ModuleEngines EngineModule { get; }
 
         private Part part;
         public Part GetPart()
@@ -88,7 +84,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             vehicleBasisForwardVector *= -1f;
 
 
-            this.engine = engine;
+            this.EngineModule = engine;
             part = engine.part;
 
             Bounds partBounds = part.GetPartColliderBoundsInBasis(Matrix4x4.identity);
@@ -139,7 +135,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetThisToVesselMatrixForTransform()
         {
-            meshLocalToWorld = engine.thrustTransforms[0].localToWorldMatrix;
+            meshLocalToWorld = EngineModule.thrustTransforms[0].localToWorldMatrix;
         }
 
         public void UpdateArea() { }

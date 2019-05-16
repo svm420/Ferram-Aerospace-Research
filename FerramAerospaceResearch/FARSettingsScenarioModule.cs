@@ -322,8 +322,6 @@ namespace FerramAerospaceResearch
         public int index;
 
 
-        public static bool customSettings = false;
-
         public FARDifficultyAndExactnessSettings(int index)
         {
             this.index = index;

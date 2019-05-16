@@ -52,23 +52,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
     internal class EditorAeroCenter
     {
-        private static EditorAeroCenter instance;
-        public static EditorAeroCenter Instance
-        {
-            get { return instance; }
-        }
+        public static EditorAeroCenter Instance { get; private set; }
 
         private Vector3 vesselRootLocalAeroCenter;
         public static Vector3 VesselRootLocalAeroCenter
         {
-            get { return instance.vesselRootLocalAeroCenter; }
+            get { return Instance.vesselRootLocalAeroCenter; }
         }
 
         private List<FARAeroSection> _currentAeroSections;
 
         public EditorAeroCenter()
         {
-            instance = this;
+            Instance = this;
         }
 
         public void UpdateAeroData(List<FARAeroSection> aeroSections)

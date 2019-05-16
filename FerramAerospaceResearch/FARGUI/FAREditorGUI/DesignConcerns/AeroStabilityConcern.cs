@@ -48,6 +48,7 @@ using PreFlightTests;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 {
+    // ReSharper disable once UnusedMember.Global
     internal class AeroStabilityConcern : DesignConcernBase
     {
         private InstantConditionSim _instantSim;

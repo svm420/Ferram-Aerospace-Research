@@ -87,6 +87,7 @@ namespace FerramAerospaceResearch
         }
 
 
+        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// "Set" method for the wind function.
         /// If newFunction is null, it resets the function to ZeroWind.

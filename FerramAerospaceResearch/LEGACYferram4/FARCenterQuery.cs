@@ -106,6 +106,7 @@ namespace ferram4
         }
 
         // Merge two force sets
+        // ReSharper disable once UnusedMember.Global
         public void AddAll(FARCenterQuery q2)
         {
             force += q2.force;
@@ -121,6 +122,7 @@ namespace ferram4
             return amount > 0 ? pos / amount : Vector3d.zero;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetPos(Vector3d npos)
         {
             pos = npos;
@@ -144,6 +146,7 @@ namespace ferram4
             return origin + Vector3d.Cross(force, TorqueAt(origin)) / fmag;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public Vector3d GetMinTorquePos()
         {
             return GetMinTorquePos(GetPos());
@@ -153,6 +156,7 @@ namespace ferram4
         // object. This tries to replicate it based on results of experiments.
         // In practice this is probably not necessary for FAR, but since this
         // knowledge has been obtained, might as well turn it into code.
+        // ReSharper disable once UnusedMember.Global
         public static float TorqueClipFactor(Vector3 torque, Rigidbody body)
         {
             Vector3 tq = Quaternion.Inverse(body.rotation * body.inertiaTensorRotation) * torque;

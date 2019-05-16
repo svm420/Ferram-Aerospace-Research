@@ -51,6 +51,7 @@ namespace FerramAerospaceResearch
     {
         public static class FARPartExtensions
         {
+            // ReSharper disable once UnusedMember.Global
             public static Collider[] GetPartColliders(this Part part)
             {
                 Collider[] colliders;
@@ -94,6 +95,7 @@ namespace FerramAerospaceResearch
                 return colliders;
             }
 
+            // ReSharper disable once UnusedMember.Global
             public static Bounds[] GetPartMeshBoundsInPartSpace(this Part part, int excessiveVerts = 2500)
             {
                 var transforms = part.FindModelComponents<Transform>();
