@@ -486,7 +486,7 @@ namespace ferram4
                     AoAdesiredControl += BrakeRudderLocation * Math.Max(0.0, BrakeRudderSide * vessel.ctrlState.yaw) * brakeRudder * 0.01;
                 }
                 AoAdesiredControl *= maxdeflect;
-                if (pitchaxisDueToAoA != 0.0)
+                if (!pitchaxisDueToAoA.NearlyEqual(0))
 				{
                     Vector3d vel = GetVelocity();
                     double velMag = vel.magnitude;
