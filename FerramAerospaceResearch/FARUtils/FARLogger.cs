@@ -57,6 +57,7 @@ namespace FerramAerospaceResearch.FARUtils
     {
 
         public static string defaultTag = $"[FAR {FARVersion.String}] ";
+        private static readonly string[] separators = {"\r\n", "\r", "\n"};
 
         public static string Tag { get; } = defaultTag;
 
@@ -363,7 +364,7 @@ namespace FerramAerospaceResearch.FARUtils
             {
                 return "";
             }
-            string[] lines = trace.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            string[] lines = trace.Split(separators, StringSplitOptions.None);
             string caller = lines[3].Trim();
             return caller.Substring(0, caller.IndexOf("(", StringComparison.Ordinal));
         }
