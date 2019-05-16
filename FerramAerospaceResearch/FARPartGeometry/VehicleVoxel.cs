@@ -76,7 +76,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private VoxelChunk[, , ] voxelChunks;
         private DebugVisualVoxelMeshController voxelMesh;
         private HashSet<Part> overridingParts;
-        private HashSet<Part> ductingParts;
         private int xLength, yLength, zLength;
         private int xCellLength, yCellLength, zCellLength;
         private int threadsQueued;
@@ -174,7 +173,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Vector3d max = new Vector3d(double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity);
 
             overridingParts = new HashSet<Part>(ObjectReferenceEqualityComparer<Part>.Default);
-            ductingParts = new HashSet<Part>();
             //Determine bounds and "overriding parts" from geoModules
             for (int i = 0; i < geoModules.Count; i++)
             {

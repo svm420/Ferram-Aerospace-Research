@@ -462,11 +462,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             if (part.Modules.Contains<ModuleAsteroid>())
             {
-                ModuleAsteroid asteroidModule = part.Modules.GetModule<ModuleAsteroid>();
-
-                StockProcAsteroidGeoUpdater asteroidUpdater = new StockProcAsteroidGeoUpdater(asteroidModule, this);
+                StockProcAsteroidGeoUpdater asteroidUpdater = new StockProcAsteroidGeoUpdater(this);
                 geometryUpdaters.Add(asteroidUpdater);
-
             }
         }
 

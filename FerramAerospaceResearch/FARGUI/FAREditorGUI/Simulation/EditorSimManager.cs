@@ -100,7 +100,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
              List<FARAeroSection> aeroSections;
              vehicleAero.GetNewAeroData(out aeroModules, out aeroSections);
              _instantCondition.UpdateAeroData(aeroModules, aeroSections, vehicleAero, wingAerodynamicModel);
-             _aeroCenter.UpdateAeroData(aeroModules, aeroSections);
+             _aeroCenter.UpdateAeroData(aeroSections);
         }
     }
 }

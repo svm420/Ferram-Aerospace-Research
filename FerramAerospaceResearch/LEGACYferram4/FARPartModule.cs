@@ -54,7 +54,6 @@ namespace ferram4
     {
         protected Callback OnVesselPartsChange;
         public List<Part> VesselPartList;
-        private int VesselPartListCount;
         private Collider[] partColliders;
 
         public Collider[] PartColliders { get { if(partColliders == null) TriggerPartColliderUpdate(); return partColliders; } protected set { partColliders = value; } }
@@ -119,7 +118,7 @@ namespace ferram4
 
         public List<Part> GetShipPartList()
         {
-            List<Part> list = null;
+            List<Part> list;
             if (HighLogic.LoadedSceneIsEditor)
                 list = FARAeroUtil.AllEditorParts;
             else if (vessel)
@@ -130,9 +129,6 @@ namespace ferram4
                 if (part)
                     list.Add(part);
             }
-            VesselPartListCount = list.Count;
-
-//            print("Updated Vessel Part List...");
 
             return list;
         }

@@ -64,7 +64,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             get { return instance.vesselRootLocalAeroCenter; }
         }
 
-        private List<FARAeroPartModule> _currentAeroModules;
         private List<FARAeroSection> _currentAeroSections;
 
         public EditorAeroCenter()
@@ -72,9 +71,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             instance = this;
         }
 
-        public void UpdateAeroData(List<FARAeroPartModule> aeroModules, List<FARAeroSection> aeroSections)
+        public void UpdateAeroData(List<FARAeroSection> aeroSections)
         {
-            _currentAeroModules = aeroModules;
             _currentAeroSections = aeroSections;
             UpdateAerodynamicCenter();
         }
