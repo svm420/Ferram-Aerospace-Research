@@ -104,9 +104,9 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             SaveSettings();
         }
 
-        public void UpdatePhysicsInfo(VesselFlightInfo info)
+        public void UpdatePhysicsInfo(VesselFlightInfo flightInfo)
         {
-            this.info = info;
+            info = flightInfo;
         }
 
         public void Display()

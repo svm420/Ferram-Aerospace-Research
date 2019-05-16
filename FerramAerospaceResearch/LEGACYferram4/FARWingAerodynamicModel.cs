@@ -709,21 +709,21 @@ namespace ferram4
         }
 
         //This version also updates the wing centroid
-        public Vector3d CalculateForces(Vector3d velocity, double MachNumber, double AoA, double rho, bool updateAeroArrows = true)
+        public Vector3d CalculateForces(Vector3d velocity, double MachNumber, double AoA, double density, bool updateAeroArrows = true)
         {
             CurWingCentroid = WingCentroid();
 
-            return DoCalculateForces(velocity, MachNumber, AoA, rho, 1, updateAeroArrows);
+            return DoCalculateForces(velocity, MachNumber, AoA, density, 1, updateAeroArrows);
         }
 
-        public Vector3d CalculateForces(Vector3d velocity, double MachNumber, double AoA, double rho, double failureForceScaling, bool updateAeroArrows = true)
+        public Vector3d CalculateForces(Vector3d velocity, double MachNumber, double AoA, double density, double failureForceScaling, bool updateAeroArrows = true)
         {
             CurWingCentroid = WingCentroid();
 
-            return DoCalculateForces(velocity, MachNumber, AoA, rho, failureForceScaling, updateAeroArrows);
+            return DoCalculateForces(velocity, MachNumber, AoA, density, failureForceScaling, updateAeroArrows);
         }
 
-        private Vector3d DoCalculateForces(Vector3d velocity, double MachNumber, double AoA, double rho, double failureForceScaling, bool updateAeroArrows = true)
+        private Vector3d DoCalculateForces(Vector3d velocity, double MachNumber, double AoA, double density, double failureForceScaling, bool updateAeroArrows = true)
         {
             //This calculates the angle of attack, adjusting the part's orientation for any deflection
             //CalculateAoA();
@@ -735,7 +735,7 @@ namespace ferram4
             Vector3 forward = part_transform.forward;
             Vector3d velocity_normalized = velocity / v_scalar;
 
-            double q = rho * v_scalar * v_scalar * 0.0005;   //dynamic pressure, q
+            double q = density * v_scalar * v_scalar * 0.0005;   //dynamic pressure, q
 
             ParallelInPlane = Vector3d.Exclude(forward, velocity).normalized;  //Projection of velocity vector onto the plane of the wing
             perp = Vector3d.Cross(forward, ParallelInPlane).normalized;       //This just gives the vector to cross with the velocity vector
@@ -750,7 +750,7 @@ namespace ferram4
 
             double skinFrictionDrag;
             if(HighLogic.LoadedSceneIsFlight)
-                skinFrictionDrag = FARAeroUtil.SkinFrictionDrag(rho, effective_MAC, v_scalar, MachNumber, vessel.externalTemperature, vessel.mainBody.atmosphereAdiabaticIndex);
+                skinFrictionDrag = FARAeroUtil.SkinFrictionDrag(density, effective_MAC, v_scalar, MachNumber, vessel.externalTemperature, vessel.mainBody.atmosphereAdiabaticIndex);
             else
                 skinFrictionDrag = 0.005;
 

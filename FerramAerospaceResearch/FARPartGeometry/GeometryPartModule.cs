@@ -1021,20 +1021,20 @@ namespace FerramAerospaceResearch.FARPartGeometry
             LoadList(node, "unignoreTransform", ref unignoredTransforms);
         }
 
-        private void LoadBool(ConfigNode node, string name, ref bool value)
+        private void LoadBool(ConfigNode node, string nodeName, ref bool value)
         {
-            if (node.HasValue(name))
+            if (node.HasValue(nodeName))
             {
-                bool.TryParse(node.GetValue(name), out value);
+                bool.TryParse(node.GetValue(nodeName), out value);
                 _ready = false;
             }
         }
 
-        private void LoadList(ConfigNode node, string name, ref List<string> list)
+        private void LoadList(ConfigNode node, string nodeName, ref List<string> list)
         {
-            if (node.HasValue(name))
+            if (node.HasValue(nodeName))
             {
-                foreach (string _name in node.GetValues(name))
+                foreach (string _name in node.GetValues(nodeName))
                 {
                     list.Add(_name);
                 }

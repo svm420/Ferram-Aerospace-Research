@@ -98,9 +98,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private FARAeroSection() { }
 
+        // ReSharper disable ParameterHidesMember -> updating member values
         public void UpdateAeroSection(float potentialFlowNormalForce, float viscCrossflowDrag, float diameter, float flatnessRatio, float hypersonicMomentForward, float hypersonicMomentBackward,
-            Vector3 centroidWorldSpace, Vector3 xRefVectorWorldSpace, Vector3 nRefVectorWorldSpace, Matrix4x4 vesselToWorldMatrix, Vector3 vehicleMainAxis, List<FARAeroPartModule> moduleList,
+                                      Vector3 centroidWorldSpace, Vector3 xRefVectorWorldSpace, Vector3 nRefVectorWorldSpace, Matrix4x4 vesselToWorldMatrix, Vector3 vehicleMainAxis, List<FARAeroPartModule> moduleList,
             List<float> dragFactor, Dictionary<Part, PartTransformInfo> partWorldToLocalMatrixDict)
+        // ReSharper restore ParameterHidesMember
         {
             mergeFactor = 0;
 
@@ -325,12 +327,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 this.atmDensity = atmDensity;
             }
 
+            // ReSharper disable ParameterHidesMember -> updating member values
             public void UpdateSimulationContext(Vector4 worldVel, FARCenterQuery center, float atmDensity)
             {
                 this.worldVel = worldVel;
                 this.center = center;
                 this.atmDensity = atmDensity;
             }
+            // ReSharper restore ParameterHidesMember
 
             public Vector3 LocalVelocity(PartData pd)
             {

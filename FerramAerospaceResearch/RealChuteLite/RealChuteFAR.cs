@@ -636,17 +636,17 @@ namespace FerramAerospaceResearch.RealChuteLite
         }
 
         //Calculates parachute deployed area
-        private float DragDeployment(float time, float debutDiameter, float endDiameter)
+        private float DragDeployment(float currentTime, float debutDiameter, float endDiameter)
         {
             if (!dragTimer.IsRunning) { dragTimer.Start(); }
 
             double t = dragTimer.Elapsed.TotalSeconds;
-            this.time = (float)t;
-            if (t <= time)
+            time = (float)t;
+            if (t <= currentTime)
             {
                 /* While this looks linear, area scales with the square of the diameter, and therefore
                  * Deployment will be quadratic. The previous exponential function was too slow at first and rough at the end */
-                float currentDiam = Mathf.Lerp(debutDiameter, endDiameter, (float)(t / time));
+                float currentDiam = Mathf.Lerp(debutDiameter, endDiameter, (float)(t / currentTime));
                 currentArea = GetArea(currentDiam);
                 return currentArea;
             }
@@ -655,9 +655,9 @@ namespace FerramAerospaceResearch.RealChuteLite
         }
 
         //Drag force vector
-        private Vector3 DragForce(float debutDiameter, float endDiameter, float time)
+        private Vector3 DragForce(float debutDiameter, float endDiameter, float currentTime)
         {
-            return DragCalculation(DragDeployment(time, debutDiameter, endDiameter)) * dragVector;
+            return DragCalculation(DragDeployment(currentTime, debutDiameter, endDiameter)) * dragVector;
         }
 
         //Calculates convective flux
@@ -734,11 +734,11 @@ namespace FerramAerospaceResearch.RealChuteLite
         }
 
         //Sets the part in the correct position for DragCube rendering
-        public void AssumeDragCubePosition(string name)
+        public void AssumeDragCubePosition(string cubeName)
         {
-            if (string.IsNullOrEmpty(name)) { return; }
+            if (string.IsNullOrEmpty(cubeName)) { return; }
             InitializeAnimationSystem();
-            switch (name)
+            switch (cubeName)
             {
                 //DaMichel: now we handle the stock behaviour, too.
                 case "PACKED":          //stock
@@ -796,7 +796,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         }
 
         //Info window
-        private void Window(int id)
+        private void Window(int windowId)
         {
             //Header
             GUI.DragWindow(drag);
@@ -1043,7 +1043,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         #endregion
 
         #region Overrides
-        public override void OnStart(StartState state)
+        public override void OnStart(StartState startState)
         {
             if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight) { return; }
             if (!CompatibilityChecker.IsAllCompatible())

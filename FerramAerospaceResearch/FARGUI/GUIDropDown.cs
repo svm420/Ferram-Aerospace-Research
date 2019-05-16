@@ -234,10 +234,10 @@ namespace FerramAerospaceResearch.FARGUI
                    displayRect.Contains(GUIUtils.GetMousePos());
         }
 
-        public void ActivateDisplay(int id, Rect btnRect, Rect rect, GUI.WindowFunction func, GUIStyle style)
+        public void ActivateDisplay(int id, Rect buttonRect, Rect rect, GUI.WindowFunction func, GUIStyle style)
         {
             windowId = id;
-            this.btnRect = btnRect;
+            btnRect = buttonRect;
             displayRect = rect;
             windowFunction = func;
             listStyle = style;

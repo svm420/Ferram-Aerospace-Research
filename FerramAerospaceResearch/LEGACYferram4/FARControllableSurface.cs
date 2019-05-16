@@ -514,9 +514,9 @@ namespace ferram4
 
         // Had to add this one since the parent class don't use AoAoffset and adding it would break GetWingInFrontOf
         // ReSharper disable once UnusedMember.Global
-        public double CalculateAoA(Vector3d velocity, double AoAoffset)
+        public double CalculateAoA(Vector3d velocity, double offset)
         {
-            double radAoAoffset = AoAoffset * FARMathUtil.deg2rad * ctrlSurfFrac;
+            double radAoAoffset = offset * FARMathUtil.deg2rad * ctrlSurfFrac;
             Vector3 perp = part_transform.TransformDirection(new Vector3d(0, Math.Sin(radAoAoffset), Math.Cos(radAoAoffset)));
             double PerpVelocity = Vector3d.Dot(perp, velocity.normalized);
             return Math.Asin(PerpVelocity.Clamp(-1, 1));
@@ -524,13 +524,12 @@ namespace ferram4
 
         //DaMichel: Factored the time evolution for deflection AoA into this function. This one results into an exponential asympotic
         //"decay" towards the desired value. Good for stick inputs, i suppose, and the original method.
-        private static double BlendDeflectionExp(double current, double desired, double timeConstant, bool forceSetToDesired)
+        private static double BlendDeflectionExp(double current, double desired, double blendTimeConstant, bool forceSetToDesired)
         {
             double error = desired - current;
             if (!forceSetToDesired && Math.Abs(error) >= 0.1)  // DaMichel: i changed the threshold since i noticed a "bump" at max deflection
             {
-                double recip_timeconstant = 1 / timeConstant;
-                double tmp1 = error * recip_timeconstant;
+                double tmp1 = error / blendTimeConstant;
                 current += (TimeWarp.fixedDeltaTime * tmp1).Clamp(-Math.Abs(0.6 * error), Math.Abs(0.6 * error));
             }
             else
@@ -542,12 +541,12 @@ namespace ferram4
         //for slow moving flaps and spoilers. It looks better anyways.
         //ferram4: The time constant specifies the time it would take for a first-order system to reach its steady-state value,
         //assuming that it was proportional to only the initial error, not the error as a function of time
-        private static double BlendDeflectionLinear(double current, double desired, double maximumDeflection, double timeConstant, bool forceSetToDesired)
+        private static double BlendDeflectionLinear(double current, double desired, double maximumDeflection, double blendTimeConstant, bool forceSetToDesired)
         {
             double error = desired - current;
             if (!forceSetToDesired && Math.Abs(error) >= 0.1)
             {
-                double degreesPerSecond = Math.Max(Math.Abs(maximumDeflection), Math.Abs(current)) / timeConstant;
+                double degreesPerSecond = Math.Max(Math.Abs(maximumDeflection), Math.Abs(current)) / blendTimeConstant;
                 double tmp = current + TimeWarp.fixedDeltaTime * degreesPerSecond * Math.Sign(desired - current);
                 if(error > 0)
                     current = tmp.Clamp(current, desired);
@@ -606,7 +605,7 @@ namespace ferram4
             CheckShielded();
         }
 
-        public void SetControlStateEditor(Vector3 CoM, Vector3 velocityVec, float pitch, float yaw, float roll, int flap, bool brake)
+        public void SetControlStateEditor(Vector3 CoM, Vector3 velocityVec, float pitch, float yaw, float roll, int flap, bool braking)
         {
             if (HighLogic.LoadedSceneIsEditor)
             {
@@ -684,7 +683,7 @@ namespace ferram4
                 if (isFlap)
                     AoAcurrentFlap += maxdeflectFlap * flapLocation * flap * 0.3333333333333;
                 else if (isSpoiler)
-                    AoAcurrentFlap += brake ? maxdeflectFlap * spoilerLocation : 0;
+                    AoAcurrentFlap += braking ? maxdeflectFlap * spoilerLocation : 0;
 
                 AoAdesiredFlap = AoAcurrentFlap;
                 AoAoffset = AoAcurrentFlap + AoAcurrentControl;

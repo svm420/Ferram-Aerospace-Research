@@ -532,19 +532,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
 
-        public void AddLocalForce(Vector3 partLocalForce, Vector3 partLocalLocation)
+        public void AddLocalForce(Vector3 localForce, Vector3 localLocation)
         {
-            this.partLocalForce += partLocalForce;
-            partLocalTorque += Vector3.Cross(partLocalLocation - part.CoMOffset, partLocalForce);
+            partLocalForce += localForce;
+            partLocalTorque += Vector3.Cross(localLocation - part.CoMOffset, localForce);
         }
 
-        public void AddLocalForceAndTorque(Vector3 partLocalForce, Vector3 partLocalTorque, Vector3 partLocalLocation)
+        public void AddLocalForceAndTorque(Vector3 localForce, Vector3 localTorque, Vector3 localLocation)
         {
-            Vector3 localRadVector = partLocalLocation - part.CoMOffset;
-            this.partLocalForce += partLocalForce;
-            this.partLocalTorque += Vector3.Cross(localRadVector, partLocalForce);
+            Vector3 localRadVector = localLocation - part.CoMOffset;
+            partLocalForce += localForce;
+            partLocalTorque += Vector3.Cross(localRadVector, localForce);
 
-            this.partLocalTorque += partLocalTorque;
+            partLocalTorque += localTorque;
 
         }
 

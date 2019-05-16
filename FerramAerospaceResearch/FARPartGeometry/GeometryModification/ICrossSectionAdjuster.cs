@@ -55,7 +55,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         double AreaThreshold();
 
-        void SetForwardBackwardNoFlowDirection(int sign);
+        void SetForwardBackwardNoFlowDirection(int direction);
         // ReSharper disable once UnusedMember.Global
         int GetForwardBackwardNoFlowSign();
 

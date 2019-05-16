@@ -84,6 +84,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             this.overridingParts = overridingParts;
         }
 
+        // ReSharper disable ParameterHidesMember -> update member values
         public void SetChunk(double size, Vector3d lowerCorner, int iOffset, int jOffset, int kOffset, HashSet<Part> overridingParts)
         {
             _size = size;
@@ -91,6 +92,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             this.lowerCorner = lowerCorner;
             this.overridingParts = overridingParts;
         }
+        // ReSharper restore ParameterHidesMember
 
         public void ClearChunk()
         {

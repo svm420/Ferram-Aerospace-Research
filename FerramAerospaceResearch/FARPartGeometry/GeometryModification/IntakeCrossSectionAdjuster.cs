@@ -164,9 +164,9 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
              return nodeOffsetArea;
         }
 
-        public void SetForwardBackwardNoFlowDirection(int sign)
+        public void SetForwardBackwardNoFlowDirection(int direction)
         {
-            this.sign = sign;
+            sign = direction;
         }
 
         public int GetForwardBackwardNoFlowSign() { return sign; }
