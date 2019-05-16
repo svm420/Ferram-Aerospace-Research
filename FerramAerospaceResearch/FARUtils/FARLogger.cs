@@ -49,7 +49,7 @@ using System;
 using System.Diagnostics;
 using Object = UnityEngine.Object;
 
-// ReSharper disable UnusedMember.Global
+// ReSharper disable InvocationIsSkipped UnusedMember.Global
 
 namespace FerramAerospaceResearch.FARUtils
 {
@@ -265,41 +265,49 @@ namespace FerramAerospaceResearch.FARUtils
         #endregion // Error
 
         #region Assertion
+        [Conditional("UNITY_ASSERTIONS")]
         public static void Assertion(object message)
         {
             UnityEngine.Debug.LogAssertion(Tag + message);
         }
 
+        [Conditional("UNITY_ASSERTIONS")]
         public static void Assertion(object message, Object context)
         {
             UnityEngine.Debug.LogAssertion(Tag + message, context);
         }
 
+        [Conditional("UNITY_ASSERTIONS")]
         public static void AssertionFormat(string format, params object[] args)
         {
             UnityEngine.Debug.LogAssertionFormat(Tag + format, args);
         }
 
+        [Conditional("UNITY_ASSERTIONS")]
         public static void AssertionFormat(Object context, string format, params object[] args)
         {
             UnityEngine.Debug.LogAssertionFormat(context, Tag + format, args);
         }
 
+        [Conditional("UNITY_ASSERTIONS")]
         public static void AssertionWithCaller(object message)
         {
             UnityEngine.Debug.LogAssertion(Tag + GetCallerInfo() + " - " + message);
         }
 
+        [Conditional("UNITY_ASSERTIONS")]
         public static void AssertionWithCaller(object message, Object context)
         {
             UnityEngine.Debug.LogAssertion(Tag + GetCallerInfo() + " - " + message, context);
         }
 
+        [Conditional("UNITY_ASSERTIONS")]
         public static void AssertionFormatWithCaller(string format, params object[] args)
         {
             UnityEngine.Debug.LogAssertionFormat(Tag + GetCallerInfo() + " - " + format, args);
         }
 
+        [Conditional("UNITY_ASSERTIONS")]
         public static void AssertionFormatWithCaller(Object context, string format, params object[] args)
         {
             UnityEngine.Debug.LogAssertionFormat(context, Tag + GetCallerInfo() + " - " + format, args);
