@@ -1345,6 +1345,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void DetermineIfPartGetsForcesAndAreas(Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas, PartSizePair voxel, int i, int j, int k)
         {
+            // ReSharper disable BitwiseOperatorOnEnumWithoutFlags
             VoxelCrossSection.SideAreaValues areas;
             VoxelOrientationPlane filledPlanes = VoxelOrientationPlane.NONE;
             bool partGetsForces = true;
@@ -1417,6 +1418,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
 
             voxel.SetFilledSides(filledPlanes);
+            // ReSharper restore BitwiseOperatorOnEnumWithoutFlags
         }
 
         private double TanPrincipalAxisAngle(double Ixx, double Iyy, double Ixy)

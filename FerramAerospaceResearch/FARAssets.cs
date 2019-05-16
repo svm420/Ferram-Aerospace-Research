@@ -7,6 +7,8 @@ using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace FerramAerospaceResearch
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]

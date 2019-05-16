@@ -98,6 +98,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public void SaveAndDestroy()
         {
+            // ReSharper disable once DelegateSubtraction
             if (_vessel != null)
                 _vessel.OnAutopilotUpdate -= OnAutoPilotUpdate;
             SaveSettings();

@@ -143,6 +143,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             try
             {
+                // ReSharper disable once InconsistentlySynchronizedField
                 Matrix4x4 tempMatrix = newThisToVesselMatrix * meshLocalToWorld;
                 //Matrix4x4 tempMatrix = thisToVesselMatrix.inverse;
                 //thisToVesselMatrix = newThisToVesselMatrix * meshLocalToWorld;

@@ -140,7 +140,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             _vehicleAero = new VehicleAerodynamics();
 
+            // ReSharper disable PossibleLossOfFraction
             guiRect = new Rect(Screen.width / 4, Screen.height / 6, 10, 10);
+            // ReSharper restore PossibleLossOfFraction
 
             _instantSim = new InstantConditionSim();
             GUIDropDown<int> flapSettingDropDown = new GUIDropDown<int>(new[] { Localizer.Format("FARFlapSetting0"), Localizer.Format("FARFlapSetting1"), Localizer.Format("FARFlapSetting2"), Localizer.Format("FARFlapSetting3") }, new[] { 0, 1, 2, 3 }, 0);

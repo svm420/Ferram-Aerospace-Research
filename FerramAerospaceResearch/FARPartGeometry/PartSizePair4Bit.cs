@@ -99,6 +99,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public override void SetFilledSides(VoxelOrientationPlane filledPlanes)
         {
+            // ReSharper disable BitwiseOperatorOnEnumWithoutFlags
             if ((filledPlanes & VoxelOrientationPlane.X_UP) == VoxelOrientationPlane.X_UP)
                 xPlane |= UP_MASK;
 
@@ -116,6 +117,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if ((filledPlanes & VoxelOrientationPlane.Z_DOWN) == VoxelOrientationPlane.Z_DOWN)
                 zPlane |= DOWN_MASK;
+            // ReSharper restore BitwiseOperatorOnEnumWithoutFlags
         }
 
         //Will return true if the location is updated
