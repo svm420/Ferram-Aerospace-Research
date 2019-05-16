@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
+// ReSharper disable once CheckNamespace
 namespace FerramAerospaceResearch
 {
     public static class FARAnimOverrides
@@ -23,6 +20,7 @@ namespace FerramAerospaceResearch
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static bool OverrideExists(string moduleName)
         {
             return animOverrides.ContainsKey(moduleName);

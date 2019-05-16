@@ -1,5 +1,7 @@
 ﻿using System;
 
+// ReSharper disable UnusedMember.Global
+
 /* RealChuteLite is the work of Christophe Savard (stupid_chris), and is licensed the same way than the rest of FAR is.
  * If you have any questions about this code, or want to report something, don't annoy ferram about it, ask me
  * directly on GitHub, the forums, or IRC. */
@@ -46,7 +48,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public TimeSpan Elapsed
         {
-            get { return new TimeSpan(this.ElapsedTicks); }
+            get { return new TimeSpan(ElapsedTicks); }
         }
 
         /// <summary>
@@ -56,8 +58,8 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.IsRunning) { UpdateWatch(); }
-                return (long)Math.Round(this.totalSeconds * millisecondPerSecond);
+                if (IsRunning) { UpdateWatch(); }
+                return (long)Math.Round(totalSeconds * millisecondPerSecond);
             }
         }
 
@@ -68,8 +70,8 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.IsRunning) { UpdateWatch(); }
-                return (long)Math.Round(this.totalSeconds * ticksPerSecond);
+                if (IsRunning) { UpdateWatch(); }
+                return (long)Math.Round(totalSeconds * ticksPerSecond);
             }
         }
         #endregion
@@ -86,7 +88,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// <param name="seconds">Time to start at, in seconds</param>
         public PhysicsWatch(double seconds)
         {
-            this.totalSeconds = seconds;
+            totalSeconds = seconds;
         }
         #endregion
 
@@ -96,10 +98,10 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public void Start()
         {
-            if (!this.IsRunning)
+            if (!IsRunning)
             {
-                this.lastCheck = Planetarium.GetUniversalTime();
-                this.IsRunning = true;
+                lastCheck = Planetarium.GetUniversalTime();
+                IsRunning = true;
             }
         }
 
@@ -108,10 +110,10 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public void Stop()
         {
-            if (this.IsRunning)
+            if (IsRunning)
             {
                 UpdateWatch();
-                this.IsRunning = false;
+                IsRunning = false;
             }
         }
 
@@ -120,9 +122,9 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public void Restart()
         {
-            this.totalSeconds = 0;
-            this.lastCheck = Planetarium.GetUniversalTime();
-            this.IsRunning = true;
+            totalSeconds = 0;
+            lastCheck = Planetarium.GetUniversalTime();
+            IsRunning = true;
         }
 
         /// <summary>
@@ -130,9 +132,9 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public void Reset()
         {
-            this.totalSeconds = 0;
-            this.lastCheck = 0;
-            this.IsRunning = false;
+            totalSeconds = 0;
+            lastCheck = 0;
+            IsRunning = false;
         }
         #endregion
 
@@ -143,8 +145,8 @@ namespace FerramAerospaceResearch.RealChuteLite
         protected virtual void UpdateWatch()
         {
             double current = Planetarium.GetUniversalTime();
-            this.totalSeconds += current - this.lastCheck;
-            this.lastCheck = current;
+            totalSeconds += current - lastCheck;
+            lastCheck = current;
         }
         #endregion
 
@@ -154,7 +156,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public override string ToString()
         {
-            return this.Elapsed.ToString();
+            return Elapsed.ToString();
         }
         #endregion
 

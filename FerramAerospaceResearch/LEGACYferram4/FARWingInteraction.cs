@@ -45,14 +45,15 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using FerramAerospaceResearch;
+using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     public class FARWingInteraction
     {
-        static RaycastHitComparer _comparer = new RaycastHitComparer();
+        private static RaycastHitComparer _comparer = new RaycastHitComparer();
 
         private FARWingAerodynamicModel parentWingModule;
         private Part parentWingPart;
@@ -75,36 +76,21 @@ namespace ferram4
         private double leftwardExposure;
         private double rightwardExposure;
 
-        private double effectiveUpstreamMAC;
-        private double effectiveUpstreamb_2;
-        private double effectiveUpstreamLiftSlope;
-        private double effectiveUpstreamArea;
-        private double effectiveUpstreamStall;
-        private double effectiveUpstreamCosSweepAngle;
-        private double effectiveUpstreamAoAMax;
-        private double effectiveUpstreamAoA;
-        private double effectiveUpstreamCd0;
-        private double effectiveUpstreamInfluence;
-
-        private bool hasWingsUpstream = false;
-
-        public double EffectiveUpstreamMAC { get { return effectiveUpstreamMAC; } private set { effectiveUpstreamMAC = value; } }
-        public double EffectiveUpstreamb_2 { get { return effectiveUpstreamb_2; } private set { effectiveUpstreamb_2 = value; } }
-        public double EffectiveUpstreamLiftSlope { get { return effectiveUpstreamLiftSlope; } private set { effectiveUpstreamLiftSlope = value; } }
-        public double EffectiveUpstreamArea { get { return effectiveUpstreamArea; } private set { effectiveUpstreamArea = value; } }
-        public double EffectiveUpstreamStall { get { return effectiveUpstreamStall; } private set { effectiveUpstreamStall = value; } }
-        public double EffectiveUpstreamCosSweepAngle { get { return effectiveUpstreamCosSweepAngle; } private set { effectiveUpstreamCosSweepAngle = value; } }
-        public double EffectiveUpstreamAoAMax { get { return effectiveUpstreamAoAMax; } private set { effectiveUpstreamAoAMax = value; } }
-        public double EffectiveUpstreamAoA { get { return effectiveUpstreamAoA; } private set { effectiveUpstreamAoA = value; } }
-        public double EffectiveUpstreamCd0 { get { return effectiveUpstreamCd0; } private set { effectiveUpstreamCd0 = value; } }
-        public double EffectiveUpstreamInfluence { get { return effectiveUpstreamInfluence; } private set { effectiveUpstreamInfluence = value; } }
-
-        public bool HasWingsUpstream { get { return hasWingsUpstream; } private set { hasWingsUpstream = value; } }
+        public double EffectiveUpstreamMAC { get; private set; }
+        public double EffectiveUpstreamb_2 { get; private set; }
+        public double EffectiveUpstreamLiftSlope { get; private set; }
+        public double EffectiveUpstreamArea { get; private set; }
+        public double EffectiveUpstreamStall { get; private set; }
+        public double EffectiveUpstreamCosSweepAngle { get; private set; }
+        public double EffectiveUpstreamAoAMax { get; private set; }
+        public double EffectiveUpstreamAoA { get; private set; }
+        public double EffectiveUpstreamCd0 { get; private set; }
+        public double EffectiveUpstreamInfluence { get; private set; }
+        public bool HasWingsUpstream { get; private set; }
 
 
-
-        private static FloatCurve wingCamberFactor = null;
-        private static FloatCurve wingCamberMoment = null;
+        private static FloatCurve wingCamberFactor;
+        private static FloatCurve wingCamberMoment;
 
         private double aRFactor = 1;
         private double clInterferenceFactor = 1;
@@ -177,13 +163,13 @@ namespace ferram4
         /// </summary>
         public void ResetWingInteractions()
         {
-            effectiveUpstreamLiftSlope = 0;
-            effectiveUpstreamStall = 0;
-            effectiveUpstreamCosSweepAngle = 0;
-            effectiveUpstreamAoAMax = 0;
-            effectiveUpstreamAoA = 0;
-            effectiveUpstreamCd0 = 0;
-            effectiveUpstreamInfluence = 0;
+            EffectiveUpstreamLiftSlope = 0;
+            EffectiveUpstreamStall = 0;
+            EffectiveUpstreamCosSweepAngle = 0;
+            EffectiveUpstreamAoAMax = 0;
+            EffectiveUpstreamAoA = 0;
+            EffectiveUpstreamCd0 = 0;
+            EffectiveUpstreamInfluence = 0;
         }
 
         /// <summary>
@@ -222,9 +208,9 @@ namespace ferram4
             }
             else
             {
-                forwardExposure = ExposureInChordDirection(out nearbyWingModulesForward, up, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
+                forwardExposure = ExposureInChordDirection(out nearbyWingModulesForward, up, VesselPartList, flt_b_2, flt_MAC, flt_MidChordSweep);
 
-                backwardExposure = ExposureInChordDirection(out nearbyWingModulesBackward, -up, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
+                backwardExposure = ExposureInChordDirection(out nearbyWingModulesBackward, -up, VesselPartList, flt_b_2, flt_MAC, flt_MidChordSweep);
 
                 leftwardExposure = ExposureInSpanDirection(out nearbyWingModulesLeftward, -right, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
 
@@ -245,12 +231,8 @@ namespace ferram4
             ClInterferenceFactor = ClCdInterference;
         }
 
-        public HashSet<FARWingAerodynamicModel> UpdateNearbyWingInteractions()
-        {
-            return UpdateNearbyWingInteractions(new HashSet<FARWingAerodynamicModel>());
-        }
-
         //This updates the interactions of all wings near this one; call this one when somethign changes rather than all of them at once
+        // ReSharper disable once UnusedMember.Global
         public HashSet<FARWingAerodynamicModel> UpdateNearbyWingInteractions(HashSet<FARWingAerodynamicModel> wingsHandled)
         {
             //Hashset to avoid repeating the same one affected
@@ -362,7 +344,7 @@ namespace ferram4
                                 {
 
                                     double tmp = h.distance / dist;
-                                    tmp = FARMathUtil.Clamp(tmp, 0, 1);
+                                    tmp = tmp.Clamp(0, 1);
                                     double tmp2 = Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward, w.part.partTransform.forward));
                                     tmp = 1 - (1 - tmp) * tmp2;
                                     interferencevalue = Math.Min(tmp, interferencevalue);
@@ -380,7 +362,7 @@ namespace ferram4
         }
 
         #region StandardWingExposureDetection
-        private double ExposureInChordDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float TaperRatio, float MidChordSweep)
+        private double ExposureInChordDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float MidChordSweep)
         {
             Ray ray = new Ray();
             ray.direction = rayDirection;
@@ -452,7 +434,7 @@ namespace ferram4
 
         private FARWingAerodynamicModel ExposureHitDetectionAndWingDetection(RaycastHit[] hits, List<Part> vesselPartList, ref double exposure, double exposureDecreasePerHit)
         {
-            bool gotSomething = false;
+            bool gotSomething;
             bool firstHit = true;
             double wingInteractionFactor = 0;
 
@@ -475,7 +457,7 @@ namespace ferram4
 
                         Collider[] colliders;
 
-                        if ((object)farModule != null)
+                        if (!(farModule is null))
                         {
                             colliders = farModule.PartColliders;
                             if (colliders == null)
@@ -485,7 +467,7 @@ namespace ferram4
                             }
                         }
                         else
-                            colliders = new Collider[1] { p.collider };
+                            colliders = new[] { p.collider };
 
                         for (int l = 0; l < colliders.Length; l++)
                             if (h.collider == colliders[l] && h.distance > 0)
@@ -568,8 +550,9 @@ namespace ferram4
         /// </summary>
         /// <param name="thisWingAoA">AoA of this wing in rad</param>
         /// <param name="thisWingMachNumber">Mach Number of this wing in rad</param>
-        /// <param name="ACWeight">Weighting value for applying ACshift</param>
-        /// <param name="ACShift">Value used to shift the wing AC due to interactive effects</param>
+        /// <param name="parallelInPlaneLocal">Local coordinate system (right, forward, ..)</param>
+        /// <param name="ACweight">Weighting value for applying ACshift</param>
+        /// <param name="ACshift">Value used to shift the wing AC due to interactive effects</param>
         /// <param name="ClIncrementFromRear">Increase in Cl due to this</param>
         /// <returns></returns>
         public void CalculateEffectsOfUpstreamWing(double thisWingAoA, double thisWingMachNumber, Vector3d parallelInPlaneLocal,
@@ -580,17 +563,17 @@ namespace ferram4
             thisWingMAC = parentWingModule.GetMAC();
             thisWingb_2 = parentWingModule.Getb_2();
 
-            effectiveUpstreamMAC = 0;
-            effectiveUpstreamb_2 = 0;
-            effectiveUpstreamArea = 0;
+            EffectiveUpstreamMAC = 0;
+            EffectiveUpstreamb_2 = 0;
+            EffectiveUpstreamArea = 0;
 
-            effectiveUpstreamLiftSlope = 0;
-            effectiveUpstreamStall = 0;
-            effectiveUpstreamCosSweepAngle = 0;
-            effectiveUpstreamAoAMax = 0;
-            effectiveUpstreamAoA = 0;
-            effectiveUpstreamCd0 = 0;
-            effectiveUpstreamInfluence = 0;
+            EffectiveUpstreamLiftSlope = 0;
+            EffectiveUpstreamStall = 0;
+            EffectiveUpstreamCosSweepAngle = 0;
+            EffectiveUpstreamAoAMax = 0;
+            EffectiveUpstreamAoA = 0;
+            EffectiveUpstreamCd0 = 0;
+            EffectiveUpstreamInfluence = 0;
 
             double wingForwardDir = parallelInPlaneLocal.y;
             double wingRightwardDir = parallelInPlaneLocal.x * srfAttachFlipped;
@@ -617,28 +600,28 @@ namespace ferram4
                 UpdateUpstreamValuesFromWingModules(nearbyWingModulesLeftwardList, nearbyWingModulesLeftwardInfluence, wingRightwardDir, thisWingAoA);
             }
 
-            double MachCoeff = FARMathUtil.Clamp(1 - thisWingMachNumber * thisWingMachNumber, 0, 1);
+            double MachCoeff = (1 - thisWingMachNumber * thisWingMachNumber).Clamp(0, 1);
 
             if (!MachCoeff.NearlyEqual(0))
             {
-                double flapRatio = FARMathUtil.Clamp(thisWingMAC / (thisWingMAC + effectiveUpstreamMAC), 0, 1);
+                double flapRatio = (thisWingMAC / (thisWingMAC + EffectiveUpstreamMAC)).Clamp(0, 1);
                 float flt_flapRatio = (float)flapRatio;
                 double flapFactor = wingCamberFactor.Evaluate(flt_flapRatio);        //Flap Effectiveness Factor
                 double dCm_dCl = wingCamberMoment.Evaluate(flt_flapRatio);           //Change in moment due to change in lift from flap
 
                 //This accounts for the wing possibly having a longer span than the flap
-                double WingFraction = FARMathUtil.Clamp(thisWingb_2 / effectiveUpstreamb_2, 0, 1);
+                double WingFraction = (thisWingb_2 / EffectiveUpstreamb_2).Clamp(0, 1);
                 //This accounts for the flap possibly having a longer span than the wing it's attached to
-                double FlapFraction = FARMathUtil.Clamp(effectiveUpstreamb_2 / thisWingb_2, 0, 1);
+                double FlapFraction = (EffectiveUpstreamb_2 / thisWingb_2).Clamp(0, 1);
 
-                double ClIncrement = flapFactor * effectiveUpstreamLiftSlope * effectiveUpstreamAoA;   //Lift created by the flap interaction
-                ClIncrement *= (parentWingModule.S * FlapFraction + effectiveUpstreamArea * WingFraction) / parentWingModule.S;                   //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
+                double ClIncrement = flapFactor * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;   //Lift created by the flap interaction
+                ClIncrement *= (parentWingModule.S * FlapFraction + EffectiveUpstreamArea * WingFraction) / parentWingModule.S;                   //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
 
                 ACweight = ClIncrement * MachCoeff; // Total flap Cl for the purpose of applying ACshift, including the bit subtracted below
 
-                ClIncrement -= FlapFraction * effectiveUpstreamLiftSlope * effectiveUpstreamAoA;        //Removing additional angle so that lift of the flap is calculated as lift at wing angle + lift due to flap interaction rather than being greater
+                ClIncrement -= FlapFraction * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;        //Removing additional angle so that lift of the flap is calculated as lift at wing angle + lift due to flap interaction rather than being greater
 
-                ACshift = (dCm_dCl + 0.75 * (1 - flapRatio)) * (thisWingMAC + effectiveUpstreamMAC);      //Change in Cm with change in Cl
+                ACshift = (dCm_dCl + 0.75 * (1 - flapRatio)) * (thisWingMAC + EffectiveUpstreamMAC);      //Change in Cm with change in Cl
 
                 ClIncrementFromRear = ClIncrement * MachCoeff;
             }
@@ -654,7 +637,7 @@ namespace ferram4
             double wingRightwardDir = parallelInPlaneLocal.x * srfAttachFlipped;
 
             ARFactor = CalculateARFactor(wingForwardDir, wingRightwardDir);
-            hasWingsUpstream = DetermineWingsUpstream(wingForwardDir, wingRightwardDir);
+            HasWingsUpstream = DetermineWingsUpstream(wingForwardDir, wingRightwardDir);
         }
 
         private void UpdateUpstreamValuesFromWingModules(List<FARWingAerodynamicModel> wingModules, List<double> associatedInfluences, double directionalInfluence, double thisWingAoA)
@@ -676,21 +659,21 @@ namespace ferram4
 
                 double tmp = Vector3.Dot(wingModule.transform.forward, parentWingModule.transform.forward);
 
-                effectiveUpstreamMAC += wingModule.GetMAC() * wingInfluenceFactor;
-                effectiveUpstreamb_2 += wingModule.Getb_2() * wingInfluenceFactor;
-                effectiveUpstreamArea += wingModule.S * wingInfluenceFactor;
+                EffectiveUpstreamMAC += wingModule.GetMAC() * wingInfluenceFactor;
+                EffectiveUpstreamb_2 += wingModule.Getb_2() * wingInfluenceFactor;
+                EffectiveUpstreamArea += wingModule.S * wingInfluenceFactor;
 
-                effectiveUpstreamLiftSlope += wingModule.GetRawLiftSlope() * wingInfluenceFactor;
-                effectiveUpstreamStall += wingModule.GetStall() * wingInfluenceFactor;
-                effectiveUpstreamCosSweepAngle += wingModule.GetCosSweepAngle() * wingInfluenceFactor;
-                effectiveUpstreamAoAMax += wingModule.rawAoAmax * wingInfluenceFactor;
-                effectiveUpstreamCd0 += wingModule.GetCd0() * wingInfluenceFactor;
-                effectiveUpstreamInfluence += wingInfluenceFactor;
+                EffectiveUpstreamLiftSlope += wingModule.GetRawLiftSlope() * wingInfluenceFactor;
+                EffectiveUpstreamStall += wingModule.GetStall() * wingInfluenceFactor;
+                EffectiveUpstreamCosSweepAngle += wingModule.GetCosSweepAngle() * wingInfluenceFactor;
+                EffectiveUpstreamAoAMax += wingModule.rawAoAmax * wingInfluenceFactor;
+                EffectiveUpstreamCd0 += wingModule.GetCd0() * wingInfluenceFactor;
+                EffectiveUpstreamInfluence += wingInfluenceFactor;
 
                 double wAoA = wingModule.CalculateAoA(wingModule.GetVelocity()) * Math.Sign(tmp);
                 tmp = (thisWingAoA - wAoA) * wingInfluenceFactor;                //First, make sure that the AoA are wrt the same direction; then account for any strange angling of the part that shouldn't be there
 
-                effectiveUpstreamAoA += tmp;
+                EffectiveUpstreamAoA += tmp;
             }
         }
 
@@ -758,8 +741,7 @@ namespace ferram4
 
             if (effective_AR_modifier < 1)
                 return (effective_AR_modifier + 1);
-            else
-                return 2 * (2 - effective_AR_modifier) + 8 * (effective_AR_modifier - 1);
+            return 2 * (2 - effective_AR_modifier) + 8 * (effective_AR_modifier - 1);
         }
     }
 }

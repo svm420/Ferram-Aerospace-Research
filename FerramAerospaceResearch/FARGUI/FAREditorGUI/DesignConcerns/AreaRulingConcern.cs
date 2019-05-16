@@ -42,15 +42,13 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using PreFlightTests;
-using KSP.Localization;
 using FerramAerospaceResearch.FARAeroComponents;
+using KSP.Localization;
+using PreFlightTests;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 {
-    class AreaRulingConcern : DesignConcernBase
+    internal class AreaRulingConcern : DesignConcernBase
     {
         private VehicleAerodynamics _vesselAero;
 
@@ -70,10 +68,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
             return false;
         }
 
-        public override EditorFacilities GetEditorFacilities()
-        {
-            return base.GetEditorFacilities();
-        }
         public override string GetConcernTitle()
         {
             return Localizer.Format("FARDesignConcernAreaRuleTitle");

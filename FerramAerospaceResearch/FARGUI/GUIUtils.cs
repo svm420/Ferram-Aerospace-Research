@@ -42,14 +42,12 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
 {
-    static class GUIUtils
+    internal static class GUIUtils
     {
         public static Rect ClampToScreen(Rect window)
         {

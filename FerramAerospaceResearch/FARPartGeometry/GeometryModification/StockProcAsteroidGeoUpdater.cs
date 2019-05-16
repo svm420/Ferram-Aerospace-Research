@@ -42,26 +42,18 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
-using KSP;
-using ProceduralFairings;
 using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class StockProcAsteroidGeoUpdater : IGeometryUpdater
+	internal class StockProcAsteroidGeoUpdater : IGeometryUpdater
     {
-        ModuleAsteroid asteroid;
-        GeometryPartModule geoModule;
-        bool hasLoaded = false;
+	    private GeometryPartModule geoModule;
+	    private bool hasLoaded;
 
-        public StockProcAsteroidGeoUpdater(ModuleAsteroid asteroid, GeometryPartModule geoModule)
+        public StockProcAsteroidGeoUpdater(GeometryPartModule geoModule)
         {
-            this.asteroid = asteroid;
-            this.geoModule = geoModule;
+	        this.geoModule = geoModule;
 
         }
 

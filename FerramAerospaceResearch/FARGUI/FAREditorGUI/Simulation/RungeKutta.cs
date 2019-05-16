@@ -42,25 +42,23 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class RungeKutta4
+    internal class RungeKutta4
     {
 //        Vector4 a = new Vector4(0, 0.5f, 0.5f, 1);
-        Vector4 c = new Vector4(1f / 6, 1f / 3, 1f / 3, 1f / 6);
+private Vector4 c = new Vector4(1f / 6, 1f / 3, 1f / 3, 1f / 6);
 
 //        FARMatrix b = new FARMatrix(3, 4);
 
-        double dt;
-        double endTime;
-        double[] initCond;
+private double dt;
+private double endTime;
+private double[] initCond;
 
-        SimMatrix stateEquations;
+private SimMatrix stateEquations;
 
         public double[,] soln;
         public double[] time;
@@ -72,7 +70,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 //            b.Add(1, 2, 3);
             this.endTime = endTime;
             this.dt = dt;
-            this.stateEquations = eqns;
+            stateEquations = eqns;
             this.initCond = initCond;
             soln = new double[initCond.Length, (int)Math.Ceiling(endTime / dt)];
             time = new double[(int)Math.Ceiling(endTime / dt)];

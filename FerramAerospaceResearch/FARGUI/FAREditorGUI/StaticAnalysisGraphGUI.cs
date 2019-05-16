@@ -44,35 +44,35 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEngine;
-using KSP.Localization;
-using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
-using FerramAerospaceResearch.FARAeroComponents;
 using ferram4;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
+using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class StaticAnalysisGraphGUI : IDisposable
+    internal class StaticAnalysisGraphGUI : IDisposable
     {
-        ferramGraph _graph = new ferramGraph(400, 350);
+        private ferramGraph _graph = new ferramGraph(400, 350);
 
-        double lastMaxBounds, lastMinBounds;
-        bool isMachMode = false;
+        private double lastMaxBounds, lastMinBounds;
+        private bool isMachMode;
 
-        GraphInputs aoASweepInputs, machSweepInputs;
-        GUIDropDown<int> flapSettingDropdown;
-        GUIDropDown<CelestialBody> bodySettingDropdown;
-        EditorSimManager simManager;
+        private GraphInputs aoASweepInputs, machSweepInputs;
+        private GUIDropDown<int> flapSettingDropdown;
+        private GUIDropDown<CelestialBody> bodySettingDropdown;
+        private EditorSimManager simManager;
 
-        Vector3 upperAoAVec, lowerAoAVec;
-        float pingPongAoAFactor = 0;
+        private Vector3 upperAoAVec, lowerAoAVec;
+        private float pingPongAoAFactor;
 
         public StaticAnalysisGraphGUI(EditorSimManager simManager, GUIDropDown<int> flapSettingDropDown, GUIDropDown<CelestialBody> bodySettingDropdown)
         {
             this.simManager = simManager;
-            this.flapSettingDropdown = flapSettingDropDown;
+            flapSettingDropdown = flapSettingDropDown;
             this.bodySettingDropdown = bodySettingDropdown;
 
             //Set up defaults for AoA Sweep
@@ -124,7 +124,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //FARLogger.Info("" + velArrow.Direction);
         }
 
-        void SetAngleVectors(double lowerAoA, double upperAoA)
+        private void SetAngleVectors(double lowerAoA, double upperAoA)
         {
             lowerAoA *= FARMathUtil.deg2rad;
             upperAoA *= FARMathUtil.deg2rad;
@@ -171,7 +171,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(540));
 
-            _graph.Display(graphBackingStyle, 0, 0);
+            _graph.Display(0, 0);
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
@@ -219,20 +219,20 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 double lowerBound, upperBound, numPts, pitchSetting, otherInput;
 
                 lowerBound = double.Parse(input.lowerBound);
-                lowerBound = FARMathUtil.Clamp(lowerBound, -90, 90);
-                input.lowerBound = lowerBound.ToString();
+                lowerBound = lowerBound.Clamp(-90, 90);
+                input.lowerBound = lowerBound.ToString(CultureInfo.InvariantCulture);
 
                 upperBound = double.Parse(input.upperBound);
-                upperBound = FARMathUtil.Clamp(upperBound, lowerBound, 90);
-                input.upperBound = upperBound.ToString();
+                upperBound = upperBound.Clamp(lowerBound, 90);
+                input.upperBound = upperBound.ToString(CultureInfo.InvariantCulture);
 
                 numPts = double.Parse(input.numPts);
                 numPts = Math.Ceiling(numPts);
-                input.numPts = numPts.ToString();
+                input.numPts = numPts.ToString(CultureInfo.InvariantCulture);
 
                 pitchSetting = double.Parse(input.pitchSetting);
-                pitchSetting = FARMathUtil.Clamp(pitchSetting, -1, 1);
-                input.pitchSetting = pitchSetting.ToString();
+                pitchSetting = pitchSetting.Clamp(-1, 1);
+                input.pitchSetting = pitchSetting.ToString(CultureInfo.InvariantCulture);
 
                 otherInput = double.Parse(input.otherInput);
 
@@ -289,7 +289,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
             for (int i = 0; i < data.yValues.Count; i++)
             {
-                AddZeroMarks(data.lineNames[i], data.xValues, data.yValues[i], upperBound - lowerBound, realMax - realMin, data.lineColors[i]);
+                AddZeroMarks(data.lineNames[i], data.xValues, data.yValues[i], realMax - realMin, data.lineColors[i]);
             }
 
             _graph.horizontalLabel = horizontalLabel;
@@ -297,7 +297,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _graph.Update();
         }
 
-        private void AddZeroMarks(String key, double[] x, double[] y, double xsize, double ysize, Color color)
+        private void AddZeroMarks(String key, double[] x, double[] y, double ysize, Color color)
         {
             int j = 0;
 
@@ -308,12 +308,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 if (Math.Sign(y[i]) == Math.Sign(y[i + 1]))
                     continue;
 
-                /*// Don't display if slope is good enough?..
-                float dx = Mathf.Abs(x[i+1]-x[i])*400/xsize;
-                float dy = Mathf.Abs(y[i+1]-y[i])*275/ysize;
-                if (dx <= 2*dy)
-                    continue;*/
-
                 double xv = x[i] + Math.Abs(y[i]) * (x[i + 1] - x[i]) / Math.Abs(y[i + 1] - y[i]);
                 double yv = ysize * 3 / 275;
                 xv_yvPairs.Add(xv);
@@ -322,11 +316,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if(xv_yvPairs.Count < 5)
                 for(int i = 0; i < xv_yvPairs.Count; i += 2)
                 {
-                    _graph.AddLine(key + (j++), new double[] { xv_yvPairs[i], xv_yvPairs[i] }, new double[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
+                    _graph.AddLine(key + (j++), new[] { xv_yvPairs[i], xv_yvPairs[i] }, new[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
                 }
         }
 
-        class GraphInputs
+        private class GraphInputs
         {
             public string lowerBound;
             public string upperBound;

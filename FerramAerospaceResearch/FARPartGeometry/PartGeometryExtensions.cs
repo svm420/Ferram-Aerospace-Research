@@ -42,7 +42,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -53,6 +52,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
     {
         public static List<List<string>> ignorePartModuleTransforms;
 
+        // ReSharper disable once UnusedMember.Global
         public static Bounds GetPartOverallLocalMeshBound(this Part part)
         {
             return GetPartOverallMeshBoundsInBasis(part, part.partTransform.worldToLocalMatrix);
@@ -88,7 +88,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (mf != null)
                 {
                     m = mf.sharedMesh;
-                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
                     if ((t.gameObject.layer == ignoreLayers))
                         m = null;
                 }
@@ -112,7 +111,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return bounds;
         }
 
-        static void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
+        private static void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
         {
             Vector3 boundPt = new Vector3 (center.x + extX, center.y + extY, center.z + extZ);
             boundPt = matrix.MultiplyPoint3x4(boundPt);
@@ -136,7 +135,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             TransformedPointBounds(matrix, center, -extents.x, +extents.y, +extents.z, ref lower, ref upper);
         }
 
-        public static Bounds GetPartColliderBoundsInBasis(this Part part, Matrix4x4 worldToBasisMatrix, int excessiveVerts = 2500)
+        public static Bounds GetPartColliderBoundsInBasis(this Part part, Matrix4x4 worldToBasisMatrix)
         {
             var transforms = part.FindModelComponents<Transform>();
             Bounds bounds = new Bounds();
@@ -158,8 +157,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                     continue;
                 }
-                else
-                    m = mc.sharedMesh;
+
+                m = mc.sharedMesh;
 
                 if (m == null)
                     continue;
@@ -278,7 +277,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             ignorePartModuleTransforms = new List<List<string>>();
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARPartModuleTransformExceptions"))
-                if((object)node != null)
+                if(node != null)
                     foreach(ConfigNode template in node.GetNodes("FARPartModuleException"))
                     {
                         if(!template.HasValue("PartModuleName"))

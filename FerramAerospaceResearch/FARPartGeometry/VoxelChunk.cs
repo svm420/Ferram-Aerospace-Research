@@ -42,26 +42,24 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using System.Collections;
 using UnityEngine;
-using FerramAerospaceResearch.FARThreading;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
-    unsafe class VoxelChunk
+    internal class VoxelChunk
     {
         //private Part[] voxelPoints = null;
         //private float[] voxelSize = null;
-        private PartSizePair[] voxelPoints = null;
-        private DebugVisualVoxel[, ,] visualVoxels = null;
+        private PartSizePair[] voxelPoints;
+        private DebugVisualVoxel[, ,] visualVoxels;
         private HashSet<Part> overridingParts;
 
-        double _size;
-        Vector3d lowerCorner;
+        private double _size;
+
+        private Vector3d lowerCorner;
         //int iOffset, jOffset, kOffset;
-        int offset;
+        private int offset;
 
         public VoxelChunk(double size, Vector3d lowerCorner, int iOffset, int jOffset, int kOffset, HashSet<Part> overridingParts, bool usePartSize256)
         {
@@ -86,6 +84,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             this.overridingParts = overridingParts;
         }
 
+        // ReSharper disable ParameterHidesMember -> update member values
         public void SetChunk(double size, Vector3d lowerCorner, int iOffset, int jOffset, int kOffset, HashSet<Part> overridingParts)
         {
             _size = size;
@@ -93,6 +92,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             this.lowerCorner = lowerCorner;
             this.overridingParts = overridingParts;
         }
+        // ReSharper restore ParameterHidesMember
 
         public void ClearChunk()
         {
@@ -106,7 +106,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         //Use when locking is unnecessary and only to change size, not part
-        public unsafe void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             zeroBaseIndex -= offset;
             //voxelPoints[zeroBaseIndex].part = p;
@@ -114,31 +114,33 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         //Use when certain that locking is unnecessary and need to fill the location
-        public unsafe void SetVoxelPointPartOnlyGlobalIndexNoLock(int zeroBaseIndex, Part p)
+        public void SetVoxelPointPartOnlyGlobalIndexNoLock(int zeroBaseIndex, Part p)
         {
             zeroBaseIndex -= offset;
             SetPart(p, zeroBaseIndex, VoxelOrientationPlane.NONE, 0);
         }
 
-        public unsafe void SetVoxelPointPartOnlyGlobalIndexNoLock(int i, int j, int k, Part p)
+        // ReSharper disable once UnusedMember.Global
+        public void SetVoxelPointPartOnlyGlobalIndexNoLock(int i, int j, int k, Part p)
         {
             int index = i + 8 * j + 64 * k - offset;
             SetPart(p, index, VoxelOrientationPlane.NONE, 0);
         }
         //Use when certain that locking is unnecessary and need to fill the location
-        public unsafe void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             zeroBaseIndex -= offset;
             SetPart(p, zeroBaseIndex, plane, location);
         }
 
-        public unsafe void SetVoxelPointGlobalIndexNoLock(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        // ReSharper disable once UnusedMember.Global
+        public void SetVoxelPointGlobalIndexNoLock(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             int index = i + 8 * j + 64 * k - offset;
             SetPart(p, index, plane, location);
         }
         //Sets point and ensures that includedParts includes p
-        public unsafe void SetVoxelPointGlobalIndex(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndex(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             zeroBaseIndex -= offset;
 
@@ -148,7 +150,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        public unsafe void SetVoxelPointGlobalIndex(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        // ReSharper disable once UnusedMember.Global
+        public void SetVoxelPointGlobalIndex(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             int index = i + 8 * j + 64 * k - offset;
 
@@ -158,52 +161,56 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        unsafe void SetPart(Part p, int index, VoxelOrientationPlane plane, byte location)
+        private void SetPart(Part p, int index, VoxelOrientationPlane plane, byte location)
         {
             PartSizePair pair = voxelPoints[index];
 
             Part currentPart = pair.part;
             //if we update the plane location with this, then we can consider replacing the part here.  Otherwise, we don't
             bool largerThanLast = pair.SetPlaneLocation(plane, location);
-            if ((object)currentPart == null || overridingParts.Contains(p) || (largerThanLast && !overridingParts.Contains(currentPart)))
+            if (currentPart is null || overridingParts.Contains(p) || (largerThanLast && !overridingParts.Contains(currentPart)))
                 pair.part = p;
 
         }
 
-        public unsafe bool VoxelPointExistsLocalIndex(int zeroBaseIndex)
+        // ReSharper disable once UnusedMember.Global
+        public bool VoxelPointExistsLocalIndex(int zeroBaseIndex)
         {
             return (voxelPoints[zeroBaseIndex].GetSize() > 0);
         }
 
-        public unsafe bool VoxelPointExistsLocalIndex(int i, int j, int k)
+        // ReSharper disable once UnusedMember.Global
+        public bool VoxelPointExistsLocalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k;
             return (voxelPoints[index].GetSize() > 0);
         }
 
-        public unsafe bool VoxelPointExistsGlobalIndex(int zeroBaseIndex)
+        public bool VoxelPointExistsGlobalIndex(int zeroBaseIndex)
         {
             return (voxelPoints[zeroBaseIndex - offset].GetSize() > 0);
         }
 
-        public unsafe bool VoxelPointExistsGlobalIndex(int i, int j, int k)
+        // ReSharper disable once UnusedMember.Global
+        public bool VoxelPointExistsGlobalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k - offset;
             return (voxelPoints[index].GetSize() > 0);
         }
 
 
-        public unsafe Part GetVoxelPartGlobalIndex(int zeroBaseIndex)
+        public Part GetVoxelPartGlobalIndex(int zeroBaseIndex)
         {
-            Part p = null;
+            Part p;
             int index = zeroBaseIndex - offset;
             p = voxelPoints[index].part;
             return p;
         }
 
-        public unsafe Part GetVoxelPartGlobalIndex(int i, int j, int k)
+        // ReSharper disable once UnusedMember.Global
+        public Part GetVoxelPartGlobalIndex(int i, int j, int k)
         {
-            Part p = null;
+            Part p;
 
             int index = i + 8 * j + 64 * k - offset;
             p = voxelPoints[index].part;
@@ -211,13 +218,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return p;
         }
 
-        public unsafe PartSizePair GetVoxelPartSizePairGlobalIndex(int zeroBaseIndex)
+        public PartSizePair GetVoxelPartSizePairGlobalIndex(int zeroBaseIndex)
         {
             int index = zeroBaseIndex - offset;
             return voxelPoints[index];
         }
 
-        public unsafe PartSizePair GetVoxelPartSizePairGlobalIndex(int i, int j, int k)
+        // ReSharper disable once UnusedMember.Global
+        public PartSizePair GetVoxelPartSizePairGlobalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k - offset;
 

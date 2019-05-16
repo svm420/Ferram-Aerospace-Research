@@ -42,12 +42,12 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch;
-using KSP.Localization;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI;
+using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     public class FARBaseAerodynamics : FARPartModule, ILiftProvider
@@ -63,9 +63,6 @@ namespace ferram4
         protected Vector3d velocityEditor = Vector3.zero;
 
         protected Transform part_transform;
-
-        protected static Ray ray;
-        protected static RaycastHit hit;
 
         //Reset tinting for this part and its children
  //       private bool resetTinting;
@@ -99,34 +96,15 @@ namespace ferram4
 
         }
 
-        public override void Initialization()
-        {
-            base.Initialization();
-        }
-
-        /*public void ClearShielding()
-        {
-            isShielded = false;
-        }
-
-        public void ActivateShielding()
-        {
-            isShielded = true;
-            Cl = 0;
-            Cd = 0;
-            Cm = 0;
-        }*/
-
-
-        public virtual Vector3d GetVelocity()
+        public Vector3d GetVelocity()
         {
             if (HighLogic.LoadedSceneIsFlight)
                 return part.Rigidbody.velocity + Krakensbane.GetFrameVelocityV3f()
                     - FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
-            else
-                return velocityEditor;
+            return velocityEditor;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public Vector3d GetVelocity(Vector3 refPoint)
         {
             Vector3d velocity = Vector3.zero;
@@ -140,8 +118,8 @@ namespace ferram4
 
                 return velocity;
             }
-            else
-                return velocityEditor;
+
+            return velocityEditor;
         }
 
         protected virtual void ResetCenterOfLift()
@@ -219,7 +197,7 @@ namespace ferram4
         {
             // Compute the actual center ourselves once per frame
             // Feed the precomputed values to the vanilla indicator
-            CoLMarker.pos = FerramAerospaceResearch.FARGUI.FAREditorGUI.EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
             CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;

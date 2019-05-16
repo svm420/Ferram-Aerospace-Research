@@ -44,30 +44,30 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using KSP.UI.Screens.Flight;
-using FerramAerospaceResearch.FARAeroComponents;
-using FerramAerospaceResearch.RealChuteLite;
 using ferram4;
+using FerramAerospaceResearch.FARAeroComponents;
+using KSP.UI.Screens.Flight;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
-    class PhysicsCalcs
+    internal class PhysicsCalcs
     {
-        KSP.UI.Screens.Flight.NavBall _navball;
-        Vessel _vessel;
-        FARVesselAero _vesselAero;
+        private NavBall _navball;
+        private Vessel _vessel;
+        private FARVesselAero _vesselAero;
 
-        List<FARAeroPartModule> _currentAeroModules;
-        List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
+        private List<FARAeroPartModule> _currentAeroModules;
+        private List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
 
-        FARCenterQuery aeroForces = new FARCenterQuery();
-        int intakeAirId;
-        double intakeAirDensity = 1;
-        bool useWingArea;
-        double wingArea = 0;
+        private FARCenterQuery aeroForces = new FARCenterQuery();
+        private int intakeAirId;
+        private double intakeAirDensity = 1;
+        private bool useWingArea;
+        private double wingArea;
 
-        VesselFlightInfo vesselInfo;
+        private VesselFlightInfo vesselInfo;
 
         public PhysicsCalcs(Vessel vessel, FARVesselAero vesselAerodynamics)
         {
@@ -92,7 +92,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             for (int i = 0; i < legacyWingModels.Count; i++)
             {
                 FARWingAerodynamicModel w = legacyWingModels[i];
-                if ((object)w != null)
+                if (!(w is null))
                 {
                     useWingArea = true;
                     wingArea += w.S;
@@ -113,7 +113,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
 
             CalculateTotalAeroForce();
-            CalculateForceBreakdown(velVectorNorm, velVector);
+            CalculateForceBreakdown(velVectorNorm);
             CalculateVesselOrientation(velVectorNorm);
             CalculateEngineAndIntakeBasedParameters(vesselSpeed);
             CalculateBallisticCoefficientAndTermVel();
@@ -135,10 +135,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 for (int i = 0; i < _currentAeroModules.Count; i++)
                 {
                     FARAeroPartModule m = _currentAeroModules[i];
-                    if ((object)m != null) {
+                    if (!(m is null)) {
                         aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
                         aeroForces.AddTorque(m.worldSpaceTorque);
-                    }   
+                    }
                 }
             }
 
@@ -146,7 +146,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             for (int i = 0; i < _LEGACY_currentWingAeroModel.Count; i++)
             {
                 FARWingAerodynamicModel w = _LEGACY_currentWingAeroModel[i];
-                if ((object)w == null)
+                if (w is null)
                     continue;
                 totalAeroForceVector += w.worldSpaceForce;
                 aeroForces.AddForce(w.AerodynamicCenter, w.worldSpaceForce);
@@ -163,7 +163,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }*/
         }
 
-        private void CalculateForceBreakdown(Vector3d velVectorNorm, Vector3d velVector)
+        private void CalculateForceBreakdown(Vector3d velVectorNorm)
         {
             if (useWingArea)
                 vesselInfo.refArea = wingArea;
@@ -181,7 +181,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 vesselInfo.liftToDragRatio = 0;
                 return;
             }
-            
+
             var com_frc = aeroForces.force;
             var com_trq = aeroForces.TorqueAt(_vessel.CoM);
 
@@ -208,7 +208,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private void GetNavball()
         {
             if (HighLogic.LoadedSceneIsFlight)
-                _navball = GameObject.FindObjectOfType<KSP.UI.Screens.Flight.NavBall>();
+                _navball = Object.FindObjectOfType<NavBall>();
         }
 
         private void CalculateVesselOrientation(Vector3d velVectorNorm)
@@ -254,7 +254,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             double airAvailableVol = 0;
 
             double invDeltaTime = 1 / TimeWarp.fixedDeltaTime;
-            PartResourceLibrary resLibrary = PartResourceLibrary.Instance;
 
 
             List<Part> partsList = _vessel.Parts;

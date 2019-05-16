@@ -42,7 +42,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
@@ -56,7 +55,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         double AreaThreshold();
 
-        void SetForwardBackwardNoFlowDirection(int sign);
+        void SetForwardBackwardNoFlowDirection(int direction);
+        // ReSharper disable once UnusedMember.Global
         int GetForwardBackwardNoFlowSign();
 
         bool IntegratedCrossSectionIncreaseDecrease();

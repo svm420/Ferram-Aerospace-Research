@@ -42,20 +42,15 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class StockJettisonTransformGeoUpdater : IGeometryUpdater
+    internal class StockJettisonTransformGeoUpdater : IGeometryUpdater
     {
-        ModuleJettison engineFairing;
-        GeometryPartModule geoModule;
-        bool fairingVisible;
+        private ModuleJettison engineFairing;
+        private GeometryPartModule geoModule;
+        private bool fairingVisible;
 
         public StockJettisonTransformGeoUpdater(ModuleJettison engineFairing, GeometryPartModule geoModule)
         {

@@ -42,8 +42,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using UnityEngine;
 using KSP.Localization;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
@@ -75,7 +73,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
                     if (airspeedSettingsGUI.GetVelocityDisplayString(out value, out mode))
                     {
-                        this.textObject.text.SetText(shortCaptions[(int)mode] + value);
+                        textObject.text.SetText(shortCaptions[(int)mode] + value);
                         return; // we are done here
                     }
                 }

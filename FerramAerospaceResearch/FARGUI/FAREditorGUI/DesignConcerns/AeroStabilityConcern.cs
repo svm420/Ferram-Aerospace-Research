@@ -42,15 +42,14 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
+using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 using KSP.Localization;
 using PreFlightTests;
-using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 {
-    class AeroStabilityConcern : DesignConcernBase
+    // ReSharper disable once UnusedMember.Global
+    internal class AeroStabilityConcern : DesignConcernBase
     {
         private InstantConditionSim _instantSim;
         private InstantConditionSimInput _simInput;
@@ -82,10 +81,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
             return true;
         }
 
-        public override EditorFacilities GetEditorFacilities()
-        {
-            return base.GetEditorFacilities();
-        }
         public override string GetConcernTitle()
         {
             return Localizer.Format("FARDesignConcernStabTitle");
@@ -99,10 +94,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
         {
             if (_editorFacility == EditorFacilities.VAB)
                 return DesignConcernSeverity.WARNING;
-            else if (_editorFacility == EditorFacilities.SPH)
+            if (_editorFacility == EditorFacilities.SPH)
                 return DesignConcernSeverity.CRITICAL;
-            else
-                return DesignConcernSeverity.WARNING;
+            return DesignConcernSeverity.WARNING;
         }
     }
 }

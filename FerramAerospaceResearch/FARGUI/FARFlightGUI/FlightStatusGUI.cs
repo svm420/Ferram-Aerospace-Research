@@ -43,24 +43,21 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
-    class FlightStatusGUI
+    internal class FlightStatusGUI
     {
-        string statusString;
-        Color statusColor;
-        double statusOverrideTimer;
-        double statusBlinkerTimer;
-        bool statusBlinker;
-        GUIStyle stallStyle;
+        private string statusString;
+        private Color statusColor;
+        private double statusOverrideTimer;
+        private double statusBlinkerTimer;
+        private bool statusBlinker;
+        private GUIStyle stallStyle;
 
-        VesselFlightInfo infoParameters;
+        private VesselFlightInfo infoParameters;
 
 
         public void UpdateInfoParameters(VesselFlightInfo info)

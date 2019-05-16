@@ -42,21 +42,12 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using UnityEngine;
-using FerramAerospaceResearch.FARThreading;
-
-
 namespace FerramAerospaceResearch.FARPartGeometry
 {
     public abstract class PartSizePair
     {
         public Part part;
         //byte xPlaneDown, yPlaneDown, zPlaneDown;
-
-        protected PartSizePair() { }
 
         public abstract void Clear();
 

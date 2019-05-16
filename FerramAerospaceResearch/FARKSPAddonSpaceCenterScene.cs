@@ -1,12 +1,11 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
-    class FARKSPAddonSpaceCenterScene : MonoBehaviour
+    internal class FARKSPAddonSpaceCenterScene : MonoBehaviour
     {
-        void Awake()
+        private void Awake()
         {
             if (FARDebugAndSettings.FARDebugButtonStock)
                 FARDebugAndSettings.ForceCloseDebugWindow();

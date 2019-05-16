@@ -44,49 +44,42 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class EditorAeroCenter
+    internal class EditorAeroCenter
     {
-        static EditorAeroCenter instance;
-        public static EditorAeroCenter Instance
-        {
-            get { return instance; }
-        }
+        public static EditorAeroCenter Instance { get; private set; }
 
-        Vector3 vesselRootLocalAeroCenter;
+        private Vector3 vesselRootLocalAeroCenter;
         public static Vector3 VesselRootLocalAeroCenter
         {
-            get { return instance.vesselRootLocalAeroCenter; }
+            get { return Instance.vesselRootLocalAeroCenter; }
         }
 
-        List<FARAeroPartModule> _currentAeroModules;
-        List<FARAeroSection> _currentAeroSections;
+        private List<FARAeroSection> _currentAeroSections;
 
         public EditorAeroCenter()
         {
-            instance = this;
+            Instance = this;
         }
 
-        public void UpdateAeroData(List<FARAeroPartModule> aeroModules, List<FARAeroSection> aeroSections)
+        public void UpdateAeroData(List<FARAeroSection> aeroSections)
         {
-            _currentAeroModules = aeroModules;
             _currentAeroSections = aeroSections;
             UpdateAerodynamicCenter();
         }
 
-        void UpdateAerodynamicCenter()
+        private void UpdateAerodynamicCenter()
         {
             FARCenterQuery aeroSection, dummy;
             aeroSection = new FARCenterQuery();
             dummy = new FARCenterQuery();
 
-            if((object)EditorLogic.RootPart == null)
+            if(EditorLogic.RootPart is null)
                 return;
 
             Vector3 vel_base, vel_fuzz;
@@ -168,7 +161,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //float dist = deltaMomentPerp.magnitude / deltaForcePerpMag;
             //vesselRootLocalAeroCenter = vel_base * dist;
 
-            vesselRootLocalAeroCenter = deltaMomentPerp.magnitude / deltaForcePerpMag * vel_base * Math.Sign(Vector3.Dot(Vector3.Cross(deltaForce, deltaMoment), vel_base));
+            vesselRootLocalAeroCenter = deltaMomentPerp.magnitude / deltaForcePerpMag * Math.Sign(Vector3.Dot(Vector3.Cross(deltaForce, deltaMoment), vel_base)) * vel_base;
 
             //FARLogger.Info("" + dist + " " + deltaMomentPerp.magnitude + " " + deltaForcePerpMag);
             //vesselRootLocalAeroCenter += avgForcePos;

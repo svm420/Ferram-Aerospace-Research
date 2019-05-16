@@ -42,26 +42,17 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using UnityEngine;
-using FerramAerospaceResearch.FARThreading;
-
-
 namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class PartSizePair4Bit : PartSizePair
     {
-        const float AREA_SCALING = 1f / (15f * 15f * 15f);
-        const int LENGTH_OF_VOXEL = 15;
-        const byte UP_MASK = 0xF0;
-        const byte DOWN_MASK = 0x0F;
+        private const float AREA_SCALING = 1f / (15f * 15f * 15f);
+        private const int LENGTH_OF_VOXEL = 15;
+        private const byte UP_MASK = 0xF0;
+        private const byte DOWN_MASK = 0x0F;
 
-        byte xPlane, yPlane, zPlane;
+        private byte xPlane, yPlane, zPlane;
         //byte xPlaneDown, yPlaneDown, zPlaneDown;
-
-        public PartSizePair4Bit() { }
 
         public override void Clear()
         {
@@ -108,6 +99,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public override void SetFilledSides(VoxelOrientationPlane filledPlanes)
         {
+            // ReSharper disable BitwiseOperatorOnEnumWithoutFlags
             if ((filledPlanes & VoxelOrientationPlane.X_UP) == VoxelOrientationPlane.X_UP)
                 xPlane |= UP_MASK;
 
@@ -125,6 +117,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if ((filledPlanes & VoxelOrientationPlane.Z_DOWN) == VoxelOrientationPlane.Z_DOWN)
                 zPlane |= DOWN_MASK;
+            // ReSharper restore BitwiseOperatorOnEnumWithoutFlags
         }
 
         //Will return true if the location is updated

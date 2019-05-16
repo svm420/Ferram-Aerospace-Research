@@ -43,27 +43,23 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class AirbreathingEngineCrossSectonAdjuster : ICrossSectionAdjuster
+    internal class AirbreathingEngineCrossSectonAdjuster : ICrossSectionAdjuster
     {
-        Vector3 vehicleBasisForwardVector;
+        private Vector3 vehicleBasisForwardVector;
 
-        double exitArea;
-        int sign = 1;
+        private double exitArea;
+        private int sign = 1;
 
-        Matrix4x4 thisToVesselMatrix;
-        Matrix4x4 meshLocalToWorld;
+        private Matrix4x4 thisToVesselMatrix;
+        private Matrix4x4 meshLocalToWorld;
 
-        ModuleEngines engine;
-        public ModuleEngines EngineModule
-        {
-            get { return engine; }
-        }
-        Part part;
+        public ModuleEngines EngineModule { get; }
+
+        private Part part;
         public Part GetPart()
         {
             return part;
@@ -88,8 +84,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             vehicleBasisForwardVector *= -1f;
 
 
-            this.engine = engine;
-            this.part = engine.part;
+            EngineModule = engine;
+            part = engine.part;
 
             Bounds partBounds = part.GetPartColliderBoundsInBasis(Matrix4x4.identity);
             exitArea = partBounds.extents.x + partBounds.extents.z;
@@ -105,8 +101,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             double dot = Vector3.Dot(vehicleAxis, vehicleBasisForwardVector);
             if (dot > 0.9)
                 return exitArea;
-            else
-                return 0;
+            return 0;
         }
 
         public double AreaRemovedFromCrossSection()
@@ -119,9 +114,9 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             return 0;
         }
 
-        public void SetForwardBackwardNoFlowDirection(int sign)
+        public void SetForwardBackwardNoFlowDirection(int direction)
         {
-            this.sign = sign;
+            sign = direction;
         }
 
         public int GetForwardBackwardNoFlowSign() { return sign; }
@@ -140,7 +135,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetThisToVesselMatrixForTransform()
         {
-            meshLocalToWorld = engine.thrustTransforms[0].localToWorldMatrix;
+            meshLocalToWorld = EngineModule.thrustTransforms[0].localToWorldMatrix;
         }
 
         public void UpdateArea() { }

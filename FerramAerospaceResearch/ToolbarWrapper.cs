@@ -23,12 +23,14 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
+
+// ReSharper disable All
 
 
 // TODO: Change to your plugin's namespace here.
@@ -419,7 +421,7 @@ namespace FerramAerospaceResearch {
 
 		public GameScenesVisibility(params GameScenes[] gameScenes) {
 			Type gameScenesVisibilityType = ToolbarTypes.getType("Toolbar.GameScenesVisibility");
-			realGameScenesVisibility = Activator.CreateInstance(gameScenesVisibilityType, new object[] { gameScenes });
+			realGameScenesVisibility = Activator.CreateInstance(gameScenesVisibilityType, gameScenes);
 			visibleProperty = ToolbarTypes.getProperty(gameScenesVisibilityType, "Visible");
 		}
 	}
@@ -431,7 +433,7 @@ namespace FerramAerospaceResearch {
 	/// <summary>
 	/// A drawable that draws a popup menu.
 	/// </summary>
-	public partial class PopupMenuDrawable : IDrawable {
+	public class PopupMenuDrawable : IDrawable {
 		/// <summary>
 		/// Event handler that can be registered with to receive "any menu option clicked" events.
 		/// </summary>
@@ -501,7 +503,7 @@ namespace FerramAerospaceResearch {
 	#region private implementations
 
 	public partial class ToolbarManager : IToolbarManager {
-		private static bool? toolbarAvailable = null;
+		private static bool? toolbarAvailable;
 		private static IToolbarManager instance_;
 
 		private object realToolbarManager;
@@ -595,7 +597,7 @@ namespace FerramAerospaceResearch {
 			set {
 				object functionVisibility = null;
 				if (value != null) {
-					functionVisibility = Activator.CreateInstance(types.functionVisibilityType, new object[] { new Func<bool>(() => value.Visible) });
+					functionVisibility = Activator.CreateInstance(types.functionVisibilityType, new Func<bool>(() => value.Visible));
 				}
 				types.button.visibilityProperty.SetValue(realButton, functionVisibility, null);
 				visibility_ = value;
@@ -634,10 +636,9 @@ namespace FerramAerospaceResearch {
 			set {
 				object functionDrawable = null;
 				if (value != null) {
-					functionDrawable = Activator.CreateInstance(types.functionDrawableType, new object[] {
-						new Action(() => value.Update()),
-						new Func<Vector2, Vector2>((pos) => value.Draw(pos))
-					});
+					functionDrawable = Activator.CreateInstance(types.functionDrawableType,
+					                                            new Action(() => value.Update()),
+					                                            new Func<Vector2, Vector2>(pos => value.Draw(pos)));
 				}
 				types.button.drawableProperty.SetValue(realButton, functionDrawable, null);
 				drawable_ = value;

@@ -42,11 +42,10 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using UnityEngine;
-using KSP.Localization;
 using FerramAerospaceResearch.FARUtils;
+using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
@@ -170,7 +169,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             node.AddValue("fullySaturatedStall", _fullySaturatedStall);
         }
 
-        void LoadSettings()
+        private void LoadSettings()
         {
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
 

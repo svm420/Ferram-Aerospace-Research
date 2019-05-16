@@ -48,28 +48,28 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class IntakeCrossSectionAdjuster : ICrossSectionAdjuster
+    internal class IntakeCrossSectionAdjuster : ICrossSectionAdjuster
     {
-        const double INTAKE_AREA_SCALAR = 100;
+        private const double INTAKE_AREA_SCALAR = 100;
 
-        Vector3 vehicleBasisForwardVector;
-        double intakeArea;
-        int sign = 1;
+        private Vector3 vehicleBasisForwardVector;
+        private double intakeArea;
+        private int sign = 1;
 
-        Matrix4x4 thisToVesselMatrix;
-        Matrix4x4 meshLocalToWorld;
-        Transform intakeTrans;
-        ModuleResourceIntake intakeModule;
-        AttachNode node;
+        private Matrix4x4 thisToVesselMatrix;
+        private Matrix4x4 meshLocalToWorld;
+        private Transform intakeTrans;
+        private ModuleResourceIntake intakeModule;
+        private AttachNode node;
 
-        double nodeOffsetArea = 0;      //used to handle intakes being on the side of fuselage parts
+        private double nodeOffsetArea;      //used to handle intakes being on the side of fuselage parts
 
         //ModuleResourceIntake intake;
         //public ModuleResourceIntake IntakeModule
         //{
         //    get { return intake; }
         //}
-        Part part;
+        private Part part;
         public Part GetPart()
         {
             return part;
@@ -108,8 +108,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
         {
-            this.part = intake.part;
-            intakeModule = intake as ModuleResourceIntake;
+            part = intake.part;
+            intakeModule = intake;
             intakeTrans = intakeModule.intakeTransform;
             if (intakeTrans == null)
                 intakeTrans = intake.part.partTransform;
@@ -148,16 +148,14 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             double dot = Vector3.Dot(vehicleAxis, vehicleBasisForwardVector);
             if (dot > 0.9)
                 return intakeArea;
-            else
-                return 0;
+            return 0;
         }
 
         public double AreaRemovedFromCrossSection()
         {
             if (node == null || node.attachedPart == null)
                 return intakeArea * sign;
-            else
-                return 0;
+            return 0;
         }
 
 
@@ -166,9 +164,9 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
              return nodeOffsetArea;
         }
 
-        public void SetForwardBackwardNoFlowDirection(int sign)
+        public void SetForwardBackwardNoFlowDirection(int direction)
         {
-            this.sign = sign;
+            sign = direction;
         }
 
         public int GetForwardBackwardNoFlowSign() { return sign; }

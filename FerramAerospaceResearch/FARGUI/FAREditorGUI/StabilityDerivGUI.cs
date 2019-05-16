@@ -43,31 +43,27 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using UnityEngine;
-using KSP.Localization;
-using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
-using ferram4;
+using KSP.Localization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class StabilityDerivGUI
+    internal class StabilityDerivGUI
     {
+        private GUIDropDown<int> _flapSettingDropdown;
+        private GUIDropDown<CelestialBody> _bodySettingDropdown;
 
-        GUIDropDown<int> _flapSettingDropdown;
-        GUIDropDown<CelestialBody> _bodySettingDropdown;
+        private StabilityDerivOutput stabDerivOutput;
 
-        StabilityDerivOutput stabDerivOutput;
+        private string altitude = "0";
+        private string machNumber = "0.35";
+        private bool spoilersDeployed;
 
-        string altitude = "0";
-        string machNumber = "0.35";
-        bool spoilersDeployed = false;
+        private EditorSimManager simManager;
 
-        EditorSimManager simManager;
-
-        Vector3 aoAVec;
+        private Vector3 aoAVec;
 
         public StabilityDerivGUI(EditorSimManager simManager, GUIDropDown<int> flapSettingDropDown, GUIDropDown<CelestialBody> bodySettingDropdown)
         {
@@ -84,7 +80,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //FARLogger.Info("" + velArrow.Direction);
         }
 
-        void SetAngleVectors(double aoA)
+        private void SetAngleVectors(double aoA)
         {
             aoA *= FARMathUtil.deg2rad;
 
@@ -122,14 +118,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(Localizer.Format("FAREditorStabDerivCalcButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(CalcAndExportEnum.CalculateOnly);
-            // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-            /*
-            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivSaveButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(CalcAndExportEnum.CalculateAndExport);
-            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivLoopButton"), GUILayout.Width(175.0F), GUILayout.Height(25.0F)))
-                StabDerivCalcButtonAction(CalcAndExportEnum.LoopExport);
-             */
+                StabDerivCalcButtonAction();
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -230,9 +219,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             DrawTooltip();
         }
 
-        private enum CalcAndExportEnum { CalculateOnly, CalculateAndExport, LoopExport };
-
-        private void StabDerivCalcButtonAction(CalcAndExportEnum exportflag)
+        private void StabDerivCalcButtonAction()
         {
             CelestialBody body = _bodySettingDropdown.ActiveSelection;
             FARAeroUtil.UpdateCurrentActiveBody(body);
@@ -243,23 +230,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             int flapsettingInt = _flapSettingDropdown.ActiveSelection;
             bool spoilersDeployedBool = spoilersDeployed;
 
-            // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-            // if (exportflag == CalcAndExportEnum.LoopExport ...
-
             if (body.GetPressure(altitudeDouble) > 0)
             {
                 StabilityDerivExportOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool, 0, 0, 0);
-                // if (stabDerivResult.outputvals.stableAoAState == "")
-                // {
                 stabDerivOutput = stabDerivResult.outputvals;
                 simManager.vehicleData = stabDerivResult.outputvals;
                 SetAngleVectors(stabDerivResult.outputvals.stableAoA);
 
-                    // Rodhern: Export of stability derivatives disabled in dkavolis branch.
-                    // if (exportflag == CalcAndExportEnum.CalculateAndExport ...
-                // }
-                // else
-                //     PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
             }
             else
                 PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);

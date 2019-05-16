@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using UnityEngine;
-using KSP.UI.Screens;
-using KSP.Localization;
 using FerramAerospaceResearch.PartExtensions;
+using KSP.Localization;
+using KSP.UI.Screens;
+using UnityEngine;
 using Random = System.Random;
 
 /* RealChuteLite is the work of Christophe Savard (stupid_chris), and is licensed the same way than the rest of FAR is.
@@ -116,7 +117,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         // If the vessel is stopped on the ground
         public bool GroundStop
         {
-            get { return this.vessel.LandedOrSplashed && this.vessel.horizontalSrfSpeed < this.autoCutSpeed; }
+            get { return vessel.LandedOrSplashed && vessel.horizontalSrfSpeed < autoCutSpeed; }
         }
 
         // If the parachute can be repacked
@@ -124,8 +125,8 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                return (this.GroundStop || this.atmPressure.NearlyEqual(0)) && this.DeploymentState == DeploymentStates.CUT
-                       && this.chuteCount > 0 && FlightGlobals.ActiveVessel.isEVA;
+                return (GroundStop || atmPressure.NearlyEqual(0)) && DeploymentState == DeploymentStates.CUT
+                       && chuteCount > 0 && FlightGlobals.ActiveVessel.isEVA;
             }
         }
 
@@ -143,13 +144,13 @@ namespace FerramAerospaceResearch.RealChuteLite
         //Predeployed area of the chute
         public float PreDeployedArea
         {
-            get { return GetArea(this.preDeployedDiameter); }
+            get { return GetArea(preDeployedDiameter); }
         }
 
         //Deployed area of the chute
         public float DeployedArea
         {
-            get { return GetArea(this.deployedDiameter); }
+            get { return GetArea(deployedDiameter); }
         }
 
         //The current useful convection area
@@ -157,18 +158,18 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.DeploymentState == DeploymentStates.PREDEPLOYED && this.dragTimer.Elapsed.Seconds < 1 / this.semiDeploymentSpeed)
+                if (DeploymentState == DeploymentStates.PREDEPLOYED && dragTimer.Elapsed.Seconds < 1 / semiDeploymentSpeed)
                 {
-                    return UtilMath.Lerp(0, this.DeployedArea, this.dragTimer.Elapsed.Seconds * this.semiDeploymentSpeed);
+                    return UtilMath.Lerp(0, DeployedArea, dragTimer.Elapsed.Seconds * semiDeploymentSpeed);
                 }
-                return this.DeployedArea;
+                return DeployedArea;
             }
         }
 
         //Mass of the chute
         public float ChuteMass
         {
-            get { return this.DeployedArea * areaDensity; }
+            get { return DeployedArea * areaDensity; }
         }
 
         //Total dry mass of the chute part
@@ -176,15 +177,15 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.caseMass.NearlyEqual(0)) { this.caseMass = this.part.mass; }
-                return this.caseMass + this.ChuteMass;
+                if (caseMass.NearlyEqual(0)) { caseMass = part.mass; }
+                return caseMass + ChuteMass;
             }
         }
 
         //Position to apply the force to
         public Vector3 ForcePosition
         {
-            get { return this.parachute.position; }
+            get { return parachute.position; }
         }
 
         //If the random deployment timer has been spent
@@ -192,11 +193,11 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (!this.randomTimer.IsRunning) { this.randomTimer.Start(); }
+                if (!randomTimer.IsRunning) { randomTimer.Start(); }
 
-                if (this.randomTimer.Elapsed.TotalSeconds >= this.randomTime)
+                if (randomTimer.Elapsed.TotalSeconds >= randomTime)
                 {
-                    this.randomTimer.Reset();
+                    randomTimer.Reset();
                     return true;
                 }
                 return false;
@@ -206,7 +207,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         //If the parachute is in a high enough atmospheric pressure to deploy
         public bool PressureCheck
         {
-            get { return this.atmPressure >= this.minAirPressureToOpen; }
+            get { return atmPressure >= minAirPressureToOpen; }
         }
 
         //If the parachute can deploy
@@ -214,10 +215,10 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.GroundStop || this.atmPressure.NearlyEqual(0)) { return false; }
-                if (this.DeploymentState == DeploymentStates.CUT) { return false; }
-                if (this.PressureCheck) { return true; }
-                return !this.PressureCheck && this.IsDeployed;
+                if (GroundStop || atmPressure.NearlyEqual(0)) { return false; }
+                if (DeploymentState == DeploymentStates.CUT) { return false; }
+                if (PressureCheck) { return true; }
+                return !PressureCheck && IsDeployed;
             }
         }
 
@@ -226,7 +227,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                switch (this.DeploymentState)
+                switch (DeploymentState)
                 {
                     case DeploymentStates.PREDEPLOYED:
                     case DeploymentStates.DEPLOYED:
@@ -243,13 +244,13 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.state == DeploymentStates.NONE) { this.DeploymentState = states[this.depState]; }
-                return this.state;
+                if (state == DeploymentStates.NONE) { DeploymentState = states[depState]; }
+                return state;
             }
             set
             {
-                this.state = value;
-                this.depState = names[value];
+                state = value;
+                depState = names[value];
             }
         }
 
@@ -258,11 +259,11 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.thermMass.NearlyEqual(0))
+                if (thermMass.NearlyEqual(0))
                 {
-                    this.thermMass = 1 / (specificHeat * this.ChuteMass);
+                    thermMass = 1 / (specificHeat * ChuteMass);
                 }
-                return this.thermMass;
+                return thermMass;
             }
         }
 
@@ -271,8 +272,8 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (this.chuteTemperature < 293.15) { return 0.72; }
-                return this.chuteTemperature > 403.15 ? 0.9 : UtilMath.Lerp(0.72, 0.9, ((this.chuteTemperature - 293.15) / 110) + 293.15);
+                if (chuteTemperature < 293.15) { return 0.72; }
+                return chuteTemperature > 403.15 ? 0.9 : UtilMath.Lerp(0.72, 0.9, ((chuteTemperature - 293.15) / 110) + 293.15);
             }
         }
 
@@ -330,19 +331,19 @@ namespace FerramAerospaceResearch.RealChuteLite
         private BaseEvent deploy, disarm, cutE, repack;
         private BaseEvent DeployE
         {
-            get { return this.deploy ?? (this.deploy = this.Events["GUIDeploy"]); }
+            get { return deploy ?? (deploy = Events["GUIDeploy"]); }
         }
         private BaseEvent Disarm
         {
-            get { return this.disarm ?? (this.disarm = this.Events["GUIDisarm"]); }
+            get { return disarm ?? (disarm = Events["GUIDisarm"]); }
         }
         private BaseEvent CutE
         {
-            get { return this.cutE ?? (this.cutE = this.Events["GUICut"]); }
+            get { return cutE ?? (cutE = Events["GUICut"]); }
         }
         private BaseEvent Repack
         {
-            get { return this.repack ?? (this.repack = this.Events["GUIRepack"]); }
+            get { return repack ?? (repack = Events["GUIRepack"]); }
         }
         #endregion
 
@@ -390,10 +391,10 @@ namespace FerramAerospaceResearch.RealChuteLite
         [KSPEvent(guiActive = true, active = true, externalToEVAOnly = true, guiActiveUnfocused = true, guiName = "RCLEventDisarm", unfocusedRange = 5)]
         public void GUIDisarm()
         {
-            this.armed = false;
-            this.showDisarm = false;
-            this.part.stackIcon.SetIconColor(XKCDColors.White);
-            this.DeployE.active = true;
+            armed = false;
+            showDisarm = false;
+            part.stackIcon.SetIconColor(XKCDColors.White);
+            DeployE.active = true;
             DeactivateRC();
         }
 
@@ -401,24 +402,24 @@ namespace FerramAerospaceResearch.RealChuteLite
         [KSPEvent(guiActive = false, active = true, externalToEVAOnly = true, guiActiveUnfocused = true, guiName = "RCLEventRepack", unfocusedRange = 5)]
         public void GUIRepack()
         {
-            if (this.CanRepack)
+            if (CanRepack)
             {
-                if (!this.CanRepackCareer)
+                if (!CanRepackCareer)
                 {
                     ScreenMessages.PostScreenMessage(Localizer.Format("RCLRepackErrorMessage"), 5, ScreenMessageStyle.UPPER_CENTER);
                     return;
                 }
 
-                this.part.Effect("rcrepack");
-                this.Repack.guiActiveUnfocused = false;
-                this.part.stackIcon.SetIconColor(XKCDColors.White);
-                if (this.chuteCount != -1) { this.chuteCount--; }
-                this.DeploymentState = DeploymentStates.STOWED;
-                this.randomTimer.Reset();
-                this.time = 0;
-                this.cap.gameObject.SetActive(true);
-                this.part.DragCubes.SetCubeWeight("PACKED", 1);
-                this.part.DragCubes.SetCubeWeight("RCDEPLOYED", 0);
+                part.Effect("rcrepack");
+                Repack.guiActiveUnfocused = false;
+                part.stackIcon.SetIconColor(XKCDColors.White);
+                if (chuteCount != -1) { chuteCount--; }
+                DeploymentState = DeploymentStates.STOWED;
+                randomTimer.Reset();
+                time = 0;
+                cap.gameObject.SetActive(true);
+                part.DragCubes.SetCubeWeight("PACKED", 1);
+                part.DragCubes.SetCubeWeight("RCDEPLOYED", 0);
             }
         }
 
@@ -426,20 +427,20 @@ namespace FerramAerospaceResearch.RealChuteLite
         [KSPEvent(guiActive = true, active = true, guiActiveEditor = true, guiName = "RCLEventToggleInfo")]
         public void GUIToggleWindow()
         {
-            if (!this.visible)
+            if (!visible)
             {
                 List<RealChuteFAR> parachutes = new List<RealChuteFAR>();
                 if (HighLogic.LoadedSceneIsEditor) { parachutes.AddRange(EditorLogic.SortedShipList.Where(p => p.Modules.Contains<RealChuteFAR>()).Select(p => p.Modules.GetModule<RealChuteFAR>())); }
-                else if (HighLogic.LoadedSceneIsFlight) { parachutes.AddRange(this.vessel.FindPartModulesImplementing<RealChuteFAR>()); }
+                else if (HighLogic.LoadedSceneIsFlight) { parachutes.AddRange(vessel.FindPartModulesImplementing<RealChuteFAR>()); }
                 if (parachutes.Count > 1 && parachutes.Exists(p => p.visible))
                 {
                     RealChuteFAR module = parachutes.Find(p => p.visible);
-                    this.window.x = module.window.x;
-                    this.window.y = module.window.y;
+                    window.x = module.window.x;
+                    window.y = module.window.y;
                     module.visible = false;
                 }
             }
-            this.visible = !this.visible;
+            visible = !visible;
         }
         #endregion
 
@@ -455,13 +456,13 @@ namespace FerramAerospaceResearch.RealChuteLite
         [KSPAction("Cut chute", guiName = "RCLEventCut")]
         public void ActionCut(KSPActionParam param)
         {
-            if (this.IsDeployed) { Cut(); }
+            if (IsDeployed) { Cut(); }
         }
 
         [KSPAction("Disarm chute", guiName = "RCLEventDisarm")]
         public void ActionDisarm(KSPActionParam param)
         {
-            if (this.armed) { GUIDisarm(); }
+            if (armed) { GUIDisarm(); }
         }
         #endregion
 
@@ -475,26 +476,26 @@ namespace FerramAerospaceResearch.RealChuteLite
         //Activates the parachute
         public void ActivateRC()
         {
-            this.staged = true;
-            this.armed = true;
-            print("[RealChute]: " + this.part.partInfo.name + " was activated in stage " + this.part.inverseStage);
+            staged = true;
+            armed = true;
+            print("[RealChute]: " + part.partInfo.name + " was activated in stage " + part.inverseStage);
         }
 
         //Deactiates the parachute
         public void DeactivateRC()
         {
-            this.staged = false;
-            print("[RealChute]: " + this.part.partInfo.name + " was deactivated");
+            staged = false;
+            print("[RealChute]: " + part.partInfo.name + " was deactivated");
         }
 
         //Copies stats from the info window to the symmetry counterparts
         private void CopyToCouterparts()
         {
-            foreach (Part p in this.part.symmetryCounterparts)
+            foreach (Part p in part.symmetryCounterparts)
             {
                 RealChuteFAR module = (RealChuteFAR)p.Modules["RealChuteFAR"];
-                module.minAirPressureToOpen = this.minAirPressureToOpen;
-                module.deployAltitude = this.deployAltitude;
+                module.minAirPressureToOpen = minAirPressureToOpen;
+                module.deployAltitude = deployAltitude;
             }
         }
 
@@ -502,28 +503,28 @@ namespace FerramAerospaceResearch.RealChuteLite
         public void StagingReset()
         {
             DeactivateRC();
-            this.armed = false;
-            if (this.part.inverseStage != 0) { this.part.inverseStage = this.part.inverseStage - 1; }
-            else { this.part.inverseStage = StageManager.CurrentStage; }
+            armed = false;
+            if (part.inverseStage != 0) { part.inverseStage = part.inverseStage - 1; }
+            else { part.inverseStage = StageManager.CurrentStage; }
         }
 
         //Allows the chute to be repacked if available
         public void SetRepack()
         {
-            this.part.stackIcon.SetIconColor(XKCDColors.Red);
+            part.stackIcon.SetIconColor(XKCDColors.Red);
             StagingReset();
         }
 
         //Drag formula calculations
         public float DragCalculation(float area)
         {
-            return ((float)this.atmDensity * this.sqrSpeed * staticCd * area) / 2000;
+            return ((float)atmDensity * sqrSpeed * staticCd * area) / 2000;
         }
 
         //Gives the cost for this parachute
         public float GetModuleCost(float defaultCost, ModifierStagingSituation sit)
         {
-            return (float)Math.Round(this.DeployedArea * areaCost);
+            return (float)Math.Round(DeployedArea * areaCost);
         }
 
         public ModifierChangeWhen GetModuleCostChangeWhen()
@@ -534,7 +535,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         //For IPartMassModifier
         public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
         {
-            return this.massDelta;
+            return massDelta;
         }
 
         public ModifierChangeWhen GetModuleMassChangeWhen()
@@ -568,27 +569,27 @@ namespace FerramAerospaceResearch.RealChuteLite
         //Event when the UI is hidden (F2)
         private void HideUI()
         {
-            this.hid = true;
+            hid = true;
         }
 
         //Event when the UI is shown (F2)
         private void ShowUI()
         {
-            this.hid = false;
+            hid = false;
         }
 
         //Adds a random noise to the parachute movement
         private void ParachuteNoise()
         {
-            this.parachute.Rotate(new Vector3(5 * (Mathf.PerlinNoise(Time.time, this.randomX + Mathf.Sin(Time.time)) - 0.5f), 5 * (Mathf.PerlinNoise(Time.time, this.randomY + Mathf.Sin(Time.time)) - 0.5f), 0));
+            parachute.Rotate(new Vector3(5 * (Mathf.PerlinNoise(Time.time, randomX + Mathf.Sin(Time.time)) - 0.5f), 5 * (Mathf.PerlinNoise(Time.time, randomY + Mathf.Sin(Time.time)) - 0.5f), 0));
         }
 
         //Makes the canopy follow drag direction
         private void FollowDragDirection()
         {
-            if (this.dragVector.sqrMagnitude > 0)
+            if (dragVector.sqrMagnitude > 0)
             {
-                this.parachute.rotation = Quaternion.LookRotation(this.invertCanopy ? this.dragVector : -this.dragVector, this.parachute.up);
+                parachute.rotation = Quaternion.LookRotation(invertCanopy ? dragVector : -dragVector, parachute.up);
             }
             ParachuteNoise();
         }
@@ -596,97 +597,97 @@ namespace FerramAerospaceResearch.RealChuteLite
         //Parachute predeployment
         public void PreDeploy()
         {
-            this.part.stackIcon.SetIconColor(XKCDColors.BrightYellow);
-            this.part.Effect("rcpredeploy");
-            this.DeploymentState = DeploymentStates.PREDEPLOYED;
-            this.parachute.gameObject.SetActive(true);
-            this.cap.gameObject.SetActive(false);
-            this.part.PlayAnimation(this.semiDeployedAnimation, this.semiDeploymentSpeed);
-            this.dragTimer.Start();
-            this.part.DragCubes.SetCubeWeight("PACKED", 0);
-            this.part.DragCubes.SetCubeWeight("RCDEPLOYED", 1);
-            this.Fields["currentTemp"].guiActive = true;
-            this.Fields["chuteDisplayMaxTemp"].guiActive = true;
+            part.stackIcon.SetIconColor(XKCDColors.BrightYellow);
+            part.Effect("rcpredeploy");
+            DeploymentState = DeploymentStates.PREDEPLOYED;
+            parachute.gameObject.SetActive(true);
+            cap.gameObject.SetActive(false);
+            part.PlayAnimation(semiDeployedAnimation, semiDeploymentSpeed);
+            dragTimer.Start();
+            part.DragCubes.SetCubeWeight("PACKED", 0);
+            part.DragCubes.SetCubeWeight("RCDEPLOYED", 1);
+            Fields["currentTemp"].guiActive = true;
+            Fields["chuteDisplayMaxTemp"].guiActive = true;
         }
 
         //Parachute deployment
         public void Deploy()
         {
-            this.part.stackIcon.SetIconColor(XKCDColors.RadioactiveGreen);
-            this.part.Effect("rcdeploy");
-            this.DeploymentState = DeploymentStates.DEPLOYED;
-            this.dragTimer.Restart();
-            this.part.PlayAnimation(this.fullyDeployedAnimation, this.deploymentSpeed);
+            part.stackIcon.SetIconColor(XKCDColors.RadioactiveGreen);
+            part.Effect("rcdeploy");
+            DeploymentState = DeploymentStates.DEPLOYED;
+            dragTimer.Restart();
+            part.PlayAnimation(fullyDeployedAnimation, deploymentSpeed);
         }
 
         //Parachute cutting
         public void Cut()
         {
-            this.part.Effect("rccut");
-            this.DeploymentState = DeploymentStates.CUT;
-            this.parachute.gameObject.SetActive(false);
-            this.currentArea = 0;
-            this.dragTimer.Reset();
-            this.currentTemp = (float)(startTemp + absoluteZero);
-            this.chuteTemperature = startTemp;
-            this.Fields["currentTemp"].guiActive = false;
-            this.Fields["chuteDisplayMaxTemp"].guiActive = false;
+            part.Effect("rccut");
+            DeploymentState = DeploymentStates.CUT;
+            parachute.gameObject.SetActive(false);
+            currentArea = 0;
+            dragTimer.Reset();
+            currentTemp = (float)(startTemp + absoluteZero);
+            chuteTemperature = startTemp;
+            Fields["currentTemp"].guiActive = false;
+            Fields["chuteDisplayMaxTemp"].guiActive = false;
             SetRepack();
         }
 
         //Calculates parachute deployed area
-        private float DragDeployment(float time, float debutDiameter, float endDiameter)
+        private float DragDeployment(float currentTime, float debutDiameter, float endDiameter)
         {
-            if (!this.dragTimer.IsRunning) { this.dragTimer.Start(); }
+            if (!dragTimer.IsRunning) { dragTimer.Start(); }
 
-            double t = this.dragTimer.Elapsed.TotalSeconds;
-            this.time = (float)t;
-            if (t <= time)
+            double t = dragTimer.Elapsed.TotalSeconds;
+            time = (float)t;
+            if (t <= currentTime)
             {
                 /* While this looks linear, area scales with the square of the diameter, and therefore
                  * Deployment will be quadratic. The previous exponential function was too slow at first and rough at the end */
-                float currentDiam = Mathf.Lerp(debutDiameter, endDiameter, (float)(t / time));
-                this.currentArea = GetArea(currentDiam);
-                return this.currentArea;
+                float currentDiam = Mathf.Lerp(debutDiameter, endDiameter, (float)(t / currentTime));
+                currentArea = GetArea(currentDiam);
+                return currentArea;
             }
-            this.currentArea = GetArea(endDiameter);
-            return this.currentArea;
+            currentArea = GetArea(endDiameter);
+            return currentArea;
         }
 
         //Drag force vector
-        private Vector3 DragForce(float debutDiameter, float endDiameter, float time)
+        private Vector3 DragForce(float debutDiameter, float endDiameter, float currentTime)
         {
-            return DragCalculation(DragDeployment(time, debutDiameter, endDiameter)) * this.dragVector;
+            return DragCalculation(DragDeployment(currentTime, debutDiameter, endDiameter)) * dragVector;
         }
 
         //Calculates convective flux
         private void CalculateChuteFlux()
         {
-            this.convFlux = this.vessel.convectiveCoefficient * UtilMath.Lerp(1, 1 + (Math.Sqrt(this.vessel.mach * this.vessel.mach * this.vessel.mach) * (this.vessel.dynamicPressurekPa / 101.325)),
-                            (this.vessel.mach - PhysicsGlobals.FullToCrossSectionLerpStart) / PhysicsGlobals.FullToCrossSectionLerpEnd)
-                            * (this.vessel.externalTemperature - this.chuteTemperature);
+            convFlux = vessel.convectiveCoefficient * UtilMath.Lerp(1, 1 + (Math.Sqrt(vessel.mach * vessel.mach * vessel.mach) * (vessel.dynamicPressurekPa / 101.325)),
+                            (vessel.mach - PhysicsGlobals.FullToCrossSectionLerpStart) / PhysicsGlobals.FullToCrossSectionLerpEnd)
+                            * (vessel.externalTemperature - chuteTemperature);
         }
 
         //Calculates the temperature of the chute and cuts it if needed
         private bool CalculateChuteTemp()
         {
-            if (this.chuteTemperature < PhysicsGlobals.SpaceTemperature) { this.chuteTemperature = startTemp; }
+            if (chuteTemperature < PhysicsGlobals.SpaceTemperature) { chuteTemperature = startTemp; }
 
             double emissiveFlux = 0;
-            if (this.chuteTemperature > 0)
+            if (chuteTemperature > 0)
             {
-                double temp2 = this.chuteTemperature * this.chuteTemperature;
-                emissiveFlux = 2 * PhysicsGlobals.StefanBoltzmanConstant * this.ChuteEmissivity * PhysicsGlobals.RadiationFactor * temp2 * temp2;
+                double temp2 = chuteTemperature * chuteTemperature;
+                emissiveFlux = 2 * PhysicsGlobals.StefanBoltzmanConstant * ChuteEmissivity * PhysicsGlobals.RadiationFactor * temp2 * temp2;
             }
-            this.chuteTemperature = Math.Max(PhysicsGlobals.SpaceTemperature, this.chuteTemperature + ((this.convFlux - emissiveFlux) * 0.001 * this.ConvectionArea * this.InvThermalMass * TimeWarp.fixedDeltaTime));
-            if (this.chuteTemperature > maxTemp)
+            chuteTemperature = Math.Max(PhysicsGlobals.SpaceTemperature, chuteTemperature + ((convFlux - emissiveFlux) * 0.001 * ConvectionArea * InvThermalMass * TimeWarp.fixedDeltaTime));
+            if (chuteTemperature > maxTemp)
             {
 
-                ScreenMessages.PostScreenMessage(Localizer.Format("RCLDestroyMessage", this.part.partInfo.title), 6f, ScreenMessageStyle.UPPER_LEFT);
+                ScreenMessages.PostScreenMessage(Localizer.Format("RCLDestroyMessage", part.partInfo.title), 6f, ScreenMessageStyle.UPPER_LEFT);
                 Cut();
                 return false;
             }
-            this.currentTemp = (float)(this.chuteTemperature + absoluteZero);
+            currentTemp = (float)(chuteTemperature + absoluteZero);
             return true;
         }
 
@@ -694,25 +695,25 @@ namespace FerramAerospaceResearch.RealChuteLite
         private void CalculateSafeToDeployEstimate()
         {
             SafeState s;
-            if (this.vessel.externalTemperature <= maxTemp || this.convFlux < 0) { s = SafeState.SAFE; }
+            if (vessel.externalTemperature <= maxTemp || convFlux < 0) { s = SafeState.SAFE; }
             else
             {
-                s = this.chuteTemperature + (0.001 * this.convFlux * this.InvThermalMass * this.DeployedArea * 0.35) <= maxTemp ? SafeState.RISKY : SafeState.DANGEROUS;
+                s = chuteTemperature + (0.001 * convFlux * InvThermalMass * DeployedArea * 0.35) <= maxTemp ? SafeState.RISKY : SafeState.DANGEROUS;
             }
 
-            if (this.safeState != s)
+            if (safeState != s)
             {
-                this.safeState = s;
-                switch(this.safeState)
+                safeState = s;
+                switch(safeState)
                 {
                     case SafeState.SAFE:
-                        this.part.stackIcon.SetBackgroundColor(XKCDColors.White); break;
+                        part.stackIcon.SetBackgroundColor(XKCDColors.White); break;
 
                     case SafeState.RISKY:
-                        this.part.stackIcon.SetBackgroundColor(XKCDColors.BrightYellow); break;
+                        part.stackIcon.SetBackgroundColor(XKCDColors.BrightYellow); break;
 
                     case SafeState.DANGEROUS:
-                        this.part.stackIcon.SetBackgroundColor(XKCDColors.Red); break;
+                        part.stackIcon.SetBackgroundColor(XKCDColors.Red); break;
                 }
             }
         }
@@ -722,52 +723,52 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             //I know this seems random, but trust me, it's needed, else some parachutes don't animate, because fuck you, that's why.
             // ReSharper disable once UnusedVariable -> Needed to animate all parts (stupid_chris)
-            Animation anim = this.part.FindModelAnimators(this.capName).FirstOrDefault();
+            Animation anim = part.FindModelAnimators(capName).FirstOrDefault();
 
-            this.cap = this.part.FindModelTransform(this.capName);
-            this.parachute = this.part.FindModelTransform(this.canopyName);
-            this.parachute.gameObject.SetActive(true);
-            this.part.InitiateAnimation(this.semiDeployedAnimation);
-            this.part.InitiateAnimation(this.fullyDeployedAnimation);
-            this.parachute.gameObject.SetActive(false);
+            cap = part.FindModelTransform(capName);
+            parachute = part.FindModelTransform(canopyName);
+            parachute.gameObject.SetActive(true);
+            part.InitiateAnimation(semiDeployedAnimation);
+            part.InitiateAnimation(fullyDeployedAnimation);
+            parachute.gameObject.SetActive(false);
         }
 
         //Sets the part in the correct position for DragCube rendering
-        public void AssumeDragCubePosition(string name)
+        public void AssumeDragCubePosition(string cubeName)
         {
-            if (string.IsNullOrEmpty(name)) { return; }
+            if (string.IsNullOrEmpty(cubeName)) { return; }
             InitializeAnimationSystem();
-            switch (name)
+            switch (cubeName)
             {
                 //DaMichel: now we handle the stock behaviour, too.
                 case "PACKED":          //stock
                 case "STOWED":
                     {
-                        this.parachute.gameObject.SetActive(false);
-                        this.cap.gameObject.SetActive(true);
+                        parachute.gameObject.SetActive(false);
+                        cap.gameObject.SetActive(true);
                         break;
                     }
 
                 case "RCDEPLOYED":      //This is not a predeployed state, no touchy
                     {
-                        this.parachute.gameObject.SetActive(false);
-                        this.cap.gameObject.SetActive(false);
+                        parachute.gameObject.SetActive(false);
+                        cap.gameObject.SetActive(false);
                         break;
                     }
 
                 case "SEMIDEPLOYED":    //  stock
                     {
-                        this.parachute.gameObject.SetActive(true);
-                        this.cap.gameObject.SetActive(false);
-                        this.part.SkipToAnimationTime(this.semiDeployedAnimation, 0, 1); // to the end of the animation
+                        parachute.gameObject.SetActive(true);
+                        cap.gameObject.SetActive(false);
+                        part.SkipToAnimationTime(semiDeployedAnimation, 0, 1); // to the end of the animation
                         break;
                     }
 
                 case "DEPLOYED":        //  stock
                     {
-                        this.parachute.gameObject.SetActive(true);
-                        this.cap.gameObject.SetActive(false);
-                        this.part.SkipToAnimationTime(this.fullyDeployedAnimation, 0, 1);  // to the end of the animation
+                        parachute.gameObject.SetActive(true);
+                        cap.gameObject.SetActive(false);
+                        part.SkipToAnimationTime(fullyDeployedAnimation, 0, 1);  // to the end of the animation
                         break;
                     }
             }
@@ -795,26 +796,26 @@ namespace FerramAerospaceResearch.RealChuteLite
         }
 
         //Info window
-        private void Window(int id)
+        private void Window(int windowId)
         {
             //Header
-            GUI.DragWindow(this.drag);
+            GUI.DragWindow(drag);
             GUILayout.BeginVertical();
 
             //Top info labels
-            StringBuilder b = new StringBuilder(Localizer.Format("RCLGUI0", this.part.partInfo.title)).AppendLine();
-            b.AppendLine(Localizer.Format("RCLGUI0", this.part.symmetryCounterparts.Count));
-            b.AppendLine(Localizer.Format("RCLGUI2", this.part.TotalMass().ToString("F3")));
+            StringBuilder b = new StringBuilder(Localizer.Format("RCLGUI0", part.partInfo.title)).AppendLine();
+            b.AppendLine(Localizer.Format("RCLGUI0", part.symmetryCounterparts.Count));
+            b.AppendLine(Localizer.Format("RCLGUI2", part.TotalMass().ToString("F3")));
             GUILayout.Label(b.ToString());
 
             //Beggining scroll
-            this.scroll = GUILayout.BeginScrollView(this.scroll, false, false, GUI.skin.horizontalScrollbar, GUI.skin.verticalScrollbar, GUI.skin.box);
+            scroll = GUILayout.BeginScrollView(scroll, false, false, GUI.skin.horizontalScrollbar, GUI.skin.verticalScrollbar, GUI.skin.box);
             GUILayout.Space(5);
             GUILayout.Label(Localizer.Format("RCLGUI3"), BoldLabel, GUILayout.Width(120));
 
             //General labels
-            b = new StringBuilder(Localizer.Format("RCLGUI4", this.autoCutSpeed)).AppendLine();
-            b.Append(Localizer.Format("RCLGUI5", this.chuteCount));
+            b = new StringBuilder(Localizer.Format("RCLGUI4", autoCutSpeed)).AppendLine();
+            b.Append(Localizer.Format("RCLGUI5", chuteCount));
             GUILayout.Label(b.ToString());
 
             //Specific labels
@@ -825,12 +826,12 @@ namespace FerramAerospaceResearch.RealChuteLite
             b = new StringBuilder();
             b.AppendLine(Localizer.Format("RCLGUI7", materialName));
             b.AppendLine(Localizer.Format("RCLGUI8", staticCd.ToString("0.0")));
-            b.AppendLine(Localizer.Format("RCLGUI9", this.preDeployedDiameter, this.PreDeployedArea.ToString("0.###")));
-            b.AppendLine(Localizer.Format("RCLGUI10", this.deployedDiameter, this.DeployedArea.ToString("0.###")));
+            b.AppendLine(Localizer.Format("RCLGUI9", preDeployedDiameter, PreDeployedArea.ToString("0.###")));
+            b.AppendLine(Localizer.Format("RCLGUI10", deployedDiameter, DeployedArea.ToString("0.###")));
             GUILayout.Label(b.ToString());
 
             //DeploymentSafety
-            switch (this.safeState)
+            switch (safeState)
             {
                 case SafeState.SAFE:
                     GUILayout.Label(Localizer.Format("RCLGUISafe")); break;
@@ -844,43 +845,43 @@ namespace FerramAerospaceResearch.RealChuteLite
 
             //Temperature info
             b = new StringBuilder();
-            b.AppendLine(Localizer.Format("RCLGUI11", (maxTemp + absoluteZero).ToString()));
-            b.AppendLine(Localizer.Format("RCLGUI12", Math.Round(this.chuteTemperature + absoluteZero, 1, MidpointRounding.AwayFromZero)));
-            GUILayout.Label(b.ToString(), this.chuteTemperature / maxTemp > 0.85 ? RedLabel : GUI.skin.label);
+            b.AppendLine(Localizer.Format("RCLGUI11", (maxTemp + absoluteZero).ToString(CultureInfo.InvariantCulture)));
+            b.AppendLine(Localizer.Format("RCLGUI12", Math.Round(chuteTemperature + absoluteZero, 1, MidpointRounding.AwayFromZero)));
+            GUILayout.Label(b.ToString(), chuteTemperature / maxTemp > 0.85 ? RedLabel : GUI.skin.label);
 
             //Predeployment pressure selection
-            GUILayout.Label(Localizer.Format("RCLGUI13", this.minAirPressureToOpen));
+            GUILayout.Label(Localizer.Format("RCLGUI13", minAirPressureToOpen));
             if (HighLogic.LoadedSceneIsFlight)
             {
                 //Predeployment pressure slider
-                this.minAirPressureToOpen = GUILayout.HorizontalSlider(this.minAirPressureToOpen, 0.005f, 1);
+                minAirPressureToOpen = GUILayout.HorizontalSlider(minAirPressureToOpen, 0.005f, 1);
             }
 
             //Deployment altitude selection
-            GUILayout.Label(Localizer.Format("RCLGUI14", this.deployAltitude));
+            GUILayout.Label(Localizer.Format("RCLGUI14", deployAltitude));
             if (HighLogic.LoadedSceneIsFlight)
             {
                 //Deployment altitude slider
-                this.deployAltitude = GUILayout.HorizontalSlider(this.deployAltitude, 50, 10000);
+                deployAltitude = GUILayout.HorizontalSlider(deployAltitude, 50, 10000);
             }
 
             //Other labels
             b = new StringBuilder();
-            b.AppendLine(Localizer.Format("RCLGUI15", Math.Round(1 / this.semiDeploymentSpeed, 1, MidpointRounding.AwayFromZero)));
-            b.AppendLine(Localizer.Format("RCLGUI16",Math.Round(1 / this.deploymentSpeed, 1, MidpointRounding.AwayFromZero)));
+            b.AppendLine(Localizer.Format("RCLGUI15", Math.Round(1 / semiDeploymentSpeed, 1, MidpointRounding.AwayFromZero)));
+            b.AppendLine(Localizer.Format("RCLGUI16",Math.Round(1 / deploymentSpeed, 1, MidpointRounding.AwayFromZero)));
             GUILayout.Label(b.ToString());
 
             //End scroll
             GUILayout.EndScrollView();
 
             //Copy button if in flight
-            if (HighLogic.LoadedSceneIsFlight && this.part.symmetryCounterparts.Count > 0)
+            if (HighLogic.LoadedSceneIsFlight && part.symmetryCounterparts.Count > 0)
             {
                 CenteredButton(Localizer.Format("RCLGUICopy"), CopyToCouterparts);
             }
 
             //Close button
-            CenteredButton(Localizer.Format("RCLGUIClose"), () => this.visible = false);
+            CenteredButton(Localizer.Format("RCLGUIClose"), () => visible = false);
 
             //Closer
             GUILayout.EndVertical();
@@ -908,102 +909,102 @@ namespace FerramAerospaceResearch.RealChuteLite
             if (!CompatibilityChecker.IsAllCompatible() || !HighLogic.LoadedSceneIsFlight) { return; }
 
             //Makes the chute icon blink if failed
-            if (this.failedTimer.IsRunning)
+            if (failedTimer.IsRunning)
             {
-                double time = this.failedTimer.Elapsed.TotalSeconds;
-                if (time <= 2.5)
+                double totalSeconds = failedTimer.Elapsed.TotalSeconds;
+                if (totalSeconds <= 2.5)
                 {
-                    if (!this.displayed)
+                    if (!displayed)
                     {
                         ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailDeploy"), 2.5f, ScreenMessageStyle.UPPER_CENTER);
-                        if (this.part.ShieldedFromAirstream) { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailShielded"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
-                        else if (this.GroundStop) { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailGround"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
-                        else if (this.atmPressure.NearlyEqual(0)) { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailPres"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
+                        if (part.ShieldedFromAirstream) { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailShielded"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
+                        else if (GroundStop) { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailGround"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
+                        else if (atmPressure.NearlyEqual(0)) { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailPres"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
                         else { ScreenMessages.PostScreenMessage(Localizer.Format("RCLFailOther"), 2.5f, ScreenMessageStyle.UPPER_CENTER); }
-                        this.displayed = true;
+                        displayed = true;
                     }
-                    if (time < 0.5 || time >= 1 && time < 1.5 || time >= 2) { this.part.stackIcon.SetIconColor(XKCDColors.Red); }
-                    else { this.part.stackIcon.SetIconColor(XKCDColors.White); }
+                    if (totalSeconds < 0.5 || totalSeconds >= 1 && totalSeconds < 1.5 || totalSeconds >= 2) { part.stackIcon.SetIconColor(XKCDColors.Red); }
+                    else { part.stackIcon.SetIconColor(XKCDColors.White); }
                 }
                 else
                 {
-                    this.displayed = false;
-                    this.part.stackIcon.SetIconColor(XKCDColors.White);
-                    this.failedTimer.Reset();
+                    displayed = false;
+                    part.stackIcon.SetIconColor(XKCDColors.White);
+                    failedTimer.Reset();
                 }
             }
 
-            this.Disarm.active = this.armed || this.showDisarm;
-            this.DeployE.active = !this.staged && this.DeploymentState != DeploymentStates.CUT;
-            this.CutE.active = this.IsDeployed;
-            this.Repack.guiActiveUnfocused = this.CanRepack;
+            Disarm.active = armed || showDisarm;
+            DeployE.active = !staged && DeploymentState != DeploymentStates.CUT;
+            CutE.active = IsDeployed;
+            Repack.guiActiveUnfocused = CanRepack;
         }
 
         private void FixedUpdate()
         {
             //Flight values
-            if (!CompatibilityChecker.IsAllCompatible() || !HighLogic.LoadedSceneIsFlight || FlightGlobals.ActiveVessel == null || this.part.Rigidbody == null) { return; }
-            this.pos = this.part.partTransform.position;
-            this.asl = FlightGlobals.getAltitudeAtPos(this.pos);
-            this.trueAlt = this.asl;
-            if (this.vessel.mainBody.pqsController != null)
+            if (!CompatibilityChecker.IsAllCompatible() || !HighLogic.LoadedSceneIsFlight || FlightGlobals.ActiveVessel == null || part.Rigidbody == null) { return; }
+            pos = part.partTransform.position;
+            asl = FlightGlobals.getAltitudeAtPos(pos);
+            trueAlt = asl;
+            if (vessel.mainBody.pqsController != null)
             {
-                double terrainAlt = this.vessel.pqsAltitude;
-                if (!this.vessel.mainBody.ocean || terrainAlt > 0) { this.trueAlt -= terrainAlt; }
+                double terrainAlt = vessel.pqsAltitude;
+                if (!vessel.mainBody.ocean || terrainAlt > 0) { trueAlt -= terrainAlt; }
             }
-            this.atmPressure = FlightGlobals.getStaticPressure(this.asl, this.vessel.mainBody) * PhysicsGlobals.KpaToAtmospheres;
-            this.atmDensity = this.part.atmDensity;
-            Vector3 velocity = this.part.Rigidbody.velocity + Krakensbane.GetFrameVelocityV3f();
-            this.sqrSpeed = velocity.sqrMagnitude;
-            this.dragVector = -velocity.normalized;
+            atmPressure = FlightGlobals.getStaticPressure(asl, vessel.mainBody) * PhysicsGlobals.KpaToAtmospheres;
+            atmDensity = part.atmDensity;
+            Vector3 velocity = part.Rigidbody.velocity + Krakensbane.GetFrameVelocityV3f();
+            sqrSpeed = velocity.sqrMagnitude;
+            dragVector = -velocity.normalized;
 
-            if (this.atmDensity > 0) { CalculateChuteFlux(); }
-            else { this.convFlux = 0; }
+            if (atmDensity > 0) { CalculateChuteFlux(); }
+            else { convFlux = 0; }
 
             CalculateSafeToDeployEstimate();
 
-            if (!this.staged && GameSettings.LAUNCH_STAGES.GetKeyDown() && this.vessel.isActiveVessel && (this.part.inverseStage == StageManager.CurrentStage - 1 || StageManager.CurrentStage == 0)) { ActivateRC(); }
+            if (!staged && GameSettings.LAUNCH_STAGES.GetKeyDown() && vessel.isActiveVessel && (part.inverseStage == StageManager.CurrentStage - 1 || StageManager.CurrentStage == 0)) { ActivateRC(); }
 
-            if (this.staged)
+            if (staged)
             {
                 //Checks if the parachute must disarm
-                if (this.armed)
+                if (armed)
                 {
-                    this.part.stackIcon.SetIconColor(XKCDColors.LightCyan);
-                    if (this.CanDeploy) { this.armed = false; }
+                    part.stackIcon.SetIconColor(XKCDColors.LightCyan);
+                    if (CanDeploy) { armed = false; }
                 }
                 //Parachute deployments
                 else
                 {
                     //Parachutes
-                    if (this.CanDeploy)
+                    if (CanDeploy)
                     {
-                        if (this.IsDeployed)
+                        if (IsDeployed)
                         {
                             if (!CalculateChuteTemp()) { return; }
                             FollowDragDirection();
                         }
-                        this.part.GetComponentCached(ref this.rigidbody);
-                        switch (this.DeploymentState)
+                        part.GetComponentCached(ref rigidbody);
+                        switch (DeploymentState)
                         {
                             case DeploymentStates.STOWED:
                                 {
-                                    this.part.stackIcon.SetIconColor(XKCDColors.LightCyan);
-                                    if (this.PressureCheck && this.RandomDeployment) { PreDeploy(); }
+                                    part.stackIcon.SetIconColor(XKCDColors.LightCyan);
+                                    if (PressureCheck && RandomDeployment) { PreDeploy(); }
                                     break;
                                 }
 
                             case DeploymentStates.PREDEPLOYED:
                                 {
-                                    part.AddForceAtPosition(DragForce(0, this.preDeployedDiameter, 1f / this.semiDeploymentSpeed), this.ForcePosition);
+                                    part.AddForceAtPosition(DragForce(0, preDeployedDiameter, 1f / semiDeploymentSpeed), ForcePosition);
                                     //this.rigidbody.AddForceAtPosition(DragForce(0, this.preDeployedDiameter, 1f / this.semiDeploymentSpeed), this.ForcePosition, ForceMode.Force);
-                                    if (this.trueAlt <= this.deployAltitude && this.dragTimer.Elapsed.TotalSeconds >= 1f / this.semiDeploymentSpeed) { Deploy(); }
+                                    if (trueAlt <= deployAltitude && dragTimer.Elapsed.TotalSeconds >= 1f / semiDeploymentSpeed) { Deploy(); }
                                     break;
                                 }
 
                             case DeploymentStates.DEPLOYED:
                                 {
-                                    part.AddForceAtPosition(DragForce(this.preDeployedDiameter, this.deployedDiameter, 1f / this.deploymentSpeed), this.ForcePosition);
+                                    part.AddForceAtPosition(DragForce(preDeployedDiameter, deployedDiameter, 1f / deploymentSpeed), ForcePosition);
                                     //this.rigidbody.AddForceAtPosition(DragForce(this.preDeployedDiameter, this.deployedDiameter, 1f / this.deploymentSpeed), this.ForcePosition, ForceMode.Force);
                                     break;
                                 }
@@ -1012,10 +1013,10 @@ namespace FerramAerospaceResearch.RealChuteLite
                     //Deactivation
                     else
                     {
-                        if (this.IsDeployed) { Cut(); }
+                        if (IsDeployed) { Cut(); }
                         else
                         {
-                            this.failedTimer.Start();
+                            failedTimer.Start();
                             StagingReset();
                         }
                     }
@@ -1025,10 +1026,10 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         private void OnGUI()
         {
-            if (CompatibilityChecker.IsAllCompatible() && (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor) && this.visible && !this.hid)
+            if (CompatibilityChecker.IsAllCompatible() && (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor) && visible && !hid)
             {
                 GUI.skin = HighLogic.Skin;
-                this.window = GUILayout.Window(this.id, this.window, Window, Localizer.Format("RCLGUITitle"));
+                window = GUILayout.Window(id, window, Window, Localizer.Format("RCLGUITitle"));
             }
         }
 
@@ -1042,82 +1043,82 @@ namespace FerramAerospaceResearch.RealChuteLite
         #endregion
 
         #region Overrides
-        public override void OnStart(StartState state)
+        public override void OnStart(StartState startState)
         {
             if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight) { return; }
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.Actions.ForEach(a => a.active = false);
-                this.Events.ForEach(e =>
+                Actions.ForEach(a => a.active = false);
+                Events.ForEach(e =>
                     {
                         e.active = false;
                         e.guiActive = false;
                         e.guiActiveEditor = false;
                     });
-                this.Fields["chuteCount"].guiActive = false;
+                Fields["chuteCount"].guiActive = false;
                 return;
             }
 
             //Staging icon
-            this.part.stagingIcon = "PARACHUTES";
+            part.stagingIcon = "PARACHUTES";
             InitializeAnimationSystem();
 
             //First initiation of the part
-            if (!this.initiated)
+            if (!initiated)
             {
-                this.initiated = true;
-                this.armed = false;
-                this.chuteCount = maxSpares;
-                this.cap.gameObject.SetActive(true);
+                initiated = true;
+                armed = false;
+                chuteCount = maxSpares;
+                cap.gameObject.SetActive(true);
             }
-            float tmpPartMass = this.TotalMass;
-            this.massDelta = 0;
-            if (this.part.partInfo != null && (object)this.part.partInfo.partPrefab != null)
+            float tmpPartMass = TotalMass;
+            massDelta = 0;
+            if (part.partInfo != null && !(part.partInfo.partPrefab is null))
             {
-                this.massDelta = tmpPartMass - this.part.partInfo.partPrefab.mass;
+                massDelta = tmpPartMass - part.partInfo.partPrefab.mass;
             }
 
             //Flight loading
             if (HighLogic.LoadedSceneIsFlight)
             {
                 Random random = new Random();
-                this.randomTime = (float)random.NextDouble();
-                this.randomX = (float)(random.NextDouble() * 100);
-                this.randomY = (float)(random.NextDouble() * 100);
+                randomTime = (float)random.NextDouble();
+                randomX = (float)(random.NextDouble() * 100);
+                randomY = (float)(random.NextDouble() * 100);
 
                 //Hide/show UI event addition
                 GameEvents.onHideUI.Add(HideUI);
                 GameEvents.onShowUI.Add(ShowUI);
 
-                if (this.CanRepack) { SetRepack(); }
+                if (CanRepack) { SetRepack(); }
 
-                if (!this.time.NearlyEqual(0)) { this.dragTimer = new PhysicsWatch(this.time); }
-                if (this.DeploymentState != DeploymentStates.STOWED)
+                if (!time.NearlyEqual(0)) { dragTimer = new PhysicsWatch(time); }
+                if (DeploymentState != DeploymentStates.STOWED)
                 {
-                    this.part.stackIcon.SetIconColor(XKCDColors.Red);
-                    this.cap.gameObject.SetActive(false);
+                    part.stackIcon.SetIconColor(XKCDColors.Red);
+                    cap.gameObject.SetActive(false);
                 }
 
-                if (this.staged && this.IsDeployed)
+                if (staged && IsDeployed)
                 {
-                    this.parachute.gameObject.SetActive(true);
-                    switch(this.DeploymentState)
+                    parachute.gameObject.SetActive(true);
+                    switch(DeploymentState)
                     {
                         case DeploymentStates.PREDEPLOYED:
-                            this.part.SkipToAnimationTime(this.semiDeployedAnimation, this.semiDeploymentSpeed, Mathf.Clamp01(this.time)); break;
+                            part.SkipToAnimationTime(semiDeployedAnimation, semiDeploymentSpeed, Mathf.Clamp01(time)); break;
                         case DeploymentStates.DEPLOYED:
-                            this.part.SkipToAnimationTime(this.fullyDeployedAnimation, this.deploymentSpeed, Mathf.Clamp01(this.time)); break;
+                            part.SkipToAnimationTime(fullyDeployedAnimation, deploymentSpeed, Mathf.Clamp01(time)); break;
                     }
                 }
 
-                DragCubeList cubes = this.part.DragCubes;
+                DragCubeList cubes = part.DragCubes;
                 //Set stock cubes to 0
                 cubes.SetCubeWeight("PACKED", 0);
                 cubes.SetCubeWeight("SEMIDEPLOYED", 0);
                 cubes.SetCubeWeight("DEPLOYED", 0);
 
                 //Sets RC cubes
-                if (this.DeploymentState == DeploymentStates.STOWED)
+                if (DeploymentState == DeploymentStates.STOWED)
                 {
                     cubes.SetCubeWeight("PACKED", 1);
                     cubes.SetCubeWeight("RCDEPLOYED", 0);
@@ -1130,27 +1131,27 @@ namespace FerramAerospaceResearch.RealChuteLite
             }
 
             //GUI
-            this.window = new Rect(200, 100, 350, 400);
-            this.drag = new Rect(0, 0, 350, 30);
+            window = new Rect(200, 100, 350, 400);
+            drag = new Rect(0, 0, 350, 30);
         }
 
         public override void OnLoad(ConfigNode node)
         {
             if (!CompatibilityChecker.IsAllCompatible()) { return; }
-            if (HighLogic.LoadedScene == GameScenes.LOADING || !PartLoader.Instance.IsReady() || this.part.partInfo == null)
+            if (HighLogic.LoadedScene == GameScenes.LOADING || !PartLoader.Instance.IsReady() || part.partInfo == null)
             {
-                if (this.deployAltitude <= 500) { this.deployAltitude += 200; }
+                if (deployAltitude <= 500) { deployAltitude += 200; }
             }
             else
             {
-                Part prefab = this.part.partInfo.partPrefab;
-                this.massDelta = prefab == null ? 0 : this.TotalMass - prefab.mass;
+                Part prefab = part.partInfo.partPrefab;
+                massDelta = prefab == null ? 0 : TotalMass - prefab.mass;
             }
         }
 
         public override void OnActive()
         {
-            if (!this.staged)
+            if (!staged)
             {
                 ActivateRC();
             }
@@ -1160,26 +1161,26 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             if (!CompatibilityChecker.IsAllCompatible()) { return string.Empty; }
             //Info in the editor part window
-            float tmpPartMass = this.TotalMass;
-            this.massDelta = 0;
-            if (this.part.partInfo != null && (object)this.part.partInfo.partPrefab != null)
+            float tmpPartMass = TotalMass;
+            massDelta = 0;
+            if (part.partInfo != null && !(part.partInfo.partPrefab is null))
             {
-                this.massDelta = tmpPartMass - this.part.partInfo.partPrefab.mass;
+                massDelta = tmpPartMass - part.partInfo.partPrefab.mass;
             }
 
             StringBuilder b = new StringBuilder();
-            b.Append(Localizer.Format("RCLModuleInfo0", this.caseMass));
+            b.Append(Localizer.Format("RCLModuleInfo0", caseMass));
             b.Append(Localizer.Format("RCLModuleInfo1", maxSpares));
-            b.Append(Localizer.Format("RCLModuleInfo2", this.autoCutSpeed));
+            b.Append(Localizer.Format("RCLModuleInfo2", autoCutSpeed));
             b.AppendLine(Localizer.Format("RCLModuleInfo3", materialName));
             b.Append(Localizer.Format("RCLModuleInfo4", staticCd));
             b.Append(Localizer.Format("RCLModuleInfo5", maxTemp + absoluteZero));
-            b.Append(Localizer.Format("RCLModuleInfo6", this.preDeployedDiameter));
-            b.Append(Localizer.Format("RCLModuleInfo7", this.deployedDiameter));
-            b.Append(Localizer.Format("RCLModuleInfo8", this.minAirPressureToOpen));
-            b.Append(Localizer.Format("RCLModuleInfo9", this.deployAltitude));
-            b.Append(Localizer.Format("RCLModuleInfo10", Math.Round(1 / this.semiDeploymentSpeed, 1, MidpointRounding.AwayFromZero)));
-            b.Append(Localizer.Format("RCLModuleInfo11", Math.Round(1 / this.deploymentSpeed, 1, MidpointRounding.AwayFromZero)));
+            b.Append(Localizer.Format("RCLModuleInfo6", preDeployedDiameter));
+            b.Append(Localizer.Format("RCLModuleInfo7", deployedDiameter));
+            b.Append(Localizer.Format("RCLModuleInfo8", minAirPressureToOpen));
+            b.Append(Localizer.Format("RCLModuleInfo9", deployAltitude));
+            b.Append(Localizer.Format("RCLModuleInfo10", Math.Round(1 / semiDeploymentSpeed, 1, MidpointRounding.AwayFromZero)));
+            b.Append(Localizer.Format("RCLModuleInfo11", Math.Round(1 / deploymentSpeed, 1, MidpointRounding.AwayFromZero)));
 
             return b.ToString();
         }

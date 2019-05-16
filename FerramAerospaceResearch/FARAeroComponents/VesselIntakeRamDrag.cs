@@ -50,21 +50,21 @@ namespace FerramAerospaceResearch.FARAeroComponents
 {
     //Engines handle ram drag at full throttle, but as throttle drops so does ram drag
     //This attempts some manner of handling ram drag at various speeds
-    class VesselIntakeRamDrag
+    internal class VesselIntakeRamDrag
     {
-        const float AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM = 0.25f;       //assume value approximately for turbojets
-        const float AVG_NOZZLE_VEL_FACTOR = AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM * (1 - AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM);
+        private const float AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM = 0.25f;       //assume value approximately for turbojets
+        private const float AVG_NOZZLE_VEL_FACTOR = AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM * (1 - AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM);
 
-        static int AJE_JET_CLASS_ID = "ModuleEnginesAJEJet".GetHashCode();
-        static int AJE_PROP_CLASS_ID = "ModuleEnginesAJEPropeller".GetHashCode();
+        private static int AJE_JET_CLASS_ID = "ModuleEnginesAJEJet".GetHashCode();
+        private static int AJE_PROP_CLASS_ID = "ModuleEnginesAJEPropeller".GetHashCode();
 
 
-        List<FARAeroPartModule> _aeroModulesWithIntakes = new List<FARAeroPartModule>();
-        List<ModuleResourceIntake> _intakeModules = new List<ModuleResourceIntake>();
-        List<Transform> _intakeTransforms = new List<Transform>();
-        List<ModuleEngines> _airBreathingEngines = new List<ModuleEngines>();
+        private List<FARAeroPartModule> _aeroModulesWithIntakes = new List<FARAeroPartModule>();
+        private List<ModuleResourceIntake> _intakeModules = new List<ModuleResourceIntake>();
+        private List<Transform> _intakeTransforms = new List<Transform>();
+        private List<ModuleEngines> _airBreathingEngines = new List<ModuleEngines>();
 
-        public void UpdateAeroData(List<FARAeroPartModule> allUsedAeroModules, List<FARAeroPartModule> allUnusedAeroModules)
+        public void UpdateAeroData(List<FARAeroPartModule> allUsedAeroModules)
         {
             _aeroModulesWithIntakes.Clear();
             _intakeModules.Clear();
@@ -136,10 +136,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
 
-        public void ApplyIntakeRamDrag(float machNumber, Vector3 vesselVelNorm, float dynPres)
+        public void ApplyIntakeRamDrag(float machNumber, Vector3 vesselVelNorm)
         {
             float currentRamDrag = CalculateRamDrag(machNumber);
-            ApplyIntakeDrag(currentRamDrag, vesselVelNorm, dynPres);
+            ApplyIntakeDrag(currentRamDrag, vesselVelNorm);
         }
 
         private float CalculateRamDrag(float machNumber)
@@ -165,7 +165,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return currentRamDrag;
         }
 
-        private void ApplyIntakeDrag(float currentRamDrag, Vector3 vesselVelNorm, float dynPres)
+        private void ApplyIntakeDrag(float currentRamDrag, Vector3 vesselVelNorm)
         {
             for (int i = _intakeTransforms.Count - 1; i >= 0; i--)
             {
@@ -193,7 +193,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 FARAeroPartModule aeroModule = _aeroModulesWithIntakes[i];
 
 
-                Vector3 force = -aeroModule.partLocalVelNorm * cosAoA * currentRamDrag * (float)intake.area * 100f;
+                Vector3 force = cosAoA * currentRamDrag * (float)intake.area * 100f * -aeroModule.partLocalVelNorm;
                 //if(float.IsNaN(force.sqrMagnitude))
                 //    force = Vector3.zero;
                 aeroModule.AddLocalForce(force, Vector3.zero);

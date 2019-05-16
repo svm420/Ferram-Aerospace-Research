@@ -43,15 +43,13 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class StabilityDerivLinearSim
+    internal class StabilityDerivLinearSim
     {
-        InstantConditionSim _instantCondition;
+        private InstantConditionSim _instantCondition;
 
         public StabilityDerivLinearSim(InstantConditionSim instantConditionSim)
         {
@@ -101,8 +99,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     num++;              //Avoid Ix, Iy, Iz and long derivs
                     continue;
                 }
-                else
-                    num++;
+
+                num++;
                 FARLogger.Info("" + i + "," + j);
                 if (i <= 2)
                     A.Add(f, i, j);
@@ -177,7 +175,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             int i = 0;
             int j = 0;
             int num = 0;
-            double[] Derivs = new double[27];
 
             for (int k = 0; k < vehicleData.stabDerivs.Length; k++)
             {
@@ -187,8 +184,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     num++;              //Avoid Ix, Iy, Iz
                     continue;
                 }
-                else
-                    num++;
+
+                num++;
                 FARLogger.Info(i + "," + j);
                 if (i <= 2)
                     if (num == 10)

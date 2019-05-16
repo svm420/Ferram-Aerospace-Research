@@ -44,19 +44,18 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using UnityEngine;
 using ferram4;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
     public static class FARAeroUtil
     {
-        private static FloatCurve prandtlMeyerMach = null;
-        private static FloatCurve prandtlMeyerAngle = null;
-        public static double maxPrandtlMeyerTurnAngle = 0;
+        private static FloatCurve prandtlMeyerMach;
+        private static FloatCurve prandtlMeyerAngle;
+        public static double maxPrandtlMeyerTurnAngle;
 //        private static FloatCurve criticalMachNumber = null;
         //private static FloatCurve liftslope = null;
 
@@ -64,15 +63,15 @@ namespace FerramAerospaceResearch
         public static double massStressPower;
         public static bool AJELoaded;
 
-        public static Dictionary<int, double[]> bodyAtmosphereConfiguration = null;
+        public static Dictionary<int, double[]> bodyAtmosphereConfiguration;
         public static int prevBodyIndex = -1;
         public static double[] currentBodyVisc = new double[2];
-        private static CelestialBody currentBody = null;
+        private static CelestialBody currentBody;
         public static CelestialBody CurrentBody
         {
             get
             {
-                if ((object)currentBody == null)
+                if (currentBody is null)
                 {
                     if (FlightGlobals.Bodies[1] || !FlightGlobals.ActiveVessel)
                         currentBody = FlightGlobals.Bodies[1];
@@ -85,7 +84,7 @@ namespace FerramAerospaceResearch
             }
         }
 
-        public static bool loaded = false;
+        public static bool loaded;
 
         //Based on ratio of density of water to density of air at SL
         private const double UNDERWATER_DENSITY_FACTOR_MINUS_ONE = 814.51020408163265306122448979592;
@@ -151,7 +150,7 @@ namespace FerramAerospaceResearch
                 if (node.HasValue("ctrlSurfTimeConstantSpoiler"))
                     double.TryParse(node.GetValue("ctrlSurfTimeConstantSpoiler"), out FARControllableSurface.timeConstantSpoiler);
 
-                FARAeroUtil.bodyAtmosphereConfiguration = new Dictionary<int, double[]>();
+                bodyAtmosphereConfiguration = new Dictionary<int, double[]>();
                 foreach (ConfigNode bodyProperties in node.GetNodes("BodyAtmosphericData"))
                 {
                     if (bodyProperties == null || !(bodyProperties.HasValue("index") || bodyProperties.HasValue("name")) || !bodyProperties.HasValue("viscosityAtReferenceTemp")
@@ -184,7 +183,7 @@ namespace FerramAerospaceResearch
                     if(index < 0)
                         int.TryParse(bodyProperties.GetValue("index"), out index);
 
-                    FARAeroUtil.bodyAtmosphereConfiguration.Add(index, Rgamma_and_gamma);
+                    bodyAtmosphereConfiguration.Add(index, Rgamma_and_gamma);
                 }
 
             }
@@ -199,7 +198,7 @@ namespace FerramAerospaceResearch
                 Rgamma_and_gamma[0] = 1.7894e-5;
                 Rgamma_and_gamma[1] = 288;
 
-                FARAeroUtil.bodyAtmosphereConfiguration.Add(body.flightGlobalsIndex, Rgamma_and_gamma);
+                bodyAtmosphereConfiguration.Add(body.flightGlobalsIndex, Rgamma_and_gamma);
             }
 
             foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
@@ -230,6 +229,7 @@ namespace FerramAerospaceResearch
                 massStressPower = 1.2;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static double MaxPressureCoefficientCalc(double M)
         {
             double gamma = CurrentBody.atmosphereAdiabaticIndex;
@@ -416,19 +416,20 @@ namespace FerramAerospaceResearch
                     p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE);
         }
 
-        private static List<FARWingAerodynamicModel> curEditorWingCache = null;
+        private static List<FARWingAerodynamicModel> curEditorWingCache;
 
+        // ReSharper disable once UnusedMember.Global
         public static List<FARWingAerodynamicModel> CurEditorWings
         {
             get
             {
                 if (curEditorWingCache == null)
-                    curEditorWingCache = ListEditorWings(false);
+                    curEditorWingCache = ListEditorWings();
                 return curEditorWingCache;
             }
         }
         // Parts currently added to the vehicle in the editor
-        private static List<Part> CurEditorPartsCache = null;
+        private static List<Part> CurEditorPartsCache;
 
         public static List<Part> CurEditorParts
         {
@@ -441,7 +442,7 @@ namespace FerramAerospaceResearch
         }
 
         // Parts currently added, plus the ghost part(s) about to be attached
-        private static List<Part> AllEditorPartsCache = null;
+        private static List<Part> AllEditorPartsCache;
 
         public static List<Part> AllEditorParts
         {
@@ -489,7 +490,7 @@ namespace FerramAerospaceResearch
             return list;
         }
 
-        public static List<FARWingAerodynamicModel> ListEditorWings(bool include_selected)
+        public static List<FARWingAerodynamicModel> ListEditorWings()
         {
             List<Part> list = CurEditorParts;
 
@@ -498,7 +499,7 @@ namespace FerramAerospaceResearch
             {
                 Part p = list[i];
                 FARWingAerodynamicModel wing = p.GetComponent<FARWingAerodynamicModel>();
-                if ((object)wing != null)
+                if (!(wing is null))
                     wings.Add(wing);
             }
             return wings;
@@ -514,7 +515,7 @@ namespace FerramAerospaceResearch
             }
         }
 
-        private static int RaycastMaskVal = 0, RaycastMaskEdit;
+        private static int RaycastMaskVal, RaycastMaskEdit;
         private static String[] RaycastLayers = {
             "Default", "TransparentFX", "Local Scenery", "Disconnected Parts"
         };
@@ -559,6 +560,7 @@ namespace FerramAerospaceResearch
             return exp;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static double GetFailureForceScaling(CelestialBody body, double altitude)
         {
             if (!body.ocean || altitude > 0)
@@ -681,7 +683,7 @@ namespace FerramAerospaceResearch
 
         public static void UpdateCurrentActiveBody(CelestialBody body)
         {
-            if ((object)body != null && body.flightGlobalsIndex != prevBodyIndex)
+            if (!(body is null) && body.flightGlobalsIndex != prevBodyIndex)
             {
                 UpdateCurrentActiveBody(body.flightGlobalsIndex, body);
             }
@@ -729,14 +731,14 @@ namespace FerramAerospaceResearch
             if (D > 0.001)
                 return double.NaN;
 
-            double phi = Math.Atan(Math.Sqrt(FARMathUtil.Clamp(-D, 0, double.PositiveInfinity)) / R);
+            double phi = Math.Atan(Math.Sqrt((-D).Clamp(0, double.PositiveInfinity)) / R);
             if (R < 0)
                 phi += Math.PI;
             phi *= 0.33333333;
 
-            double chiW = -0.33333333 * b - Math.Sqrt(FARMathUtil.Clamp(-Q, 0, double.PositiveInfinity)) * (Math.Cos(phi) - 1.7320508f * Math.Sin(phi));
+            double chiW = -0.33333333 * b - Math.Sqrt((-Q).Clamp(0, double.PositiveInfinity)) * (Math.Cos(phi) - 1.7320508f * Math.Sin(phi));
 
-            double betaW = Math.Sqrt(FARMathUtil.Clamp(chiW, 0, double.PositiveInfinity));
+            double betaW = Math.Sqrt(chiW.Clamp(0, double.PositiveInfinity));
 
             return betaW;
         }
@@ -757,12 +759,13 @@ namespace FerramAerospaceResearch
 
             double tmp = b * b - 4 * a * c;
 
-            double sin2def = -b + Math.Sqrt(FARMathUtil.Clamp(tmp, 0, double.PositiveInfinity));
+            double sin2def = -b + Math.Sqrt(tmp.Clamp(0, double.PositiveInfinity));
             sin2def /= (2 * a);
 
             return Math.Sqrt(sin2def);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static double MaxShockAngleCheck(double MachNumber, double gamma, out bool attachedShock)
         {
             double M2 = MachNumber * MachNumber;
@@ -788,6 +791,7 @@ namespace FerramAerospaceResearch
         }
 
         //Calculates Oswald's Efficiency e using Shevell's Method
+        // ReSharper disable once UnusedMember.Global
         public static double CalculateOswaldsEfficiency(double AR, double CosSweepAngle, double Cd0)
         {
             double e = 1 - 0.02 * FARMathUtil.PowApprox(AR, 0.7) * FARMathUtil.PowApprox(Math.Acos(CosSweepAngle), 2.2);

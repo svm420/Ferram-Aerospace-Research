@@ -43,43 +43,43 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ferram4;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 using KSP.Localization;
 using UnityEngine;
-using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class StabilityDerivSimulationGUI : IDisposable
+    internal class StabilityDerivSimulationGUI : IDisposable
     {
 
         private SimMode simMode = 0;
 
-        EditorSimManager simManager;
-        InitialConditions lonConditions, latConditions;
-        ferramGraph _graph = new ferramGraph(400, 200);
+        private EditorSimManager simManager;
+        private InitialConditions lonConditions, latConditions;
+        private ferramGraph _graph = new ferramGraph(400, 200);
 
+        // ReSharper disable once UnusedMember.Local
         private enum SimMode
         {
             LONG,
-            LAT,
+            LAT
         }
 
         private static string[] SimMode_str =
         {
             Localizer.Format("FAREditorSimModeLong"),
-            Localizer.Format("FAREditorSimModeLat"),
+            Localizer.Format("FAREditorSimModeLat")
         };
 
         public StabilityDerivSimulationGUI(EditorSimManager simManager)
         {
             this.simManager = simManager;
 
-            lonConditions = new InitialConditions(new string[] { "0", "0", "0", "0" }, new string[] { "w", "u", "q", "θ" }, new double[]{1, 1, Math.PI/180, Math.PI/180}, "0.01", "10");
-            latConditions = new InitialConditions(new string[] { "0", "0", "0", "0" }, new string[] { "β", "p", "r", "φ" }, new double[]{Math.PI/180, Math.PI/180, Math.PI/180, Math.PI/180}, "0.01", "10");
+            lonConditions = new InitialConditions(new[] { "0", "0", "0", "0" }, new[] { "w", "u", "q", "θ" }, new[]{1, 1, Math.PI/180, Math.PI/180}, "0.01", "10");
+            latConditions = new InitialConditions(new[] { "0", "0", "0", "0" }, new[] { "β", "p", "r", "φ" }, new[]{Math.PI/180, Math.PI/180, Math.PI/180, Math.PI/180}, "0.01", "10");
 
             _graph.SetBoundaries(0, 10, 0, 2);
             _graph.SetGridScaleUsingValues(1, 0.25);
@@ -117,7 +117,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
-            _graph.Display(BackgroundStyle, 0, 0);
+            _graph.Display(0, 0);
             //graph.Display(GUILayout.Width(540), GUILayout.Height(300));
 
             DrawTooltip();
@@ -313,7 +313,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _graph.Update();
         }
 
-        class InitialConditions
+        private class InitialConditions
         {
             public string[] inits;
             public string[] names;

@@ -44,36 +44,33 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using FerramAerospaceResearch.FARPartGeometry;
-using FerramAerospaceResearch.FARUtils;
 using ferram4;
+using FerramAerospaceResearch.FARPartGeometry;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
-    class FARAeroSection
+    internal class FARAeroSection
     {
-        static FloatCurve crossFlowDragMachCurve;
-        static FloatCurve crossFlowDragReynoldsCurve;
+        private static FloatCurve crossFlowDragMachCurve;
+        private static FloatCurve crossFlowDragReynoldsCurve;
 
         public FARFloatCurve xForcePressureAoA0;
         public FARFloatCurve xForcePressureAoA180;
         public FARFloatCurve xForceSkinFriction;
-        float potentialFlowNormalForce;
-        float viscCrossflowDrag;
-        float flatnessRatio;
-        float invFlatnessRatio;
-        float hypersonicMomentForward;
-        float hypersonicMomentBackward;
-        float diameter;
+        private float potentialFlowNormalForce;
+        private float viscCrossflowDrag;
+        private float flatnessRatio;
+        private float invFlatnessRatio;
+        private float hypersonicMomentForward;
+        private float hypersonicMomentBackward;
+        private float diameter;
 
-        float mergeFactor = 0;
-        Vector3 worldNormalVector;
+        private float mergeFactor;
+        private Vector3 worldNormalVector;
 
-        List<PartData> partData;
-        Dictionary<FARAeroPartModule, int> handledAeroModulesIndexDict;
+        private List<PartData> partData;
+        private Dictionary<FARAeroPartModule, int> handledAeroModulesIndexDict;
 
         public struct PartData
         {
@@ -101,9 +98,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private FARAeroSection() { }
 
+        // ReSharper disable ParameterHidesMember -> updating member values
         public void UpdateAeroSection(float potentialFlowNormalForce, float viscCrossflowDrag, float diameter, float flatnessRatio, float hypersonicMomentForward, float hypersonicMomentBackward,
-            Vector3 centroidWorldSpace, Vector3 xRefVectorWorldSpace, Vector3 nRefVectorWorldSpace, Matrix4x4 vesselToWorldMatrix, Vector3 vehicleMainAxis, List<FARAeroPartModule> moduleList,
+                                      Vector3 centroidWorldSpace, Vector3 xRefVectorWorldSpace, Vector3 nRefVectorWorldSpace, Matrix4x4 vesselToWorldMatrix, Vector3 vehicleMainAxis, List<FARAeroPartModule> moduleList,
             List<float> dragFactor, Dictionary<Part, PartTransformInfo> partWorldToLocalMatrixDict)
+        // ReSharper restore ParameterHidesMember
         {
             mergeFactor = 0;
 
@@ -314,13 +313,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             /// <summary>
             /// The center with which force should be accumulated
             /// </summary>
-            private ferram4.FARCenterQuery center;
+            private FARCenterQuery center;
 
             /// <summary>
             /// The atmospheric density that the force is being simulated at
             /// </summary>
             private float atmDensity;
-            
+
             public SimulatedForceContext(Vector3 worldVel, FARCenterQuery center, float atmDensity)
             {
                 this.worldVel = worldVel;
@@ -328,12 +327,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 this.atmDensity = atmDensity;
             }
 
+            // ReSharper disable ParameterHidesMember -> updating member values
             public void UpdateSimulationContext(Vector4 worldVel, FARCenterQuery center, float atmDensity)
             {
                 this.worldVel = worldVel;
                 this.center = center;
                 this.atmDensity = atmDensity;
             }
+            // ReSharper restore ParameterHidesMember
 
             public Vector3 LocalVelocity(PartData pd)
             {
@@ -377,7 +378,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
         #endregion
 
-        private void CalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, 
+        private void CalculateAeroForces(
+            float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag,
             IForceContext forceContext)
         {
             double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);      //this will be the same for each part, so why recalc it multiple times?
@@ -388,7 +390,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 PartData data = partData[i];
                 FARAeroPartModule aeroModule = data.aeroModule;
-                if ((object)aeroModule == null)
+                if (aeroModule is null)
                 {
                     continue;
                 }
@@ -398,7 +400,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 velLocal = forceContext.LocalVelocity(data);
                 // Rejects both negligable speed and invalid simulation cases
-                if (FARMathUtil.NearlyEqual(velLocal.sqrMagnitude, 0.0f)) 
+                if (velLocal.sqrMagnitude.NearlyEqual(0.0f))
                 {
                     continue;
                 }
@@ -517,18 +519,18 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 forceContext.ApplyForce(data, velLocal, forceVector, torqueVector);
             }
         }
-        
+
         private SimulatedForceContext simContext = new SimulatedForceContext(Vector3.zero, new FARCenterQuery(), 0.0f);
-        public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, ferram4.FARCenterQuery center)
+        public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, FARCenterQuery center)
         {
             simContext.UpdateSimulationContext(vel, center, atmDensity);
-            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);
+            CalculateAeroForces(machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);
         }
 
         private FlightForceContext flightContext = new FlightForceContext();
-        public void FlightCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
+        public void FlightCalculateAeroForces(float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
         {
-            CalculateAeroForces(atmDensity, machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, flightContext);
+            CalculateAeroForces(machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, flightContext);
 
         }
 

@@ -42,24 +42,15 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using UnityEngine;
-using FerramAerospaceResearch.FARThreading;
-
-
 namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class PartSizePair8Bit : PartSizePair
     {
-        const float AREA_SCALING = 1f / (255f * 255f * 255f);
-        const int LENGTH_OF_VOXEL = 255;
+        private const float AREA_SCALING = 1f / (255f * 255f * 255f);
+        private const int LENGTH_OF_VOXEL = 255;
 
-        byte xPlaneUp, yPlaneUp, zPlaneUp;
-        byte xPlaneDown, yPlaneDown, zPlaneDown;
-
-        public PartSizePair8Bit() { }
+        private byte xPlaneUp, yPlaneUp, zPlaneUp;
+        private byte xPlaneDown, yPlaneDown, zPlaneDown;
 
         public override void Clear()
         {
@@ -107,6 +98,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public override void SetFilledSides(VoxelOrientationPlane filledPlanes)
         {
+            // ReSharper disable BitwiseOperatorOnEnumWithoutFlags
             if ((filledPlanes & VoxelOrientationPlane.X_UP) == VoxelOrientationPlane.X_UP)
                 xPlaneUp = LENGTH_OF_VOXEL;
 
@@ -124,6 +116,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if ((filledPlanes & VoxelOrientationPlane.Z_DOWN) == VoxelOrientationPlane.Z_DOWN)
                 zPlaneDown = LENGTH_OF_VOXEL;
+            // ReSharper restore BitwiseOperatorOnEnumWithoutFlags
         }
 
         //Will return true if the location is updated

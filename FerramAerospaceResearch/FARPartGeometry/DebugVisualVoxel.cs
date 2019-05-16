@@ -42,44 +42,35 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
-    class DebugVisualVoxel
+    internal class DebugVisualVoxel
     {
         public static float globalScale = 0.9f;
-        float m_scale;
-        float m_extent;
-        Vector3 m_position;
+        private float scale;
 
         public DebugVisualVoxel(Vector3 pos, double elementScale)
         {
             Scale = (float) elementScale;
-            m_position = pos;
+            Position = pos;
         }
 
         public float Scale
         {
-            get => m_scale;
+            get => scale;
             set
             {
-                m_scale = value;
-                m_extent = value * globalScale;
+                scale = value;
+                Extent = value * globalScale;
             }
         }
-        public float Extent
-        {
-            get => m_extent;
-            set => Scale = value / globalScale;
-        }
-        public Vector3 Position
-        {
-            get => m_position;
-            set => m_position = value;
-        }
+        public float Extent { get; private set; }
+
+        public Vector3 Position { get; }
+
         public Vector3 BottomLeft
         {
             get => new Vector3(Position.x - Extent, Position.y - Extent, Position.z);
@@ -103,7 +94,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             int counter = vertices.Count - indexOffset;
 
             // update extent in case globalScale changed
-            m_extent = m_scale * globalScale;
+            Extent = Scale * globalScale;
 
             vertices.Add(BottomLeft);
             uvs.Add(new Vector2(0, 0));

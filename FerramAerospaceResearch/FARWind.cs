@@ -43,11 +43,8 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
@@ -90,6 +87,7 @@ namespace FerramAerospaceResearch
         }
 
 
+        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// "Set" method for the wind function.
         /// If newFunction is null, it resets the function to ZeroWind.
@@ -99,12 +97,12 @@ namespace FerramAerospaceResearch
             if (newFunction == null)
             {
                 FARLogger.Info("[FARWind] Attempted to set a null wind function, using ZeroWind instead.");
-                FARWind.func = ZeroWind;
+                func = ZeroWind;
             }
             else
             {
                 FARLogger.Info("[FARWind] Setting wind function to " + newFunction.Method.Name);
-                FARWind.func = newFunction;
+                func = newFunction;
             }
         }
 

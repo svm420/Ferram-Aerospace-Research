@@ -42,11 +42,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class InstantConditionSimInput
+	internal class InstantConditionSimInput
     {
         public double alpha;
         public double beta;
@@ -61,22 +59,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public InstantConditionSimInput() { }
 
-        public InstantConditionSimInput(double alpha, double beta, double phi, double alphaDot, double betaDot, double phiDot, double machNumber, double pitchValue)
-        {
-            this.alpha = alpha;
-            this.beta = beta;
-            this.phi = phi;
-            this.alphaDot = alphaDot;
-            this.betaDot = betaDot;
-            this.phiDot = phiDot;
-            this.machNumber = machNumber;
-            this.pitchValue = pitchValue;
-
-            flaps = 0;
-            spoilers = false;
-        }
-
-        public InstantConditionSimInput(double alpha, double beta, double phi, double alphaDot, double betaDot, double phiDot, double machNumber, double pitchValue, int flaps, bool spoilers)
+        public InstantConditionSimInput(double alpha, double beta, double phi, double alphaDot, double betaDot, double phiDot, double machNumber, double pitchValue, int flaps = 0, bool spoilers = false)
         {
             this.alpha = alpha;
             this.beta = beta;

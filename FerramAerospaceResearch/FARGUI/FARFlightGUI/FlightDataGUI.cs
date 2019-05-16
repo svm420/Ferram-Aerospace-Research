@@ -42,21 +42,21 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
 using System.Text;
+using FerramAerospaceResearch.FARUtils;
+using KSP.Localization;
 using StringLeakTest;
 using UnityEngine;
-using KSP.Localization;
-using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
-    class FlightDataGUI
+    internal class FlightDataGUI
     {
-        bool[] activeFlightDataSections = new bool[9] { true, true, true, true, true, true, true, true, true };
-        bool[] oldFlightDataSections = new bool[9] { false, false, false, false, false, false, false, false, false };
-        string[] flightDataOptionLabels = new string[9]{
+        private bool[] activeFlightDataSections = { true, true, true, true, true, true, true, true, true };
+        private bool[] oldFlightDataSections = { false, false, false, false, false, false, false, false, false };
+
+        private string[] flightDataOptionLabels = {
             Localizer.Format("FARFlightDataOption0"),
             Localizer.Format("FARFlightDataOption1"),
             Localizer.Format("FARFlightDataOption2"),
@@ -68,14 +68,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightDataOption8")
         };
 
-        VesselFlightInfo infoParameters;
-	    StringBuilder dataStringBuilder = new StringBuilder();
-	    StringBuilder labelStringBuilder = new StringBuilder();
+        private VesselFlightInfo infoParameters;
+        private StringBuilder dataStringBuilder = new StringBuilder();
+        private StringBuilder labelStringBuilder = new StringBuilder();
 
-        GUIStyle buttonStyle;
-        GUIStyle boxStyle;
+        private GUIStyle buttonStyle;
+        private GUIStyle boxStyle;
 
-        int thisFrame = 0;
+        private int thisFrame;
 
         public FlightDataGUI()
         {
@@ -88,7 +88,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         }
 
 
-        void CreateLabelString()
+        private void CreateLabelString()
         {
             bool change = false;
             for(int i=0; i<activeFlightDataSections.Length;++i)
@@ -152,7 +152,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
         }
 
-        void CreateDataString()
+        private void CreateDataString()
         {
             dataStringBuilder.Length = 0;
             dataStringBuilder.AppendLine();
@@ -328,7 +328,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
         }
 
-        void LoadSettings()
+        private void LoadSettings()
         {
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
 

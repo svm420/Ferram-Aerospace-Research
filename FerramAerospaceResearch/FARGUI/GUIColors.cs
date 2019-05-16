@@ -42,19 +42,18 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
 {
-    class GUIColors
+    internal class GUIColors
     {
-        List<Color> colors = null;
+        private List<Color> colors;
 
-        static GUIColors _instance = null;
+        private static GUIColors _instance;
         public static GUIColors Instance
         {
             get
@@ -65,7 +64,7 @@ namespace FerramAerospaceResearch.FARGUI
             }
         }
 
-        GUIColors()
+        private GUIColors()
         {
             LoadColors();
         }

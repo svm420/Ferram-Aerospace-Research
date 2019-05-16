@@ -43,12 +43,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
@@ -73,15 +70,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public GeometryMesh(MeshData meshData, Transform meshTransform, Matrix4x4 worldToVesselMatrix, GeometryPartModule module)
         {
-            this.meshLocalVerts = meshData.vertices;
-            this.triangles = meshData.triangles;
-            this.isSkinned = meshData.isSkinned;
+            meshLocalVerts = meshData.vertices;
+            triangles = meshData.triangles;
+            isSkinned = meshData.isSkinned;
             Bounds meshBounds = meshData.bounds;
 
             vertices = new Vector3[meshLocalVerts.Length];
             this.meshTransform = meshTransform;
             UpdateLocalToWorldMatrix();
-            this.thisToVesselMatrix = worldToVesselMatrix * meshLocalToWorld;
+            thisToVesselMatrix = worldToVesselMatrix * meshLocalToWorld;
 
             for (int i = 0; i < vertices.Length; i++)
             {
@@ -98,7 +95,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 vertices[i] = vert;
             }
 
-            this.gameObjectActiveInHierarchy = meshTransform.gameObject.activeInHierarchy;
+            gameObjectActiveInHierarchy = meshTransform.gameObject.activeInHierarchy;
 
             bounds = TransformBounds(meshBounds, thisToVesselMatrix);
 
@@ -113,7 +110,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 valid = true;
 
             this.module = module;
-            this.part = module.part;
+            part = module.part;
 
             if (!module.part.isMirrored)
                 invertXYZ = 1;
@@ -126,7 +123,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (meshTransform == null)
                 return false;
             lock(this)
-            UpdateLocalToWorldMatrix();
+                UpdateLocalToWorldMatrix();
             return true;
         }
 
@@ -146,6 +143,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             try
             {
+                // ReSharper disable once InconsistentlySynchronizedField
                 Matrix4x4 tempMatrix = newThisToVesselMatrix * meshLocalToWorld;
                 //Matrix4x4 tempMatrix = thisToVesselMatrix.inverse;
                 //thisToVesselMatrix = newThisToVesselMatrix * meshLocalToWorld;
@@ -188,11 +186,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void MultithreadTransformBasis(object newThisToVesselMatrixObj)
         {
             lock(this)
             {
-                this.TransformBasis((Matrix4x4) newThisToVesselMatrixObj);
+                TransformBasis((Matrix4x4) newThisToVesselMatrixObj);
             }
         }
 
@@ -214,12 +213,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
             TransformedPointBounds(matrix, center, -extents.x, +extents.y, -extents.z, ref lower, ref upper);
             TransformedPointBounds(matrix, center, -extents.x, +extents.y, +extents.z, ref lower, ref upper);
 
-            Bounds bounds = new Bounds((lower + upper) * 0.5f, upper - lower);
-            //FARThreading.ThreadSafeDebugLogger.Instance.RegisterMessage("Bounds center: " + bounds.center + " extents: " + bounds.extents);
-            return bounds;
+            return new Bounds((lower + upper) * 0.5f, upper - lower);
         }
 
-        void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
+        private void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
         {
             Vector3 boundPt = new Vector3(center.x + extX, center.y + extY, center.z + extZ);
             boundPt = matrix.MultiplyPoint3x4(boundPt);

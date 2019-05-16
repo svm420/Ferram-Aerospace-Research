@@ -42,14 +42,12 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Text;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class SimMatrix
+    internal class SimMatrix
     {
         private double[,] matrix;
         public int m;

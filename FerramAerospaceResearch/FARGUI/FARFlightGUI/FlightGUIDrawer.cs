@@ -42,36 +42,25 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using KSP;
-using KSP.UI.Screens;
-using FerramAerospaceResearch.FARAeroComponents;
-using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class FlightGUIDrawer : MonoBehaviour
     {
-        private static FlightGUIDrawer instance;
         private static List<FlightGUI> activeGUIs = new List<FlightGUI>(); //this could be a HashSet as well, but iterating over those causes garbage.
 
-        public static FlightGUIDrawer Instance
-        {
-            get { return instance; }
-        }
+        public static FlightGUIDrawer Instance { get; private set; }
 
-        void Start()
+        private void Start()
         {
-            if (CompatibilityChecker.IsAllCompatible() && instance == null)
-                instance = this;
+            if (CompatibilityChecker.IsAllCompatible() && Instance == null)
+                Instance = this;
             else
             {
-                GameObject.Destroy(this);
-                return;
+                Destroy(this);
             }
         }
 
@@ -86,7 +75,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 activeGUIs.Remove(Gui);
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             for(int i = 0 ; i < activeGUIs.Count; ++i)
             {

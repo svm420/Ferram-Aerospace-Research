@@ -42,15 +42,17 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using UnityEngine;
-using FerramAerospaceResearch.FARGUI.FARFlightGUI;
+using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
+using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
+
+// ReSharper disable UnusedMember.Global
 
 namespace FerramAerospaceResearch
 {
-    public partial class FARAPI
+    public class FARAPI
     {
         private static FARAPI instance;
         private static FARAPI Instance
@@ -162,8 +164,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.dynPres;
+            return gui.InfoParameters.dynPres;
         }
 
         public static double ActiveVesselLiftCoeff()
@@ -176,8 +177,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.liftCoeff;
+            return gui.InfoParameters.liftCoeff;
         }
 
         public static double ActiveVesselDragCoeff()
@@ -190,8 +190,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.dragCoeff;
+            return gui.InfoParameters.dragCoeff;
         }
 
         public static double ActiveVesselRefArea()
@@ -204,8 +203,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.refArea;
+            return gui.InfoParameters.refArea;
         }
 
         public static double ActiveVesselTermVelEst()
@@ -218,8 +216,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.termVelEst;
+            return gui.InfoParameters.termVelEst;
         }
 
         public static double ActiveVesselBallisticCoeff()
@@ -232,8 +229,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.ballisticCoeff;
+            return gui.InfoParameters.ballisticCoeff;
         }
 
         public static double ActiveVesselAoA()
@@ -246,8 +242,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.aoA;
+            return gui.InfoParameters.aoA;
         }
 
         public static double ActiveVesselSideslip()
@@ -260,8 +255,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.sideslipAngle;
+            return gui.InfoParameters.sideslipAngle;
         }
 
         public static double ActiveVesselTSFC()
@@ -274,8 +268,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.tSFC;
+            return gui.InfoParameters.tSFC;
         }
 
         public static double ActiveVesselStallFrac()
@@ -288,8 +281,7 @@ namespace FerramAerospaceResearch
             FlightGUI gui = VesselFlightInfo(v);
             if(gui == null)
                 return 0;
-            else
-                return gui.InfoParameters.stallFraction;
+            return gui.InfoParameters.stallFraction;
         }
 
         /// <summary>
@@ -300,9 +292,9 @@ namespace FerramAerospaceResearch
             for(int i = 0; i < v.parts.Count; i++)
             {
                 Part p = v.parts[i];
-                if(p.Modules.Contains<ferram4.FARControllableSurface>())
+                if(p.Modules.Contains<FARControllableSurface>())
                 {
-                    ferram4.FARControllableSurface surface = p.Modules.GetModule<ferram4.FARControllableSurface>();
+                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                     surface.SetDeflection(surface.flapDeflectionLevel + 1);
                 }
             }
@@ -316,9 +308,9 @@ namespace FerramAerospaceResearch
             for(int i = 0; i < v.parts.Count; i++)
             {
                 Part p = v.parts[i];
-                if (p.Modules.Contains<ferram4.FARControllableSurface>())
+                if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    ferram4.FARControllableSurface surface = p.Modules.GetModule<ferram4.FARControllableSurface>();
+                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                     surface.SetDeflection(surface.flapDeflectionLevel - 1);
                 }
             }
@@ -334,9 +326,9 @@ namespace FerramAerospaceResearch
             for (int i = 0; i < v.parts.Count; i++)
             {
                 Part p = v.parts[i];
-                if (p.Modules.Contains<ferram4.FARControllableSurface>())
+                if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    ferram4.FARControllableSurface surface = p.Modules.GetModule<ferram4.FARControllableSurface>();
+                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                     if (surface.isFlap)
                         return surface.flapDeflectionLevel;
                 }
@@ -353,9 +345,9 @@ namespace FerramAerospaceResearch
             for(int i = 0; i < v.parts.Count; i++)
             {
                 Part p = v.parts[i];
-                if (p.Modules.Contains<ferram4.FARControllableSurface>())
+                if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    ferram4.FARControllableSurface surface = p.Modules.GetModule<ferram4.FARControllableSurface>();
+                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                     surface.brake = spoilerActive;
                 }
             }
@@ -371,9 +363,9 @@ namespace FerramAerospaceResearch
             for (int i = 0; i < v.parts.Count; i++)
             {
                 Part p = v.parts[i];
-                if (p.Modules.Contains<ferram4.FARControllableSurface>())
+                if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    ferram4.FARControllableSurface surface = p.Modules.GetModule<ferram4.FARControllableSurface>();
+                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                     if (surface.isSpoiler)
                         return surface.brake;
                 }
@@ -450,8 +442,7 @@ namespace FerramAerospaceResearch
         /// <param name="aeroForce">Total aerodynamic force at CoM, in kN</param>
         /// <param name="aeroTorque">Total aerodynamic torque at CoM, in kN * m</param>
         /// <param name="velocityWorldVector">Velocity vector in worldspace relative to the atmosphere for CURRENT vessel orientation, m/s</param>
-        /// <param name="density">Atm density at that location, kg/m^3</param>
-        /// <param name="machNumber">Mach number at that location</param>
+        /// <param name="altitude">Vessel altitude, in m</param>
         public static void CalculateVesselAeroForces(Vessel vessel, out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
         {
             Instance.InstanceCalcVesselAeroForces(vessel, out aeroForce, out aeroTorque, velocityWorldVector, altitude);
@@ -480,7 +471,7 @@ namespace FerramAerospaceResearch
                 }
             }
 
-            if ((object)vesselAeroModule == null)       //if this is true, then the vessel has not been initialized yet and so must be false
+            if (vesselAeroModule is null)       //if this is true, then the vessel has not been initialized yet and so must be false
                 return false;
 
             return vesselAeroModule.HasEverValidVoxelization();
@@ -508,7 +499,7 @@ namespace FerramAerospaceResearch
                 }
             }
 
-            if ((object)vesselAeroModule == null)       //if this is true, then the vessel has not been initialized yet and so must be false
+            if (vesselAeroModule is null)       //if this is true, then the vessel has not been initialized yet and so must be false
                 return false;
 
             return vesselAeroModule.HasValidVoxelizationCurrently();

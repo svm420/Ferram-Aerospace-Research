@@ -45,13 +45,12 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARThreading
 {
     //This class only exists to ensure that the ThreadPool is not choked with requests to start running voxels, which will deadlock the entire voxelization process when the MaxThread limit is reached because they will be unable to start up their various worker threads
-    class VoxelizationThreadpool
+    internal class VoxelizationThreadpool
     {
         // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit
         static VoxelizationThreadpool()
@@ -71,15 +70,15 @@ namespace FerramAerospaceResearch.FARThreading
             }
         }
 
-        Queue<Task> queuedMainThreadTasks;
+        private Queue<Task> queuedMainThreadTasks;
 
-        Thread[] _threads;
-        Queue<Action> queuedVoxelizations;
-        const int THREAD_COUNT = 8;
+        private Thread[] _threads;
+        private Queue<Action> queuedVoxelizations;
+        private const int THREAD_COUNT = 8;
 
         public static bool RunInMainThread = false;
 
-        private Thread _mainThread = null;
+        private Thread _mainThread;
 
         public bool inMainThread
         {
@@ -112,13 +111,13 @@ namespace FerramAerospaceResearch.FARThreading
             }
         }
 
-        void SetupMainThread()
+        private void SetupMainThread()
         {
             _mainThread = Thread.CurrentThread;
             FARLogger.Debug("Main thread: " + _mainThread.Name);
         }
 
-        void ExecuteQueuedVoxelization()
+        private void ExecuteQueuedVoxelization()
         {
             while (true)
             {

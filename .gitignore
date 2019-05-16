@@ -23,6 +23,9 @@ releases
 // unignore Debug build DLLs
 !bin/[Dd]ebug/[Ff]erram*.dll
 
+// Rider
+.idea
+
 # Unity
 # This .gitignore file should be placed at the root of your Unity project directory
 

@@ -43,17 +43,15 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
-using UnityEngine;
-using KSP;
-using KSP.Localization;
 using FerramAerospaceResearch;
+using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
-    public class FARControllableSurface : FARWingAerodynamicModel, ILiftProvider, ITorqueProvider
+    public class FARControllableSurface : FARWingAerodynamicModel, ITorqueProvider
     {
-        protected Transform movableSection = null;
+        protected Transform movableSection;
 
         protected Transform MovableSection
         {
@@ -78,7 +76,7 @@ namespace ferram4
             }
         }
 
-        private bool flipAxis = false;
+        private bool flipAxis;
 
 
         [KSPField(isPersistant = false)]
@@ -86,7 +84,6 @@ namespace ferram4
 
         [KSPField(isPersistant = false)]
         public float ctrlSurfFrac = 1;
-        private float invCtrlSurfFrac = 1;
 
         [KSPField(isPersistant = false)]
         public string transformName = "obj_ctrlSrf";
@@ -96,12 +93,13 @@ namespace ferram4
         [SerializeField]
         protected Quaternion MovableOrig = Quaternion.identity;
         [SerializeField]
-        private bool MovableOrigReady = false;
+        private bool MovableOrigReady;
 
 //        protected int MovableSectionFlip = 1;
         [KSPField(guiName = "FARCtrlSurfStdTitle", guiActiveEditor = true, guiActive = true), UI_Toggle(affectSymCounterparts = UI_Scene.All, scene = UI_Scene.All, disabledText = "FARCtrlSurfStdText", enabledText = "FARCtrlSurfStdText")]
-        bool showStdCtrl = false;
-        bool prevStdCtrl = true;
+        private bool showStdCtrl = false;
+
+        private bool prevStdCtrl = true;
 
         [KSPField(guiName = "FARCtrlSurfPitch", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_FloatRange(affectSymCounterparts = UI_Scene.All, maxValue = 100.0f, minValue = -100f, scene = UI_Scene.All, stepIncrement = 5f)]
         public float pitchaxis = 100.0f;
@@ -113,25 +111,28 @@ namespace ferram4
         public float rollaxis = 100.0f;
 
         [KSPField(guiName = "FARCtrlSurfAoA", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_FloatRange(affectSymCounterparts = UI_Scene.All, maxValue = 200.0f, minValue = -200f, scene = UI_Scene.All, stepIncrement = 5f)]
-		public float pitchaxisDueToAoA = 0.0f;
+		public float pitchaxisDueToAoA;
 
         [KSPField(guiName = "FARCtrlSurfBrakeRudder", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_FloatRange(affectSymCounterparts = UI_Scene.All, maxValue = 100.0f, minValue = -100f, scene = UI_Scene.All, stepIncrement = 5f)]
-        public float brakeRudder = 0.0f;
+        public float brakeRudder;
 
         [KSPField(guiName = "FARCtrlSurfCtrlDeflect", guiActiveEditor = false, isPersistant = true), UI_FloatRange(affectSymCounterparts = UI_Scene.All, maxValue = 40, minValue = -40, scene = UI_Scene.All, stepIncrement = 0.5f)]
         public float maxdeflect = 15;
 
         [KSPField(guiName = "FARCtrlSurfFlapSpoiler", guiActiveEditor = true, guiActive = true), UI_Toggle(affectSymCounterparts = UI_Scene.All, scene = UI_Scene.All, disabledText = "FARCtrlSurfStdText", enabledText = "FARCtrlSurfStdText")]
-        bool showFlpCtrl = false;
-        bool prevFlpCtrl = true;
+        private bool showFlpCtrl = false;
+
+        private bool prevFlpCtrl = true;
 
         [KSPField(guiName = "FARCtrlSurfFlap", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_Toggle(affectSymCounterparts = UI_Scene.All, enabledText = "FARCtrlSurfFlapActive", scene = UI_Scene.All, disabledText = "FARCtrlSurfFlapInActive")]
         public bool isFlap;
-        bool prevIsFlap;
+
+        private bool prevIsFlap;
 
         [KSPField(guiName = "FARCtrlSurfSpoiler", isPersistant = true, guiActiveEditor = false, guiActive = false), UI_Toggle(affectSymCounterparts = UI_Scene.All, enabledText = "FARCtrlSurfFlapActive", scene = UI_Scene.All, disabledText = "FARCtrlSurfFlapInActive")]
         public bool isSpoiler;
-        bool prevIsSpoiler;
+
+        private bool prevIsSpoiler;
 
         [KSPField(isPersistant = true, guiName = "FARCtrlSurfFlapSetting")]
         public int flapDeflectionLevel = 2;
@@ -139,31 +140,31 @@ namespace ferram4
         [KSPField(guiName = "FARCtrlSurfFlapDeflect", guiActiveEditor = false, isPersistant = true), UI_FloatRange(affectSymCounterparts = UI_Scene.All, maxValue = 85, minValue = -85, scene = UI_Scene.All, stepIncrement = 0.5f)]
         public float maxdeflectFlap = 15;
 
-        protected double PitchLocation = 0;
-        protected double YawLocation = 0;
-        protected double RollLocation = 0;
-        protected double BrakeRudderLocation = 0;
-        protected double BrakeRudderSide = 0;
-        protected int flapLocation = 0;
-        protected int spoilerLocation = 0;
+        protected double PitchLocation;
+        protected double YawLocation;
+        protected double RollLocation;
+        protected double BrakeRudderLocation;
+        protected double BrakeRudderSide;
+        protected int flapLocation;
+        protected int spoilerLocation;
 
         private double AoAsign = 1;
-        private double AoAdesiredControl = 0; //DaMichel: treat desired AoA's from flap and stick inputs separately for different animation rates
-        private double AoAdesiredFlap = 0;
-        private double AoAcurrentControl = 0; // current deflection due to control inputs
-        private double AoAcurrentFlap = 0; // current deflection due to flap/spoiler deployment
-        private double AoAoffset = 0; // total current deflection
+        private double AoAdesiredControl; //DaMichel: treat desired AoA's from flap and stick inputs separately for different animation rates
+        private double AoAdesiredFlap;
+        private double AoAcurrentControl; // current deflection due to control inputs
+        private double AoAcurrentFlap; // current deflection due to flap/spoiler deployment
+        private double AoAoffset; // total current deflection
 
-        private double lastAoAoffset = 0;
+        private double lastAoAoffset;
         private Vector3d deflectedNormal = Vector3d.forward;
 
         public static double timeConstant = 0.25;
         public static double timeConstantFlap = 10;
         public static double timeConstantSpoiler = 0.75;
-        public bool brake = false;
-        private bool justStarted = false;
+        public bool brake;
+        private bool justStarted;
 
-        private Transform lastReferenceTransform = null;
+        private Transform lastReferenceTransform;
 
 
         [FARAction("FARCtrlActionSpoiler", FARActionGroupConfiguration.ID_SPOILER)] // use our new FARAction for configurable action group assignemnt
@@ -208,13 +209,13 @@ namespace ferram4
                 {
                     PartModule m = p.Modules[j];
                     if (m is FARControllableSurface)
-                        (m as FARControllableSurface).SetDeflection(this.flapDeflectionLevel);
+                        (m as FARControllableSurface).SetDeflection(flapDeflectionLevel);
                 }
             }
         }
 
         //[KSPEvent(guiName = "Std. Ctrl Settings", guiActiveEditor = true, guiActive = false)]
-        void CheckFieldVisibility()
+        private void CheckFieldVisibility()
         {
             if (showStdCtrl != prevStdCtrl)
             {
@@ -294,8 +295,6 @@ namespace ferram4
             if(vessel)
                 lastReferenceTransform = vessel.ReferenceTransform;
 
-            invCtrlSurfFrac = 1 / ctrlSurfFrac;
-
             if (FARDebugValues.allowStructuralFailures)
             {
                 FARPartStressTemplate template;
@@ -328,11 +327,11 @@ namespace ferram4
             if (justStarted)
                 CalculateSurfaceFunctions();
 
-            if (HighLogic.LoadedSceneIsFlight && (object)part != null && (object)vessel != null)
+            if (HighLogic.LoadedSceneIsFlight && !(part is null) && !(vessel is null))
             {
                 bool process = part.isControllable || (justStarted && isFlap);
 
-                if (process && (object)MovableSection != null && part.Rigidbody)
+                if (process && !(MovableSection is null) && part.Rigidbody)
                 {
                     // Set member vars for desired AoA
                     if (isSpoiler)
@@ -358,7 +357,7 @@ namespace ferram4
 
         }
 
-        void CheckShielded()
+        private void CheckShielded()
         {
             if (NUFAR_areaExposedFactor < 0.1 * S && !NUFAR_totalExposedAreaFactor.NearlyEqual(0))
             {
@@ -373,7 +372,7 @@ namespace ferram4
 
         public void CalculateSurfaceFunctions()
         {
-            if (HighLogic.LoadedSceneIsEditor && (!FlightGlobals.ready || (object)vessel == null || (object)part.partTransform == null))
+            if (HighLogic.LoadedSceneIsEditor && (!FlightGlobals.ready || vessel is null || part.partTransform is null))
                 return;
 
             // use caching to improve performance since all vector properties call into native code
@@ -453,20 +452,20 @@ namespace ferram4
                 AoAdesiredFlap = maxdeflectFlap * spoilerLocation;
             else
                 AoAdesiredFlap = 0;
-            AoAdesiredFlap = FARMathUtil.Clamp(AoAdesiredFlap, -Math.Abs(maxdeflectFlap), Math.Abs(maxdeflectFlap));
+            AoAdesiredFlap = AoAdesiredFlap.Clamp(-Math.Abs(maxdeflectFlap), Math.Abs(maxdeflectFlap));
         }
 
 
         private void AoAOffsetFromFlapDeflection()
         {
             AoAdesiredFlap = maxdeflectFlap * flapLocation * flapDeflectionLevel * 0.33333333333;
-            AoAdesiredFlap = FARMathUtil.Clamp(AoAdesiredFlap, -Math.Abs(maxdeflectFlap), Math.Abs(maxdeflectFlap));
+            AoAdesiredFlap = AoAdesiredFlap.Clamp(-Math.Abs(maxdeflectFlap), Math.Abs(maxdeflectFlap));
         }
 
         private void AoAOffsetFromControl()
         {
             AoAdesiredControl = 0;
-            if ((object)vessel != null && vessel.atmDensity > 0)
+            if (!(vessel is null) && vessel.atmDensity > 0)
             {
                 if (!pitchaxis.NearlyEqual(0))
                 {
@@ -485,9 +484,9 @@ namespace ferram4
                     AoAdesiredControl += BrakeRudderLocation * Math.Max(0.0, BrakeRudderSide * vessel.ctrlState.yaw) * brakeRudder * 0.01;
                 }
                 AoAdesiredControl *= maxdeflect;
-                if (pitchaxisDueToAoA != 0.0)
+                if (!pitchaxisDueToAoA.NearlyEqual(0))
 				{
-                    Vector3d vel = this.GetVelocity();
+                    Vector3d vel = GetVelocity();
                     double velMag = vel.magnitude;
                     if (velMag > 5)
                     {
@@ -502,7 +501,7 @@ namespace ferram4
 				}
 
                 AoAdesiredControl *= AoAsign;
-                AoAdesiredControl = FARMathUtil.Clamp(AoAdesiredControl, -Math.Abs(maxdeflect), Math.Abs(maxdeflect));
+                AoAdesiredControl = AoAdesiredControl.Clamp(-Math.Abs(maxdeflect), Math.Abs(maxdeflect));
             }
         }
 
@@ -511,28 +510,28 @@ namespace ferram4
             // Use the vector computed by DeflectionAnimation
             Vector3d perp = part_transform.TransformDirection(deflectedNormal);
             double PerpVelocity = Vector3d.Dot(perp, velocity.normalized);
-            return Math.Asin(FARMathUtil.Clamp(PerpVelocity, -1, 1));
+            return Math.Asin(PerpVelocity.Clamp(-1, 1));
         }
 
         // Had to add this one since the parent class don't use AoAoffset and adding it would break GetWingInFrontOf
-        public double CalculateAoA(Vector3d velocity, double AoAoffset)
+        // ReSharper disable once UnusedMember.Global
+        public double CalculateAoA(Vector3d velocity, double offset)
         {
-            double radAoAoffset = AoAoffset * FARMathUtil.deg2rad * ctrlSurfFrac;
+            double radAoAoffset = offset * FARMathUtil.deg2rad * ctrlSurfFrac;
             Vector3 perp = part_transform.TransformDirection(new Vector3d(0, Math.Sin(radAoAoffset), Math.Cos(radAoAoffset)));
             double PerpVelocity = Vector3d.Dot(perp, velocity.normalized);
-            return Math.Asin(FARMathUtil.Clamp(PerpVelocity, -1, 1));
+            return Math.Asin(PerpVelocity.Clamp(-1, 1));
         }
 
         //DaMichel: Factored the time evolution for deflection AoA into this function. This one results into an exponential asympotic
         //"decay" towards the desired value. Good for stick inputs, i suppose, and the original method.
-        private static double BlendDeflectionExp(double current, double desired, double timeConstant, bool forceSetToDesired)
+        private static double BlendDeflectionExp(double current, double desired, double blendTimeConstant, bool forceSetToDesired)
         {
             double error = desired - current;
             if (!forceSetToDesired && Math.Abs(error) >= 0.1)  // DaMichel: i changed the threshold since i noticed a "bump" at max deflection
             {
-                double recip_timeconstant = 1 / timeConstant;
-                double tmp1 = error * recip_timeconstant;
-                current += FARMathUtil.Clamp((double)TimeWarp.fixedDeltaTime * tmp1, -Math.Abs(0.6 * error), Math.Abs(0.6 * error));
+                double tmp1 = error / blendTimeConstant;
+                current += (TimeWarp.fixedDeltaTime * tmp1).Clamp(-Math.Abs(0.6 * error), Math.Abs(0.6 * error));
             }
             else
                 current = desired;
@@ -543,17 +542,17 @@ namespace ferram4
         //for slow moving flaps and spoilers. It looks better anyways.
         //ferram4: The time constant specifies the time it would take for a first-order system to reach its steady-state value,
         //assuming that it was proportional to only the initial error, not the error as a function of time
-        private static double BlendDeflectionLinear(double current, double desired, double maximumDeflection, double timeConstant, bool forceSetToDesired)
+        private static double BlendDeflectionLinear(double current, double desired, double maximumDeflection, double blendTimeConstant, bool forceSetToDesired)
         {
             double error = desired - current;
             if (!forceSetToDesired && Math.Abs(error) >= 0.1)
             {
-                double degreesPerSecond = Math.Max(Math.Abs(maximumDeflection), Math.Abs(current)) / timeConstant;
-                double tmp = current + (double)TimeWarp.fixedDeltaTime * degreesPerSecond * Math.Sign(desired - current);
+                double degreesPerSecond = Math.Max(Math.Abs(maximumDeflection), Math.Abs(current)) / blendTimeConstant;
+                double tmp = current + TimeWarp.fixedDeltaTime * degreesPerSecond * Math.Sign(desired - current);
                 if(error > 0)
-                    current = FARMathUtil.Clamp(tmp, current, desired);
+                    current = tmp.Clamp(current, desired);
                 else
-                    current = FARMathUtil.Clamp(tmp, desired, current);
+                    current = tmp.Clamp(desired, current);
             }
             else
                 return desired;
@@ -607,7 +606,7 @@ namespace ferram4
             CheckShielded();
         }
 
-        public void SetControlStateEditor(Vector3 CoM, Vector3 velocityVec, float pitch, float yaw, float roll, int flap, bool brake)
+        public void SetControlStateEditor(Vector3 CoM, Vector3 velocityVec, float pitch, float yaw, float roll, int flap, bool braking)
         {
             if (HighLogic.LoadedSceneIsEditor)
             {
@@ -658,7 +657,7 @@ namespace ferram4
                 }
 
                 AoAdesiredControl *= AoAsign;
-                AoAdesiredControl = FARMathUtil.Clamp(AoAdesiredControl, -Math.Abs(maxdeflect), Math.Abs(maxdeflect));
+                AoAdesiredControl = AoAdesiredControl.Clamp(-Math.Abs(maxdeflect), Math.Abs(maxdeflect));
                 AoAcurrentControl = AoAdesiredControl;
                 AoAcurrentFlap = 0;
 
@@ -685,7 +684,7 @@ namespace ferram4
                 if (isFlap)
                     AoAcurrentFlap += maxdeflectFlap * flapLocation * flap * 0.3333333333333;
                 else if (isSpoiler)
-                    AoAcurrentFlap += brake ? maxdeflectFlap * spoilerLocation : 0;
+                    AoAcurrentFlap += braking ? maxdeflectFlap * spoilerLocation : 0;
 
                 AoAdesiredFlap = AoAcurrentFlap;
                 AoAoffset = AoAcurrentFlap + AoAcurrentControl;
@@ -733,6 +732,7 @@ namespace ferram4
         //For some reason, all the UIRange values are saved in the config files, and there is no way to prevent that
         //This makes the options limited for people loading old crafts with new FAR
         //This resets the values to what they should be
+        // ReSharper disable once UnusedMember.Local
         private void FixAllUIRanges()
         {
             FixWrongUIRange("pitchaxis", 100, -100);

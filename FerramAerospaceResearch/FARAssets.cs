@@ -3,14 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 using Object = UnityEngine.Object;
+
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace FerramAerospaceResearch
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
-    class FARAssets : MonoBehaviour
+    internal class FARAssets : MonoBehaviour
     {
         private static readonly string assetBundleRootPath = Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
         private const string AssetBundleExtension = ".far";
@@ -22,6 +24,7 @@ namespace FerramAerospaceResearch
 
             public string BundleName
             {
+                // ReSharper disable once UnusedMember.Global
                 get { return bundleName; }
                 private set
                 {
@@ -107,7 +110,7 @@ namespace FerramAerospaceResearch
                 if (TryGetValue("FerramAerospaceResearch/Debug Voxel Mesh", out var voxelShader))
                 {
                     DebugVoxels = new ShaderMaterialPair(voxelShader);
-                    DebugVoxels.Material.SetFloat("_Cutoff", 0.45f);
+                    DebugVoxels.Material.SetFloat(ShaderPropertyIds.Cutoff, 0.45f);
                 }
                 else
                 {
@@ -164,7 +167,7 @@ namespace FerramAerospaceResearch
         public static FARShaderCache ShaderCache { get; private set; }
         public static FARTextureCache TextureCache { get; private set; }
 
-        void Start()
+        private void Start()
         {
             ShaderCache = new FARShaderCache("farshaders");
             TextureCache = new FARTextureCache();

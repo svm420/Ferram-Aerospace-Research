@@ -43,14 +43,14 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using System.Collections.Generic;
-using UnityEngine;
-using KSP;
-using KSP.Localization;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARUtils;
+using KSP.IO;
+using KSP.Localization;
+using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     //Added by DaMichel:
@@ -62,9 +62,9 @@ namespace ferram4
         public FARAction(string guiName, int actionIdentifier)
             : base(guiName)
         {
-            base.actionGroup = FARActionGroupConfiguration.map(actionIdentifier);
+            actionGroup = FARActionGroupConfiguration.map(actionIdentifier);
         }
-    };
+    }
 
 
 
@@ -75,22 +75,22 @@ namespace ferram4
         public const int ID_DECREASE_FLAP_DEFLECTION = 2;
         public const int ACTION_COUNT = 3;
 
-        static Vector2 scrollPos = Vector2.zero;
         // private lookup tables
-        static KSPActionGroup[] id2actionGroup = { KSPActionGroup.Brakes, KSPActionGroup.None, KSPActionGroup.None };
+        private static KSPActionGroup[] id2actionGroup = { KSPActionGroup.Brakes, KSPActionGroup.None, KSPActionGroup.None };
         // keys in the configuration file
-        static string[] configKeys = {  "actionGroupSpoiler",
+        private static string[] configKeys = {  "actionGroupSpoiler",
                                         "actionGroupIncreaseFlapDeflection",
                                         "actionGroupDecreaseFlapDeflection" };
         // for the gui
-        static string[] guiLabels = { Localizer.Format("FARActionSpoilers"),
+        private static string[] guiLabels = { Localizer.Format("FARActionSpoilers"),
                                       Localizer.Format("FARActionIncreaseFlap"),
                                       Localizer.Format("FARActionDecreaseFlap") };
-        static string[] currentGuiStrings = { id2actionGroup[0].ToString(),
+
+        private static string[] currentGuiStrings = { id2actionGroup[0].ToString(),
                                               id2actionGroup[1].ToString(),
                                               id2actionGroup[2].ToString() };
 
-        static GUIDropDown<KSPActionGroup>[] actionGroupDropDown;
+        private static GUIDropDown<KSPActionGroup>[] actionGroupDropDown;
 
         public static KSPActionGroup map(int id)
         {
@@ -114,18 +114,18 @@ namespace ferram4
                 agTypes[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), names[i]);
             }
             // straight forward, reading the (action name, action group) tuples
-            KSP.IO.PluginConfiguration config = FARDebugAndSettings.config;
+            PluginConfiguration config = FARDebugAndSettings.config;
             for (int i = 0; i < ACTION_COUNT; ++i)
             {
                 try
                 {
-                    id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), config.GetValue(configKeys[i], id2actionGroup[i].ToString())); ;
+                    id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), config.GetValue(configKeys[i], id2actionGroup[i].ToString()));
                     currentGuiStrings[i] = id2actionGroup[i].ToString(); // don't forget to initialize the gui
                     FARLogger.Info(String.Format("Loaded AG {0} as {1}", configKeys[i], id2actionGroup[i]));
                 }
                 catch (Exception e)
                 {
-                    FARLogger.Warning("Error reading config key '" + configKeys[i] + "' with value '" + config.GetValue(configKeys[i], "n/a") + "' gave " + e.ToString());
+                    FARLogger.Warning("Error reading config key '" + configKeys[i] + "' with value '" + config.GetValue(configKeys[i], "n/a") + "' gave " + e);
                 }
                 int initIndex = 0;
                 for(int j = 0; j < agTypes.Length; j++)
@@ -143,7 +143,7 @@ namespace ferram4
 
         public static void SaveConfigruration()
         {
-            KSP.IO.PluginConfiguration config = FARDebugAndSettings.config;
+            PluginConfiguration config = FARDebugAndSettings.config;
             for (int i = 0; i < ACTION_COUNT; ++i)
             {
                 FARLogger.Info(String.Format("Save AG {0} as {1}", configKeys[i], id2actionGroup[i]));
@@ -158,44 +158,19 @@ namespace ferram4
             GUILayout.Label(Localizer.Format("FARActionDefaultLabel"));
             GUILayout.BeginHorizontal(); // left column: label, right column: text field
             GUILayout.BeginVertical();
-            for (int i = 0; i < FARActionGroupConfiguration.ACTION_COUNT; ++i)
+            for (int i = 0; i < ACTION_COUNT; ++i)
             {
-                GUILayout.Label(FARActionGroupConfiguration.guiLabels[i], label);
+                GUILayout.Label(guiLabels[i], label);
             }
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
-            for (int i = 0; i < FARActionGroupConfiguration.ACTION_COUNT; ++i)
+            for (int i = 0; i < ACTION_COUNT; ++i)
             {
                 actionGroupDropDown[i].GUIDropDownDisplay(GUILayout.Width(150));
                 id2actionGroup[i] = actionGroupDropDown[i].ActiveSelection;
-                /*                GUILayout.BeginHorizontal();
-                                currentGuiStrings[i] = GUILayout.TextField(currentGuiStrings[i], GUILayout.Width(150));
-                                bool ok = false;
-                                try
-                                {
-                                    id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), currentGuiStrings[i]);
-                                    ok = true;
-                                    //FARLogger.Info(String.Format("Set AG {0} to {1}", guiLabels[i], id2actionGroup[i]));
-                                }
-                                catch   //FIXME with a dropdown list
-                                {
-                                }
-                                GUILayout.Label(ok ? " Ok" : " Invalid", GUILayout.Width(50));
-                                GUILayout.EndHorizontal();*/
             }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal(); // end of columns
-/*            GUILayout.BeginHorizontal(); // list admissible entries for ease of use. Unity has no comboboxes, so this has to do for now ...
-            GUILayout.Label("Admissible Entries ", label);
-            string[] names = Enum.GetNames(typeof(KSPActionGroup));
-            var sb = new System.Text.StringBuilder(256);
-            for (int i = 0; i < names.Length; ++i)
-            {
-                sb.Append(names[i]);
-                if (i < names.Length - 1) sb.Append(',');
-            }
-            GUILayout.Label(sb.ToString());
-            GUILayout.EndHorizontal();*/
         }
     }
 }

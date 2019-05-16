@@ -42,48 +42,37 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class EditorSimManager
+    internal class EditorSimManager
     {
-        InstantConditionSim _instantCondition;
+        private InstantConditionSim _instantCondition;
 
-        StabilityDerivCalculator _stabDerivCalculator;
+        private StabilityDerivCalculator _stabDerivCalculator;
         public StabilityDerivCalculator StabDerivCalculator
         {
             get { return _stabDerivCalculator; }
         }
 
-        StabilityDerivLinearSim _stabDerivLinearSim;
+        private StabilityDerivLinearSim _stabDerivLinearSim;
         public StabilityDerivLinearSim StabDerivLinearSim
         {
             get { return _stabDerivLinearSim; }
         }
 
-        SweepSim _sweepSim;
+        private SweepSim _sweepSim;
         public SweepSim SweepSim
         {
             get { return _sweepSim; }
         }
-        EditorAeroCenter _aeroCenter;
+
+        private EditorAeroCenter _aeroCenter;
 
         public StabilityDerivOutput vehicleData;
-
-        public EditorSimManager()
-        {
-            _instantCondition = new InstantConditionSim();
-            _stabDerivCalculator = new StabilityDerivCalculator(_instantCondition);
-            _stabDerivLinearSim = new StabilityDerivLinearSim(_instantCondition);
-            _sweepSim = new SweepSim(_instantCondition);
-            _aeroCenter = new EditorAeroCenter();
-            vehicleData = new StabilityDerivOutput();
-        }
 
         public EditorSimManager(InstantConditionSim _instantSim)
         {
@@ -95,13 +84,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             vehicleData = new StabilityDerivOutput();
         }
 
-        public void UpdateAeroData(VehicleAerodynamics vehicleAero, List<ferram4.FARWingAerodynamicModel> wingAerodynamicModel)
+        public void UpdateAeroData(VehicleAerodynamics vehicleAero, List<FARWingAerodynamicModel> wingAerodynamicModel)
         {
              List<FARAeroPartModule> aeroModules;
              List<FARAeroSection> aeroSections;
              vehicleAero.GetNewAeroData(out aeroModules, out aeroSections);
              _instantCondition.UpdateAeroData(aeroModules, aeroSections, vehicleAero, wingAerodynamicModel);
-             _aeroCenter.UpdateAeroData(aeroModules, aeroSections);
+             _aeroCenter.UpdateAeroData(aeroSections);
         }
     }
 }

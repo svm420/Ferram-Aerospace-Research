@@ -24,15 +24,16 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ferram4
 {
     public class ferramGraph : IDisposable
     {
-        class ferramGraphLine
+        private class ferramGraphLine
         {
             private Texture2D lineDisplay;
             private Texture2D lineLegend;
@@ -43,8 +44,8 @@ namespace ferram4
             private double[] pixelDataY = new double[1];
             private Vector4d bounds;
             public int lineThickness;
-            public Color lineColor = new Color();
-            public Color backgroundColor = new Color();
+            public Color lineColor;
+            public Color backgroundColor;
             private double verticalScaling;
             private double horizontalScaling;
 
@@ -66,7 +67,6 @@ namespace ferram4
 
             public void InputData(double[] xValues, double[] yValues)
             {
-                int elements = xValues.Length;
                 rawDataX = xValues.replaceNaNs(0, "xValues");
                 rawDataY = yValues.replaceNaNs(0, "yValues");
                 ConvertRawToPixels(false);
@@ -169,8 +169,8 @@ namespace ferram4
 
             public void ClearTextures()
             {
-                GameObject.Destroy(lineLegend);
-                GameObject.Destroy(lineDisplay);
+                Object.Destroy(lineLegend);
+                Object.Destroy(lineDisplay);
                 lineDisplay = null;
                 lineLegend = null;
             }
@@ -179,7 +179,7 @@ namespace ferram4
 
 
         protected Texture2D graph;
-        protected Rect displayRect = new Rect(0, 0, 0, 0);
+        protected Rect displayRect;
 
         private Dictionary<string, ferramGraphLine> allLines = new Dictionary<string, ferramGraphLine>();
 
@@ -199,15 +199,8 @@ namespace ferram4
         private Vector2 ScrollView = Vector2.zero;
 
         #region Constructors
-        public ferramGraph(int width, int height)
-        {
-            graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
-            SetBoundaries(0, 1, 0, 1);
-            displayRect = new Rect(1, 1, graph.width, graph.height);
-            GridInit();
-        }
 
-        public ferramGraph(int width, int height, double minx, double maxx, double miny, double maxy)
+        public ferramGraph(int width, int height, double minx = 0, double maxx = 1, double miny = 0, double maxy = 1)
         {
             graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
             SetBoundaries(minx, maxx, miny, maxy);
@@ -229,10 +222,10 @@ namespace ferram4
         public void SetBoundaries(Vector4d boundaries)
         {
             bounds = boundaries;
-            leftBound = bounds.x.ToString();
-            rightBound = bounds.y.ToString();
-            topBound = bounds.w.ToString();
-            bottomBound = bounds.z.ToString();
+            leftBound = bounds.x.ToString(CultureInfo.InvariantCulture);
+            rightBound = bounds.y.ToString(CultureInfo.InvariantCulture);
+            topBound = bounds.w.ToString(CultureInfo.InvariantCulture);
+            bottomBound = bounds.z.ToString(CultureInfo.InvariantCulture);
             foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
                 pair.Value.SetBoundaries(bounds);
         }
@@ -267,6 +260,7 @@ namespace ferram4
 
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetLineVerticalScaling(string lineName, double scaling)
         {
             if (!allLines.ContainsKey(lineName))
@@ -280,6 +274,7 @@ namespace ferram4
         }
 
 
+        // ReSharper disable once UnusedMember.Global
         public void SetLineHorizontalScaling(string lineName, double scaling)
         {
             if (!allLines.ContainsKey(lineName))
@@ -314,8 +309,6 @@ namespace ferram4
             {
                 for (int j = 0; j < graph.height; j++)
                 {
-
-                    Color grid = new Color(0.42f, 0.35f, 0.11f, 1);
                     if (i - horizontalAxis == 0 || j - verticalAxis == 0)
                         graph.SetPixel(i, j, axisColor);
                     else if ((i - horizontalAxis) % widthSize == 0 || (j - verticalAxis) % heightSize == 0)
@@ -331,6 +324,7 @@ namespace ferram4
 
         #region Add / Remove Line Functions
 
+        // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName)
         {
             if (allLines.ContainsKey(lineName))
@@ -344,12 +338,14 @@ namespace ferram4
             Update();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName, double[] xValues, double[] yValues)
         {
             int lineThickness = 1;
             AddLine(lineName, xValues, yValues, lineThickness);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName, double[] xValues, double[] yValues, Color lineColor)
         {
             int lineThickness = 1;
@@ -393,6 +389,7 @@ namespace ferram4
             Update();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void RemoveLine(string lineName)
         {
             if (!allLines.ContainsKey(lineName))
@@ -423,6 +420,7 @@ namespace ferram4
 
         #region Update Data Functions
 
+        // ReSharper disable once UnusedMember.Global
         public void UpdateLineData(string lineName, double[] xValues, double[] yValues)
         {
             if (xValues.Length != yValues.Length)
@@ -498,6 +496,7 @@ namespace ferram4
 
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void LineColor(string lineName, Color newColor)
         {
             ferramGraphLine line;
@@ -511,6 +510,7 @@ namespace ferram4
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void LineThickness(string lineName, int thickness)
         {
             ferramGraphLine line;
@@ -532,7 +532,7 @@ namespace ferram4
         /// <summary>
         /// This displays the graph
         /// </summary>
-        public void Display(GUIStyle AreaStyle, int horizontalBorder, int verticalBorder)
+        public void Display(int horizontalBorder, int verticalBorder)
         {
             ScrollView = GUILayout.BeginScrollView(ScrollView, false, false);
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
@@ -606,7 +606,6 @@ namespace ferram4
             }
             GUILayout.EndVertical();
 
-            int rightofarea = (int)displayRect.width + 2 * horizontalBorder + 30;
             int bottomofarea = (int)displayRect.height + 2 * verticalBorder + 30;
 
             GUILayout.Space(bottomofarea);

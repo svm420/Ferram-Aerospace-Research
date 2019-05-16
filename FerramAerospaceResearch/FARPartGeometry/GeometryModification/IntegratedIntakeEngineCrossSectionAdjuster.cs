@@ -42,27 +42,25 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Reflection;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-    class IntegratedIntakeEngineCrossSectionAdjuster : ICrossSectionAdjuster
+    internal class IntegratedIntakeEngineCrossSectionAdjuster : ICrossSectionAdjuster
     {
-        const double INTAKE_AREA_SCALAR = 100;
+        private const double INTAKE_AREA_SCALAR = 100;
 
-        Vector3 vehicleBasisForwardVector;
-        double intakeArea;
-        int sign = 1;
+        private Vector3 vehicleBasisForwardVector;
+        private double intakeArea;
+        private int sign = 1;
 
-        Matrix4x4 thisToVesselMatrix;
-        Matrix4x4 meshLocalToWorld;
-        ModuleResourceIntake intakeModule;
-        Transform intakeTrans;
+        private Matrix4x4 thisToVesselMatrix;
+        private Matrix4x4 meshLocalToWorld;
+        private ModuleResourceIntake intakeModule;
+        private Transform intakeTrans;
 
-        Part part;
+        private Part part;
         public Part GetPart()
         {
             return part;
@@ -101,8 +99,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
         {
-            this.part = intake.part;
-            intakeModule = intake as ModuleResourceIntake;
+            part = intake.part;
+            intakeModule = intake;
             intakeTrans = intakeModule.intakeTransform;
             //ModuleResourceIntake intake = intake;
 
@@ -131,16 +129,14 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             double dot = Vector3.Dot(vehicleAxis, vehicleBasisForwardVector);
             if (dot > 0.9)
                 return intakeArea;
-            else
-                return 0;
+            return 0;
         }
 
         public double AreaRemovedFromCrossSection()
         {
             if (intakeModule.node == null || intakeModule.node.attachedPart == null)
                 return intakeArea * sign;
-            else
-                return -intakeArea * sign;      //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
+            return -intakeArea * sign; //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
         }
 
         public double AreaThreshold()
@@ -148,9 +144,9 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             return 0;
         }
 
-        public void SetForwardBackwardNoFlowDirection(int sign)
+        public void SetForwardBackwardNoFlowDirection(int direction)
         {
-            this.sign = sign;
+            sign = direction;
         }
 
         public int GetForwardBackwardNoFlowSign() { return sign; }

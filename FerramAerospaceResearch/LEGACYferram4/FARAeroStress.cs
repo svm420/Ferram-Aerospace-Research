@@ -42,32 +42,25 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using KSP;
 
 namespace FerramAerospaceResearch
 {
     public static class FARAeroStress
     {
         public static List<FARPartStressTemplate> StressTemplates = new List<FARPartStressTemplate>();
-        public static bool loaded = false;
+        public static bool loaded;
 
 
 
         public static void SaveCustomStressTemplates()
         {
             ConfigNode node = new ConfigNode("@FARAeroStress[default]:FOR[FerramAerospaceResearch]");
-            int i = 0;
             node.AddNode(new ConfigNode("!FARPartStressTemplate,*"));
 
             foreach (FARPartStressTemplate template in StressTemplates)
             {
-                node.AddNode(CreateAeroStressConfigNode(template, i));
-                i++;
+                node.AddNode(CreateAeroStressConfigNode(template));
             }
 
             ConfigNode saveNode = new ConfigNode();
@@ -75,7 +68,7 @@ namespace FerramAerospaceResearch
             saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARAeroStress.cfg");
         }
 
-        private static ConfigNode CreateAeroStressConfigNode(FARPartStressTemplate template, int index)
+        private static ConfigNode CreateAeroStressConfigNode(FARPartStressTemplate template)
         {
             ConfigNode node = new ConfigNode("FARPartStressTemplate");
             node.AddValue("name", template.name);
@@ -90,17 +83,13 @@ namespace FerramAerospaceResearch
             res.AddValue("rejectUnlistedResources", template.rejectUnlistedResources);
 
             //Make sure to update this whenever MM fixes how it goes through nodes and values
-            int i = template.resources.Count - 1;
             foreach (string s in template.resources)
             {
                 res.AddValue("res", s);
-                i--;
             }
-            i = template.excludeResources.Count - 1;
             foreach (string s in template.excludeResources)
             {
                 res.AddValue("excludeRes", s);
-                i++;
             }
 
             if (template.flowModeNeeded)
@@ -120,7 +109,7 @@ namespace FerramAerospaceResearch
                 return;
             StressTemplates.Clear();
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARAeroStress"))
-                if((object)node != null)
+                if(node != null)
                     foreach(ConfigNode template in node.GetNodes("FARPartStressTemplate"))
                         StressTemplates.Add(CreateFARPartStressTemplate(template));
 

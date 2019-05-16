@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
+﻿namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class StabilityDerivExportVariables
+    internal class StabilityDerivExportVariables
     {
         public double craftmass;
 
@@ -18,15 +15,15 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
         public double siteffg; // local gravity corrected for speed
     }
 
-    class StabilityDerivExportOutput
+    internal class StabilityDerivExportOutput
     {
         public StabilityDerivOutput outputvals;
         public StabilityDerivExportVariables exportvals;
 
         public StabilityDerivExportOutput(StabilityDerivOutput outputvalues, StabilityDerivExportVariables exportvalues)
         {
-            this.outputvals = outputvalues;
-            this.exportvals = exportvalues;
+            outputvals = outputvalues;
+            exportvals = exportvalues;
         }
     }
 }

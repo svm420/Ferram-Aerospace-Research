@@ -42,10 +42,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace ferram4
 {
     // An accumulator class for summarizing a set of forces acting on the body and calculating the AerodynamicCenter
@@ -59,7 +58,7 @@ namespace ferram4
         // Weighted average of force positions used as aid in choosing the
         // single center location on the line of physically equivalent ones.
         public Vector3d pos = Vector3d.zero;
-        public double amount = 0.0;
+        public double amount;
 
         /*public Vector3d GetACPosition()
         {
@@ -108,6 +107,7 @@ namespace ferram4
         }
 
         // Merge two force sets
+        // ReSharper disable once UnusedMember.Global
         public void AddAll(FARCenterQuery q2)
         {
             force += q2.force;
@@ -123,6 +123,7 @@ namespace ferram4
             return amount > 0 ? pos / amount : Vector3d.zero;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetPos(Vector3d npos)
         {
             pos = npos;
@@ -146,6 +147,7 @@ namespace ferram4
             return origin + Vector3d.Cross(force, TorqueAt(origin)) / fmag;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public Vector3d GetMinTorquePos()
         {
             return GetMinTorquePos(GetPos());
@@ -155,6 +157,7 @@ namespace ferram4
         // object. This tries to replicate it based on results of experiments.
         // In practice this is probably not necessary for FAR, but since this
         // knowledge has been obtained, might as well turn it into code.
+        // ReSharper disable once UnusedMember.Global
         public static float TorqueClipFactor(Vector3 torque, Rigidbody body)
         {
             Vector3 tq = Quaternion.Inverse(body.rotation * body.inertiaTensorRotation) * torque;

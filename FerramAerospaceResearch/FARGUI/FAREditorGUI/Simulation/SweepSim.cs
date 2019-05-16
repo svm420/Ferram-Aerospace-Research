@@ -42,17 +42,13 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 using KSP.Localization;
-using ferram4;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    class SweepSim
+    internal class SweepSim
     {
-        InstantConditionSim _instantCondition;
+        private InstantConditionSim _instantCondition;
 
         public SweepSim(InstantConditionSim instantConditionSim)
         {
@@ -70,11 +66,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             FARAeroUtil.ResetEditorParts();
 
-            double[] ClValues = new double[(int)numPoints];
-            double[] CdValues = new double[(int)numPoints];
-            double[] CmValues = new double[(int)numPoints];
-            double[] LDValues = new double[(int)numPoints];
-            double[] AlphaValues = new double[(int)numPoints];
+            double[] ClValues = new double[numPoints];
+            double[] CdValues = new double[numPoints];
+            double[] CmValues = new double[numPoints];
+            double[] LDValues = new double[numPoints];
+            double[] AlphaValues = new double[numPoints];
 
             InstantConditionSimInput input = new InstantConditionSimInput(aoAdegrees, 0, 0, 0, 0, 0, 0, pitch, flapSetting, spoilers);
 
@@ -117,15 +113,15 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             FARAeroUtil.ResetEditorParts();
 
 
-            double[] ClValues = new double[(int)numPoints];
-            double[] CdValues = new double[(int)numPoints];
-            double[] CmValues = new double[(int)numPoints];
-            double[] LDValues = new double[(int)numPoints];
-            double[] AlphaValues = new double[(int)numPoints];
-            double[] ClValues2 = new double[(int)numPoints];
-            double[] CdValues2 = new double[(int)numPoints];
-            double[] CmValues2 = new double[(int)numPoints];
-            double[] LDValues2 = new double[(int)numPoints];
+            double[] ClValues = new double[numPoints];
+            double[] CdValues = new double[numPoints];
+            double[] CmValues = new double[numPoints];
+            double[] LDValues = new double[numPoints];
+            double[] AlphaValues = new double[numPoints];
+            double[] ClValues2 = new double[numPoints];
+            double[] CdValues2 = new double[numPoints];
+            double[] CmValues2 = new double[numPoints];
+            double[] LDValues2 = new double[numPoints];
 
             for (int i = 0; i < 2 * numPoints; i++)
             {
@@ -133,7 +129,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 if (i < numPoints)
                     angle = i / (double)numPoints * (upperBound - lowerBound) + lowerBound;
                 else
-                    angle = (i - (double)numPoints + 1) / (double)numPoints * (lowerBound - upperBound) + upperBound;
+                    angle = (i - (double)numPoints + 1) / numPoints * (lowerBound - upperBound) + upperBound;
 
                 input.alpha = angle;
 

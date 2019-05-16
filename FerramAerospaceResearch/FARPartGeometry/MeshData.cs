@@ -42,8 +42,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -55,12 +53,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public Bounds bounds;
         public bool isSkinned;
 
-        MeshData() { }
-
         public MeshData(Vector3[] vertices, int[] tris, Bounds bounds, bool isSkinned = false)
         {
             this.vertices = vertices;
-            this.triangles = tris;
+            triangles = tris;
             this.bounds = bounds;
             this.isSkinned = isSkinned;
         }

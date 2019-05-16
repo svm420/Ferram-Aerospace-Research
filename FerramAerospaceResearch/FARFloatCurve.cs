@@ -1,12 +1,11 @@
 ﻿using System;
-using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
     //recyclable float curve
-    class FARFloatCurve
+    internal class FARFloatCurve
     {
-        struct CubicSection
+        private struct CubicSection
         {
             public double a, b, c, d;
             public double upperLim, lowerLim;
@@ -79,11 +78,10 @@ namespace FerramAerospaceResearch
             }
         }
 
-        Vector3d[] controlPoints;
-        CubicSection[] sections;
-        int centerIndex;
+        private Vector3d[] controlPoints;
+        private CubicSection[] sections;
+        private int centerIndex;
 
-        private FARFloatCurve() { }
         public FARFloatCurve(int numControlPoints)
         {
             controlPoints = new Vector3d[numControlPoints];
@@ -138,8 +136,7 @@ namespace FerramAerospaceResearch
             {
                 if (count > sections.Length)
                     throw new Exception();
-                else
-                    ++count;
+                ++count;
                 //curIndex = (highIndex + lowIndex) / 2;
                 int check = sections[curIndex].CheckRange(x);
                 if (check > 0)       //above of this cubic's range
@@ -151,13 +148,14 @@ namespace FerramAerospaceResearch
                         curIndex = sections[curIndex].nextIndex;    //otherwise, find next cubic to check and continue
                         continue;
                     }
-                else if (check < 0) //below this cubic's range
+
+                if (check < 0) //below this cubic's range
                     if (curIndex <= 0)
-                        return sections[curIndex].EvalLowerLim();   //at lower end of curve, return min val of first cubic
+                        return sections[curIndex].EvalLowerLim(); //at lower end of curve, return min val of first cubic
                     else
                     {
                         //highIndex = curIndex - 1;
-                        curIndex = sections[curIndex].prevIndex;    //otherwise, find next cubic to check and continue
+                        curIndex = sections[curIndex].prevIndex; //otherwise, find next cubic to check and continue
                         continue;
                     }
 
@@ -165,6 +163,7 @@ namespace FerramAerospaceResearch
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void Scale(double scalar)
         {
             for(int i = 0; i < sections.Length; ++i)

@@ -41,21 +41,16 @@ Copyright 2019, Daumantas Kavolis, aka dkavolis
  */
 
 using System.Collections.Generic;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
     [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer))]
     public class DebugVisualVoxelSubmesh : MonoBehaviour
     {
-        private Mesh m_mesh;
-        private MeshFilter m_meshFilter;
-        private MeshRenderer m_meshRenderer;
-
-        private List<Vector3> m_vertices = new List<Vector3>();
-        private List<Vector2> m_uvs = new List<Vector2>();
-        private List<int> m_triangles = new List<int>();
+        private MeshFilter meshFilter;
 
         public static DebugVisualVoxelSubmesh Create(Transform parent = null, bool active = true)
         {
@@ -67,8 +62,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return component;
         }
 
-        public bool active
+        public bool Active
         {
+            // ReSharper disable once UnusedMember.Global
             get => gameObject.activeSelf;
             set
             {
@@ -76,62 +72,51 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        public Mesh Mesh
-        {
-            get => m_mesh;
-        }
-        public MeshRenderer MeshRenderer
-        {
-            get => m_meshRenderer;
-        }
-        public List<Vector3> Vertices
-        {
-            get => m_vertices;
-        }
-        public List<Vector2> Uvs
-        {
-            get => m_uvs;
-        }
-        public List<int> Triangles
-        {
-            get => m_triangles;
-        }
+        public Mesh Mesh { get; private set; }
+
+        public MeshRenderer MeshRenderer { get; private set; }
+
+        public List<Vector3> Vertices { get; } = new List<Vector3>();
+
+        public List<Vector2> Uvs { get; } = new List<Vector2>();
+
+        public List<int> Triangles { get; } = new List<int>();
 
         protected virtual void Awake()
         {
             FARLogger.Debug("Setting up debug voxel submesh");
-            m_mesh = new Mesh();
-            m_meshFilter = GetComponent<MeshFilter>();
-            m_meshRenderer = GetComponent<MeshRenderer>();
+            Mesh = new Mesh();
+            meshFilter = GetComponent<MeshFilter>();
+            MeshRenderer = GetComponent<MeshRenderer>();
 
-            m_meshFilter.mesh = m_mesh;
-            m_meshRenderer.material = FARAssets.ShaderCache.DebugVoxels.Material;
-            m_meshRenderer.material.mainTexture = FARAssets.TextureCache.VoxelTexture;
-            setupMeshRenderer();
+            meshFilter.mesh = Mesh;
+            MeshRenderer.material = FARAssets.ShaderCache.DebugVoxels.Material;
+            MeshRenderer.material.mainTexture = FARAssets.TextureCache.VoxelTexture;
+            SetupMeshRenderer();
         }
 
-        private void setupMeshRenderer()
+        private void SetupMeshRenderer()
         {
-            m_meshRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            m_meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
-            m_meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            m_meshRenderer.receiveShadows = false;
-            m_meshRenderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
+            MeshRenderer.lightProbeUsage = LightProbeUsage.Off;
+            MeshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+            MeshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            MeshRenderer.receiveShadows = false;
+            MeshRenderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
         }
 
         public void Rebuild()
         {
-            m_mesh.SetVertices(m_vertices);
-            m_mesh.SetUVs(0, m_uvs);
-            m_mesh.SetTriangles(m_triangles, 0);
+            Mesh.SetVertices(Vertices);
+            Mesh.SetUVs(0, Uvs);
+            Mesh.SetTriangles(Triangles, 0);
         }
 
         public void Clear()
         {
-            m_mesh.Clear();
-            m_uvs.Clear();
-            m_vertices.Clear();
-            m_triangles.Clear();
+            Mesh.Clear();
+            Uvs.Clear();
+            Vertices.Clear();
+            Triangles.Clear();
         }
 
         protected virtual void OnDestroy()
@@ -139,7 +124,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Clear();
 
             // have to clean up renderer material
-            Destroy(m_meshRenderer.material);
+            Destroy(MeshRenderer.material);
         }
     }
 }

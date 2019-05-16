@@ -42,23 +42,20 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using UnityEngine;
-using KSP;
+using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI;
-using FerramAerospaceResearch.FARGUI.FAREditorGUI;
+using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARUtils;
-using ferram4;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT)]
     public class FARSettingsScenarioModule : ScenarioModule
     {
-        public bool newGame = false;
+        public bool newGame;
         public FARDifficultyAndExactnessSettings settings;
         public static FARDifficultyAndExactnessSettings Settings
         {
@@ -88,11 +85,11 @@ namespace FerramAerospaceResearch
             }
         }
 
-        static List<string> presetNames;
+        private static List<string> presetNames;
 
         public int currentIndex;
 
-        static FARSettingsScenarioModule instance;
+        private static FARSettingsScenarioModule instance;
         public static FARSettingsScenarioModule Instance
         {
             get
@@ -100,7 +97,8 @@ namespace FerramAerospaceResearch
                 return instance;
             }
         }
-        GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
+
+        private GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
 
         public static void MainMenuBuildDefaultScenarioModule()
         {
@@ -112,16 +110,16 @@ namespace FerramAerospaceResearch
         }
 
 
-        FARSettingsScenarioModule()
+        private FARSettingsScenarioModule()
         {
             instance = this;
         }
 
-        void Start()
+        private void Start()
         {
             if (!CompatibilityChecker.IsAllCompatible())
             {
-                this.enabled = false;
+                enabled = false;
                 return;
             }
             instance = this;
@@ -130,7 +128,7 @@ namespace FerramAerospaceResearch
             //    PopupDialog.SpawnPopupDialog("Ferram Aerospace Research", "Welcome to KSP with FAR!\n\r\n\rThings will be much harder from here on out; the FAR button in the top-right corner will bring you to difficulty settings if you ever decide to change them.  Have fun!", "OK", false, HighLogic.Skin);
 
             FARLogger.Info("Vehicle Voxel Setup started");
-            FerramAerospaceResearch.FARAeroComponents.FARAeroSection.GenerateCrossFlowDragCurve();
+            FARAeroSection.GenerateCrossFlowDragCurve();
             VehicleVoxel.VoxelSetup();
             PhysicsGlobals.DragCubeMultiplier = 0;
             FARLogger.Info("Vehicle Voxel Setup complete");
@@ -153,7 +151,7 @@ namespace FerramAerospaceResearch
             node.AddValue("useHigherResVoxelPoints", voxelSettings.useHigherResVoxelPoints);
             node.AddValue("index", settings.index);
 
-            FARGUI.FARFlightGUI.FlightGUI.SaveActiveData();
+            FlightGUI.SaveActiveData();
             ConfigNode flightGUINode = new ConfigNode("FlightGUISettings");
             FARLogger.Info("Saving FAR Data");
             for (int i = 0; i < flightGUISettings.Count; i++)
@@ -323,8 +321,6 @@ namespace FerramAerospaceResearch
         public int numDerivSmoothingPasses = 1;
         public int index;
 
-
-        public static bool customSettings = false;
 
         public FARDifficultyAndExactnessSettings(int index)
         {

@@ -44,22 +44,21 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using KSPAssets;
-using KSPAssets.Loaders;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
-    class EditorAreaRulingOverlay
+    internal class EditorAreaRulingOverlay
     {
         //VectorLine _areaLine;
         //VectorLine _derivLine;
         //List<VectorLine> _markingLines;
-        LineRenderer _areaRenderer;
-        LineRenderer _derivRenderer;
-        LineRenderer _coeffRenderer;
-        List<LineRenderer> _markingRenderers;
+        private LineRenderer _areaRenderer;
+        private LineRenderer _derivRenderer;
+        private LineRenderer _coeffRenderer;
+        private List<LineRenderer> _markingRenderers;
 
         public enum OverlayType
         {
@@ -68,15 +67,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             COEFF
         }
 
-        Color _axisColor;
-        Color _crossSectionColor;
-        Color _derivColor;
-        double _yScaleMaxDistance;
-        double _yAxisGridScale;
-        int _numGridLines;
+        private Color _axisColor;
+        private Color _crossSectionColor;
+        private Color _derivColor;
+        private double _yScaleMaxDistance;
+        private double _yAxisGridScale;
+        private int _numGridLines;
 
-        Material _rendererMaterial;
-        private static readonly int colorId = Shader.PropertyToID("_Color");
+        private Material _rendererMaterial;
 
         public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(Color axisColor, Color crossSectionColor, Color derivColor, double yScaleMaxDistance, double yAxisGridScale)
         {
@@ -121,21 +119,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         public void Cleanup()
         {
             if (_areaRenderer)
-                GameObject.Destroy(_areaRenderer.gameObject);
+                Object.Destroy(_areaRenderer.gameObject);
             if (_derivRenderer)
-                GameObject.Destroy(_derivRenderer.gameObject);
+                Object.Destroy(_derivRenderer.gameObject);
             if (_coeffRenderer)
-                GameObject.Destroy(_coeffRenderer.gameObject);
+                Object.Destroy(_coeffRenderer.gameObject);
             if (_markingRenderers != null)
                 for (int i = 0; i < _markingRenderers.Count; i++)
                 {
                     if (_markingRenderers[i])
-                        GameObject.Destroy(_markingRenderers[i].gameObject);
+                        Object.Destroy(_markingRenderers[i].gameObject);
                 }
 
             _markingRenderers = null;
 
-            GameObject.Destroy(_rendererMaterial);
+            Object.Destroy(_rendererMaterial);
             _rendererMaterial = null;
         }
 
@@ -145,7 +143,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             Initialize();
         }
 
-        LineRenderer CreateNewRenderer(Color color, float width, Material material)
+        private LineRenderer CreateNewRenderer(Color color, float width, Material material)
         {
             GameObject o = new GameObject();
 
@@ -157,10 +155,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             // rendererMaterial.CopyPropertiesFromMaterial(material);
 
             renderer.useWorldSpace = false;
-            if (material.HasProperty("_Color"))
+            if (material.HasProperty(ShaderPropertyIds.Color))
             {
                 // FARLogger.Info("Setting _Color on " + material + "to " + color);
-                rendererMaterial.SetColor(colorId, color);
+                rendererMaterial.SetColor(ShaderPropertyIds.Color, color);
             }
             else
                 FARLogger.Warning("Material " + material + " has no _Color property");
@@ -238,7 +236,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         public void UpdateAeroData(Matrix4x4 voxelLocalToWorldMatrix, double[] xCoords, double[] yCoordsCrossSection, double[] yCoordsDeriv, double[] yCoordsPressureCoeffs, double maxValue)
         {
             _numGridLines = (int)Math.Ceiling(maxValue / _yAxisGridScale);       //add one to account for the xAxis
-            double gridScale = _yScaleMaxDistance / (double)_numGridLines;
+            double gridScale = _yScaleMaxDistance / _numGridLines;
             double scalingFactor = _yScaleMaxDistance / (_yAxisGridScale * _numGridLines);
 
             /*if (_areaLine == null)
@@ -284,12 +282,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
 
 
-            double[] shortXCoords = new double[] {xCoords[0], xCoords[xCoords.Length - 1]};
+            double[] shortXCoords = {xCoords[0], xCoords[xCoords.Length - 1]};
 
             for (int i = 0; i < _markingRenderers.Count; i++)
             {
                 double height = i * gridScale;
-                UpdateRenderer(_markingRenderers[i], voxelLocalToWorldMatrix, shortXCoords, new double[] { height, height });
+                UpdateRenderer(_markingRenderers[i], voxelLocalToWorldMatrix, shortXCoords, new[] { height, height });
                 if (i > _numGridLines)
                     _markingRenderers[i].enabled = false;
                 else
@@ -329,12 +327,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         }*/
 
 
-        void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords)
+        private void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords)
         {
             UpdateRenderer(renderer, transformMatrix, xCoords, yCoords, 1);
         }
 
-        void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor)
+        private void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor)
         {
             // getting transform is internal call, cache
             Transform transform = renderer.transform;
