@@ -1197,9 +1197,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     potentialFlowNormalForce = areaChangeMax;
                 else if (potentialFlowNormalForce < -areaChangeMax)
                     potentialFlowNormalForce = -areaChangeMax;
-                else
-                    if (!areaChangeMax.NearlyEqual(0))
-                    sonicBaseDrag *= Math.Abs(potentialFlowNormalForce / areaChangeMax);      //some scaling for small changes in cross-section
+                else if (!areaChangeMax.NearlyEqual(0))
+                        sonicBaseDrag *= Math.Abs(potentialFlowNormalForce / areaChangeMax);      //some scaling for small changes in cross-section
 
                 double flatnessRatio = _vehicleCrossSection[index].flatnessRatio;
                 if (flatnessRatio >= 1)

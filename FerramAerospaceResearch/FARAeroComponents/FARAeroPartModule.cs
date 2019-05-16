@@ -476,7 +476,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (part.submergedPortion <= 0)
             {
                 part.AddForce(worldSpaceAeroForce);
-                //rb.AddForce(worldSpaceAeroForce);
             }
             else
             {
@@ -506,11 +505,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     worldSpaceDragForce = Vector3.zero;
                 }
                 hackWaterDragVal += Math.Abs(waterDragForce.magnitude / (rb.mass * rb.velocity.magnitude));
-                //rb.drag += waterDragForce.magnitude / (rb.mass * rb.velocity.magnitude);
 
                 if(!float.IsNaN(worldSpaceDragForce.x))
                     part.AddForce(worldSpaceDragForce + worldSpaceLiftForce + waterLiftForce);
-                    //rb.AddForce(worldSpaceDragForce + worldSpaceLiftForce + waterLiftForce);
 
                 worldSpaceAeroForce = worldSpaceDragForce + worldSpaceLiftForce + waterDragForce + waterLiftForce;
             }

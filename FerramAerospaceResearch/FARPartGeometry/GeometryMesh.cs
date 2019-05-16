@@ -123,7 +123,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (meshTransform == null)
                 return false;
             lock(this)
-            UpdateLocalToWorldMatrix();
+                UpdateLocalToWorldMatrix();
             return true;
         }
 
