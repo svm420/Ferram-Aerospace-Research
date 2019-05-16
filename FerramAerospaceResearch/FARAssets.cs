@@ -110,7 +110,7 @@ namespace FerramAerospaceResearch
                 if (TryGetValue("FerramAerospaceResearch/Debug Voxel Mesh", out var voxelShader))
                 {
                     DebugVoxels = new ShaderMaterialPair(voxelShader);
-                    DebugVoxels.Material.SetFloat("_Cutoff", 0.45f);
+                    DebugVoxels.Material.SetFloat(ShaderPropertyIds.Cutoff, 0.45f);
                 }
                 else
                 {

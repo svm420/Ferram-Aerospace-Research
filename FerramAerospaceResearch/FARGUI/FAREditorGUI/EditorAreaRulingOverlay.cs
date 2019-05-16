@@ -75,7 +75,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private int _numGridLines;
 
         private Material _rendererMaterial;
-        private static readonly int colorId = Shader.PropertyToID("_Color");
 
         public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(Color axisColor, Color crossSectionColor, Color derivColor, double yScaleMaxDistance, double yAxisGridScale)
         {
@@ -156,10 +155,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             // rendererMaterial.CopyPropertiesFromMaterial(material);
 
             renderer.useWorldSpace = false;
-            if (material.HasProperty("_Color"))
+            if (material.HasProperty(ShaderPropertyIds.Color))
             {
                 // FARLogger.Info("Setting _Color on " + material + "to " + color);
-                rendererMaterial.SetColor(colorId, color);
+                rendererMaterial.SetColor(ShaderPropertyIds.Color, color);
             }
             else
                 FARLogger.Warning("Material " + material + " has no _Color property");
