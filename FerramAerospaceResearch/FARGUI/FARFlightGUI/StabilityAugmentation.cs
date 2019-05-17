@@ -357,6 +357,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             scalingDynPres = 20;
         }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global -> try method
         public static bool TryLoadSystem(ConfigNode systemNode, int index)
         {
             bool sysExists = false;
