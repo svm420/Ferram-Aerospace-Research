@@ -65,7 +65,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public bool Active
         {
             // ReSharper disable once UnusedMember.Global
-            get => gameObject.activeSelf;
+            get { return gameObject.activeSelf; }
             set
             {
                 gameObject.SetActive(value);

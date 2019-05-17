@@ -60,32 +60,36 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public float Scale
         {
-            get => scale;
+            get { return scale; }
             set
             {
                 scale = value;
                 Extent = value * globalScale;
             }
         }
+
         public float Extent { get; private set; }
 
         public Vector3 Position { get; }
 
         public Vector3 BottomLeft
         {
-            get => new Vector3(Position.x - Extent, Position.y - Extent, Position.z);
+            get { return new Vector3(Position.x - Extent, Position.y - Extent, Position.z); }
         }
+
         public Vector3 BottomRight
         {
-            get => new Vector3(Position.x + Extent, Position.y - Extent, Position.z);
+            get { return new Vector3(Position.x + Extent, Position.y - Extent, Position.z); }
         }
+
         public Vector3 TopRight
         {
-            get => new Vector3(Position.x + Extent, Position.y + Extent, Position.z);
+            get { return new Vector3(Position.x + Extent, Position.y + Extent, Position.z); }
         }
+
         public Vector3 TopLeft
         {
-            get => new Vector3(Position.x - Extent, Position.y + Extent, Position.z);
+            get { return new Vector3(Position.x - Extent, Position.y + Extent, Position.z); }
         }
 
         public void AddToMesh(List<Vector3> vertices, List<Vector2> uvs, List<int> triangles, int indexOffset = 0)

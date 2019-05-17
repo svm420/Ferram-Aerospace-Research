@@ -66,7 +66,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public bool Active
         {
             // ReSharper disable once UnusedMember.Global
-            get => active;
+            get { return active; }
             set
             {
                 if (active != value)
@@ -79,8 +79,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         internal List<DebugVisualVoxel> DebugVoxels
         {
-            get => debugVoxels;
+            get { return debugVoxels; }
         }
+
         public Transform Parent { get; }
 
         private void UpdateActive()
