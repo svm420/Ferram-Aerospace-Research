@@ -51,7 +51,7 @@ namespace FerramAerospaceResearch.FARUtils
         public const byte Revision = 1;
         public const string Name = "Lundgren";
 
-        public readonly static string String = $"v{Major}.{Minor}.{Build}.{Revision}";
-        public readonly static string VersionString = $"{String} '{Name}'";
+        public static readonly string String = $"v{Major}.{Minor}.{Build}.{Revision}";
+        public static readonly string VersionString = $"{String} '{Name}'";
     }
 }
