@@ -11,30 +11,30 @@ namespace FerramAerospaceResearch.RealChuteLite
     /// <summary>
     /// A generic Stopwatch clone which runs on KSP's internal clock
     /// </summary>
-    public class PhysicsWatch
+    public sealed class PhysicsWatch
     {
         #region Constants
         /// <summary>
         /// The amound of ticks in a second
         /// </summary>
-        protected const long ticksPerSecond = 10000000L;
+        private const long ticksPerSecond = 10000000L;
 
         /// <summary>
         /// The amount of milliseconds in a second
         /// </summary>
-        protected const long millisecondPerSecond = 1000L;
+        private const long millisecondPerSecond = 1000L;
         #endregion
 
         #region Fields
         /// <summary>
         /// UT of the last frame
         /// </summary>
-        protected double lastCheck;
+        private double lastCheck;
 
         /// <summary>
         /// Total elapsed time calculated by the watch in seconds
         /// </summary>
-        protected double totalSeconds;
+        private double totalSeconds;
         #endregion
 
         #region Propreties
@@ -142,7 +142,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// <summary>
         /// Updates the time on the watch
         /// </summary>
-        protected virtual void UpdateWatch()
+        private void UpdateWatch()
         {
             double current = Planetarium.GetUniversalTime();
             totalSeconds += current - lastCheck;

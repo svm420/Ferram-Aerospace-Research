@@ -48,7 +48,7 @@ using UnityEngine.Rendering;
 namespace FerramAerospaceResearch.FARPartGeometry
 {
     [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer))]
-    public class DebugVisualVoxelSubmesh : MonoBehaviour
+    public sealed class DebugVisualVoxelSubmesh : MonoBehaviour
     {
         private MeshFilter meshFilter;
 
@@ -82,7 +82,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public List<int> Triangles { get; } = new List<int>();
 
-        protected virtual void Awake()
+        private void Awake()
         {
             FARLogger.Debug("Setting up debug voxel submesh");
             Mesh = new Mesh();
@@ -119,7 +119,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Triangles.Clear();
         }
 
-        protected virtual void OnDestroy()
+        private void OnDestroy()
         {
             Clear();
 
