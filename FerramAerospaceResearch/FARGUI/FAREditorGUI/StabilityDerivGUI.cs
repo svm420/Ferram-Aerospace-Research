@@ -232,11 +232,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             if (body.GetPressure(altitudeDouble) > 0)
             {
-                StabilityDerivExportOutput stabDerivResult = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool, 0, 0, 0);
-                stabDerivOutput = stabDerivResult.outputvals;
-                simManager.vehicleData = stabDerivResult.outputvals;
-                SetAngleVectors(stabDerivResult.outputvals.stableAoA);
-
+                stabDerivOutput = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool, 0, 0, 0);
+                simManager.vehicleData = stabDerivOutput;
+                SetAngleVectors(stabDerivOutput.stableAoA);
             }
             else
                 PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
