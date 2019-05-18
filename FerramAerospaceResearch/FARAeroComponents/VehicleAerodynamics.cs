@@ -361,51 +361,49 @@ namespace FerramAerospaceResearch.FARAeroComponents
         //This function will attempt to voxelize the vessel, as long as it isn't being voxelized currently all data that is on the Unity thread should be processed here before being passed to the other threads
         public bool TryVoxelUpdate(Matrix4x4 worldToLocalMatrix, Matrix4x4 localToWorldMatrix, int voxelCount, List<Part> vehiclePartList, List<GeometryPartModule> currentGeoModules, bool updateGeometryPartModules = true)
         {
-            bool returnVal = false;
-            if (voxelizing)             //set to true when this function ends; only continue to voxelizing if the voxelization thread has not been queued
-            {                                               //this should catch conditions where this function is called again before the voxelization thread starts
-                returnVal = false;
-            }
-            else if (Monitor.TryEnter(this, 0))         //only continue if the voxelizing thread has not locked this object
-            {
-                try
+            //set to true when this function ends; only continue to voxelizing if the voxelization thread has not been queued
+            //this should catch conditions where this function is called again before the voxelization thread starts
+            if (!voxelizing)
+                if (Monitor.TryEnter(this, 0))         //only continue if the voxelizing thread has not locked this object
                 {
-                    _calculationCompleted = false;      //ensure that the main thread isn't going to try to read the updated section data while it is being worked with
-                    //Bunch of voxel setup data
-                    _voxelCount = voxelCount;
-
-                    _worldToLocalMatrix = worldToLocalMatrix;
-                    _localToWorldMatrix = localToWorldMatrix;
-                    _vehiclePartList = vehiclePartList;
-                    _currentGeoModules = currentGeoModules;
-
-                    _partWorldToLocalMatrixDict.Clear();
-
-                    foreach (GeometryPartModule g in _currentGeoModules)
+                    try
                     {
-                        _partWorldToLocalMatrixDict.Add(g.part, new PartTransformInfo(g.part.partTransform));
-                        if (updateGeometryPartModules)
-                            g.UpdateTransformMatrixList(_worldToLocalMatrix);
+                        _calculationCompleted = false;      //ensure that the main thread isn't going to try to read the updated section data while it is being worked with
+                        //Bunch of voxel setup data
+                        _voxelCount = voxelCount;
+
+                        _worldToLocalMatrix = worldToLocalMatrix;
+                        _localToWorldMatrix = localToWorldMatrix;
+                        _vehiclePartList = vehiclePartList;
+                        _currentGeoModules = currentGeoModules;
+
+                        _partWorldToLocalMatrixDict.Clear();
+
+                        foreach (GeometryPartModule g in _currentGeoModules)
+                        {
+                            _partWorldToLocalMatrixDict.Add(g.part, new PartTransformInfo(g.part.partTransform));
+                            if (updateGeometryPartModules)
+                                g.UpdateTransformMatrixList(_worldToLocalMatrix);
+                        }
+
+                        _vehicleMainAxis = CalculateVehicleMainAxis();
+                        //If the voxel still exists, cleanup everything so we can continue;
+                        visualizing = false;
+
+                        _voxel?.CleanupVoxel();
+
+                        //set flag so that this function can't run again before voxelizing completes and queue voxelizing thread
+                        voxelizing = true;
+                        VoxelizationThreadpool.Instance.QueueVoxelization(CreateVoxel);
+                        return true;
                     }
-
-                    _vehicleMainAxis = CalculateVehicleMainAxis();
-                    //If the voxel still exists, cleanup everything so we can continue;
-                    visualizing = false;
-
-                    _voxel?.CleanupVoxel();
-
-                    //set flag so that this function can't run again before voxelizing completes and queue voxelizing thread
-                    voxelizing = true;
-                    VoxelizationThreadpool.Instance.QueueVoxelization(CreateVoxel);
-                    returnVal = true;
+                    finally
+                    {
+                        Monitor.Exit(this);
+                    }
                 }
-                finally
-                {
-                    Monitor.Exit(this);
-                }
-            }
 
-            return returnVal;
+            return false;
         }
 
         //And this actually creates the voxel and then begins the aero properties determination
@@ -1088,8 +1086,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             finenessRatio = _sectionThickness * numSections * 0.5 * invMaxRadFactor;       //vehicle length / max diameter, as calculated from sect thickness * num sections / (2 * max radius)
 
             //skin friction and pressure drag for a body, taken from 1978 USAF Stability And Control DATCOM, Section 4.2.3.1, Paragraph A
-            double viscousDragFactor = 0;
-            viscousDragFactor = 60 / (finenessRatio * finenessRatio * finenessRatio) + 0.0025 * finenessRatio;     //pressure drag for a subsonic / transonic body due to skin friction
+            //pressure drag for a subsonic / transonic body due to skin friction
+            double viscousDragFactor = 60 / (finenessRatio * finenessRatio * finenessRatio) + 0.0025 * finenessRatio;
             viscousDragFactor++;
 
             viscousDragFactor /= numSections;   //fraction of viscous drag applied to each section
@@ -1428,10 +1426,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         unusedSection.ClearAeroSection();
                         if (currentlyUnusedSections.Count < 64)
                             currentlyUnusedSections.Push(unusedSection);        //if there aren't that many extra ones stored, add them to the stack to be reused
-                        else
-                        {
-                            unusedSection = null;
-                        }
                     }
             }
             if (_moduleAndAreasDict.Count > 0)
@@ -1851,15 +1845,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (currentSectAreaCrossSection.NearlyEqual(0))       //quick escape for 0 cross-section section drag
                 return 0;
 
-            double lj2ndTerm = 0;
-            double drag = 0;
             int limDoubleDrag = Math.Min(i, numSections - i);
             double sectionThicknessSq = sectionThickness * sectionThickness;
 
             double lj3rdTerm = Math.Log(sectionThickness) - 1;
 
-            lj2ndTerm = 0.5 * Math.Log(0.5);
-            drag = currentSectAreaCrossSection * (lj2ndTerm + lj3rdTerm);
+            double lj2ndTerm = 0.5 * Math.Log(0.5);
+            double drag = currentSectAreaCrossSection * (lj2ndTerm + lj3rdTerm);
 
 
             for (int j = 1; j <= limDoubleDrag; j++)      //section of influence from ahead and behind
