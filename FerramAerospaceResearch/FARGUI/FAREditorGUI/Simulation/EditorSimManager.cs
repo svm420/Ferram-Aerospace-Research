@@ -50,7 +50,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
     internal class EditorSimManager
     {
-        private InstantConditionSim _instantCondition;
+        private readonly InstantConditionSim _instantCondition;
 
         public StabilityDerivCalculator StabDerivCalculator { get; }
 
@@ -58,7 +58,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public SweepSim SweepSim { get; }
 
-        private EditorAeroCenter _aeroCenter;
+        private readonly EditorAeroCenter _aeroCenter;
 
         public StabilityDerivOutput vehicleData;
 

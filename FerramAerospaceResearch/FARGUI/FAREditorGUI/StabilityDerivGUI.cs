@@ -52,8 +52,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
     internal class StabilityDerivGUI
     {
-        private GUIDropDown<int> _flapSettingDropdown;
-        private GUIDropDown<CelestialBody> _bodySettingDropdown;
+        private readonly GUIDropDown<int> _flapSettingDropdown;
+        private readonly GUIDropDown<CelestialBody> _bodySettingDropdown;
 
         private StabilityDerivOutput stabDerivOutput;
 
@@ -61,7 +61,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private string machNumber = "0.35";
         private bool spoilersDeployed;
 
-        private EditorSimManager simManager;
+        private readonly EditorSimManager simManager;
 
         private Vector3 aoAVec;
 
