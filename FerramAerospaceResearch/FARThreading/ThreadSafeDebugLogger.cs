@@ -95,7 +95,7 @@ namespace FerramAerospaceResearch.FARThreading
         {
             if (_infoMessages.Count > 0)
             {
-                StringBuilder sB = new StringBuilder();
+                var sB = new StringBuilder();
                 foreach (string message in _infoMessages)
                     sB.AppendLine(message);
 
@@ -110,7 +110,7 @@ namespace FerramAerospaceResearch.FARThreading
         {
             if (_debugMessages.Count > 0)
             {
-                StringBuilder sB = new StringBuilder();
+                var sB = new StringBuilder();
                 foreach (string message in _debugMessages)
                     sB.AppendLine(message);
 

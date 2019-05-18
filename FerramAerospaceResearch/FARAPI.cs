@@ -264,7 +264,7 @@ namespace FerramAerospaceResearch
             {
                 if(p.Modules.Contains<FARControllableSurface>())
                 {
-                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
+                    var surface = p.Modules.GetModule<FARControllableSurface>();
                     surface.SetDeflection(surface.flapDeflectionLevel + 1);
                 }
             }
@@ -279,7 +279,7 @@ namespace FerramAerospaceResearch
             {
                 if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
+                    var surface = p.Modules.GetModule<FARControllableSurface>();
                     surface.SetDeflection(surface.flapDeflectionLevel - 1);
                 }
             }
@@ -296,7 +296,7 @@ namespace FerramAerospaceResearch
             {
                 if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
+                    var surface = p.Modules.GetModule<FARControllableSurface>();
                     if (surface.isFlap)
                         return surface.flapDeflectionLevel;
                 }
@@ -314,7 +314,7 @@ namespace FerramAerospaceResearch
             {
                 if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
+                    var surface = p.Modules.GetModule<FARControllableSurface>();
                     surface.brake = spoilerActive;
                 }
             }
@@ -331,7 +331,7 @@ namespace FerramAerospaceResearch
             {
                 if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
+                    var surface = p.Modules.GetModule<FARControllableSurface>();
                     if (surface.isSpoiler)
                         return surface.brake;
                 }
@@ -398,7 +398,7 @@ namespace FerramAerospaceResearch
                 return;
             }
 
-            FARVesselAero vesselAero = vessel.GetComponent<FARVesselAero>();
+            var vesselAero = vessel.GetComponent<FARVesselAero>();
 
             if (vesselAero == null)
             {

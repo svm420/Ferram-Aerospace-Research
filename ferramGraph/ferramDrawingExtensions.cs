@@ -34,7 +34,7 @@ namespace ferram4
         public static double[] replaceNaNs(this double[] array, double value = 0.0, string name = "double[]")
         {
             int elements = array.Length;
-            double[] other = new double[elements];
+            var other = new double[elements];
             for (int i = 0; i < elements; i++)
             {
                 if (double.IsNaN(array[i]))
@@ -51,7 +51,7 @@ namespace ferram4
         public static double[] toPixelsF(this double[] raw, double zeroValue, double scale, double scaling = 1.0)
         {
             int elements = raw.Length;
-            double[] pixels = new double[elements];
+            var pixels = new double[elements];
             for (int i = 0; i < elements; i++)
             {
                 double tmp = raw[i] * scale;

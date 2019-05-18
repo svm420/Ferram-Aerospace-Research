@@ -83,7 +83,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public static FARAeroSection CreateNewAeroSection()
         {
-            FARAeroSection section = new FARAeroSection
+            var section = new FARAeroSection
             {
                 xForcePressureAoA0   = new FARFloatCurve(6),
                 xForcePressureAoA180 = new FARFloatCurve(6),
@@ -147,7 +147,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             for (int i = 0; i < moduleList.Count; i++)
             {
-                PartData data = new PartData {aeroModule = moduleList[i]};
+                var data = new PartData {aeroModule = moduleList[i]};
                 Matrix4x4 transformMatrix = partWorldToLocalMatrixDict[data.aeroModule.part].worldToLocalMatrix;
 
                 Vector3 forceCenterWorldSpace = centroidLocationAlongxRef + Vector3.ProjectOnPlane(partWorldToLocalMatrixDict[data.aeroModule.part].worldPosition, worldVehicleAxis) + avgPosDiffFromCentroid;
@@ -334,14 +334,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             public void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector)
             {
-                var tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
-                var dynamicPressurekPa = tmp * atmDensity;
-                var dragFactor = dynamicPressurekPa * Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
-                var liftFactor = dynamicPressurekPa;
+                double tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
+                double dynamicPressurekPa = tmp * atmDensity;
+                double dragFactor = dynamicPressurekPa * Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
+                double liftFactor = dynamicPressurekPa;
 
-                var localVelNorm = Vector3.Normalize(localVel);
+                Vector3 localVelNorm = Vector3.Normalize(localVel);
                 Vector3 localForceTemp = Vector3.Dot(localVelNorm, forceVector) * localVelNorm;
-                var partLocalForce = (localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor);
+                Vector3 partLocalForce = (localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor);
                 forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
                 torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)dynamicPressurekPa);
                 if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))

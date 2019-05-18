@@ -719,7 +719,7 @@ namespace ferram4
 
         private void FixWrongUIRange(string field, float upperRange, float lowerRange)
         {
-            UI_FloatRange tmpUI = (UI_FloatRange)Fields[field].uiControlEditor;
+            var tmpUI = (UI_FloatRange)Fields[field].uiControlEditor;
             tmpUI.maxValue = upperRange;
             tmpUI.minValue = lowerRange;
         }

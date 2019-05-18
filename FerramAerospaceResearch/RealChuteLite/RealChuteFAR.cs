@@ -421,7 +421,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             if (!visible)
             {
-                List<RealChuteFAR> parachutes = new List<RealChuteFAR>();
+                var parachutes = new List<RealChuteFAR>();
                 if (HighLogic.LoadedSceneIsEditor) { parachutes.AddRange(EditorLogic.SortedShipList.Where(p => p.Modules.Contains<RealChuteFAR>()).Select(p => p.Modules.GetModule<RealChuteFAR>())); }
                 else if (HighLogic.LoadedSceneIsFlight) { parachutes.AddRange(vessel.FindPartModulesImplementing<RealChuteFAR>()); }
                 if (parachutes.Count > 1 && parachutes.Exists(p => p.visible))
@@ -485,7 +485,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             foreach (Part p in part.symmetryCounterparts)
             {
-                RealChuteFAR module = (RealChuteFAR)p.Modules["RealChuteFAR"];
+                var module = (RealChuteFAR)p.Modules["RealChuteFAR"];
                 module.minAirPressureToOpen = minAirPressureToOpen;
                 module.deployAltitude = deployAltitude;
             }
@@ -1073,7 +1073,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             //Flight loading
             if (HighLogic.LoadedSceneIsFlight)
             {
-                Random random = new Random();
+                var random = new Random();
                 randomTime = (float)random.NextDouble();
                 randomX = (float)(random.NextDouble() * 100);
                 randomY = (float)(random.NextDouble() * 100);
@@ -1160,7 +1160,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 massDelta = tmpPartMass - part.partInfo.partPrefab.mass;
             }
 
-            StringBuilder b = new StringBuilder();
+            var b = new StringBuilder();
             b.Append(Localizer.Format("RCLModuleInfo0", caseMass));
             b.Append(Localizer.Format("RCLModuleInfo1", maxSpares));
             b.Append(Localizer.Format("RCLModuleInfo2", autoCutSpeed));

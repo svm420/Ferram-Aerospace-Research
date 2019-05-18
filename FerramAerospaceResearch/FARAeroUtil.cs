@@ -95,7 +95,7 @@ namespace FerramAerospaceResearch
 
         public static void SaveCustomAeroDataToConfig()
         {
-            ConfigNode node = new ConfigNode("@FARAeroData[default]:FOR[FerramAerospaceResearch]");
+            var node = new ConfigNode("@FARAeroData[default]:FOR[FerramAerospaceResearch]");
             node.AddValue("%massPerWingAreaSupported", massPerWingAreaSupported);
             node.AddValue("%massStressPower", massStressPower);
             node.AddValue("%ctrlSurfTimeConstant", FARControllableSurface.timeConstant);
@@ -109,14 +109,14 @@ namespace FerramAerospaceResearch
                 node.AddNode(CreateAtmConfigurationConfigNode(pair.Key, pair.Value));
             }
 
-            ConfigNode saveNode = new ConfigNode();
+            var saveNode = new ConfigNode();
             saveNode.AddNode(node);
             saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARAeroData.cfg");
         }
 
         private static ConfigNode CreateAtmConfigurationConfigNode(int bodyIndex, double[] atmProperties)
         {
-            ConfigNode node = new ConfigNode("BodyAtmosphericData");
+            var node = new ConfigNode("BodyAtmosphericData");
             node.AddValue("index", bodyIndex);
 
             node.AddValue("viscosityAtReferenceTemp", atmProperties[0]);
@@ -157,7 +157,7 @@ namespace FerramAerospaceResearch
                         || !bodyProperties.HasValue("referenceTemp"))
                         continue;
 
-                    double[] Rgamma_and_gamma = new double[2];
+                    var Rgamma_and_gamma = new double[2];
                     double.TryParse(bodyProperties.GetValue("viscosityAtReferenceTemp"), out double tmp);
 
                     Rgamma_and_gamma[0] = tmp;
@@ -193,7 +193,7 @@ namespace FerramAerospaceResearch
                 if (bodyAtmosphereConfiguration.ContainsKey(body.flightGlobalsIndex))
                     continue;
 
-                double[] Rgamma_and_gamma = new double[2];
+                var Rgamma_and_gamma = new double[2];
                 Rgamma_and_gamma[0] = 1.7894e-5;
                 Rgamma_and_gamma[1] = 288;
 
@@ -474,10 +474,10 @@ namespace FerramAerospaceResearch
         {
             List<Part> list = CurEditorParts;
 
-            List<FARWingAerodynamicModel> wings = new List<FARWingAerodynamicModel>();
+            var wings = new List<FARWingAerodynamicModel>();
             foreach (Part p in list)
             {
-                FARWingAerodynamicModel wing = p.GetComponent<FARWingAerodynamicModel>();
+                var wing = p.GetComponent<FARWingAerodynamicModel>();
                 if (!(wing is null))
                     wings.Add(wing);
             }

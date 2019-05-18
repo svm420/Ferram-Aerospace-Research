@@ -51,14 +51,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
     {
         public static GraphData RunTransientSimLateral(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
         {
-            SimMatrix A = new SimMatrix(4, 4);
+            var A = new SimMatrix(4, 4);
 
             A.PrintToConsole();
 
             int i = 0;
             int j = 0;
             int num = 0;
-            double[] Derivs = new double[27];
+            var Derivs = new double[27];
 
             vehicleData.stabDerivs.CopyTo(Derivs, 0);
 
@@ -125,10 +125,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
              *
              *
              */
-            RungeKutta4 transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
+            var transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
             transSolve.Solve();
 
-            GraphData lines = new GraphData {xValues = transSolve.time};
+            var lines = new GraphData {xValues = transSolve.time};
 
             double[] yVal = transSolve.GetSolution(0);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
@@ -157,8 +157,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public static GraphData RunTransientSimLongitudinal(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
         {
-            SimMatrix A = new SimMatrix(4, 4);
-            SimMatrix B = new SimMatrix(1, 4);
+            var A = new SimMatrix(4, 4);
+            var B = new SimMatrix(1, 4);
 
             A.PrintToConsole();
 
@@ -212,10 +212,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
              *
              */
 
-            RungeKutta4 transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
+            var transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
             transSolve.Solve();
 
-            GraphData lines = new GraphData {xValues = transSolve.time};
+            var lines = new GraphData {xValues = transSolve.time};
 
             double[] yVal = transSolve.GetSolution(0);
             ScaleAndClampValues(yVal, 1, 50);

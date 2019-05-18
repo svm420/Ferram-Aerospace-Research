@@ -152,7 +152,7 @@ namespace FerramAerospaceResearch
             node.AddValue("index", settings.index);
 
             FlightGUI.SaveActiveData();
-            ConfigNode flightGUINode = new ConfigNode("FlightGUISettings");
+            var flightGUINode = new ConfigNode("FlightGUISettings");
             FARLogger.Info("Saving FAR Data");
             foreach (ConfigNode configNode in flightGUISettings)
             {
@@ -227,7 +227,7 @@ namespace FerramAerospaceResearch
             presets = new List<FARDifficultyAndExactnessSettings>();
             presetNames = new List<string>();
 
-            FARDifficultyAndExactnessSettings tmp = new FARDifficultyAndExactnessSettings(0.6, 0.03, 2, 2, 0);
+            var tmp = new FARDifficultyAndExactnessSettings(0.6, 0.03, 2, 2, 0);
             presets.Add(tmp);
             presetNames.Add("Low Drag, Lenient Area Ruling");
 

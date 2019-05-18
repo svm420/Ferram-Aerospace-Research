@@ -60,7 +60,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public static Bounds GetPartOverallMeshBoundsInBasis(this Part part, Matrix4x4 worldToBasisMatrix)
         {
-            var transforms = part.FindModelComponents<Transform>();
+            List<Transform> transforms = part.FindModelComponents<Transform>();
 
             Vector3 lower = Vector3.one * float.PositiveInfinity;
             Vector3 upper = Vector3.one * float.NegativeInfinity;
@@ -74,7 +74,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 Matrix4x4 matrix = worldToBasisMatrix * t.localToWorldMatrix;
 
-                MeshCollider mc = t.GetComponent<MeshCollider>();
+                var mc = t.GetComponent<MeshCollider>();
                 Mesh m = null;
                 if (mc != null)
                 {
@@ -84,7 +84,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
 
 
-                MeshFilter mf = t.GetComponent<MeshFilter>();
+                var mf = t.GetComponent<MeshFilter>();
                 if (mf != null)
                 {
                     m = mf.sharedMesh;
@@ -93,7 +93,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
                 else
                 {
-                    SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
+                    var smr = t.GetComponent<SkinnedMeshRenderer>();
                     if (smr != null)
                     {
                         m = new Mesh();
@@ -107,13 +107,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 EncapsulateBounds(ref lower, ref upper, matrix, m);
 
             }
-            Bounds bounds = new Bounds((lower + upper) * 0.5f, upper - lower);
+            var bounds = new Bounds((lower + upper) * 0.5f, upper - lower);
             return bounds;
         }
 
         private static void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
         {
-            Vector3 boundPt = new Vector3 (center.x + extX, center.y + extY, center.z + extZ);
+            var boundPt = new Vector3 (center.x + extX, center.y + extY, center.z + extZ);
             boundPt = matrix.MultiplyPoint3x4(boundPt);
             lower = Vector3.Min (lower, boundPt);
             upper = Vector3.Max (upper, boundPt);
@@ -136,18 +136,18 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public static Bounds GetPartColliderBoundsInBasis(this Part part, Matrix4x4 worldToBasisMatrix)
         {
-            var transforms = part.FindModelComponents<Transform>();
-            Bounds bounds = new Bounds();
+            List<Transform> transforms = part.FindModelComponents<Transform>();
+            var bounds = new Bounds();
             for (int i = transforms.Count - 1; i >= 0; --i)
             {
                 Transform t = transforms[i];
 
-                MeshCollider mc = t.GetComponent<MeshCollider>();
+                var mc = t.GetComponent<MeshCollider>();
                 Matrix4x4 matrix = worldToBasisMatrix * t.localToWorldMatrix;
 
                 if (mc == null)
                 {
-                    BoxCollider bc = t.GetComponent<BoxCollider>();
+                    var bc = t.GetComponent<BoxCollider>();
                     if (bc != null)
                     {
                         bounds.Encapsulate(matrix.MultiplyPoint3x4(bc.bounds.min));
@@ -170,7 +170,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public static List<Transform> PartModelTransformList(this Part p)
         {
-            List<Transform> returnList = new List<Transform>();
+            var returnList = new List<Transform>();
 
             List<Transform> ignoredModelTransforms = IgnoreModelTransformList(p);
 
@@ -187,7 +187,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private static List<Transform> IgnoreModelTransformList(this Part p)
         {
-            List<Transform> Transform = new List<Transform>();
+            var Transform = new List<Transform>();
             if (ignorePartModuleTransforms == null)
                 LoadPartModuleTransformStrings();
 
@@ -229,7 +229,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private static void ProceduralAsteroidTransforms(Part p, List<Transform> transformList)
         {
-            ModuleAsteroid asteroid = (ModuleAsteroid)p.Modules["ModuleAsteroid"];
+            var asteroid = (ModuleAsteroid)p.Modules["ModuleAsteroid"];
             FieldInfo[] fields = asteroid.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
 
             /*for (int i = 0; i < fields.Length; ++i)
@@ -269,7 +269,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         if(!template.HasValue("PartModuleName"))
                             continue;
-                        List<string> transformExceptions = new List<string> {template.GetValue("PartModuleName")};
+                        var transformExceptions = new List<string> {template.GetValue("PartModuleName")};
 
                         foreach(string value in template.GetValues("TransformException"))
                             transformExceptions.Add(value);

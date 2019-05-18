@@ -115,7 +115,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 LateralGUI(vehicleData);
                 DataInput(latConditions, vehicleData, false);
             }
-            GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
+            var BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
             _graph.Display(0, 0);
@@ -127,7 +127,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private static void LongitudinalGUI(StabilityDerivOutput vehicleData)
         {
 
-            GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
+            var BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
             GUILayout.BeginHorizontal();
@@ -167,7 +167,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private static void LateralGUI(StabilityDerivOutput vehicleData)
         {
-            GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
+            var BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
             GUILayout.BeginHorizontal();
@@ -227,7 +227,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 inits.maxTime = Regex.Replace(inits.maxTime, @"[^-?[0-9]*(\.[0-9]*)?]", "");
                 inits.dt = Regex.Replace(inits.dt, @"[^-?[0-9]*(\.[0-9]*)?]", "");
 
-                double[] initCond = new double[inits.inits.Length];
+                var initCond = new double[inits.inits.Length];
                 for (int i = 0; i < initCond.Length; i++)
                 {
                     initCond[i] = Convert.ToDouble(inits.inits[i]) * inits.scaling[i];
@@ -247,7 +247,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (sign != 0)
                 color = (Math.Sign(val) == sign) ? Color.green : Color.red;
 
-            GUIStyle style = new GUIStyle(GUI.skin.label);
+            var style = new GUIStyle(GUI.skin.label);
             style.normal.textColor = style.hover.textColor = color;
 
             GUILayout.Label(new GUIContent(text1 + val.ToString("G6") + text2, tooltip), style, GUILayout.Width(width));
@@ -258,13 +258,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (GUI.tooltip == "")
                 return;
 
-            GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
+            var BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
             Vector3 mousePos = GUIUtils.GetMousePos();
             Rect windowRect = EditorGUI.GUIRect;
 
-            Rect tooltipRect = new Rect(Mathf.Clamp(mousePos.x - windowRect.x, 0, windowRect.width - 300), Mathf.Clamp(mousePos.y - windowRect.y, 0, windowRect.height - 80), 300, 80);
+            var tooltipRect = new Rect(Mathf.Clamp(mousePos.x - windowRect.x, 0, windowRect.width - 300), Mathf.Clamp(mousePos.y - windowRect.y, 0, windowRect.height - 80), 300, 80);
 
             GUIStyle toolTipStyle = BackgroundStyle;
             toolTipStyle.normal.textColor = toolTipStyle.active.textColor = toolTipStyle.hover.textColor = toolTipStyle.focused.textColor = toolTipStyle.onNormal.textColor = toolTipStyle.onHover.textColor = toolTipStyle.onActive.textColor = toolTipStyle.onFocused.textColor = new Color(1, 0.75f, 0);

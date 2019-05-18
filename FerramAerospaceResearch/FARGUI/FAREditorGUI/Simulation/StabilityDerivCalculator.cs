@@ -68,7 +68,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             double u0 = sspeed * machNumber;
             double q = u0 * u0 * density * 0.5f;
 
-            StabilityDerivOutput stabDerivOutput = new StabilityDerivOutput
+            var stabDerivOutput = new StabilityDerivOutput
             {
                 nominalVelocity = u0,
                 altitude        = alt,
@@ -89,8 +89,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             double Iyz = 0;
             double Ixz = 0;
 
-            InstantConditionSimInput input = new InstantConditionSimInput(alpha, beta, phi, 0, 0, 0, machNumber, 0, flapSetting, spoilers);
-            InstantConditionSimOutput pertOutput = new InstantConditionSimOutput();
+            var input = new InstantConditionSimInput(alpha, beta, phi, 0, 0, 0, machNumber, 0, flapSetting, spoilers);
+            var pertOutput = new InstantConditionSimOutput();
 
             _instantCondition.GetClCdCmSteady(input, out InstantConditionSimOutput nominalOutput, true);
 
@@ -107,7 +107,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 // If you want to use GetModuleMass, you need to start from p.partInfo.mass, not p.mass
                 CoM  += partMass * (Vector3d)p.transform.TransformPoint(p.CoMOffset);
                 mass += partMass;
-                FARWingAerodynamicModel w = p.GetComponent<FARWingAerodynamicModel>();
+                var w = p.GetComponent<FARWingAerodynamicModel>();
                 if (w != null)
                 {
                     if (w.isShielded)
@@ -170,15 +170,15 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 Quaternion prncInertRot     = p.Rigidbody.inertiaTensorRotation;
 
                 //The rows of the direction cosine matrix for a quaternion
-                Vector3 Row1 = new Vector3(prncInertRot.x * prncInertRot.x - prncInertRot.y * prncInertRot.y - prncInertRot.z * prncInertRot.z + prncInertRot.w * prncInertRot.w,
+                var Row1 = new Vector3(prncInertRot.x * prncInertRot.x - prncInertRot.y * prncInertRot.y - prncInertRot.z * prncInertRot.z + prncInertRot.w * prncInertRot.w,
                                            2 * (prncInertRot.x * prncInertRot.y + prncInertRot.z * prncInertRot.w),
                                            2 * (prncInertRot.x * prncInertRot.z - prncInertRot.y * prncInertRot.w));
 
-                Vector3 Row2 = new Vector3(2 * (prncInertRot.x * prncInertRot.y - prncInertRot.z * prncInertRot.w),
+                var Row2 = new Vector3(2 * (prncInertRot.x * prncInertRot.y - prncInertRot.z * prncInertRot.w),
                                            -prncInertRot.x * prncInertRot.x + prncInertRot.y * prncInertRot.y - prncInertRot.z * prncInertRot.z + prncInertRot.w * prncInertRot.w,
                                            2 * (prncInertRot.y * prncInertRot.z + prncInertRot.x * prncInertRot.w));
 
-                Vector3 Row3 = new Vector3(2 * (prncInertRot.x * prncInertRot.z + prncInertRot.y * prncInertRot.w),
+                var Row3 = new Vector3(2 * (prncInertRot.x * prncInertRot.z + prncInertRot.y * prncInertRot.w),
                                            2 * (prncInertRot.y * prncInertRot.z - prncInertRot.x * prncInertRot.w),
                                            -prncInertRot.x * prncInertRot.x - prncInertRot.y * prncInertRot.y + prncInertRot.z * prncInertRot.z + prncInertRot.w * prncInertRot.w);
 

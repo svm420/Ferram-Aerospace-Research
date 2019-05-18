@@ -21,7 +21,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 if (prefab != null && prefab.Modules.Contains<RealChuteFAR>())
                 {
                     //Updates the part's GetInfo.
-                    RealChuteFAR module = prefab.Modules.GetModule<RealChuteFAR>();
+                    var module = prefab.Modules.GetModule<RealChuteFAR>();
                     DragCubeSystem.Instance.LoadDragCubes(prefab);
                     DragCube semi = prefab.DragCubes.Cubes.Find(c => c.Name == "SEMIDEPLOYED"), deployed = prefab.DragCubes.Cubes.Find(c => c.Name == "DEPLOYED");
                     if (semi == null || deployed == null) { FARLogger.Info("" + part.title + " cannot find drag cube for RealChuteLite"); }

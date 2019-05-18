@@ -55,7 +55,7 @@ namespace FerramAerospaceResearch
 
         public static void SaveCustomStressTemplates()
         {
-            ConfigNode node = new ConfigNode("@FARAeroStress[default]:FOR[FerramAerospaceResearch]");
+            var node = new ConfigNode("@FARAeroStress[default]:FOR[FerramAerospaceResearch]");
             node.AddNode(new ConfigNode("!FARPartStressTemplate,*"));
 
             foreach (FARPartStressTemplate template in StressTemplates)
@@ -63,21 +63,21 @@ namespace FerramAerospaceResearch
                 node.AddNode(CreateAeroStressConfigNode(template));
             }
 
-            ConfigNode saveNode = new ConfigNode();
+            var saveNode = new ConfigNode();
             saveNode.AddNode(node);
             saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARAeroStress.cfg");
         }
 
         private static ConfigNode CreateAeroStressConfigNode(FARPartStressTemplate template)
         {
-            ConfigNode node = new ConfigNode("FARPartStressTemplate");
+            var node = new ConfigNode("FARPartStressTemplate");
             node.AddValue("name", template.name);
             node.AddValue("YmaxStress", template.YmaxStress);
             node.AddValue("XZmaxStress", template.XZmaxStress);
             node.AddValue("requiresCrew", template.crewed.ToString());
             node.AddValue("isSpecialTemplate", template.isSpecialTemplate.ToString());
 
-            ConfigNode res = new ConfigNode("Resources");
+            var res = new ConfigNode("Resources");
 
             res.AddValue("numReq", template.minNumResources);
             res.AddValue("rejectUnlistedResources", template.rejectUnlistedResources);
@@ -118,7 +118,7 @@ namespace FerramAerospaceResearch
 
         private static FARPartStressTemplate CreateFARPartStressTemplate(ConfigNode template)
         {
-            FARPartStressTemplate parsedTemplate = new FARPartStressTemplate
+            var parsedTemplate = new FARPartStressTemplate
             {
                 XZmaxStress             = 500,
                 YmaxStress              = 500,

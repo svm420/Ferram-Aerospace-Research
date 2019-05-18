@@ -166,7 +166,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void GraphDisplay()
         {
-            GUIStyle graphBackingStyle = new GUIStyle(GUI.skin.box);
+            var graphBackingStyle = new GUIStyle(GUI.skin.box);
             graphBackingStyle.hover = graphBackingStyle.active = graphBackingStyle.normal;
 
             GUILayout.BeginHorizontal();
@@ -235,7 +235,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
                 double otherInput = double.Parse(input.otherInput);
 
-                var sim = simManager.SweepSim;
+                SweepSim sim = simManager.SweepSim;
                 if (sim.IsReady())
                 {
                     GraphData data;
@@ -299,7 +299,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             int j = 0;
 
-            List<double> xv_yvPairs = new List<double>();
+            var xv_yvPairs = new List<double>();
 
             for (int i = 0; i < y.Length - 1; i++)
             {

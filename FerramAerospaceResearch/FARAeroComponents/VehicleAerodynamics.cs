@@ -226,7 +226,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     continue;
                 if (p.Modules.Contains<FARWingAerodynamicModel>())
                 {
-                    FARWingAerodynamicModel w = p.Modules.GetModule<FARWingAerodynamicModel>();
+                    var w = p.Modules.GetModule<FARWingAerodynamicModel>();
                     if (!(w is null))
                     {
                         w.isShielded = false;
@@ -288,7 +288,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public double[] GetPressureCoeffs()
         {
-            double[] pressureCoeffs = new double[validSectionCount];
+            var pressureCoeffs = new double[validSectionCount];
             return GetPressureCoeffs(pressureCoeffs);
         }
 
@@ -303,7 +303,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public double[] GetCrossSectionAreas()
         {
-            double[] areas = new double[validSectionCount];
+            var areas = new double[validSectionCount];
             return GetCrossSectionAreas(areas);
         }
 
@@ -317,7 +317,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public double[] GetCrossSection2ndAreaDerivs()
         {
-            double[] areaDerivs = new double[validSectionCount];
+            var areaDerivs = new double[validSectionCount];
             return GetCrossSection2ndAreaDerivs(areaDerivs);
         }
 
@@ -450,7 +450,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             Vector3 axis = Vector3.zero;
             //Vector3 notAxis = Vector3.zero;
-            HashSet<Part> hitParts = new HashSet<Part>();
+            var hitParts = new HashSet<Part>();
 
             bool hasPartsForAxis = false;
 
@@ -469,7 +469,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 if (p.Modules.Contains<ModuleResourceIntake>()) //intakes are probably pointing in the direction we're gonna be going in
                 {
-                    ModuleResourceIntake intake      = p.Modules.GetModule<ModuleResourceIntake>();
+                    var intake      = p.Modules.GetModule<ModuleResourceIntake>();
                     Transform            intakeTrans = p.FindModelTransform(intake.intakeTransformName);
                     if (!(intakeTrans is null))
                         candVector = intakeTrans.TransformDirection(Vector3.forward);
@@ -511,7 +511,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                     if (q.Modules.Contains<ModuleResourceIntake>()) //intakes are probably pointing in the direction we're gonna be going in
                     {
-                        ModuleResourceIntake intake      = q.Modules.GetModule<ModuleResourceIntake>();
+                        var intake      = q.Modules.GetModule<ModuleResourceIntake>();
                         Transform            intakeTrans = q.FindModelTransform(intake.intakeTransformName);
                         if (!(intakeTrans is null))
                             candVector += intakeTrans.TransformDirection(Vector3.forward);
@@ -1103,7 +1103,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             _moduleAndAreasDict.Clear();
             //_newAeroSections = new List<FARAeroSection>();
 
-            HashSet<FARAeroPartModule> tmpAeroModules = new HashSet<FARAeroPartModule>(ObjectReferenceEqualityComparer<FARAeroPartModule>.Default);
+            var tmpAeroModules = new HashSet<FARAeroPartModule>(ObjectReferenceEqualityComparer<FARAeroPartModule>.Default);
             _sonicDragArea = 0;
 
             if (_newAeroSections.Capacity < numSections + 1)
@@ -1360,7 +1360,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     if (!key.Modules.Contains<FARAeroPartModule>())
                         continue;
 
-                    FARAeroPartModule m = key.Modules.GetModule<FARAeroPartModule>();
+                    var m = key.Modules.GetModule<FARAeroPartModule>();
                     if (!(m is null))
                         includedModules.Add(m);
 
@@ -1468,7 +1468,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     if (!geoModule)
                         continue;
 
-                    FARAeroPartModule aeroModule = geoModule.GetComponent<FARAeroPartModule>();
+                    var aeroModule = geoModule.GetComponent<FARAeroPartModule>();
                     if (aeroModule != null && !tmpAeroModules.Contains(aeroModule))
                         _newUnusedAeroModules.Add(aeroModule);
                 }
@@ -1478,7 +1478,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void UpdateSonicDragArea()
         {
-            FARCenterQuery center = new FARCenterQuery();
+            var center = new FARCenterQuery();
 
             Vector3 worldMainAxis = _localToWorldMatrix.MultiplyVector(_vehicleMainAxis);
             worldMainAxis.Normalize();

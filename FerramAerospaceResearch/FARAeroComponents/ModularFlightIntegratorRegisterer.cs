@@ -74,7 +74,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (!part.Modules.Contains<FARAeroPartModule>())
                     continue;
 
-                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
+                var aeroModule = part.Modules.GetModule<FARAeroPartModule>();
 
                 //FARAeroPartModule aeroModule = (FARAeroPartModule)module;
 

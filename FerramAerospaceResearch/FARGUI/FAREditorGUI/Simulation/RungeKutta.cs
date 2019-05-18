@@ -110,7 +110,7 @@ private readonly SimMatrix stateEquations;
                 return new double[time.Length];
             }
 
-            double[] solution = new double[time.Length];
+            var solution = new double[time.Length];
             for (int j = 0; j < solution.Length; j++)
                 solution[j] = soln[i, j];
             return solution;
@@ -118,7 +118,7 @@ private readonly SimMatrix stateEquations;
 
         private double[] NextState(double[] currentState)
         {
-            double[] next = new double[currentState.Length];
+            var next = new double[currentState.Length];
             // dkavolis: f1-f4 where all pointing to the same array...
             var f1 = new double[currentState.Length];
             var f2 = new double[currentState.Length];

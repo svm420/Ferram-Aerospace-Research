@@ -148,7 +148,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             public static implicit operator ProjectedArea(VoxelCrossSection.SideAreaValues b)
             {
-                ProjectedArea a = new ProjectedArea
+                var a = new ProjectedArea
                 {
                     iN = b.iN,
                     iP = b.iP,
@@ -197,7 +197,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void SetProjectedArea(ProjectedArea areas, Matrix4x4 vesselToWorldMatrix)
         {
-            ProjectedArea transformedArea = new ProjectedArea();
+            var transformedArea = new ProjectedArea();
             if (!part)
                 return;
 
@@ -619,7 +619,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             bool failureOccured = false;
             if (part.Modules.Contains<ModuleProceduralFairing>())
             {
-                ModuleProceduralFairing fairing = part.Modules.GetModule<ModuleProceduralFairing>();
+                var fairing = part.Modules.GetModule<ModuleProceduralFairing>();
                 fairing.ejectionForce = 0.5f;
 
                 fairing.DeployFairing();

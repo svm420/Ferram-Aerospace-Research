@@ -121,7 +121,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public void Display()
         {
-            GUIStyle minorTitle = new GUIStyle(GUI.skin.label)
+            var minorTitle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.UpperCenter,
                 padding   = new RectOffset(0, 0, 0, 0)

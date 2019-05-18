@@ -62,8 +62,8 @@ namespace FerramAerospaceResearch
                         Collider[] tmpColliderArray = part.GetComponentsInChildren<Collider>(); //In the editor, this returns all the colliders of this part AND all the colliders of its children, recursively
                         //However, this can also be called on its child parts to get their colliders, so we can exclude the child colliders
                         //Also, fortunately, parent colliders are at the beginning of this; we can take advantage of this to reduce the time iterating through lists
-                        List<Collider> partColliders = new List<Collider>();
-                        HashSet<Collider> excludedCollidersHash = new HashSet<Collider>();      //We'll use a hash to make this fast
+                        var partColliders = new List<Collider>();
+                        var excludedCollidersHash = new HashSet<Collider>();      //We'll use a hash to make this fast
 
                         foreach (Part p in part.children)
                         {
@@ -97,15 +97,15 @@ namespace FerramAerospaceResearch
             // ReSharper disable once UnusedMember.Global
             public static Bounds[] GetPartMeshBoundsInPartSpace(this Part part, int excessiveVerts = 2500)
             {
-                var transforms = part.FindModelComponents<Transform>();
-                Bounds[] bounds = new Bounds[transforms.Count];
+                List<Transform> transforms = part.FindModelComponents<Transform>();
+                var bounds = new Bounds[transforms.Count];
                 Matrix4x4 partMatrix = part.partTransform.worldToLocalMatrix;
                 for(int i = 0; i < transforms.Count; i++)
                 {
-                    Bounds newBounds = new Bounds();
+                    var newBounds = new Bounds();
                     Transform t = transforms[i];
 
-                    MeshFilter mf = t.GetComponent<MeshFilter>();
+                    var mf = t.GetComponent<MeshFilter>();
                     if (mf == null)
                         continue;
                     Mesh m = mf.sharedMesh;

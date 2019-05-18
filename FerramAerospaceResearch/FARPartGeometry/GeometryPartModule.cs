@@ -157,7 +157,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             public void Print(Part p)
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.Append($"{p.name} - mesh build info:");
                 if (meshes.Count > 0)
                 {
@@ -335,7 +335,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     --i;
                     continue;
                 }
-                GeometryMesh geoMesh = new GeometryMesh(m, meshTransforms[i], worldToVesselMatrix, this);
+                var geoMesh = new GeometryMesh(m, meshTransforms[i], worldToVesselMatrix, this);
                 meshDataList.Add(geoMesh);
             }
 
@@ -362,7 +362,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 upper = Vector3.Max(upper, geoMesh.bounds.max);
                 lower = Vector3.Min(lower, geoMesh.bounds.min);
             }
-            Bounds overallBounds = new Bounds((upper + lower) * 0.5f, upper - lower);
+            var overallBounds = new Bounds((upper + lower) * 0.5f, upper - lower);
 
             float tmpTestBounds = overallBounds.center.x + overallBounds.center.y + overallBounds.center.z +
                 overallBounds.extents.x + overallBounds.extents.y + overallBounds.extents.z;
@@ -426,7 +426,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             geometryUpdaters = new List<IGeometryUpdater>();
             if(part is CompoundPart compoundPart)
             {
-                CompoundPartGeoUpdater compoundUpdate = new CompoundPartGeoUpdater(compoundPart, this);
+                var compoundUpdate = new CompoundPartGeoUpdater(compoundPart, this);
                 geometryUpdaters.Add(compoundUpdate);
             }
             if(part.Modules.Contains<ModuleProceduralFairing>())
@@ -434,7 +434,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 List<ModuleProceduralFairing> fairings = part.Modules.GetModules<ModuleProceduralFairing>();
                 foreach (ModuleProceduralFairing fairing in fairings)
                 {
-                    StockProcFairingGeoUpdater fairingUpdater = new StockProcFairingGeoUpdater(fairing, this);
+                    var fairingUpdater = new StockProcFairingGeoUpdater(fairing, this);
                     geometryUpdaters.Add(fairingUpdater);
                 }
             }
@@ -444,13 +444,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 List<ModuleJettison> engineFairings = part.Modules.GetModules<ModuleJettison>();
                 foreach (ModuleJettison engineFairing in engineFairings)
                 {
-                    StockJettisonTransformGeoUpdater fairingUpdater = new StockJettisonTransformGeoUpdater(engineFairing, this);
+                    var fairingUpdater = new StockJettisonTransformGeoUpdater(engineFairing, this);
                     geometryUpdaters.Add(fairingUpdater);
                 }
             }
             if (part.Modules.Contains<ModuleAsteroid>())
             {
-                StockProcAsteroidGeoUpdater asteroidUpdater = new StockProcAsteroidGeoUpdater(this);
+                var asteroidUpdater = new StockProcAsteroidGeoUpdater(this);
                 geometryUpdaters.Add(asteroidUpdater);
             }
         }
@@ -509,7 +509,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             if (engineType != "")
             {
-                ModuleEngines engines = (ModuleEngines)part.Modules[engineType];
+                var engines = (ModuleEngines)part.Modules[engineType];
                 bool airBreather = false;
 
                 if (engineType == "ModuleEnginesAJEJet")
@@ -522,7 +522,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (airBreather)
                 {
-                    AirbreathingEngineCrossSectionAdjuster engineAdjuster = new AirbreathingEngineCrossSectionAdjuster(engines, worldToVesselMatrix);
+                    var engineAdjuster = new AirbreathingEngineCrossSectionAdjuster(engines, worldToVesselMatrix);
                     crossSectionAdjusters.Add(engineAdjuster);
                 }
             }
@@ -683,13 +683,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private static MeshData GetColliderMeshData(Transform t)
         {
-            MeshCollider mc = t.GetComponent<MeshCollider>();
+            var mc = t.GetComponent<MeshCollider>();
             if (mc != null)
             {
                 //Mesh m = mc.sharedMesh;       //we can't used mc.sharedMesh because it does not contain all the triangles or verts for some reason
                                                 //must instead get the mesh filter and use its shared mesh
 
-                MeshFilter mf = t.GetComponent<MeshFilter>();
+                var mf = t.GetComponent<MeshFilter>();
                 if (mf != null)
                 {
                     Mesh m = mf.sharedMesh;
@@ -707,7 +707,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else
             {
-                BoxCollider bc = t.GetComponent<BoxCollider>();
+                var bc = t.GetComponent<BoxCollider>();
                 if (bc != null)
                 {
                     return CreateBoxMeshFromBoxCollider(bc.size, bc.center);
@@ -719,7 +719,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private MeshData GetVisibleMeshData(Transform t, bool skipIfNoRenderer, bool onlyMeshes)
         {
             Mesh m;
-            MeshFilter mf = t.GetComponent<MeshFilter>();
+            var mf = t.GetComponent<MeshFilter>();
 
             if (onlyMeshes && t.GetComponent<MeshCollider>() != null)       //if we've decided to force use of meshes, we don't want colliders
                 return null;
@@ -728,7 +728,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 if (skipIfNoRenderer && !unignoredTransforms.Contains(t.name))
                 {
-                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
+                    var mr = t.GetComponent<MeshRenderer>();
                     if (mr == null)
                     {
                         DebugAddNoRenderer(t);
@@ -738,7 +738,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 #if DEBUG
                 else
                 {
-                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
+                    var mr = t.GetComponent<MeshRenderer>();
                     if (mr == null)
                         DebugAddNoRenderer(t);
                 }
@@ -760,12 +760,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 return new MeshData(m.vertices, m.triangles, m.bounds);
             }
 
-            SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
+            var smr = t.GetComponent<SkinnedMeshRenderer>();
             if (smr != null)
             {
                 m = new Mesh();
                 smr.BakeMesh(m);
-                MeshData md = new MeshData(m.vertices, m.triangles, m.bounds, true);
+                var md = new MeshData(m.vertices, m.triangles, m.bounds, true);
 
                 Destroy(m); //ensure that no memory is left over
                 return md;
@@ -776,8 +776,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private List<MeshData> CreateMeshListFromTransforms(ref List<Transform> meshTransforms)
         {
             DebugClear();
-            List<MeshData> meshList = new List<MeshData>();
-            List<Transform> validTransformList = new List<Transform>();
+            var meshList = new List<MeshData>();
+            var validTransformList = new List<Transform>();
 
             if (part.Modules.Contains<KerbalEVA>() || part.Modules.Contains<FlagSite>())
             {
@@ -788,9 +788,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 return meshList;
             }
 
-            var worldToLocalMatrix = part.partTransform.worldToLocalMatrix;
-            var rendererBounds = part.GetPartOverallMeshBoundsInBasis(worldToLocalMatrix);
-            var colliderBounds = part.GetPartColliderBoundsInBasis(worldToLocalMatrix);
+            Matrix4x4 worldToLocalMatrix = part.partTransform.worldToLocalMatrix;
+            Bounds rendererBounds = part.GetPartOverallMeshBoundsInBasis(worldToLocalMatrix);
+            Bounds colliderBounds = part.GetPartColliderBoundsInBasis(worldToLocalMatrix);
 
             bool cantUseColliders = true;
             bool isFairing = part.Modules.Contains<ModuleProceduralFairing>() || part.Modules.Contains("ProceduralFairingSide");
@@ -817,7 +817,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 bool variants = part.Modules.Contains<ModulePartVariants>();
                 List<ModuleJettison> jettisons = part.Modules.GetModules<ModuleJettison>();
-                HashSet<string> jettisonTransforms = new HashSet<string>();
+                var jettisonTransforms = new HashSet<string>();
                 foreach (ModuleJettison j in jettisons)
                 {
                     if (j.jettisonTransform == null)
@@ -890,9 +890,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private static MeshData CreateBoxMeshFromBoxCollider(Vector3 size, Vector3 center)
         {
-            List<Vector3> Points = new List<Vector3>();
-            List<Vector3> Verts = new List<Vector3>();
-            List<int> Tris = new List<int>();
+            var Points = new List<Vector3>();
+            var Verts = new List<Vector3>();
+            var Tris = new List<int>();
 
             Vector3 extents = size * 0.5f;
 
@@ -935,7 +935,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Tris.Add(20); Tris.Add(21); Tris.Add(22);
             Tris.Add(22); Tris.Add(23); Tris.Add(20);
 
-            MeshData mesh = new MeshData(Verts.ToArray(), Tris.ToArray(), new Bounds(center, size));
+            var mesh = new MeshData(Verts.ToArray(), Tris.ToArray(), new Bounds(center, size));
 
             return mesh;
         }

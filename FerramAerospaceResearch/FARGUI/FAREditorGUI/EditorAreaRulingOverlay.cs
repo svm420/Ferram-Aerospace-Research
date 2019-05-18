@@ -78,7 +78,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(Color axisColor, Color crossSectionColor, Color derivColor, double yScaleMaxDistance, double yAxisGridScale)
         {
-            EditorAreaRulingOverlay overlay = new EditorAreaRulingOverlay
+            var overlay = new EditorAreaRulingOverlay
             {
                 _axisColor         = axisColor,
                 _crossSectionColor = crossSectionColor,
@@ -148,13 +148,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private static LineRenderer CreateNewRenderer(Color color, float width, Material material)
         {
-            GameObject o = new GameObject();
+            var o = new GameObject();
 
-            LineRenderer renderer = o.gameObject.AddComponent<LineRenderer>();
+            var renderer = o.gameObject.AddComponent<LineRenderer>();
 
             // need to copy the material properties so the same material is not
             // reused between renderers
-            Material rendererMaterial = new Material(material);
+            var rendererMaterial = new Material(material);
             // rendererMaterial.CopyPropertiesFromMaterial(material);
 
             renderer.useWorldSpace = false;

@@ -100,13 +100,13 @@ namespace ferram4
         public static void LoadConfiguration()
         {
             string[] namesTmp = Enum.GetNames(typeof(KSPActionGroup));
-            string[] names = new string[namesTmp.Length - 1];
+            var names = new string[namesTmp.Length - 1];
 
             for(int i = 0; i < namesTmp.Length - 1; ++i)
             {
                 names[i] = namesTmp[i];
             }
-            KSPActionGroup[] agTypes = new KSPActionGroup[names.Length];
+            var agTypes = new KSPActionGroup[names.Length];
             actionGroupDropDown = new GUIDropDown<KSPActionGroup>[3];
 
             for(int i = 0; i < agTypes.Length; i++)
@@ -136,7 +136,7 @@ namespace ferram4
                         break;
                     }
                 }
-                GUIDropDown<KSPActionGroup> dropDown = new GUIDropDown<KSPActionGroup>(names, agTypes, initIndex);
+                var dropDown = new GUIDropDown<KSPActionGroup>(names, agTypes, initIndex);
                 actionGroupDropDown[i] = dropDown;
             }
         }
@@ -153,7 +153,7 @@ namespace ferram4
 
         public static void DrawGUI()
         {
-            GUIStyle label = new GUIStyle(GUI.skin.label) {normal = {textColor = GUI.skin.toggle.normal.textColor}};
+            var label = new GUIStyle(GUI.skin.label) {normal = {textColor = GUI.skin.toggle.normal.textColor}};
             GUILayout.Label(Localizer.Format("FARActionDefaultLabel"));
             GUILayout.BeginHorizontal(); // left column: label, right column: text field
             GUILayout.BeginVertical();

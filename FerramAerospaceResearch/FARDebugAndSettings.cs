@@ -243,7 +243,7 @@ namespace FerramAerospaceResearch
         private void debugWindow(int windowID)
         {
 
-            GUIStyle thisStyle = new GUIStyle(GUI.skin.toggle)
+            var thisStyle = new GUIStyle(GUI.skin.toggle)
             {
                 stretchHeight = true,
                 stretchWidth  = true,
@@ -251,7 +251,7 @@ namespace FerramAerospaceResearch
                 margin        = new RectOffset(4, 4, 4, 4)
             };
 
-            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
+            var buttonStyle = new GUIStyle(GUI.skin.button)
             {
                 stretchHeight = true,
                 stretchWidth  = true,
@@ -259,7 +259,7 @@ namespace FerramAerospaceResearch
                 margin        = new RectOffset(4, 4, 4, 4)
             };
 
-            GUIStyle boxStyle = new GUIStyle(GUI.skin.box)
+            var boxStyle = new GUIStyle(GUI.skin.box)
             {
                 stretchHeight = true,
                 stretchWidth  = true,
@@ -366,7 +366,7 @@ namespace FerramAerospaceResearch
             }
             if (GUILayout.Button("+", buttonStyle, GUILayout.Width(30), GUILayout.Height(30)))
             {
-                FARPartStressTemplate newTemplate = new FARPartStressTemplate
+                var newTemplate = new FARPartStressTemplate
                 {
                     XZmaxStress             = 500,
                     YmaxStress              = 500,
@@ -591,7 +591,7 @@ namespace FerramAerospaceResearch
         /// <summary> Update GUI after a new scenario was loaded. </summary>
         private void OnScenarioChanged()
         {
-            var guiColors = GUIColors.Instance;
+            GUIColors guiColors = GUIColors.Instance;
             ReColorTexture(guiColors[0], ref cLTexture);
             ReColorTexture(guiColors[1], ref cDTexture);
             ReColorTexture(guiColors[2], ref cMTexture);

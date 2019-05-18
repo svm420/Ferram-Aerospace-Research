@@ -134,7 +134,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 p.bodyLiftMultiplier = 0;
                 p.bodyLiftScalar = 0;*/
 
-                GeometryPartModule g = p.GetComponent<GeometryPartModule>();
+                var g = p.GetComponent<GeometryPartModule>();
                 if (!(g is null))
                 {
                     _currentGeoModules.Add(g);
@@ -163,7 +163,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private PartModule.StartState StartState()
         {
-            PartModule.StartState startState = PartModule.StartState.None;
+            var startState = PartModule.StartState.None;
             if (HighLogic.LoadedSceneIsEditor)
             {
                 startState |= PartModule.StartState.Editor;
@@ -295,8 +295,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void SimulateAeroProperties(out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
         {
-            FARCenterQuery center = new FARCenterQuery();
-            FARCenterQuery dummy = new FARCenterQuery();
+            var center = new FARCenterQuery();
+            var dummy = new FARCenterQuery();
 
             CelestialBody body = vessel.mainBody;      //Calculate main gas properties
             float pressure = (float)body.GetPressure(altitude);
@@ -427,7 +427,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                  geoModulesReady = 0;
                  foreach (Part p in vessel.Parts)
                  {
-                     GeometryPartModule g = p.Modules.GetModule<GeometryPartModule>();
+                     var g = p.Modules.GetModule<GeometryPartModule>();
                      if (!(g is null))
                      {
                          _currentGeoModules.Add(g);

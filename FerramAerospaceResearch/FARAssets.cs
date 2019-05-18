@@ -44,7 +44,7 @@ namespace FerramAerospaceResearch
             public IEnumerator LoadAsync()
             {
                 FARLogger.Debug($"Loading asset bundle {BundlePath}");
-                var createRequest = AssetBundle.LoadFromFileAsync(BundlePath);
+                AssetBundleCreateRequest createRequest = AssetBundle.LoadFromFileAsync(BundlePath);
                 yield return createRequest;
 
                 assetBundle = createRequest.assetBundle;
@@ -54,10 +54,10 @@ namespace FerramAerospaceResearch
                     yield break;
                 }
 
-                var loadRequest = assetBundle.LoadAllAssetsAsync(typeof(T));
+                AssetBundleRequest loadRequest = assetBundle.LoadAllAssetsAsync(typeof(T));
                 yield return loadRequest;
 
-                foreach (var asset in loadRequest.allAssets)
+                foreach (Object asset in loadRequest.allAssets)
                 {
                     FARLogger.Debug($"Adding {asset} to dictionary");
                     Add(asset.name, (T) asset);
@@ -107,7 +107,7 @@ namespace FerramAerospaceResearch
             protected override void OnLoad()
             {
                 LineRenderer = new ShaderMaterialPair(Shader.Find("Hidden/Internal-Colored"));
-                if (TryGetValue("FerramAerospaceResearch/Debug Voxel Mesh", out var voxelShader))
+                if (TryGetValue("FerramAerospaceResearch/Debug Voxel Mesh", out Shader voxelShader))
                 {
                     DebugVoxels = new ShaderMaterialPair(voxelShader);
                     DebugVoxels.Material.SetFloat(ShaderPropertyIds.Cutoff, 0.45f);

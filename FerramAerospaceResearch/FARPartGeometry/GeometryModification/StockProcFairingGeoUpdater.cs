@@ -94,7 +94,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             for (int i = 0; i < panels.Count; i++)      //set them back to where they started to prevent voxelization errors
             {
                 FairingPanel p = panels[i];
-                Bounds panelBounds = new Bounds();
+                var panelBounds = new Bounds();
                 if (p != null)
                 {
                     p.SetExplodedView(0);

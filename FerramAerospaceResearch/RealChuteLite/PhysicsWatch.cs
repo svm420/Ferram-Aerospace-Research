@@ -166,7 +166,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public static PhysicsWatch StartNew()
         {
-            PhysicsWatch watch = new PhysicsWatch();
+            var watch = new PhysicsWatch();
             watch.Start();
             return watch;
         }
@@ -177,7 +177,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// <param name="seconds">Time to start the watch at, in seconds</param>
         public static PhysicsWatch StartNewFromTime(double seconds)
         {
-            PhysicsWatch watch = new PhysicsWatch(seconds);
+            var watch = new PhysicsWatch(seconds);
             watch.Start();
             return watch;
         }

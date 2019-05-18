@@ -309,7 +309,7 @@ namespace FerramAerospaceResearch
         {
             double x0 = 0d;
             double f0 = function(x0);
-            MirroredFunction mfobj = new MirroredFunction(function, f0 > 0d);
+            var mfobj = new MirroredFunction(function, f0 > 0d);
             if (mfobj.IsMirrored) f0 = -f0;
             Func<double, double> f = mfobj.Delegate;
             double x1 = xstepinitial;

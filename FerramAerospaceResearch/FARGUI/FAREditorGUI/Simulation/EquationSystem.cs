@@ -73,7 +73,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
         public void PrintToConsole()
         {
-            StringBuilder MatrixDump = new StringBuilder();
+            var MatrixDump = new StringBuilder();
             for (int j = 0; j < n; j++)
             {
                 MatrixDump.Append("[");

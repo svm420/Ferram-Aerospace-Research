@@ -213,7 +213,7 @@ namespace ferram4
 
             //This part handles effects of biplanes, triplanes, etc.
             double ClCdInterference = 0;
-            var forward = parentWingPart.partTransform.forward;
+            Vector3 forward = parentWingPart.partTransform.forward;
             ClCdInterference += 0.5f * WingInterference(forward, VesselPartList, flt_b_2);
             ClCdInterference += 0.5f * WingInterference(-forward, VesselPartList, flt_b_2);
 
@@ -267,8 +267,8 @@ namespace ferram4
             associatedInfluences.Clear();
             double influencePerIndex = 1 / (double)arrayIn.Length;
 
-            var forward = parentWingPart.partTransform.forward;
-            foreach (var w in arrayIn)
+            Vector3 forward = parentWingPart.partTransform.forward;
+            foreach (FARWingAerodynamicModel w in arrayIn)
             {
                 if (w is null) continue;
                 bool foundModule = false;
@@ -292,14 +292,14 @@ namespace ferram4
         {
             double interferenceValue = 1;
 
-            Ray ray = new Ray
+            var ray = new Ray
             {
                 origin    = parentWingModule.WingCentroid(),
                 direction = rayDirection
             };
 
 
-            RaycastHit hit = new RaycastHit();
+            var hit = new RaycastHit();
 
             bool gotSomething = false;
 
@@ -317,7 +317,7 @@ namespace ferram4
                         if (p == parentWingPart)
                             continue;
 
-                        FARWingAerodynamicModel w = p.GetComponent<FARWingAerodynamicModel>();
+                        var w = p.GetComponent<FARWingAerodynamicModel>();
 
                         if (w != null)
                         {
@@ -348,7 +348,7 @@ namespace ferram4
         #region StandardWingExposureDetection
         private double ExposureInChordDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float MidChordSweep)
         {
-            Ray ray = new Ray {direction = rayDirection};
+            var ray = new Ray {direction = rayDirection};
 
             nearbyWings = new FARWingAerodynamicModel[5];
 
@@ -368,7 +368,7 @@ namespace ferram4
 
         private double ExposureInSpanDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float TaperRatio, float MidChordSweep)
         {
-            Ray ray = new Ray {direction = rayDirection};
+            var ray = new Ray {direction = rayDirection};
 
             nearbyWings = new FARWingAerodynamicModel[5];
 
@@ -398,7 +398,7 @@ namespace ferram4
 
         private double ExposureSmallSrf(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float rayCastDist, float MAC)
         {
-            Ray ray = new Ray {direction = rayDirection};
+            var ray = new Ray {direction = rayDirection};
 
             nearbyWings = new FARWingAerodynamicModel[1];
 
@@ -431,7 +431,7 @@ namespace ferram4
                         if (p == null || p == parentWingPart)
                             continue;
 
-                        FARPartModule farModule = p.GetComponent<FARPartModule>();
+                        var farModule = p.GetComponent<FARPartModule>();
 
                         Collider[] colliders;
 
@@ -456,7 +456,7 @@ namespace ferram4
                                     firstHit =  false;
                                 }
 
-                                FARWingAerodynamicModel hitModule = p.GetComponent<FARWingAerodynamicModel>();
+                                var hitModule = p.GetComponent<FARWingAerodynamicModel>();
                                 if (hitModule != null)
                                 {
                                     double tmp = Math.Abs(Vector3.Dot(p.transform.forward, parentWingPart.partTransform.forward));

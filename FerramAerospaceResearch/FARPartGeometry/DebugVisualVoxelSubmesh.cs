@@ -54,10 +54,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public static DebugVisualVoxelSubmesh Create(Transform parent = null, bool active = true)
         {
-            GameObject go = new GameObject();
+            var go = new GameObject();
             if (parent != null)
                 go.transform.SetParent(parent);
-            DebugVisualVoxelSubmesh component = go.AddComponent<DebugVisualVoxelSubmesh>();
+            var component = go.AddComponent<DebugVisualVoxelSubmesh>();
             go.SetActive(active);
             return component;
         }

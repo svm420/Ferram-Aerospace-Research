@@ -315,7 +315,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public static void BuildDefaultSystems()
         {
             //Roll system
-            ControlSystem sys = new ControlSystem
+            var sys = new ControlSystem
             {
                 kP = 0.5,
                 kD = 1,
@@ -434,7 +434,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             ControlSystem sys = systemTemplates[index];
 
-            ConfigNode node = new ConfigNode("ControlSys" + index);
+            var node = new ConfigNode("ControlSys" + index);
             node.AddValue("active", sys.active);
             node.AddValue("zeroPoint", sys.zeroPoint);
 

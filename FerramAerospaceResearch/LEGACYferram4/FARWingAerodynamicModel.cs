@@ -185,7 +185,7 @@ namespace ferram4
 
         public void NUFAR_CalculateExposedAreaFactor()
         {
-            FARAeroPartModule a = part.Modules.GetModule<FARAeroPartModule>();
+            var a = part.Modules.GetModule<FARAeroPartModule>();
 
             NUFAR_areaExposedFactor = Math.Min(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
             NUFAR_totalExposedAreaFactor = Math.Max(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
@@ -826,7 +826,7 @@ namespace ferram4
 
             foreach (Part p in part.children)
             {
-                FARWingAerodynamicModel childWing = p.GetComponent<FARWingAerodynamicModel>();
+                var childWing = p.GetComponent<FARWingAerodynamicModel>();
                 if (childWing is null)
                     continue;
 

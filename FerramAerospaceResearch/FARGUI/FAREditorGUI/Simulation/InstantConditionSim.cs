@@ -212,7 +212,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 b_2  += w.Getb_2() * w.S;
             }
 
-            FARCenterQuery center = new FARCenterQuery();
+            var center = new FARCenterQuery();
             foreach (FARAeroSection aeroSection in _currentAeroSections)
             {
                 aeroSection.PredictionCalculateAeroForces(2, (float)input.machNumber, 10000, 0, 0.005f, velocity.normalized, center);

@@ -71,7 +71,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             _intakeTransforms.Clear();
             _airBreathingEngines.Clear();
 
-            HashSet<string> intakeResourceNames = new HashSet<string>();
+            var intakeResourceNames = new HashSet<string>();
 
 
             foreach (FARAeroPartModule aeroModule in allUsedAeroModules)

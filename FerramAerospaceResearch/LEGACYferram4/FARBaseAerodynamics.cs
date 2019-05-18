@@ -155,7 +155,7 @@ namespace ferram4
                AoA is zero (or at least minimal). This approximates the
                derivative by a simple subtraction, like before. */
 
-            var parts = GetAllEditorModules();
+            List<FARBaseAerodynamics> parts = GetAllEditorModules();
 
             foreach (FARBaseAerodynamics ba in parts)
             {

@@ -82,7 +82,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public static IntakeCrossSectionAdjuster CreateAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
         {
-            IntakeCrossSectionAdjuster adjuster = new IntakeCrossSectionAdjuster();
+            var adjuster = new IntakeCrossSectionAdjuster();
             adjuster.SetupAdjuster(intake, worldToVesselMatrix);
 
             return adjuster;
@@ -90,7 +90,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public static IntakeCrossSectionAdjuster CreateAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
         {
-            IntakeCrossSectionAdjuster adjuster = new IntakeCrossSectionAdjuster();
+            var adjuster = new IntakeCrossSectionAdjuster();
             adjuster.SetupAdjuster(intake, worldToVesselMatrix);
 
             return adjuster;

@@ -269,7 +269,7 @@ namespace ferram4
                 return;
             }
 
-            if (!allLines.TryGetValue(lineName, out var line)) return;
+            if (!allLines.TryGetValue(lineName, out ferramGraphLine line)) return;
             line.UpdateVerticalScaling(scaling);
         }
 
@@ -283,7 +283,7 @@ namespace ferram4
                 return;
             }
 
-            if (!allLines.TryGetValue(lineName, out var line)) return;
+            if (!allLines.TryGetValue(lineName, out ferramGraphLine line)) return;
             line.UpdateHorizontalScaling(scaling);
         }
 
@@ -329,7 +329,7 @@ namespace ferram4
                 MonoBehaviour.print("[FAR] [ferramGraph] Error: A Line with that name already exists");
                 return;
             }
-            ferramGraphLine newLine = new ferramGraphLine((int)displayRect.width, (int)displayRect.height);
+            var newLine = new ferramGraphLine((int)displayRect.width, (int)displayRect.height);
             newLine.SetBoundaries(bounds);
             allLines.Add(lineName, newLine);
             Update();
@@ -368,7 +368,7 @@ namespace ferram4
                 return;
             }
 
-            ferramGraphLine newLine = new ferramGraphLine((int)displayRect.width, (int)displayRect.height);
+            var newLine = new ferramGraphLine((int)displayRect.width, (int)displayRect.height);
             newLine.InputData(xValues, yValues);
             newLine.SetBoundaries(bounds);
             newLine.lineColor = lineColor;
@@ -522,7 +522,7 @@ namespace ferram4
         public void Display(int horizontalBorder, int verticalBorder)
         {
             ScrollView = GUILayout.BeginScrollView(ScrollView, false, false);
-            GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
+            var BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
             GUILayout.Space(verticalBorder);
@@ -531,7 +531,7 @@ namespace ferram4
             GUILayout.BeginVertical();
             GUILayout.BeginArea(new Rect(20 + horizontalBorder, 15 + verticalBorder, 30, displayRect.height + 2 * verticalBorder));
 
-            GUIStyle LabelStyle = new GUIStyle(GUI.skin.label) {alignment = TextAnchor.UpperCenter};
+            var LabelStyle = new GUIStyle(GUI.skin.label) {alignment = TextAnchor.UpperCenter};
 
             GUILayout.Label(topBound, LabelStyle, GUILayout.Height(20), GUILayout.ExpandWidth(true));
             int pixelspace = (int)displayRect.height / 2 - 72;
@@ -547,7 +547,7 @@ namespace ferram4
             //Graph itself
 
             GUILayout.BeginVertical();
-            Rect areaRect = new Rect(50 + horizontalBorder, 15 + verticalBorder, displayRect.width + 2 * horizontalBorder, displayRect.height + 2 * verticalBorder);
+            var areaRect = new Rect(50 + horizontalBorder, 15 + verticalBorder, displayRect.width + 2 * horizontalBorder, displayRect.height + 2 * verticalBorder);
             GUILayout.BeginArea(areaRect);
 
             GUI.DrawTexture(displayRect, graph);

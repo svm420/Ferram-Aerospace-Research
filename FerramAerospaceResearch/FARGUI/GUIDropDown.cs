@@ -90,7 +90,7 @@ namespace FerramAerospaceResearch.FARGUI
             Rect btnRect = GUILayoutUtility.GetLastRect();
             btnRect.x += relativePos.x;
             btnRect.y += relativePos.y;
-            Rect dropdownRect = new Rect(btnRect.x, btnRect.y + btnRect.height, btnRect.width, 150);
+            var dropdownRect = new Rect(btnRect.x, btnRect.y + btnRect.height, btnRect.width, 150);
 
             if (!isActive && toggleBtnState && Event.current.type == EventType.Repaint)
             {

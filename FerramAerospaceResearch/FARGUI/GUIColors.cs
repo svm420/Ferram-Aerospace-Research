@@ -110,13 +110,13 @@ namespace FerramAerospaceResearch.FARGUI
 
         public void SaveColors()
         {
-            ConfigNode node = new ConfigNode("@FARGUIColors[default]:FOR[FerramAerospaceResearch]");
+            var node = new ConfigNode("@FARGUIColors[default]:FOR[FerramAerospaceResearch]");
             node.AddValue("%ClColor", SaveColor(colors[0]));
             node.AddValue("%CdColor", SaveColor(colors[1]));
             node.AddValue("%CmColor", SaveColor(colors[2]));
             node.AddValue("%L_DColor", SaveColor(colors[3]));
 
-            ConfigNode saveNode = new ConfigNode();
+            var saveNode = new ConfigNode();
             saveNode.AddNode(node);
             saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARGUIColors.cfg");
         }
@@ -127,7 +127,7 @@ namespace FerramAerospaceResearch.FARGUI
             string[] splitValues = input.Split(separators);
 
             int curIndex = 0;
-            Color color = new Color {a = 1};
+            var color = new Color {a = 1};
             foreach (string s in splitValues)
             {
                 if (s.Length > 0)
@@ -153,7 +153,7 @@ namespace FerramAerospaceResearch.FARGUI
 
         private static string SaveColor(Color color)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
 
             //Should return string in format of color.r, color.g, color.b
             builder.Append(color.r);

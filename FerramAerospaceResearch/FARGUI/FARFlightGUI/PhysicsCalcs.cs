@@ -180,8 +180,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             }
 
-            var com_frc = aeroForces.force;
-            var com_trq = aeroForces.TorqueAt(_vessel.CoM);
+            Vector3d com_frc = aeroForces.force;
+            Vector3d com_trq = aeroForces.TorqueAt(_vessel.CoM);
 
             vesselInfo.aerodynamicForce = com_frc;
             vesselInfo.aerodynamicTorque = com_trq;
