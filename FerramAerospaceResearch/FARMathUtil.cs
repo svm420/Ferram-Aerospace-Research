@@ -136,7 +136,7 @@ namespace FerramAerospaceResearch
                 double tmpA = 0.5 * (a + b);
                 double tmpSqrt = Math.Sqrt((a - c) * (b - c));
                 b = c + tmpSqrt;
-                c = c - tmpSqrt;
+                c -= tmpSqrt;
                 a = tmpA;
             }
             return (a + b) * 0.5;

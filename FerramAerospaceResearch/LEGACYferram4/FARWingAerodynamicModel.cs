@@ -1068,7 +1068,7 @@ namespace ferram4
             Cd = Math.Max(Cd, CdMax * (1 - CosAoA * CosAoA));
 
 
-            AerodynamicCenter = AerodynamicCenter + ACShiftVec;
+            AerodynamicCenter += ACShiftVec;
 
             Cl *= wingInteraction.ClInterferenceFactor;
 

@@ -113,7 +113,7 @@ namespace ferram4
                     tmp--;
                     tmp = Math.Acos(tmp);
 
-                    tmp = tmp - Math.Sin(tmp);
+                    tmp -= Math.Sin(tmp);
                     tmp /= Math.PI;
                     tmp = 1 - tmp;
 

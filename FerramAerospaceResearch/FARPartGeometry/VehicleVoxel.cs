@@ -563,7 +563,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             int jMax = Math.Max(jSect1, jSect3) + 1;
 
                             jSect1 = jMin >> 3;
-                            jSect2 = jSect2 >> 3;
+                            jSect2 >>= 3;
                             jSect3 = (jMax - 1) >> 3;
 
                             if (jSect1 >= yLength)  //if the smallest sect is above the limit, they all are
@@ -819,7 +819,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             int iMax = Math.Max(iSect1, iSect3) + 1;
 
                             iSect1 = iMin >> 3;
-                            iSect2 = iSect2 >> 3;
+                            iSect2 >>= 3;
                             iSect3 = (iMax - 1) >> 3;
 
                             if (iSect1 >= xLength)  //if the smallest sect is above the limit, they all are
@@ -1078,7 +1078,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             int kMax = Math.Max(kSect1, kSect3) + 1;
 
                             kSect1 = kMin >> 3;
-                            kSect2 = kSect2 >> 3;
+                            kSect2 >>= 3;
                             kSect3 = (kMax - 1) >> 3;
 
                             if (kSect1 >= zLength)  //if the smallest sect is above the limit, they all are

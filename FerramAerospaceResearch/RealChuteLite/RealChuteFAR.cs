@@ -496,7 +496,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             DeactivateRC();
             armed = false;
-            if (part.inverseStage != 0) { part.inverseStage = part.inverseStage - 1; }
+            if (part.inverseStage != 0) { part.inverseStage -= 1; }
             else { part.inverseStage = StageManager.CurrentStage; }
         }
 

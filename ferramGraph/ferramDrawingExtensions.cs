@@ -118,11 +118,11 @@ namespace ferram4
                     if (tex.inBounds(x, y)) tex.SetPixel(x, y, color);
                 }
 
-                error = error - dy;
+                error -= dy;
                 if (error < 0)
                 {
-                    y = y + ystep;
-                    error = error + dx;
+                    y += ystep;
+                    error += dx;
                 }
             }
         }
