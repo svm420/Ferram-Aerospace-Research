@@ -89,30 +89,23 @@ namespace FerramAerospaceResearch
 
         public int currentIndex;
 
-        private static FARSettingsScenarioModule instance;
-        public static FARSettingsScenarioModule Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        public static FARSettingsScenarioModule Instance { get; private set; }
 
         private GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
 
         public static void MainMenuBuildDefaultScenarioModule()
         {
-            if (instance != null) return;
-            instance = new GameObject().AddComponent<FARSettingsScenarioModule>();
+            if (Instance != null) return;
+            Instance = new GameObject().AddComponent<FARSettingsScenarioModule>();
             FARLogger.Info("Creating new setting module for tutorial/scenario");
-            instance.OnLoad(new ConfigNode());
-            instance.Start();
+            Instance.OnLoad(new ConfigNode());
+            Instance.Start();
         }
 
 
         private FARSettingsScenarioModule()
         {
-            instance = this;
+            Instance = this;
         }
 
         private void Start()
@@ -122,7 +115,7 @@ namespace FerramAerospaceResearch
                 enabled = false;
                 return;
             }
-            instance = this;
+            Instance = this;
 
             //if (newGame)
             //    PopupDialog.SpawnPopupDialog("Ferram Aerospace Research", "Welcome to KSP with FAR!\n\r\n\rThings will be much harder from here on out; the FAR button in the top-right corner will bring you to difficulty settings if you ever decide to change them.  Have fun!", "OK", false, HighLogic.Skin);
@@ -165,7 +158,7 @@ namespace FerramAerospaceResearch
 
         public override void OnLoad(ConfigNode node)
         {
-            instance = this;
+            Instance = this;
             GeneratePresets();
             int index = 4;
             if (node.HasValue("newGame"))

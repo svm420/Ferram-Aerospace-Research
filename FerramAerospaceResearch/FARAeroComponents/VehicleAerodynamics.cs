@@ -64,11 +64,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private int _voxelCount;
 
-        private double _length;
-        public double Length
-        {
-            get { return _length; }
-        }
+        public double Length { get; private set; }
 
         private double _maxCrossSectionArea;
         public double MaxCrossSectionArea
@@ -76,23 +72,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
             get { return _maxCrossSectionArea; }
         }
 
-        private bool _calculationCompleted;
-        public bool CalculationCompleted
-        {
-            get { return _calculationCompleted; }
-        }
+        public bool CalculationCompleted { get; private set; }
 
-        private double _sonicDragArea;
-        public double SonicDragArea
-        {
-            get { return _sonicDragArea; }
-        }
+        public double SonicDragArea { get; private set; }
 
-        private double _criticalMach;
-        public double CriticalMach
-        {
-            get { return _criticalMach; }
-        }
+        public double CriticalMach { get; private set; }
 
         private Matrix4x4 _worldToLocalMatrix, _localToWorldMatrix;
 
@@ -181,7 +165,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void GetNewAeroData(out List<FARAeroPartModule> aeroModules, out List<FARAeroPartModule> unusedAeroModules, out List<FARAeroSection> aeroSections, out List<FARWingAerodynamicModel> legacyWingModel)
         {
-            _calculationCompleted = false;
+            CalculationCompleted = false;
             List<FARAeroPartModule> tmpAeroModules = _currentAeroModules;
             aeroModules = _currentAeroModules = _newAeroModules;
             _newAeroModules = tmpAeroModules;
@@ -200,7 +184,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void GetNewAeroData(out List<FARAeroPartModule> aeroModules, out List<FARAeroSection> aeroSections)
         {
-            _calculationCompleted = false;
+            CalculationCompleted = false;
             List<FARAeroPartModule> tmpAeroModules = _currentAeroModules;
             aeroModules = _currentAeroModules = _newAeroModules;
             _newAeroModules = tmpAeroModules;
@@ -368,7 +352,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 {
                     try
                     {
-                        _calculationCompleted = false;      //ensure that the main thread isn't going to try to read the updated section data while it is being worked with
+                        CalculationCompleted = false;      //ensure that the main thread isn't going to try to read the updated section data while it is being worked with
                         //Bunch of voxel setup data
                         _voxelCount = voxelCount;
 
@@ -422,7 +406,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     _voxelElementSize = _voxel.ElementSize;
 
                     CalculateVesselAeroProperties();
-                    _calculationCompleted = true;
+                    CalculationCompleted = true;
 
                 }
                 catch (Exception e)
@@ -1035,7 +1019,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             _voxel.CrossSectionData(_vehicleCrossSection, _vehicleMainAxis, out int front, out int back, out _sectionThickness, out _maxCrossSectionArea);
 
             int numSections = back - front;
-            _length = _sectionThickness * numSections;
+            Length = _sectionThickness * numSections;
 
             double voxelVolume = _voxel.Volume;
 
@@ -1077,7 +1061,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             AdjustCrossSectionForAirDucting(_vehicleCrossSection, _currentGeoModules, front, back, ref _maxCrossSectionArea);
 
-            GaussianSmoothCrossSections(_vehicleCrossSection, stdDevCutoff, FARSettingsScenarioModule.Settings.gaussianVehicleLengthFractionForSmoothing, _sectionThickness, _length, front, back, FARSettingsScenarioModule.Settings.numAreaSmoothingPasses + extraAreaSmoothingPasses, FARSettingsScenarioModule.Settings.numDerivSmoothingPasses + extraLowFinenessRatioDerivSmoothingPasses);
+            GaussianSmoothCrossSections(_vehicleCrossSection, stdDevCutoff, FARSettingsScenarioModule.Settings.gaussianVehicleLengthFractionForSmoothing, _sectionThickness, Length, front, back, FARSettingsScenarioModule.Settings.numAreaSmoothingPasses + extraAreaSmoothingPasses, FARSettingsScenarioModule.Settings.numDerivSmoothingPasses + extraLowFinenessRatioDerivSmoothingPasses);
 
             CalculateSonicPressure(_vehicleCrossSection, front, back, _sectionThickness);
 
@@ -1098,7 +1082,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             double criticalMachNumber = CalculateCriticalMachNumber(finenessRatio);
 
-            _criticalMach = criticalMachNumber * CriticalMachFactorForUnsmoothCrossSection(_vehicleCrossSection, finenessRatio, _sectionThickness);
+            CriticalMach = criticalMachNumber * CriticalMachFactorForUnsmoothCrossSection(_vehicleCrossSection, finenessRatio, _sectionThickness);
 
             float lowFinenessRatioFactor = 1f;
             lowFinenessRatioFactor += 1f / (1 + 0.5f * (float)finenessRatio);
@@ -1108,7 +1092,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             //_newAeroSections = new List<FARAeroSection>();
 
             var tmpAeroModules = new HashSet<FARAeroPartModule>(ObjectReferenceEqualityComparer<FARAeroPartModule>.Default);
-            _sonicDragArea = 0;
+            SonicDragArea = 0;
 
             if (_newAeroSections.Capacity < numSections + 1)
                 _newAeroSections.Capacity = numSections + 1;
@@ -1159,7 +1143,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 else
                     potentialFlowNormalForce = (float)(nextArea - prevArea) * 0.5f;      //calculated from area change
 
-                float areaChangeMax = (float)Math.Min(Math.Min(nextArea, prevArea) * 0.1, _length * 0.01);
+                float areaChangeMax = (float)Math.Min(Math.Min(nextArea, prevArea) * 0.1, Length * 0.01);
 
                 float sonicBaseDrag = 0.21f;
 
@@ -1246,8 +1230,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 if (sonicBaseDrag > 0)      //occurs with increase in area; force applied at 180 AoA
                 {
-                    xForcePressureAoA0.SetPoint(0, new Vector3d(_criticalMach, 0.325f * hypersonicDragForward * hypersonicDragForwardFrac * lowFinenessRatioFactor, 0));    //hypersonic drag used as a proxy for effects due to flow separation
-                    xForcePressureAoA180.SetPoint(0, new Vector3d(_criticalMach, (sonicBaseDrag * 0.2f - 0.325f * hypersonicDragBackward * hypersonicDragBackwardFrac) * lowFinenessRatioFactor, 0));
+                    xForcePressureAoA0.SetPoint(0, new Vector3d(CriticalMach, 0.325f * hypersonicDragForward * hypersonicDragForwardFrac * lowFinenessRatioFactor, 0));    //hypersonic drag used as a proxy for effects due to flow separation
+                    xForcePressureAoA180.SetPoint(0, new Vector3d(CriticalMach, (sonicBaseDrag * 0.2f - 0.325f * hypersonicDragBackward * hypersonicDragBackwardFrac) * lowFinenessRatioFactor, 0));
 
 
                     hypersonicDragBackwardFrac += 1f;       //avg fracs with 1 to get intermediate frac
@@ -1268,8 +1252,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 else if (sonicBaseDrag < 0)
                 {
-                    xForcePressureAoA0.SetPoint(0, new Vector3d(_criticalMach, (sonicBaseDrag * 0.2f + 0.325f * hypersonicDragForward * hypersonicDragForwardFrac) * lowFinenessRatioFactor, 0));
-                    xForcePressureAoA180.SetPoint(0, new Vector3d(_criticalMach, -(0.325f * hypersonicDragBackward * hypersonicDragBackwardFrac) * lowFinenessRatioFactor, 0));
+                    xForcePressureAoA0.SetPoint(0, new Vector3d(CriticalMach, (sonicBaseDrag * 0.2f + 0.325f * hypersonicDragForward * hypersonicDragForwardFrac) * lowFinenessRatioFactor, 0));
+                    xForcePressureAoA180.SetPoint(0, new Vector3d(CriticalMach, -(0.325f * hypersonicDragBackward * hypersonicDragBackwardFrac) * lowFinenessRatioFactor, 0));
 
                     hypersonicDragBackwardFrac += 1f;       //avg fracs with 1 to get intermediate frac
                     hypersonicDragBackwardFrac *= 0.5f;
@@ -1290,8 +1274,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 else
                 {
-                    xForcePressureAoA0.SetPoint(0, new Vector3d(_criticalMach, 0.325f * hypersonicDragForward * hypersonicDragForwardFrac * lowFinenessRatioFactor, 0));
-                    xForcePressureAoA180.SetPoint(0, new Vector3d(_criticalMach, -(0.325f * hypersonicDragBackward * hypersonicDragBackwardFrac) * lowFinenessRatioFactor, 0));
+                    xForcePressureAoA0.SetPoint(0, new Vector3d(CriticalMach, 0.325f * hypersonicDragForward * hypersonicDragForwardFrac * lowFinenessRatioFactor, 0));
+                    xForcePressureAoA180.SetPoint(0, new Vector3d(CriticalMach, -(0.325f * hypersonicDragBackward * hypersonicDragBackwardFrac) * lowFinenessRatioFactor, 0));
 
                     hypersonicDragBackwardFrac += 1f;       //avg fracs with 1 to get intermediate frac
                     hypersonicDragBackwardFrac *= 0.5f;
@@ -1492,7 +1476,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 a.PredictionCalculateAeroForces(2f, 1f, 50000f, 0, 0.005f, worldMainAxis, center);
             }
 
-            _sonicDragArea = Vector3.Dot(center.force, worldMainAxis) * -1000;
+            SonicDragArea = Vector3.Dot(center.force, worldMainAxis) * -1000;
         }
 
         private static double CalculateHypersonicMoment(double lowArea, double highArea, double sectionThickness)

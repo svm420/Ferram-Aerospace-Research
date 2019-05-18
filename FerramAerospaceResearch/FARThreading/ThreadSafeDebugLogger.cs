@@ -54,14 +54,7 @@ namespace FerramAerospaceResearch.FARThreading
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class ThreadSafeDebugLogger : MonoBehaviour
     {
-        private static ThreadSafeDebugLogger _instance;
-        public static ThreadSafeDebugLogger Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        public static ThreadSafeDebugLogger Instance { get; private set; }
 
         private List<Exception> _exceptionsThrown;
         private List<string> _infoMessages;
@@ -69,7 +62,7 @@ namespace FerramAerospaceResearch.FARThreading
 
         private void Awake()
         {
-            _instance = this;
+            Instance = this;
             _exceptionsThrown = new List<Exception>();
             _infoMessages = new List<string>();
             _debugMessages = new List<string>();

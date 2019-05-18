@@ -54,7 +54,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         // limit of vertices in each mesh imposed by Unity
         public const int MaxVerticesPerSubmesh = 65000;
         public const int MaxVoxelsPerSubmesh = MaxVerticesPerSubmesh / 4;
-        private readonly List<DebugVisualVoxel> debugVoxels = new List<DebugVisualVoxel>();
         private readonly List<DebugVisualVoxelSubmesh> submeshes = new List<DebugVisualVoxelSubmesh>();
         private bool active;
 
@@ -77,10 +76,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        internal List<DebugVisualVoxel> DebugVoxels
-        {
-            get { return debugVoxels; }
-        }
+        internal List<DebugVisualVoxel> DebugVoxels { get; } = new List<DebugVisualVoxel>();
 
         public Transform Parent { get; }
 
@@ -97,14 +93,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             FARLogger.Info("Rebuilding visual voxel mesh...");
             Clear();
-            int meshes = debugVoxels.Count / MaxVoxelsPerSubmesh + 1;
-            FARLogger.Info("Voxel mesh contains " + debugVoxels.Count + " voxels in " + meshes + " submeshes");
+            int meshes = DebugVoxels.Count / MaxVoxelsPerSubmesh + 1;
+            FARLogger.Info("Voxel mesh contains " + DebugVoxels.Count + " voxels in " + meshes + " submeshes");
             SetupSubmeshes(meshes);
             for (int i = 0; i < meshes; i++)
             {
-                for (int j = i * MaxVoxelsPerSubmesh; j < Math.Min((i + 1) * MaxVoxelsPerSubmesh, debugVoxels.Count); j++)
+                for (int j = i * MaxVoxelsPerSubmesh; j < Math.Min((i + 1) * MaxVoxelsPerSubmesh, DebugVoxels.Count); j++)
                 {
-                    debugVoxels[j].AddToMesh(submeshes[i].Vertices, submeshes[i].Uvs, submeshes[i].Triangles);
+                    DebugVoxels[j].AddToMesh(submeshes[i].Vertices, submeshes[i].Uvs, submeshes[i].Triangles);
                 }
                 submeshes[i].Rebuild();
             }
@@ -124,7 +120,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             if (clearVoxels)
             {
-                debugVoxels.Clear();
+                DebugVoxels.Clear();
             }
         }
 

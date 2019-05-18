@@ -131,11 +131,7 @@ namespace ferram4
 
         private double rawLiftSlope;
         private double liftslope;
-        private double finalLiftSlope;
-        public double LiftSlope
-        {
-            get { return finalLiftSlope; }
-        }
+        public double FinalLiftSlope { get; private set; }
         protected double zeroLiftCdIncrement;
 
         protected const double criticalCl = 1.6;
@@ -967,7 +963,7 @@ namespace ferram4
             if (MachNumber <= 0.8)
             {
                 double Cn = liftslope;
-                finalLiftSlope = liftslope;
+                FinalLiftSlope = liftslope;
                 //Cl = Cn * Math.Sin(2 * AoA) * 0.5;
                 double sinAoA = Math.Sqrt((1 - CosAoA * CosAoA).Clamp(0, 1));
                 Cl = Cn * CosAoA * Math.Sign(AoA);
@@ -994,9 +990,9 @@ namespace ferram4
 //                double SinAoA = Math.Sin(AoA);
                 //Cl = coefMult * (normalForce * CosAoA * Math.Sign(AoA) * sonicLEFactor - axialForce * SinAoA);
                 //Cd = coefMult * (Math.Abs(normalForce * SinAoA) * sonicLEFactor + axialForce * CosAoA);
-                finalLiftSlope = coefMult * normalForce * supersonicLENormalForceFactor;
+                FinalLiftSlope = coefMult * normalForce * supersonicLENormalForceFactor;
 
-                Cl = finalLiftSlope * CosAoA * Math.Sign(AoA);
+                Cl = FinalLiftSlope * CosAoA * Math.Sign(AoA);
                 Cd = beta * Cl * Cl / piARe;
 
                 Cd += Cd0;
@@ -1027,7 +1023,7 @@ namespace ferram4
                     if (Math.Abs(Cl) > Math.Abs(ACweight))
                         ACshift *= Math.Abs(ACweight / Cl).Clamp(0, 1);
                 }
-                finalLiftSlope = Cn * (1 - supScale);
+                FinalLiftSlope = Cn * (1 - supScale);
                 Cl *= 1 - supScale;
 
                 double M = MachNumber.Clamp(1.2, double.PositiveInfinity);
@@ -1040,7 +1036,7 @@ namespace ferram4
                 double normalForce = GetSupersonicPressureDifference(M, AoA);
 
                 double supersonicLiftSlope = coefMult * normalForce * supersonicLENormalForceFactor * supScale;
-                finalLiftSlope += supersonicLiftSlope;
+                FinalLiftSlope += supersonicLiftSlope;
 
 
                 Cl += CosAoA * Math.Sign(AoA) * supersonicLiftSlope;
@@ -1076,7 +1072,7 @@ namespace ferram4
 
             Cl *= wingInteraction.ClInterferenceFactor;
 
-            finalLiftSlope *= wingInteraction.ClInterferenceFactor;
+            FinalLiftSlope *= wingInteraction.ClInterferenceFactor;
 
             ClIncrementFromRear = 0;
         }

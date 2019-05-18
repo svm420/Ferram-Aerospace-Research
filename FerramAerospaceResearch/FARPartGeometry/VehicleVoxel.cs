@@ -67,11 +67,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private static byte maxLocationByte = 255;
         private static bool useHigherResVoxels;
 
-        private double elementSize;
-        public double ElementSize
-        {
-            get { return elementSize; }
-        }
+        public double ElementSize { get; private set; }
 
         private double invElementSize;
         private VoxelChunk[, , ] voxelChunks;
@@ -82,11 +78,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private int threadsQueued;
         private readonly object _locker = new object();
 
-        private Vector3d lowerRightCorner;
-        public Vector3d LocalLowerRightCorner
-        {
-            get { return lowerRightCorner; }
-        }
+        public Vector3d LocalLowerRightCorner { get; private set; }
 
         private const double RC = 0.5;
 
@@ -108,16 +100,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             get { return yCellLength + xCellLength + zCellLength; }
         }
 
-        private double volume;
-        public double Volume
-        {
-            get
-            {
-                //double volume = xCellLength * yCellLength * zCellLength;
-                //volume *= elementSize * elementSize * elementSize;
-                return volume;
-            }
-        }
+        public double Volume { get; private set; }
 
         public static void VoxelSetup()
         {
@@ -209,16 +192,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             Vector3d size = max - min;
 
-            volume = size.x * size.y * size.z;  //from bounds, get voxel volume
+            Volume = size.x * size.y * size.z;  //from bounds, get voxel volume
 
-            if (double.IsInfinity(volume))     //...if something broke, get out of here
+            if (double.IsInfinity(Volume))     //...if something broke, get out of here
             {
                 FARLogger.Error("Voxel Volume was infinity; ending voxelization");
                 return;
             }
-            double elementVol = volume / elementCount;
-            elementSize = Math.Pow(elementVol, 1d / 3d);
-            invElementSize = 1 / elementSize;
+            double elementVol = Volume / elementCount;
+            ElementSize = Math.Pow(elementVol, 1d / 3d);
+            invElementSize = 1 / ElementSize;
 
             double tmp = 0.125 * invElementSize;
 
@@ -249,14 +232,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             var extents = new Vector3d
             {
-                x = xLength * 4 * elementSize,
-                y = yLength * 4 * elementSize,
-                z = zLength * 4 * elementSize
+                x = xLength * 4 * ElementSize,
+                y = yLength * 4 * ElementSize,
+                z = zLength * 4 * ElementSize
             }; //this will be the distance from the center to the edges of the voxel object
 
             Vector3d center = (max + min) * 0.5f;    //Center of the vessel
 
-            lowerRightCorner = center - extents;    //This places the center of the voxel at the center of the vehicle to achieve maximum symmetry
+            LocalLowerRightCorner = center - extents;    //This places the center of the voxel at the center of the vehicle to achieve maximum symmetry
 
             voxelChunks = new VoxelChunk[xLength, yLength, zLength];
 
@@ -501,13 +484,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             double y = Math.Abs(plane.y);
             double z = Math.Abs(plane.z);
 
-            double elementArea = elementSize * elementSize;
+            double elementArea = ElementSize * ElementSize;
 
             bool frontIndexFound = false;
             frontIndex = 0;
             backIndex = crossSections.Length - 1;
 
-            sectionThickness = elementSize;
+            sectionThickness = ElementSize;
 
             Matrix4x4 sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(new Vector3(0, 0, 1), orientationVector), Vector3.one);
             Matrix4x4 vesselToSectionNormal = sectionNormalToVesselCoords.inverse;
@@ -764,7 +747,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     principalAxis = sectionNormalToVesselCoords.MultiplyVector(principalAxis);
 
-                    crossSections[m].centroid = centroid * elementSize + lowerRightCorner;
+                    crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
                         ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " + m);
@@ -1021,7 +1004,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     principalAxis = sectionNormalToVesselCoords.MultiplyVector(principalAxis);
 
-                    crossSections[m].centroid = centroid * elementSize + lowerRightCorner;
+                    crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
                     //crossSections[m].additionalUnshadowedCentroid = unshadowedCentroid * elementSize + lowerRightCorner;
 
                     if (double.IsNaN(areaCount))
@@ -1282,7 +1265,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     principalAxis = sectionNormalToVesselCoords.MultiplyVector(principalAxis);
 
-                    crossSections[m].centroid = centroid * elementSize + lowerRightCorner;
+                    crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
                     //crossSections[m].additionalUnshadowedCentroid = unshadowedCentroid * elementSize + lowerRightCorner;
 
                     if (double.IsNaN(areaCount))
@@ -1349,7 +1332,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             if (i + 1 >= xCellLength || !VoxelPointExistsAtPos(i + 1, j, k))
             {
-                areas.iP += elementSize * elementSize;
+                areas.iP += ElementSize * ElementSize;
                 areas.exposedAreaCount++;
                 partGetsForces = true;
             }
@@ -1358,7 +1341,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (i - 1 < 0 || !VoxelPointExistsAtPos(i - 1, j, k))
             {
-                areas.iN += elementSize * elementSize;
+                areas.iN += ElementSize * ElementSize;
                 areas.exposedAreaCount++;
                 partGetsForces = true;
             }
@@ -1367,7 +1350,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (j + 1 >= yCellLength || !VoxelPointExistsAtPos(i, j + 1, k))
             {
-                areas.jP += elementSize * elementSize;
+                areas.jP += ElementSize * ElementSize;
                 areas.exposedAreaCount++;
                 partGetsForces = true;
             }
@@ -1376,7 +1359,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (j - 1 < 0 || !VoxelPointExistsAtPos(i, j - 1, k))
             {
-                areas.jN += elementSize * elementSize;
+                areas.jN += ElementSize * ElementSize;
                 areas.exposedAreaCount++;
                 partGetsForces = true;
             }
@@ -1385,7 +1368,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (k + 1 >= zCellLength || !VoxelPointExistsAtPos(i, j, k + 1))
             {
-                areas.kP += elementSize * elementSize;
+                areas.kP += ElementSize * ElementSize;
                 areas.exposedAreaCount++;
                 partGetsForces = true;
             }
@@ -1394,7 +1377,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (k - 1 < 0 || !VoxelPointExistsAtPos(i, j, k - 1))
             {
-                areas.kN += elementSize * elementSize;
+                areas.kN += ElementSize * ElementSize;
                 areas.exposedAreaCount++;
                 partGetsForces = true;
             }
@@ -1487,9 +1470,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                 }
                 if (section == null)
-                    section = new VoxelChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                    section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
                 else
-                    section.SetChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                    section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1520,9 +1503,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                 }
                 if (section == null)
-                    section = new VoxelChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                    section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
                 else
-                    section.SetChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                    section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1552,9 +1535,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                 }
                 if (section == null)
-                    section = new VoxelChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                    section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
                 else
-                    section.SetChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                    section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1587,9 +1570,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         }
                     }
                     if (section == null)
-                        section = new VoxelChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                        section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
                     else
-                        section.SetChunk(elementSize, lowerRightCorner + new Vector3d(iSec, jSec, kSec) * elementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                        section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
 
                     voxelChunks[iSec, jSec, kSec] = section;
                 }
@@ -1747,8 +1730,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         // ReSharper disable once UnusedMember.Local
         private void CalculateVoxelShellFromTinyMesh(Vector3 minMesh, Vector3 maxMesh, Part part)
         {
-            Vector3 min = (minMesh - lowerRightCorner) * invElementSize;
-            Vector3 max = (maxMesh - lowerRightCorner) * invElementSize;
+            Vector3 min = (minMesh - LocalLowerRightCorner) * invElementSize;
+            Vector3 max = (maxMesh - LocalLowerRightCorner) * invElementSize;
 
             int lowerI = (int)min.x;
             int lowerJ = (int)min.y;
@@ -1808,9 +1791,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void VoxelShellTrianglePerpX(Vector4 indexPlane, Vector3 vert1, Vector3 vert2, Vector3 vert3, Part part, int invertTri)
         {
-            Vector3 vert1Proj = (vert1 - lowerRightCorner) * invElementSize;
-            Vector3 vert2Proj = (vert2 - lowerRightCorner) * invElementSize;
-            Vector3 vert3Proj = (vert3 - lowerRightCorner) * invElementSize;
+            Vector3 vert1Proj = (vert1 - LocalLowerRightCorner) * invElementSize;
+            Vector3 vert2Proj = (vert2 - LocalLowerRightCorner) * invElementSize;
+            Vector3 vert3Proj = (vert3 - LocalLowerRightCorner) * invElementSize;
 /*            Vector2d vert1Proj, vert2Proj, vert3Proj;
             vert1Proj = new Vector2d(vert1.y - lowerRightCorner.y, vert1.z - lowerRightCorner.z) * invElementSize;
             vert2Proj = new Vector2d(vert2.y - lowerRightCorner.y, vert2.z - lowerRightCorner.z) * invElementSize;
@@ -1952,9 +1935,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void VoxelShellTrianglePerpY(Vector4 indexPlane, Vector3 vert1, Vector3 vert2, Vector3 vert3, Part part, int invertTri)
         {
-            Vector3 vert1Proj = (vert1 - lowerRightCorner) * invElementSize;
-            Vector3 vert2Proj = (vert2 - lowerRightCorner) * invElementSize;
-            Vector3 vert3Proj = (vert3 - lowerRightCorner) * invElementSize;
+            Vector3 vert1Proj = (vert1 - LocalLowerRightCorner) * invElementSize;
+            Vector3 vert2Proj = (vert2 - LocalLowerRightCorner) * invElementSize;
+            Vector3 vert3Proj = (vert3 - LocalLowerRightCorner) * invElementSize;
             /*Vector2d vert1Proj, vert2Proj, vert3Proj;
             vert1Proj = new Vector2d(vert1.x - lowerRightCorner.x, vert1.z - lowerRightCorner.z) * invElementSize;
             vert2Proj = new Vector2d(vert2.x - lowerRightCorner.x, vert2.z - lowerRightCorner.z) * invElementSize;
@@ -2098,9 +2081,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void VoxelShellTrianglePerpZ(Vector4 indexPlane, Vector3 vert1, Vector3 vert2, Vector3 vert3, Part part, int invertTri)
         {
-            Vector3 vert1Proj = (vert1 - lowerRightCorner) * invElementSize;
-            Vector3 vert2Proj = (vert2 - lowerRightCorner) * invElementSize;
-            Vector3 vert3Proj = (vert3 - lowerRightCorner) * invElementSize;
+            Vector3 vert1Proj = (vert1 - LocalLowerRightCorner) * invElementSize;
+            Vector3 vert2Proj = (vert2 - LocalLowerRightCorner) * invElementSize;
+            Vector3 vert3Proj = (vert3 - LocalLowerRightCorner) * invElementSize;
             /*vert1Proj = new Vector2d(vert1.x - lowerRightCorner.x, vert1.y - lowerRightCorner.y) * invElementSize;
             vert2Proj = new Vector2d(vert2.x - lowerRightCorner.x, vert2.y - lowerRightCorner.y) * invElementSize;
             vert3Proj = new Vector2d(vert3.x - lowerRightCorner.x, vert3.y - lowerRightCorner.y) * invElementSize;*/
@@ -2291,7 +2274,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             var result = new Vector4d(tmp.x, tmp.y, tmp.z);
 
-            result.w = result.x * (lowerRightCorner.x - pt1.x) + result.y * (lowerRightCorner.y - pt1.y) + result.z * (lowerRightCorner.z - pt1.z);
+            result.w = result.x * (LocalLowerRightCorner.x - pt1.x) + result.y * (LocalLowerRightCorner.y - pt1.y) + result.z * (LocalLowerRightCorner.z - pt1.z);
             result.w *= invElementSize;
 
             return result;
@@ -2318,10 +2301,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             var newPlane = new Vector4d
             {
-                x = plane.x * elementSize,
-                y = plane.y * elementSize,
-                z = plane.z * elementSize,
-                w = plane.w + plane.x * lowerRightCorner.x + plane.y * lowerRightCorner.y + plane.z * lowerRightCorner.z
+                x = plane.x * ElementSize,
+                y = plane.y * ElementSize,
+                z = plane.z * ElementSize,
+                w = plane.w + plane.x * LocalLowerRightCorner.x + plane.y * LocalLowerRightCorner.y + plane.z * LocalLowerRightCorner.z
             };
 
             return newPlane;

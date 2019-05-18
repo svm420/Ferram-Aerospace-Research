@@ -371,25 +371,24 @@ namespace FerramAerospaceResearch
         public class MirroredFunction
         {
             private readonly Func<double, double> F;
-            private readonly bool mirror;
 
             public MirroredFunction(Func<double, double> original, bool mirrored)
             {
                 F = original;
-                mirror = mirrored;
+                IsMirrored = mirrored;
             }
 
             public Func<double, double> Delegate
             {
                 get
                 {
-                    if (mirror)
+                    if (IsMirrored)
                         return InvokeMirrored;
                     return F;
                 }
             }
 
-            public bool IsMirrored { get { return mirror; } }
+            public bool IsMirrored { get; }
 
             private double InvokeMirrored(double x)
             {
@@ -429,7 +428,7 @@ namespace FerramAerospaceResearch
 
             public double BrentSolve(string dbgmsg)
             {
-                FARLogger.Info("MirroredFunction (mirrored= " + mirror + ") reverting to BrentsMethod: " + dbgmsg);
+                FARLogger.Info("MirroredFunction (mirrored= " + IsMirrored + ") reverting to BrentsMethod: " + dbgmsg);
                 return BrentsMethod(F, leftedge, rightedge, tol_brent, iterlim);
             }
         }

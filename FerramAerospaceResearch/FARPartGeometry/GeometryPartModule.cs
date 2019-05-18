@@ -118,11 +118,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private int _sendUpdateTick;
         private int _meshesToUpdate = -1;
 
-        private bool _valid = true;
-        public bool Valid
-        {
-            get { return _valid; }
-        }
+        public bool Valid { get; private set; } = true;
 
         private static int ignoreLayer0 = -1;
 
@@ -369,10 +365,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (float.IsNaN(tmpTestBounds) || float.IsInfinity(tmpTestBounds))
             {
                 FARLogger.Info("Overall bounds error in " + part.partInfo.title + " " + meshDataList.Count + " meshes");
-                _valid = false;
+                Valid = false;
             }
             else
-                _valid = true;
+                Valid = true;
 
             return overallBounds;
 

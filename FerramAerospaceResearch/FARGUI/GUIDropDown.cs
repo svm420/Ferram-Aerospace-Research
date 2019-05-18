@@ -202,11 +202,7 @@ namespace FerramAerospaceResearch.FARGUI
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class FARGUIDropDownDisplay : MonoBehaviour
     {
-        private static FARGUIDropDownDisplay instance;
-        public static FARGUIDropDownDisplay Instance
-        {
-            get { return instance; }
-        }
+        public static FARGUIDropDownDisplay Instance { get; private set; }
 
         private Rect btnRect;
         private Rect displayRect;
@@ -216,7 +212,7 @@ namespace FerramAerospaceResearch.FARGUI
 
         private void Awake()
         {
-            instance = this;
+            Instance = this;
         }
 
         private void Start()

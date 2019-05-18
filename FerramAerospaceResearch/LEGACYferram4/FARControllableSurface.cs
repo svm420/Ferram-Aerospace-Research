@@ -727,7 +727,7 @@ namespace ferram4
         // TODO 1.2: ITorqueProvider now reports two Vector3s, positive torque(that produced by control actuation 1,1,1) and negative torque(that produced by -1,-1,-1).
         public void GetPotentialTorque(out Vector3 pos, out Vector3 neg)
         {
-            Vector3 maxLiftVec = LiftSlope * GetLiftDirection() * maxdeflect * Math.PI / 180;       //get max lift coeff
+            Vector3 maxLiftVec = FinalLiftSlope * GetLiftDirection() * maxdeflect * Math.PI / 180;       //get max lift coeff
             maxLiftVec *= (float)(vessel.dynamicPressurekPa * S);             //get an actual lift vector out of it
 
             Vector3 relPosVector = AerodynamicCenter - vessel.CoM;
