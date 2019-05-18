@@ -187,7 +187,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private Bounds TransformBounds(Bounds oldBounds, Matrix4x4 matrix)
+        private static Bounds TransformBounds(Bounds oldBounds, Matrix4x4 matrix)
         {
             Vector3 center = oldBounds.center;
             Vector3 extents = oldBounds.extents;
@@ -207,7 +207,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return new Bounds((lower + upper) * 0.5f, upper - lower);
         }
 
-        private void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
+        private static void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
         {
             Vector3 boundPt = new Vector3(center.x + extX, center.y + extY, center.z + extZ);
             boundPt = matrix.MultiplyPoint3x4(boundPt);

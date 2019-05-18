@@ -121,7 +121,7 @@ namespace FerramAerospaceResearch.FARGUI
             saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARGUIColors.cfg");
         }
 
-        private Color ReadColor(string input)
+        private static Color ReadColor(string input)
         {
             char[] separators = { ',', ' ', ';' };
             string[] splitValues = input.Split(separators);
@@ -151,7 +151,7 @@ namespace FerramAerospaceResearch.FARGUI
             return color;
         }
 
-        private string SaveColor(Color color)
+        private static string SaveColor(Color color)
         {
             StringBuilder builder = new StringBuilder();
 

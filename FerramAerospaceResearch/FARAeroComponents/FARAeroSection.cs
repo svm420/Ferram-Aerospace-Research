@@ -549,7 +549,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             crossFlowDragReynoldsCurve.Add(10000000, 0.58333333333333333333333333333333f, 0, 0);
         }
 
-        private float CalculateCrossFlowDrag(float crossFlowMach, float crossFlowReynolds)
+        private static float CalculateCrossFlowDrag(float crossFlowMach, float crossFlowReynolds)
         {
             if (crossFlowMach > 0.5f)
                 return crossFlowDragMachCurve.Evaluate(crossFlowMach);

@@ -259,7 +259,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
         }
 
-        private double ControlStateChange(ControlSystem system, double error)
+        private static double ControlStateChange(ControlSystem system, double error)
         {
             double state = 0;
             double dt = TimeWarp.fixedDeltaTime;
@@ -276,7 +276,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             return state;
         }
 
-        public void LoadSettings()
+        public static void LoadSettings()
         {
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
 

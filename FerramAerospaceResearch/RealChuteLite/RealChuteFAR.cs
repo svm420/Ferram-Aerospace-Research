@@ -136,7 +136,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         }
 
         //If the Kerbal can repack the chute in career mode
-        public bool CanRepackCareer
+        public static bool CanRepackCareer
         {
             get
             {
@@ -460,7 +460,7 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         #region Methods
         //Returns the canopy area of the given Diameter
-        public float GetArea(float diameter)
+        public static float GetArea(float diameter)
         {
             return (float)((diameter * diameter * Math.PI) / 4);
         }

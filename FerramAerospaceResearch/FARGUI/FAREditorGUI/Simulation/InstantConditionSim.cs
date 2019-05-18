@@ -73,7 +73,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             _bodyLength = vehicleAero.Length;
         }
 
-        public double CalculateAccelerationDueToGravity(CelestialBody body, double alt)
+        public static double CalculateAccelerationDueToGravity(CelestialBody body, double alt)
         {
             double radius = body.Radius + alt;
             double mu = body.gravParameter;

@@ -146,7 +146,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             Initialize();
         }
 
-        private LineRenderer CreateNewRenderer(Color color, float width, Material material)
+        private static LineRenderer CreateNewRenderer(Color color, float width, Material material)
         {
             GameObject o = new GameObject();
 
@@ -327,7 +327,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         }*/
 
 
-        private void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor = 1)
+        private static void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor = 1)
         {
             // getting transform is internal call, cache
             Transform transform = renderer.transform;

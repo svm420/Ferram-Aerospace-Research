@@ -478,7 +478,7 @@ namespace ferram4
             return wingHit;
         }
 
-        private RaycastHit[] SortHitsByDistance(RaycastHit[] unsortedList)
+        private static RaycastHit[] SortHitsByDistance(RaycastHit[] unsortedList)
         {
             List<RaycastHit> sortedHits = unsortedList.ToList();
 
@@ -654,7 +654,7 @@ namespace ferram4
             }
         }
 
-        private void HandleNullPart(List<FARWingAerodynamicModel> wingModules, List<double> associatedInfluences, int index)
+        private static void HandleNullPart(List<FARWingAerodynamicModel> wingModules, List<double> associatedInfluences, int index)
         {
             wingModules.RemoveAt(index);
             associatedInfluences.RemoveAt(index);

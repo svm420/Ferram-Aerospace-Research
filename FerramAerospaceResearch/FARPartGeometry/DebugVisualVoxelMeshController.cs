@@ -149,7 +149,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private void QueueMainThreadTask(Action action)
+        private static void QueueMainThreadTask(Action action)
         {
             if (VoxelizationThreadpool.Instance.inMainThread)
             {

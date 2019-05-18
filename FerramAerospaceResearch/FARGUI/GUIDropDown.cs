@@ -104,7 +104,7 @@ namespace FerramAerospaceResearch.FARGUI
             }
         }
 
-        private void InitStyles()
+        private static void InitStyles()
         {
             if (listStyle == null)
             {

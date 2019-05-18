@@ -65,7 +65,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             Destroy(this);
         }
 
-        private void UpdateThermodynamicsPre(ModularFlightIntegrator fi)
+        private static void UpdateThermodynamicsPre(ModularFlightIntegrator fi)
         {
             for (int i = 0; i < fi.PartThermalDataCount; i++)
             {
@@ -90,7 +90,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             //FARLogger.Info("MFI: " + fi.CoM + " " + Planetarium.GetUniversalTime());
         }
 
-        private void UpdateAerodynamics(ModularFlightIntegrator fi, Part part)
+        private static void UpdateAerodynamics(ModularFlightIntegrator fi, Part part)
         {
             if (part.Modules.Contains<ModuleAeroSurface>() || (part.Modules.Contains("MissileLauncher") && part.vessel.rootPart == part))     //FIXME Proper model for airbrakes
             {
@@ -123,7 +123,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
 
-        private void CalculateLocalDynPresAndAngularDrag(ModularFlightIntegrator fi, Part p)
+        private static void CalculateLocalDynPresAndAngularDrag(ModularFlightIntegrator fi, Part p)
         {
             if(fi.CurrentMainBody.ocean && p.submergedPortion > 0)
             {
@@ -150,7 +150,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             p.bodyLiftScalar = (float)(p.dynamicPressurekPa * (1.0 - p.submergedPortion) + p.submergedDynamicPressurekPa * p.submergedPortion);
         }
 
-        private double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part)
+        private static double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part)
         {
             FARAeroPartModule module = null;
             if (part.Modules.Contains<FARAeroPartModule>())
@@ -159,7 +159,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return CalculateAreaRadiative(fi, part, module);
         }
 
-        private double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
+        private static double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
             //double dragCubeExposed = fi.BaseFICalculateAreaExposed(part);
             if (!(aeroModule is null))
@@ -184,7 +184,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return CalculateAreaExposed(fi, part, module);
         }
 
-        private double CalculateAreaExposed(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
+        private static double CalculateAreaExposed(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
             if (!(aeroModule is null))
             {
@@ -205,7 +205,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }*/
         }
 
-        private double CalculateSunArea(ModularFlightIntegrator fi, PartThermalData ptd)
+        private static double CalculateSunArea(ModularFlightIntegrator fi, PartThermalData ptd)
         {
             FARAeroPartModule module = null;
             if (ptd.part.Modules.Contains<FARAeroPartModule>())
@@ -223,7 +223,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return fi.BaseFIGetSunArea(ptd);
         }
 
-        private double CalculateBodyArea(ModularFlightIntegrator fi, PartThermalData ptd)
+        private static double CalculateBodyArea(ModularFlightIntegrator fi, PartThermalData ptd)
         {
             FARAeroPartModule module = null;
             if (ptd.part.Modules.Contains<FARAeroPartModule>())

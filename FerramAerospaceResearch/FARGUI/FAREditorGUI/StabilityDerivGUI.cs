@@ -233,7 +233,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
         }
 
-        private void StabilityLabel(String text1, double val, String text2, String tooltip, int width, int sign)
+        private static void StabilityLabel(String text1, double val, String text2, String tooltip, int width, int sign)
         {
             Color color = Color.white;
             if (sign != 0)
@@ -245,7 +245,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.Label(new GUIContent(text1 + val.ToString("G6") + text2, tooltip), style, GUILayout.Width(width));
         }
 
-        private void DrawTooltip()
+        private static void DrawTooltip()
         {
             if (GUI.tooltip == "")
                 return;

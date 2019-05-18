@@ -205,7 +205,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivOutput.stabDerivs[26] = Ixz;
 
 
-            double effectiveG = _instantCondition.CalculateAccelerationDueToGravity(body, alt);     //This is the effect of gravity
+            double effectiveG = InstantConditionSim.CalculateAccelerationDueToGravity(body, alt);     //This is the effect of gravity
             effectiveG -= u0 * u0 / (alt + body.Radius);                          //This is the effective reduction of gravity due to high velocity
             double neededCl = mass * effectiveG / (q * area);
 

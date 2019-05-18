@@ -377,7 +377,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             blizzyFlightGUIButton = null;
         }
 
-        private void GenerateBlizzyToolbarButton()
+        private static void GenerateBlizzyToolbarButton()
         {
             if (blizzyFlightGUIButton == null)
             {
@@ -393,6 +393,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             showGUI = !showGUI;
         }
 
+        // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void HideUI()
         {
             showAllGUI = false;
@@ -402,9 +403,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             showAllGUI = true;
         }
+        // ReSharper restore MemberCanBeMadeStatic.Local
         #endregion
 
-        private void SaveConfigs()
+        private static void SaveConfigs()
         {
             if (FARDebugAndSettings.config != null)
             {
@@ -415,7 +417,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
         }
 
-        private void LoadConfigs()
+        private static void LoadConfigs()
         {
             PluginConfiguration config = FARDebugAndSettings.config;
             mainGuiRect = config.GetValue("flight_mainGuiRect", new Rect());

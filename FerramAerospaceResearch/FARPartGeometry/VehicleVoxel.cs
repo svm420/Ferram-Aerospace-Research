@@ -376,7 +376,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }*/
 
-        private bool CheckPartForOverridingPartList(GeometryPartModule g)
+        private static bool CheckPartForOverridingPartList(GeometryPartModule g)
         {
             if (g.part is null)
                 return false;
@@ -1411,7 +1411,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             // ReSharper restore BitwiseOperatorOnEnumWithoutFlags
         }
 
-        private double TanPrincipalAxisAngle(double Ixx, double Iyy, double Ixy)
+        private static double TanPrincipalAxisAngle(double Ixx, double Iyy, double Ixy)
         {
             if (Ixx.NearlyEqual(Iyy))
                 return 0;
@@ -2240,7 +2240,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
         }
 
-        private double DistanceFromSide(Vector3 sideVector, Vector3 testVec)
+        private static double DistanceFromSide(Vector3 sideVector, Vector3 testVec)
         {
             float sideDot = Vector3.Dot(sideVector, testVec);
             if (sideDot < 0)
@@ -2398,7 +2398,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private void CleanSweepPlane(SweepPlanePoint[,] sweepPlane)
+        private static void CleanSweepPlane(SweepPlanePoint[,] sweepPlane)
         {
             int lengthX = sweepPlane.GetLength(0);
             int lengthZ = sweepPlane.GetLength(1);

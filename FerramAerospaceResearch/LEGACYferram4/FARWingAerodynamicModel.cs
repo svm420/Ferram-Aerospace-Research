@@ -1120,7 +1120,7 @@ namespace ferram4
 
         //This models the wing using a symmetric diamond airfoil
 
-        private double GetSupersonicPressureDifference(double M, double AoA)
+        private static double GetSupersonicPressureDifference(double M, double AoA)
         {
             double maxSinBeta = FARAeroUtil.CalculateSinMaxShockAngle(M, FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex);//GetBetaMax(M) * FARMathUtil.deg2rad;
             double minSinBeta = 1 / M;
@@ -1151,7 +1151,7 @@ namespace ferram4
         }
 
         //Calculates pressure ratio of turning a supersonic flow through a particular angle using a shockwave
-        private double ShockWaveCalculation(double angle, double inM, out double outM, double maxSinBeta, double minSinBeta)
+        private static double ShockWaveCalculation(double angle, double inM, out double outM, double maxSinBeta, double minSinBeta)
         {
             //float sinBeta = (maxBeta - minBeta) * angle / maxTheta + minBeta;
             double sinBeta = FARAeroUtil.CalculateSinWeakObliqueShockAngle(inM, FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex, angle);
@@ -1175,7 +1175,7 @@ namespace ferram4
         }
 
         //Calculates pressure ratio due to turning a supersonic flow through a Prandtl-Meyer Expansion
-        private double PMExpansionCalculation(double angle, double inM, out double outM)
+        private static double PMExpansionCalculation(double angle, double inM, out double outM)
         {
             inM = inM.Clamp(1, double.PositiveInfinity);
             double nu1 = FARAeroUtil.PrandtlMeyerMach.Evaluate((float)inM);
@@ -1193,7 +1193,7 @@ namespace ferram4
         }
 
         //Calculates pressure ratio due to turning a supersonic flow through a Prandtl-Meyer Expansion
-        private double PMExpansionCalculation(double angle, double inM)
+        private static double PMExpansionCalculation(double angle, double inM)
         {
             inM = inM.Clamp(1, double.PositiveInfinity);
             double nu1 = FARAeroUtil.PrandtlMeyerMach.Evaluate((float)inM);
@@ -1302,7 +1302,7 @@ namespace ferram4
         /// <summary>
         /// Calculates Cd at 90 degrees AoA so that the numbers are done correctly
         /// </summary>
-        private double CdMaxFlatPlate(double M, double beta)
+        private static double CdMaxFlatPlate(double M, double beta)
         {
             if (M < 0.5)
                 return 2;

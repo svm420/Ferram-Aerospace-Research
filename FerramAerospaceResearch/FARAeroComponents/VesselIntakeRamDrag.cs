@@ -190,7 +190,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
 
-        private float RamDragPerArea(float machNumber)
+        private static float RamDragPerArea(float machNumber)
         {
             float drag = machNumber * machNumber;
             ++drag;

@@ -124,7 +124,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             DrawTooltip();
         }
 
-        private void LongitudinalGUI(StabilityDerivOutput vehicleData)
+        private static void LongitudinalGUI(StabilityDerivOutput vehicleData)
         {
 
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
@@ -165,7 +165,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndVertical();
         }
 
-        private void LateralGUI(StabilityDerivOutput vehicleData)
+        private static void LateralGUI(StabilityDerivOutput vehicleData)
         {
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
@@ -234,14 +234,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 }
 
 
-                GraphData data = longitudinal ? simManager.StabDerivLinearSim.RunTransientSimLongitudinal(vehicleData, Convert.ToDouble(inits.maxTime), Convert.ToDouble(inits.dt), initCond) : simManager.StabDerivLinearSim.RunTransientSimLateral(vehicleData, Convert.ToDouble(inits.maxTime), Convert.ToDouble(inits.dt), initCond);
+                GraphData data = longitudinal ? StabilityDerivLinearSim.RunTransientSimLongitudinal(vehicleData, Convert.ToDouble(inits.maxTime), Convert.ToDouble(inits.dt), initCond) : StabilityDerivLinearSim.RunTransientSimLateral(vehicleData, Convert.ToDouble(inits.maxTime), Convert.ToDouble(inits.dt), initCond);
 
                 UpdateGraph(data, Localizer.Format("FAREditorSimGraphTime"), Localizer.Format("FAREditorSimGraphParams"), 0, Convert.ToDouble(inits.maxTime), 50);
             }
             GUILayout.EndHorizontal();
         }
 
-        private void StabilityLabel(String text1, double val, String text2, String tooltip, int width, int sign)
+        private static void StabilityLabel(String text1, double val, String text2, String tooltip, int width, int sign)
         {
             Color color = Color.white;
             if (sign != 0)
@@ -253,7 +253,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.Label(new GUIContent(text1 + val.ToString("G6") + text2, tooltip), style, GUILayout.Width(width));
         }
 
-        private void DrawTooltip()
+        private static void DrawTooltip()
         {
             if (GUI.tooltip == "")
                 return;

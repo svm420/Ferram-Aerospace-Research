@@ -228,6 +228,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         }
 
         #region EditorEvents
+        // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void ResetEditorEvent(ShipConstruct construct)
         {
             FARAeroUtil.ResetEditorParts(); // Rodhern: Partial fix to https://github.com/ferram4/Ferram-Aerospace-Research/issues/177 .
@@ -275,8 +276,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     partMovement = true;
             }
         }
+        // ReSharper restore MemberCanBeMadeStatic.Local
 
-        private void UpdateGeometryModule(ConstructionEventType type, Part p)
+        private static void UpdateGeometryModule(ConstructionEventType type, Part p)
         {
             if (p is null) return;
             GeometryPartModule g = p.GetComponent<GeometryPartModule>();
@@ -289,7 +291,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
         }
 
-        private void UpdateGeometryModule(Part p)
+        private static void UpdateGeometryModule(Part p)
         {
             if (p is null) return;
             GeometryPartModule g = p.GetComponent<GeometryPartModule>();
@@ -648,7 +650,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         #region AppLauncher
 
-        private void GenerateBlizzyToolbarButton()
+        private static void GenerateBlizzyToolbarButton()
         {
             if (blizzyEditorGUIButton == null)
             {
@@ -668,7 +670,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         #region UtilFuncs
 
-        private GUIDropDown<CelestialBody> CreateBodyDropdown()
+        private static GUIDropDown<CelestialBody> CreateBodyDropdown()
         {
             CelestialBody[] bodies = FlightGlobals.Bodies.ToArray();
             string[] bodyNames = new string[bodies.Length];

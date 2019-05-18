@@ -254,7 +254,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             partForceMaxXZ = areaForStress * partStressMaxXZ;
         }
 
-        private void IncrementAreas(ref ProjectedArea data, Vector3 vector, Matrix4x4 transformMatrix)
+        private static void IncrementAreas(ref ProjectedArea data, Vector3 vector, Matrix4x4 transformMatrix)
         {
             vector = transformMatrix.MultiplyVector(vector);
 

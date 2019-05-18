@@ -138,6 +138,7 @@ namespace FerramAerospaceResearch
         }
         #endregion Unity MonoBehaviour messages
 
+        // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void OnSceneChange(GameEvents.FromToAction<GameScenes,GameScenes> fromToScenes)
         {
             FARLogger.Info("check scene");
@@ -168,13 +169,14 @@ namespace FerramAerospaceResearch
             Toggle += EditorGUI.onAppLaunchToggle;
             Toggle += FlightGUI.onAppLaunchToggle;
         }
+        // ReSharper restore MemberCanBeMadeStatic.Local
 
-        private void ToggleGUI()
+        private static void ToggleGUI()
         {
             Toggle();
         }
 
-        private void OnGUIAppLauncherReady()
+        private static void OnGUIAppLauncherReady()
         {
             FARLogger.Info("Adding Debug Button");
             FARDebugButtonStock = ApplicationLauncher.Instance.AddModApplication(
@@ -188,7 +190,7 @@ namespace FerramAerospaceResearch
                 FARAssets.TextureCache.IconLarge);
         }
 
-        private void onAppLaunchToggle()
+        private static void onAppLaunchToggle()
         {
             debugMenu = !debugMenu;
         }
@@ -422,7 +424,7 @@ namespace FerramAerospaceResearch
             GUILayout.EndHorizontal();
         }
 
-        private void StringListUpdateGUI(List<string> stringList, GUIStyle thisStyle, GUIStyle boxStyle)
+        private static void StringListUpdateGUI(List<string> stringList, GUIStyle thisStyle, GUIStyle boxStyle)
         {
             int removeIndex = -1;
             GUILayout.BeginVertical(boxStyle);
@@ -509,7 +511,7 @@ namespace FerramAerospaceResearch
 
         }
 
-        private void ChangeColor(string colorTitle, ref Color input, ref Texture2D texture)
+        private static void ChangeColor(string colorTitle, ref Color input, ref Texture2D texture)
         {
             GUILayout.BeginHorizontal();
 
@@ -544,7 +546,7 @@ namespace FerramAerospaceResearch
             GUILayout.EndHorizontal();
         }
 
-        private void ReColorTexture(Color color, ref Texture2D texture)
+        private static void ReColorTexture(Color color, ref Texture2D texture)
         {
             for (int i = 0; i < texture.width; i++)
                 for (int j = 0; j < texture.height; j++)

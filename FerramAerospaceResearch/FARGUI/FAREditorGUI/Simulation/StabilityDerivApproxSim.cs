@@ -47,16 +47,9 @@ using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    internal class StabilityDerivLinearSim
+    internal static class StabilityDerivLinearSim
     {
-        private readonly InstantConditionSim _instantCondition;
-
-        public StabilityDerivLinearSim(InstantConditionSim instantConditionSim)
-        {
-            _instantCondition = instantConditionSim;
-        }
-
-        public GraphData RunTransientSimLateral(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
+        public static GraphData RunTransientSimLateral(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
         {
             SimMatrix A = new SimMatrix(4, 4);
 
@@ -112,7 +105,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     i++;
                 }
             }
-            A.Add(_instantCondition.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude) * Math.Cos(vehicleData.stableAoA * Math.PI / 180) / vehicleData.nominalVelocity, 3, 0);
+            A.Add(InstantConditionSim.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude) * Math.Cos(vehicleData.stableAoA * Math.PI / 180) / vehicleData.nominalVelocity, 3, 0);
             A.Add(1, 1, 3);
 
 
@@ -162,7 +155,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             return lines;
         }
 
-        public GraphData RunTransientSimLongitudinal(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
+        public static GraphData RunTransientSimLongitudinal(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
         {
             SimMatrix A = new SimMatrix(4, 4);
             SimMatrix B = new SimMatrix(1, 4);
@@ -198,7 +191,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     i++;
                 }
             }
-            A.Add(-_instantCondition.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude), 3, 1);
+            A.Add(-InstantConditionSim.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude), 3, 1);
             A.Add(1, 2, 3);
 
 
@@ -250,7 +243,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
         }
 
 
-        private void ScaleAndClampValues(double[] yVal, double scalingFactor, double clampValue)
+        private static void ScaleAndClampValues(double[] yVal, double scalingFactor, double clampValue)
         {
             for (int k = 0; k < yVal.Length; k++)
             {

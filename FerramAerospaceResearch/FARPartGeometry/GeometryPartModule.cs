@@ -681,7 +681,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         #endregion
 
-        private MeshData GetColliderMeshData(Transform t)
+        private static MeshData GetColliderMeshData(Transform t)
         {
             MeshCollider mc = t.GetComponent<MeshCollider>();
             if (mc != null)
