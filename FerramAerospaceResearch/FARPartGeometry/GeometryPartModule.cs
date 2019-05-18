@@ -78,10 +78,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (crossSectionAdjusters == null)
                     return false;
 
-                if (crossSectionAdjusters.Count > 0)
-                    return true;
-
-                return false;
+                return crossSectionAdjusters.Count > 0;
             }
         }
 

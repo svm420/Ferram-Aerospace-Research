@@ -1952,9 +1952,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             if (value < -abs)
                 return -abs;
-            if (value > abs)
-                return abs;
-            return value;
+            return value > abs ? abs : value;
         }
     }
 }

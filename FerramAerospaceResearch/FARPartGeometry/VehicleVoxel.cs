@@ -1610,10 +1610,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             //{
             VoxelChunk section = voxelChunks[iSec, jSec, kSec];
             //}
-            if (section == null)
-                return false;
-
-            return section.VoxelPointExistsGlobalIndex(i + j * 8 + k * 64);
+            return section != null && section.VoxelPointExistsGlobalIndex(i + j * 8 + k * 64);
         }
 
         private Part GetPartAtVoxelPos(int i, int j, int k)

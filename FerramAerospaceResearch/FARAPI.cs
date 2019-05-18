@@ -431,10 +431,7 @@ namespace FerramAerospaceResearch
                 }
             }
 
-            if (vesselAeroModule is null)       //if this is true, then the vessel has not been initialized yet and so must be false
-                return false;
-
-            return vesselAeroModule.HasEverValidVoxelization();
+            return !(vesselAeroModule is null) && vesselAeroModule.HasEverValidVoxelization();
         }
 
 
@@ -458,10 +455,7 @@ namespace FerramAerospaceResearch
                 }
             }
 
-            if (vesselAeroModule is null)       //if this is true, then the vessel has not been initialized yet and so must be false
-                return false;
-
-            return vesselAeroModule.HasValidVoxelizationCurrently();
+            return !(vesselAeroModule is null) && vesselAeroModule.HasValidVoxelizationCurrently();
         }
         #endregion
     }

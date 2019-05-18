@@ -62,10 +62,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
             if (_vesselAero == null)
                 return true;
 
-            if (_vesselAero.SonicDragArea * 0.75 < _vesselAero.MaxCrossSectionArea)
-                return true;
-
-            return false;
+            return _vesselAero.SonicDragArea * 0.75 < _vesselAero.MaxCrossSectionArea;
         }
 
         public override string GetConcernTitle()

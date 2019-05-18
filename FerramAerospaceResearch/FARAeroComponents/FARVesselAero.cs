@@ -480,9 +480,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             if (!vessel.isCommandable)
             {
-                if (vessel.parts.Count >= 2)
-                    return FARSettingsScenarioModule.VoxelSettings.numVoxelsDebrisVessel;
-                return 200;
+                return vessel.parts.Count >= 2 ? FARSettingsScenarioModule.VoxelSettings.numVoxelsDebrisVessel : 200;
             }
 
             return FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel;

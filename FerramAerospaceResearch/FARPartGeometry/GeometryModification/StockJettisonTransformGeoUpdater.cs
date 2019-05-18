@@ -89,10 +89,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 return false;
 
             GameObject o = t.gameObject;
-            if (o == null)
-                return false;
-
-            return true;
+            return o != null;
         }
 
     }

@@ -166,9 +166,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 double radArea = aeroModule.ProjectedAreas.totalArea;
 
-                if (radArea > 0)
-                    return radArea;
-                return fi.BaseFICalculateAreaRadiative(part);
+                return radArea > 0 ? radArea : fi.BaseFICalculateAreaRadiative(part);
             }
 
             return fi.BaseFICalculateAreaRadiative(part);
@@ -190,9 +188,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
 
-                if (exposedArea > 0)
-                    return exposedArea;
-                return fi.BaseFICalculateAreaExposed(part);
+                return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
             }
 
             return fi.BaseFICalculateAreaExposed(part);
@@ -215,9 +211,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 double sunArea = module.ProjectedAreaWorld(fi.sunVector) * ptd.sunAreaMultiplier;
 
-                if (sunArea > 0)
-                    return sunArea;
-                return fi.BaseFIGetSunArea(ptd);
+                return sunArea > 0 ? sunArea : fi.BaseFIGetSunArea(ptd);
             }
 
             return fi.BaseFIGetSunArea(ptd);
@@ -233,9 +227,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 double bodyArea = module.ProjectedAreaWorld(-fi.Vessel.upAxis) * ptd.bodyAreaMultiplier;
 
-                if (bodyArea > 0)
-                    return bodyArea;
-                return fi.BaseFIBodyArea(ptd);
+                return bodyArea > 0 ? bodyArea : fi.BaseFIBodyArea(ptd);
             }
 
             return fi.BaseFIBodyArea(ptd);

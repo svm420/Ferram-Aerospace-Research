@@ -106,15 +106,12 @@ namespace FerramAerospaceResearch
         public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
         {
             if (val.CompareTo(min) < 0) return min;
-            if (val.CompareTo(max) > 0) return max;
-            return val;
+            return val.CompareTo(max) > 0 ? max : val;
         }
 
         public static bool Approximately(double p, double q, double error = double.Epsilon)
         {
-            if (Math.Abs(p - q) < error)
-                return true;
-            return false;
+            return Math.Abs(p - q) < error;
         }
 
         public static double ArithmeticGeometricMean(double a, double b, double error)
@@ -300,9 +297,7 @@ namespace FerramAerospaceResearch
         {
             // Rodhern: In dkavolis branch BrentsMethod is the favoured root-finding algorithm.
             //          At slower speeds however SegmentSearchMethod is used as ad hoc root-finder.
-            if (machNumber >= machswitchvalue)
-                return BrentsMethod(function, leftedge, rightedge, tol_brent, iterlim);
-            return SegmentSearchMethod(function);
+            return machNumber >= machswitchvalue ? BrentsMethod(function, leftedge, rightedge, tol_brent, iterlim) : SegmentSearchMethod(function);
         }
 
         public static double SegmentSearchMethod(Func<double, double> function)
@@ -382,9 +377,7 @@ namespace FerramAerospaceResearch
             {
                 get
                 {
-                    if (IsMirrored)
-                        return InvokeMirrored;
-                    return F;
+                    return IsMirrored ? InvokeMirrored : F;
                 }
             }
 
