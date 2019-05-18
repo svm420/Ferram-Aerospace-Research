@@ -50,20 +50,18 @@ namespace FerramAerospaceResearch.FARPartGeometry
     {
         public double area;
         public Vector3d centroid;
-        public double secondAreaDeriv;   //second derivative of area, used in calculating slender body wave drag
+        //second derivative of area, used in calculating slender body wave drag
+        public double secondAreaDeriv;
 
-        public double flatnessRatio;            //ratio of the longest distance to shortest distance of the cross-section.  Used in calculating body lift and drag
-        public Vector3d flatNormalVector;       //unit vector indicating the direction perpendicular to the longest distance on the cross-section
-
-        //public double additionalUnshadowedArea;        //area added to this cross section that has no area ahead of it
-        //public Vector3d additionalUnshadowedCentroid;     //centroid of unshadowedArea
-
-        //public double removedArea;               //area removed from this particular cross section, compared to the one in front of it
-        //public Vector3d removedCentroid;          //centroid of removedArea
+        //ratio of the longest distance to shortest distance of the cross-section.  Used in calculating body lift and drag
+        public double flatnessRatio;
+        //unit vector indicating the direction perpendicular to the longest distance on the cross-section
+        public Vector3d flatNormalVector;
 
         public Dictionary<Part, SideAreaValues> partSideAreaValues;
 
-        public double cpSonicForward, cpSonicBackward;    //pressure coefficients calculated for this section near Mach 1 when sweeping forward and backward through the voxel
+        //pressure coefficients calculated for this section near Mach 1 when sweeping forward and backward through the voxel
+        public double cpSonicForward, cpSonicBackward;
 
         public class SideAreaValues
         {

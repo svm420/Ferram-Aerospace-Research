@@ -98,12 +98,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public float liftForce;
         // ReSharper restore NotAccessedField.Global
 
-        //[KSPField(isPersistant = false, guiActive = true)]
-        //public double expSkinArea;
-
-        //[KSPField(isPersistant = false, guiActive = true)]
-        //public double expSkinFrac;
-
         private Transform partTransform;
 
         private MaterialColorUpdater materialColorUpdater;
@@ -294,9 +288,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             partLocalForce = Vector3.zero;
             partLocalTorque = Vector3.zero;
 
-            //if (!part.Modules.Contains("ModuleAeroSurface"))
-            //    part.dragModel = Part.DragModel.CYLINDRICAL;
-
             if (FARDebugValues.allowStructuralFailures && !partStressOverride)
             {
                 FARPartStressTemplate template = FARAeroStress.DetermineStressTemplate(part);
@@ -377,9 +368,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (LegacyWingModel != null)
                 totalWorldSpaceAeroForce += LegacyWingModel.worldSpaceForce;
 
-            // Combine forces from stock code
-            //totalWorldSpaceAeroForce += -part.dragVectorDir * part.dragScalar; // dragVectorDir is actually the velocity vector direction
-
             // Handle airbrakes
             if (stockAeroSurfaceModule != null)
                 totalWorldSpaceAeroForce += stockAeroSurfaceModule.dragForce + stockAeroSurfaceModule.liftForce;
@@ -456,7 +444,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if(!vessel.packed)
                 CheckAeroStressFailure();
 
-            //Matrix4x4 matrix = partTransform.localToWorldMatrix;
             Rigidbody rb = part.Rigidbody;
 
             if (!rb)
@@ -465,9 +452,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             worldSpaceAeroForce = partTransform.TransformDirection(partLocalForce);
             worldSpaceTorque = partTransform.TransformDirection(partLocalTorque);
             UpdateAeroDisplay();
-
-            //worldSpaceAeroForce *= (float)part.dynamicPressurekPa;     //is now used as a multiplier, not a force itself, in kPa
-            //worldSpaceTorque *= (float)part.dynamicPressurekPa;
 
             if (part.submergedPortion <= 0)
             {
@@ -507,13 +491,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 worldSpaceAeroForce = worldSpaceDragForce + worldSpaceLiftForce + waterDragForce + waterLiftForce;
             }
             part.AddTorque(worldSpaceTorque);
-            //rb.AddTorque(worldSpaceTorque);
 
             partLocalForce = Vector3.zero;
             partLocalTorque = Vector3.zero;
 
-            //expSkinArea = part.skinExposedArea;
-            //expSkinFrac = part.skinExposedAreaFrac;
         }
 
         //just to make water drag work in some possibly sane way
@@ -557,15 +538,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (part == null)
                 return;
 
-            //Matrix4x4 matrix = partTransform.worldToLocalMatrix;
             Rigidbody rb = part.Rigidbody;
 
             if (rb == null)
                 return;
 
-            //rb.drag = 0;
-            partLocalVel = rb.velocity + frameVel
-                        - FARWind.GetWind(FARAeroUtil.CurrentBody, part, rb.position);      //world velocity
+            //world velocity
+            partLocalVel = rb.velocity + frameVel - FARWind.GetWind(FARAeroUtil.CurrentBody, part, rb.position);
 
             worldSpaceVelNorm = partLocalVel.normalized;
             partLocalVel = partTransform.InverseTransformDirection(partLocalVel);
@@ -599,7 +578,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             // Compute the actual center ourselves once per frame
             // Feed the precomputed values to the vanilla indicator
-            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter; //hacking the old stuff to work with the new
             CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;

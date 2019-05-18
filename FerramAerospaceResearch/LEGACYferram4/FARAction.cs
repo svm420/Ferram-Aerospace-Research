@@ -119,7 +119,8 @@ namespace ferram4
             {
                 try
                 {
-                    string currentGuiString = currentGuiStrings[i] = id2actionGroup[i].ToString(); // don't forget to initialize the gui
+                    // don't forget to initialize the gui
+                    string currentGuiString = currentGuiStrings[i] = id2actionGroup[i].ToString();
                     id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), config.GetValue(configKeys[i], currentGuiString));
                     FARLogger.Info($"Loaded AG {configKeys[i]} as {currentGuiString}");
                 }
@@ -154,7 +155,8 @@ namespace ferram4
         {
             var label = new GUIStyle(GUI.skin.label) {normal = {textColor = GUI.skin.toggle.normal.textColor}};
             GUILayout.Label(Localizer.Format("FARActionDefaultLabel"));
-            GUILayout.BeginHorizontal(); // left column: label, right column: text field
+            // left column: label, right column: text field
+            GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
             for (int i = 0; i < ACTION_COUNT; ++i)
             {

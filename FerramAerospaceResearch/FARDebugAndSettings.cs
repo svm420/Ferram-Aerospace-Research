@@ -278,16 +278,12 @@ namespace FerramAerospaceResearch
                     break;
             }
 
-            //            SaveWindowPos.x = windowPos.x;3
-            //            SaveWindowPos.y = windowPos.y;
-
             GUI.DragWindow();
             debugWinPos = GUIUtils.ClampToScreen(debugWinPos);
         }
 
         private void AeroDataTab(GUIStyle buttonStyle, GUIStyle boxStyle)
         {
-            int i = 0;
             GUILayout.BeginVertical(boxStyle);
 
             FARControllableSurface.timeConstant = GUIUtils.TextEntryForDouble("Ctrl Surf Time Constant:", 160, FARControllableSurface.timeConstant);
@@ -305,7 +301,7 @@ namespace FerramAerospaceResearch
 
             GUILayout.BeginHorizontal();
             int j = 0;
-            for (i = 0; i < FlightGlobals.Bodies.Count; i++)
+            for (int i = 0; i < FlightGlobals.Bodies.Count; i++)
             {
                 CelestialBody body = FlightGlobals.Bodies[i];
 
@@ -343,12 +339,11 @@ namespace FerramAerospaceResearch
 
         private void AeroStressTab(GUIStyle buttonStyle, GUIStyle boxStyle)
         {
-            int i = 0;
             int removeIndex = -1;
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(boxStyle);
 
-            for (i = 0; i < FARAeroStress.StressTemplates.Count; i++)
+            for (int i = 0; i < FARAeroStress.StressTemplates.Count; i++)
             {
                 GUILayout.BeginHorizontal();
                 bool active = GUILayout.Toggle(i == aeroStressIndex, FARAeroStress.StressTemplates[i].name, buttonStyle, GUILayout.Width(150));
@@ -363,8 +358,6 @@ namespace FerramAerospaceResearch
                 FARAeroStress.StressTemplates.RemoveAt(removeIndex);
                 if (aeroStressIndex == removeIndex && removeIndex > 0)
                     aeroStressIndex--;
-
-                removeIndex = -1;
             }
             if (GUILayout.Button("+", buttonStyle, GUILayout.Width(30), GUILayout.Height(30)))
             {
@@ -446,7 +439,6 @@ namespace FerramAerospaceResearch
             if (removeIndex >= 0)
             {
                 stringList.RemoveAt(removeIndex);
-                removeIndex = -1;
             }
             if (GUILayout.Button("+", thisStyle, GUILayout.Width(30), GUILayout.Height(30)))
                 stringList.Add("");
@@ -506,11 +498,8 @@ namespace FerramAerospaceResearch
             GUILayout.BeginVertical();
             FARSettingsScenarioModule.Instance.DisplaySelection();
 
-
-
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
-
         }
 
         private static void ChangeColor(string colorTitle, ref Color input, ref Texture2D texture)
@@ -619,7 +608,6 @@ namespace FerramAerospaceResearch
             if (!CompatibilityChecker.IsAllCompatible())
                 return;
 
-            //SaveConfigs();
             GameEvents.onGameSceneSwitchRequested.Remove(OnSceneChange);
 
             FARDebugButtonBlizzy?.Destroy();

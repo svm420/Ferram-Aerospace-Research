@@ -61,41 +61,27 @@ namespace ferram4
         public double Cm;
         // ReSharper restore NotAccessedField.Global
 
-                //protected float MachNumber = 0;
         protected Vector3d velocityEditor = Vector3.zero;
 
         protected Transform part_transform;
 
-        //Reset tinting for this part and its children
- //       private bool resetTinting;
-
         [KSPField(isPersistant = false, guiActive = false)]
         public double S;
-
-        //[KSPField(isPersistant = false, guiActive = false, guiName = "S")]
-        //public float displayS;
-
 
         [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = true)]
         public bool isShielded = true;
 
         public double rho;
 
-        // Keep track if the tinting effect is active or not
-        //private bool tintIsActive = false;
-
         public override void OnAwake()
         {
             base.OnAwake();
             part_transform = part.partTransform;
 
-            //refArea = S;
-            //Terrible, hacky fix for part.partTransform going bad
             if (part.partTransform == null && part == part.vessel.rootPart)
                 part_transform = vessel.vesselTransform;
             if(HighLogic.LoadedSceneIsEditor)
                 part_transform = part.partTransform;
-
         }
 
         public Vector3d GetVelocity()
@@ -131,8 +117,6 @@ namespace ferram4
         {
             return Vector3d.zero;
         }
-
-
 
         public static List<FARBaseAerodynamics> GetAllEditorModules()
         {
@@ -194,7 +178,8 @@ namespace ferram4
         {
             // Compute the actual center ourselves once per frame
             // Feed the precomputed values to the vanilla indicator
-            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
+            //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;
             CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;

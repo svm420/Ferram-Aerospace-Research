@@ -117,16 +117,12 @@ namespace FerramAerospaceResearch
             }
             Instance = this;
 
-            //if (newGame)
-            //    PopupDialog.SpawnPopupDialog("Ferram Aerospace Research", "Welcome to KSP with FAR!\n\r\n\rThings will be much harder from here on out; the FAR button in the top-right corner will bring you to difficulty settings if you ever decide to change them.  Have fun!", "OK", false, HighLogic.Skin);
-
             FARLogger.Info("Vehicle Voxel Setup started");
             FARAeroSection.GenerateCrossFlowDragCurve();
             VehicleVoxel.VoxelSetup();
             PhysicsGlobals.DragCubeMultiplier = 0;
             FARLogger.Info("Vehicle Voxel Setup complete");
 
-            //GameEvents.onGameStateSave.Add(OnSave);
             newGame = false;
         }
 

@@ -186,7 +186,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             editorReportUpdate = EngineersReport.Instance.GetType().GetMethod("OnCraftModified", BindingFlags.Instance | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
             _customDesignConcerns.Add(new AreaRulingConcern(_vehicleAero));
-            //_customDesignConcerns.Add(new AeroStabilityConcern(_instantSim, EditorDriver.editorFacility == EditorFacility.SPH ? EditorFacilities.SPH : EditorFacilities.VAB));
             foreach (IDesignConcern designConcern in _customDesignConcerns)
                 EngineersReport.Instance.AddTest(designConcern);
         }
@@ -209,8 +208,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GameEvents.onGUIEngineersReportReady.Remove(AddDesignConcerns);
             GameEvents.onGUIEngineersReportDestroy.Remove(RemoveDesignConcerns);
 
-            //EditorLogic.fetch.Unlock("FAREdLock");
-
             if (blizzyEditorGUIButton != null)
             {
                 blizzyEditorGUIButton.Destroy();
@@ -232,7 +229,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void ResetEditorEvent(ShipConstruct construct)
         {
-            FARAeroUtil.ResetEditorParts(); // Rodhern: Partial fix to https://github.com/ferram4/Ferram-Aerospace-Research/issues/177 .
+            // Rodhern: Partial fix to https://github.com/ferram4/Ferram-Aerospace-Research/issues/177 .
+            FARAeroUtil.ResetEditorParts();
 
             if (EditorLogic.RootPart != null)
             {
@@ -383,13 +381,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (Instance._updateRateLimiter > FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)
                 Instance._updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
             Instance._updateQueued = true;
-            //instance._areaRulingOverlay.SetVisibility(false);
-
         }
 
         private void RecalculateVoxel()
         {
-            if (_updateRateLimiter < FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)        //this has been updated recently in the past; queue an update and return
+            //this has been updated recently in the past; queue an update and return
+            if (_updateRateLimiter < FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)
             {
                 _updateQueued = true;
                 return;
@@ -414,7 +411,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 {
                     _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
                     _updateQueued      = true;
-                    //FARLogger.Info("We're not ready!");
                     return;
                 }
             }
@@ -492,10 +488,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
             if (cursorInGUI)
             {
-                // TODO 1.2: verify what EditorTooltip is/was, it cannot be found
-                //if (EditorTooltip.Instance)
-                //    EditorTooltip.Instance.HideToolTip();
-
                 if (!CameraMouseLook.GetMouseLook())
                     EdLogInstance.Lock(false, false, false, "FAREdLock");
                 else
@@ -526,7 +518,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndHorizontal();
             switch (currentMode)
             {
-                //GUILayout.EndHorizontal();
                 case FAREditorMode.STATIC:
                     _editorGraph.Display();
                     guiRect.height = useKSPSkin ? 570 : 450;
@@ -725,7 +716,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     }
                     catch(Exception e)
                     {
-                        FARLogger.Exception(e); //we just catch and print this ourselves to allow things to continue working, since there seems to be a bug in KSPWheels as of this writing
+                        //we just catch and print this ourselves to allow things to continue working, since there seems to be a bug in KSPWheels as of this writing
+                        FARLogger.Exception(e);
                     }
                 }
             }

@@ -55,17 +55,17 @@ namespace FerramAerospaceResearch
         // ReSharper disable CompareOfFloatsByEqualityOperator
         public static bool NearlyEqual(this double a, double b, double epsilon = 1e-14)
         {
+            // shortcut, handles infinities
             if (a.Equals(b))
             {
-                // shortcut, handles infinities
                 return true;
             }
 
+            // a or b is zero or both are extremely close to it
+            // relative error is less meaningful here
             double diff = Math.Abs(a - b);
             if (a == 0 || b == 0 || diff < double.Epsilon)
             {
-                // a or b is zero or both are extremely close to it
-                // relative error is less meaningful here
                 return diff < epsilon * double.Epsilon;
             }
 
@@ -75,17 +75,17 @@ namespace FerramAerospaceResearch
 
         public static bool NearlyEqual(this float a, float b, float epsilon = 1e-6f)
         {
+            // shortcut, handles infinities
             if (a.Equals(b))
             {
-                // shortcut, handles infinities
                 return true;
             }
 
+            // a or b is zero or both are extremely close to it
+            // relative error is less meaningful here
             float diff = Math.Abs(a - b);
             if (a == 0 || b == 0 || diff < float.Epsilon)
             {
-                // a or b is zero or both are extremely close to it
-                // relative error is less meaningful here
                 return diff < epsilon * float.Epsilon;
             }
 
@@ -317,7 +317,8 @@ namespace FerramAerospaceResearch
                 return mfobj.LinearSolution(x0, f0, x1, f1);
             double x2 = Clamp(x1 + xstepsize, 0d, rightedge);
             if (Math.Abs(x2 - x1) < tol_brent)
-                return mfobj.BrentSolve("Reached far right edge."); // Rodhern: Strict equality replaced with approximate equality for readability in dkavolis branch.
+                // Rodhern: Strict equality replaced with approximate equality for readability in dkavolis branch.
+                return mfobj.BrentSolve("Reached far right edge.");
             double f2 = f(x2);
             if (f2 > f1)
             { // skip right
@@ -394,8 +395,10 @@ namespace FerramAerospaceResearch
                 {
                     double oldx0 = x0;
                     double oldf0 = f0;
-                    x0 = -x1; f0 = -f1;
-                    x1 = -oldx0; f1 = -oldf0;
+                    x0 = -x1;
+                    f0 = -f1;
+                    x1 = -oldx0;
+                    f1 = -oldf0;
                 }
 
             LblLoop:
@@ -406,13 +409,15 @@ namespace FerramAerospaceResearch
                 double fx = F(x);
                 if (fx < 0d)
                 {
-                    x0 = x; f0 = fx;
+                    x0 = x;
+                    f0 = fx;
                     goto LblLoop;
                 }
 
                 if (fx <= 0d)
                     return x;
-                x1 = x; f1 = fx;
+                x1 = x;
+                f1 = fx;
                 goto LblLoop;
             }
 

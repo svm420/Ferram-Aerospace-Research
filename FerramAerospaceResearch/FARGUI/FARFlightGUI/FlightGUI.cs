@@ -126,7 +126,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             AeroVizGUI = new AeroVisualizationGUI();
 
             settingsWindow = new GUIDropDown<int>(new[] { Localizer.Format("FARFlightGUIWindowSelect0"), Localizer.Format("FARFlightGUIWindowSelect1"), Localizer.Format("FARFlightGUIWindowSelect2"), Localizer.Format("FARFlightGUIWindowSelect3") }, new[] { 0, 1, 2, 3 });
-            //boxStyle.padding = new RectOffset(4, 4, 4, 4);
 
             if (vesselFlightGUI.ContainsKey(_vessel))
                 vesselFlightGUI[_vessel] = this;
@@ -212,8 +211,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _physicsCalcs.UpdateAeroModules(newAeroModules, legacyWingModels);
         }
 
-        //Receives a message from any FARWingAerodynamicModel or FARAeroPartModule that has failed to update the GUI
         // ReSharper disable once UnusedMember.Local
+        //Receives a message from any FARWingAerodynamicModel or FARAeroPartModule that has failed to update the GUI
         private void AerodynamicFailureStatus()
         {
             _flightStatusGUI?.AerodynamicFailureStatus();
@@ -249,7 +248,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void LateUpdate()
         {
-            //OnGUIAppLauncherReady();
             if (airSpeedGUI != null)
                 airSpeedGUI.ChangeSurfVelocity();
             else if (_vessel != null)

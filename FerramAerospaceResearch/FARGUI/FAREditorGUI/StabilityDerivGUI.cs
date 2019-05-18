@@ -77,7 +77,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         public void ArrowAnim(ArrowPointer velArrow)
         {
             velArrow.Direction = -aoAVec;
-            //FARLogger.Info("" + velArrow.Direction);
         }
 
         private void SetAngleVectors(double aoA)
@@ -90,7 +89,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         public void Display()
         {
             const int W160 = 160 + 20; // Rodhern: A width originally designed to be of size 160.
-            //stabDerivHelp = GUILayout.Toggle(stabDerivHelp, "?", ButtonStyle, GUILayout.Width(200));
 
             GUILayout.Label(Localizer.Format("FAREditorStabDerivFlightCond"));
             GUILayout.BeginHorizontal();

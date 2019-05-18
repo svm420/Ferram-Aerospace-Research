@@ -123,8 +123,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             velMode = (SurfaceVelMode)GUILayout.SelectionGrid((int)velMode, surfModel_str, 1, buttonStyle);
             unitMode = (SurfaceVelUnit)GUILayout.SelectionGrid((int)unitMode, surfUnit_str, 1, buttonStyle);
             GUILayout.EndHorizontal();
-            //            SaveAirSpeedPos.x = AirSpeedPos.x;
-            //            SaveAirSpeedPos.y = AirSpeedPos.y;
         }
 
         public bool GetVelocityDisplayString(out string value_out, out SurfaceVelMode mode_out)
@@ -136,7 +134,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public double CalculateIAS()
         {
-            double pressureRatio = FARAeroUtil.RayleighPitotTubeStagPressure(_vessel.mach); //stag pressure at pitot tube face / ambient pressure
+            //stag pressure at pitot tube face / ambient pressure
+            double pressureRatio = FARAeroUtil.RayleighPitotTubeStagPressure(_vessel.mach);
 
             double velocity = pressureRatio - 1;
             velocity *= _vessel.staticPressurekPa * 1000 * 2;
@@ -172,7 +171,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
 
             double unitConversion = 1;
-            string unitString; // = "m/s";
+            string unitString;
             string caption;
             switch (unitMode)
             {
@@ -200,15 +199,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     break;
                 case SurfaceVelMode.IAS:
                     caption = surfModel_str[1];
-                    //double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
-
                     velString = (CalculateIAS() * unitConversion).ToString("F1") + unitString;
                     break;
                 case SurfaceVelMode.EAS:
                     caption   = surfModel_str[2];
                     velString = (CalculateEAS() * unitConversion).ToString("F1") + unitString;
                     break;
-                // if (velMode == SurfaceVelMode.MACH)
                 default:
                     caption   = surfModel_str[3];
                     velString = _vessel.mach.ToString("F3");
@@ -258,7 +254,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
             else
             {
-                //unitMode = (SurfaceVelUnit)int.Parse(node.GetValue("unitTypeIndex"));
                 if (int.TryParse(node.GetValue("unitTypeIndex"), out int tmp))
                     unitMode = (SurfaceVelUnit)tmp;
                 else

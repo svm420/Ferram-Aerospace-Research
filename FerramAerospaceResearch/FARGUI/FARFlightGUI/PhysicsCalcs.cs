@@ -136,26 +136,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
                 aeroForces.AddTorque(m.worldSpaceTorque);
             }
-
-            /*
-            for (int i = 0; i < _LEGACY_currentWingAeroModel.Count; i++)
-            {
-                FARWingAerodynamicModel w = _LEGACY_currentWingAeroModel[i];
-                if (w is null)
-                    continue;
-                totalAeroForceVector += w.worldSpaceForce;
-                aeroForces.AddForce(w.AerodynamicCenter, w.worldSpaceForce);
-
-                totalAeroForceVector += w.worldSpaceForce;
-                totalAeroTorqueVector += Vector3.Cross(w.AerodynamicCenter - _vessel.CoM, w.worldSpaceForce);
-            }
-            */
-
-            /*for(int i = 0; i < _vessel.parts.Count; i++)
-            {
-                Part p = _vessel.parts[i];
-                totalAeroForceVector += -p.dragVectorDir * p.dragScalar; // dragVectorDir is actually the velocity vector direction
-            }*/
         }
 
         private void CalculateForceBreakdown(Vector3d velVectorNorm)
@@ -182,12 +162,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             vesselInfo.aerodynamicForce = com_frc;
             vesselInfo.aerodynamicTorque = com_trq;
-            vesselInfo.dragForce = -Vector3d.Dot(com_frc, velVectorNorm);     //reverse along vel normal will be drag
+            //reverse along vel normal will be drag
+            vesselInfo.dragForce = -Vector3d.Dot(com_frc, velVectorNorm);
 
             Vector3d remainderVector = com_frc + velVectorNorm * vesselInfo.dragForce;
 
-            vesselInfo.liftForce = -Vector3d.Dot(remainderVector, _vessel.ReferenceTransform.forward);     //forward points down for the vessel, so reverse along that will be lift
-            vesselInfo.sideForce = Vector3d.Dot(remainderVector, _vessel.ReferenceTransform.right);        //and the side force
+            //forward points down for the vessel, so reverse along that will be lift
+            vesselInfo.liftForce = -Vector3d.Dot(remainderVector, _vessel.ReferenceTransform.forward);
+            //and the side force
+            vesselInfo.sideForce = Vector3d.Dot(remainderVector, _vessel.ReferenceTransform.right);
 
             double invAndDynPresArea = vesselInfo.refArea;
             invAndDynPresArea *= vesselInfo.dynPres;
@@ -213,13 +196,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Vector3 up = refTransform.up;
             Vector3 forward = refTransform.forward;
             Vector3 right = refTransform.right;
-            Vector3 tmpVec = up * Vector3.Dot(up, velVectorNorm) + forward * Vector3.Dot(forward, velVectorNorm);   //velocity vector projected onto a plane that divides the airplane into left and right halves
+            //velocity vector projected onto a plane that divides the airplane into left and right halves
+            Vector3 tmpVec = up * Vector3.Dot(up, velVectorNorm) + forward * Vector3.Dot(forward, velVectorNorm);
             vesselInfo.aoA = Vector3.Dot(tmpVec.normalized, forward);
             vesselInfo.aoA = FARMathUtil.rad2deg * Math.Asin(vesselInfo.aoA);
             if (double.IsNaN(vesselInfo.aoA))
                 vesselInfo.aoA = 0;
 
-            tmpVec = up * Vector3.Dot(up, velVectorNorm) + right * Vector3.Dot(right, velVectorNorm);     //velocity vector projected onto the vehicle-horizontal plane
+            //velocity vector projected onto the vehicle-horizontal plane
+            tmpVec = up * Vector3.Dot(up, velVectorNorm) + right * Vector3.Dot(right, velVectorNorm);
             vesselInfo.sideslipAngle = Vector3.Dot(tmpVec.normalized, right);
             vesselInfo.sideslipAngle = FARMathUtil.rad2deg * Math.Asin(vesselInfo.sideslipAngle);
             if (double.IsNaN(vesselInfo.sideslipAngle))
@@ -232,8 +217,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Quaternion vesselRot = Quaternion.Inverse(_navball.relativeGymbal);
 
             vesselInfo.headingAngle = vesselRot.eulerAngles.y;
-            //vesselRot *= Quaternion.Euler(0, -yawAngle, 0);
-            //yawAngle = 360 - yawAngle;
             vesselInfo.pitchAngle = vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
             vesselInfo.rollAngle  = vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
         }

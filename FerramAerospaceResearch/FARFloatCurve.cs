@@ -127,26 +127,24 @@ namespace FerramAerospaceResearch
 
         public double Evaluate(double x)
         {
-            //return 0;
-
             int curIndex = centerIndex;
-            //int lowIndex = 0;
-            //int highIndex = sections.Length - 1;
             int count = 0;
             while(true)
             {
                 if (count > sections.Length)
                     throw new Exception();
                 ++count;
-                //curIndex = (highIndex + lowIndex) / 2;
                 int check = sections[curIndex].CheckRange(x);
-                if (check > 0)       //above of this cubic's range
+
+                //above of this cubic's range
+                if (check > 0)
                     if (curIndex >= sections.Length - 1)
-                        return sections[curIndex].EvalUpperLim();   //at upper end of curve, just return max val of last cubic
+                        //at upper end of curve, just return max val of last cubic
+                        return sections[curIndex].EvalUpperLim();
                     else
                     {
-                        //lowIndex = curIndex + 1;
-                        curIndex = sections[curIndex].nextIndex;    //otherwise, find next cubic to check and continue
+                        //otherwise, find next cubic to check and continue
+                        curIndex = sections[curIndex].nextIndex;
                         continue;
                     }
 
@@ -154,9 +152,11 @@ namespace FerramAerospaceResearch
                     //if we get here, we're in range and should evaluate this cubic
                     return sections[curIndex].Evaluate(x);
                 if (curIndex <= 0)
-                    return sections[curIndex].EvalLowerLim(); //at lower end of curve, return min val of first cubic
+                    //at lower end of curve, return min val of first cubic
+                    return sections[curIndex].EvalLowerLim();
                 //below this cubic's range
-                curIndex = sections[curIndex].prevIndex; //otherwise, find next cubic to check and continue
+                //otherwise, find next cubic to check and continue
+                curIndex = sections[curIndex].prevIndex;
             }
         }
 

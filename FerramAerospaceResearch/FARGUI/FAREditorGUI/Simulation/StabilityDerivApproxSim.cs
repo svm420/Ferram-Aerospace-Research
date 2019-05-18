@@ -146,12 +146,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
             lines.AddData(yVal, GUIColors.GetColor(0), "φ", true);
 
-            /*graph.SetBoundaries(0, endTime, -10, 10);
-            graph.SetGridScaleUsingValues(1, 5);
-            graph.horizontalLabel = "time";
-            graph.verticalLabel = "value";
-            graph.Update();*/
-
             return lines;
         }
 
@@ -232,12 +226,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             yVal = transSolve.GetSolution(3);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
             lines.AddData(yVal, GUIColors.GetColor(0), "θ", true);
-
-            /*graph.SetBoundaries(0, endTime, -10, 10);
-            graph.SetGridScaleUsingValues(1, 5);
-            graph.horizontalLabel = "time";
-            graph.verticalLabel = "value";
-            graph.Update();*/
 
             return lines;
         }

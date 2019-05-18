@@ -60,28 +60,6 @@ namespace ferram4
         public Vector3d pos = Vector3d.zero;
         public double amount;
 
-        /*public Vector3d GetACPosition()
-        {
-            Vector3d bVec = new Vector3d();
-            bVec.x = force.y * torque.z - force.z * torque.y;
-            bVec.y = force.x * torque.z - force.z * torque.x;
-            bVec.z = force.x * torque.y - force.y * torque.x;
-
-            double approxA01, approxA02, approxA12;         //commonly used force directions
-            approxA01 = -1 / (force.z * force.z);
-            approxA02 = -1 / (force.y * force.y);
-            approxA12 = -1 / (force.x * force.x);
-
-            Vector3d acPos = new Vector3d();
-            acPos.x = force.x * force.x / (force.y * force.y * force.z * force.z) * bVec.x + bVec.y * approxA01 + bVec.z * approxA02;
-            acPos.y = force.y * force.y / (force.x * force.x * force.z * force.z) * bVec.y + bVec.x * approxA01 + bVec.z * approxA12;
-            acPos.x = force.z * force.z / (force.y * force.y * force.x * force.x) * bVec.z + bVec.y * approxA12 + bVec.x * approxA02;
-
-            acPos *= 0.5;
-            acPos += GetPos();
-
-            return acPos;
-        }*/
         public void ClearAll()
         {
             force = Vector3d.zero;

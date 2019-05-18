@@ -197,7 +197,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //The first index of each list is the name of the part module; the rest are the transforms
                 if (!p.Modules.Contains(currentPartModuleTransforms[0]))
                     continue;
-                //   FARLogger.Info("Part " + p.partInfo.title + " has module " + currentPartModuleTransforms[0] + ".  Getting exempt transforms");
                 PartModule module = p.Modules[currentPartModuleTransforms[0]];
 
                 for (int j = 1; j < currentPartModuleTransforms.Count; ++j)
@@ -231,21 +230,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             var asteroid = (ModuleAsteroid)p.Modules["ModuleAsteroid"];
             FieldInfo[] fields = asteroid.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
 
-            /*for (int i = 0; i < fields.Length; ++i)
-            {
-                FieldInfo field = fields[i];
-
-                if (field.Name.ToLowerInvariant() == "pagenerated")
-                {
-                    procAsteroid = (PAsteroid)field.GetValue(asteroid);
-                    FARLogger.Info("procAsteroid index " + i);
-                    break;
-                }
-            }*/
             var procAsteroid = (PAsteroid)fields[2].GetValue(asteroid);
             GetChildTransforms(transformList, procAsteroid.gameObject.transform.Find(""));
-
-            //FARLogger.Info("New transforms: " + count);
         }
 
         private static void GetChildTransforms(List<Transform> transformList, Transform parent)

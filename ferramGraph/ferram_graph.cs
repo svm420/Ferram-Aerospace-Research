@@ -177,8 +177,6 @@ namespace ferram4
             }
         }
 
-
-
         protected readonly Texture2D graph;
         protected Rect displayRect;
 
@@ -188,8 +186,8 @@ namespace ferram4
         public readonly bool autoscale;
 
         public Color backgroundColor = Color.black;
-        public Color gridColor = new Color(0.2f, 0.2f, 0.2f); //new Color(0.42f, 0.35f, 0.11f, 1);
-        public Color axisColor = new Color(0.8f, 0.8f, 0.8f); //Color.white;
+        public Color gridColor = new Color(0.2f, 0.2f, 0.2f);
+        public Color axisColor = new Color(0.8f, 0.8f, 0.8f);
 
         private string leftBound;
         private string rightBound;
@@ -256,8 +254,6 @@ namespace ferram4
             }
 
             SetGridScaleUsingPixels(pixelWidth, pixelHeight);
-
-
         }
 
         // ReSharper disable once UnusedMember.Global

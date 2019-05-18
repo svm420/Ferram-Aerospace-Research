@@ -104,7 +104,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             FARBaseAerodynamics.PrecomputeGlobalCenterOfLift(aeroSection, dummy, vel, 1);
 
-            Vector3 pos = Vector3.zero;//rootPartTrans.position;
+            Vector3 pos = Vector3.zero;
             float mass = 0;
             foreach (Part p in EditorLogic.SortedShipList)
             {
@@ -114,14 +114,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
             pos /= mass;
 
-            Vector3 avgForcePos = Vector3.zero;
-
             Vector3 force0 = aeroSection.force;
             Vector3 moment0 = aeroSection.TorqueAt(pos);
-            avgForcePos += aeroSection.GetPos();
-
-            //aeroSection.force = -aeroSection.force;
-            //aeroSection.torque = -aeroSection.torque;
 
             aeroSection.ClearAll();
 
@@ -136,11 +130,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             Vector3 force1 = aeroSection.force;
             Vector3 moment1 = aeroSection.TorqueAt(pos);
-            avgForcePos += aeroSection.GetPos();
 
             aeroSection.ClearAll();
-
-            avgForcePos *= 0.5f;
 
             Vector3 deltaForce = force1 - force0;
             Vector3 deltaMoment = moment1 - moment0;
@@ -152,17 +143,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             Vector3 deltaMomentPerp = deltaMoment - Vector3.Dot(deltaMoment, deltaForcePerpNorm) * deltaForcePerpNorm - Vector3.Project(deltaMoment, vel_base);
 
-            //float dist = deltaMomentPerp.magnitude / deltaForcePerpMag;
-            //vesselRootLocalAeroCenter = vel_base * dist;
-
             vesselRootLocalAeroCenter = deltaMomentPerp.magnitude / deltaForcePerpMag * Math.Sign(Vector3.Dot(Vector3.Cross(deltaForce, deltaMoment), vel_base)) * vel_base;
 
-            //FARLogger.Info("" + dist + " " + deltaMomentPerp.magnitude + " " + deltaForcePerpMag);
-            //vesselRootLocalAeroCenter += avgForcePos;
-            //avgForcePos = rootPartTrans.worldToLocalMatrix.MultiplyPoint3x4(avgForcePos);
-            //vesselRootLocalAeroCenter += Vector3.ProjectOnPlane(avgForcePos, Vector3.up);
-            //vesselRootLocalAeroCenter = aeroSection.GetPos();
-            vesselRootLocalAeroCenter += pos;//Vector3.ProjectOnPlane(avgForcePos - pos, vesselRootLocalAeroCenter) + pos;
+            vesselRootLocalAeroCenter += pos;
             vesselRootLocalAeroCenter = rootPartTrans.worldToLocalMatrix.MultiplyPoint3x4(vesselRootLocalAeroCenter);
         }
     }

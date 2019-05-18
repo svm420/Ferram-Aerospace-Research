@@ -59,25 +59,32 @@ namespace FerramAerospaceResearch
                 {
                     if (HighLogic.LoadedSceneIsEditor)
                     {
-                        Collider[] tmpColliderArray = part.GetComponentsInChildren<Collider>(); //In the editor, this returns all the colliders of this part AND all the colliders of its children, recursively
+                        //In the editor, this returns all the colliders of this part AND all the colliders of its children, recursively
+                        Collider[] tmpColliderArray = part.GetComponentsInChildren<Collider>();
                         //However, this can also be called on its child parts to get their colliders, so we can exclude the child colliders
                         //Also, fortunately, parent colliders are at the beginning of this; we can take advantage of this to reduce the time iterating through lists
                         var partColliders = new List<Collider>();
-                        var excludedCollidersHash = new HashSet<Collider>();      //We'll use a hash to make this fast
+                        //We'll use a hash to make this fast
+                        var excludedCollidersHash = new HashSet<Collider>();
 
                         foreach (Part p in part.children)
                         {
-                            Collider[] excludedColliders = p.GetComponentsInChildren<Collider>(); //All the colliders associated with the immediate child of this part AND their children
+                            //All the colliders associated with the immediate child of this part AND their children
+                            Collider[] excludedColliders = p.GetComponentsInChildren<Collider>();
 
-                            if (!excludedCollidersHash.Contains(excludedColliders[0])) //The first collider _must_ be part of the immediate child; because it is closer to the parent, it will appear earlier in tmpColliderArray
-                                excludedCollidersHash.Add(excludedColliders[0]);       //That means we only ever need the first collider for our purposes
+                            //The first collider _must_ be part of the immediate child; because it is closer to the parent, it will appear earlier in tmpColliderArray
+                            if (!excludedCollidersHash.Contains(excludedColliders[0]))
+                                //That means we only ever need the first collider for our purposes
+                                excludedCollidersHash.Add(excludedColliders[0]);
                         }
 
                         foreach (Collider collider in tmpColliderArray)
-                            if (!excludedCollidersHash.Contains(collider)) //If the collider isn't in the hash, that means that it must belong to _this_ part, because it doesn't belong to any child parts
+                            //If the collider isn't in the hash, that means that it must belong to _this_ part, because it doesn't belong to any child parts
+                            if (!excludedCollidersHash.Contains(collider))
                                 partColliders.Add(collider);
                             else
-                                break; //Once we find something that is in the hash, we're out of the colliders associated with the parent part and can escape
+                                //Once we find something that is in the hash, we're out of the colliders associated with the parent part and can escape
+                                break;
 
                         colliders = partColliders.ToArray();
                     }
@@ -87,7 +94,6 @@ namespace FerramAerospaceResearch
                 catch
                 {   //FIXME
                     //Fail silently because it's the only way to avoid issues with pWings
-                    //Debug.LogException(e);
                     colliders = new[] { part.collider };
                 }
 

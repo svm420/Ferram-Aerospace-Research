@@ -76,23 +76,18 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 var aeroModule = part.Modules.GetModule<FARAeroPartModule>();
 
-                //FARAeroPartModule aeroModule = (FARAeroPartModule)module;
-
                 part.radiativeArea = CalculateAreaRadiative(fi, part, aeroModule);
                 part.exposedArea = part.machNumber > 0 ? CalculateAreaExposed(fi, part, aeroModule) : part.radiativeArea;
 
                 if (part.exposedArea > part.radiativeArea)
                     part.exposedArea = part.radiativeArea;      //sanity check just in case
-
-                //fi.SetSkinProperties(ptd);
             }
-            //fi.timeSinceLastUpdate = 0;
-            //FARLogger.Info("MFI: " + fi.CoM + " " + Planetarium.GetUniversalTime());
         }
 
         private static void UpdateAerodynamics(ModularFlightIntegrator fi, Part part)
         {
-            if (part.Modules.Contains<ModuleAeroSurface>() || part.Modules.Contains("MissileLauncher") && part.vessel.rootPart == part)     //FIXME Proper model for airbrakes
+            //FIXME Proper model for airbrakes
+            if (part.Modules.Contains<ModuleAeroSurface>() || part.Modules.Contains("MissileLauncher") && part.vessel.rootPart == part)
             {
                 fi.BaseFIUpdateAerodynamics(part);
             }
@@ -145,7 +140,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             p.rb.angularDrag = (float)(p.angularDrag * tmp * PhysicsGlobals.AngularDragMultiplier);
 
             tmp = Math.Max(fi.pseudoReDragMult, 1);
-            p.dragScalar = (float)((p.dynamicPressurekPa * (1.0 - p.submergedPortion) + p.submergedDynamicPressurekPa * p.submergedPortion) * tmp);       //dyn pres adjusted for submersion
+            //dyn pres adjusted for submersion
+            p.dragScalar = (float)((p.dynamicPressurekPa * (1.0 - p.submergedPortion) + p.submergedDynamicPressurekPa * p.submergedPortion) * tmp);
             p.bodyLiftScalar = (float)(p.dynamicPressurekPa * (1.0 - p.submergedPortion) + p.submergedDynamicPressurekPa * p.submergedPortion);
         }
 
@@ -160,7 +156,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
-            //double dragCubeExposed = fi.BaseFICalculateAreaExposed(part);
             if (aeroModule is null)
                 return fi.BaseFICalculateAreaRadiative(part);
             double radArea = aeroModule.ProjectedAreas.totalArea;
@@ -186,14 +181,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
 
             return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
-
-            /*else
-            {
-                if (stockRadArea > 0)
-                    return aeroModule.ProjectedAreas.totalArea * dragCubeExposed / stockRadArea;
-                else
-                    return aeroModule.ProjectedAreas.totalArea;
-            }*/
         }
 
         private static double CalculateSunArea(ModularFlightIntegrator fi, PartThermalData ptd)

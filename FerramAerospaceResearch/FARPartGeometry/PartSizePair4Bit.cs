@@ -52,7 +52,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private const byte DOWN_MASK = 0x0F;
 
         private byte xPlane, yPlane, zPlane;
-        //byte xPlaneDown, yPlaneDown, zPlaneDown;
 
         public override void Clear()
         {
@@ -69,9 +68,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (x > LENGTH_OF_VOXEL)
                 x -= LENGTH_OF_VOXEL;
 
-            //if (y > LENGTH_OF_VOXEL)
-            //    y -= LENGTH_OF_VOXEL;
-
             if (z > LENGTH_OF_VOXEL)
                 z -= LENGTH_OF_VOXEL;
 
@@ -85,9 +81,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     x = LENGTH_OF_VOXEL;
                     break;
             }
-
-            //if (y == 0)
-            //    y = LENGTH_OF_VOXEL;
 
             if (z == 0)
                 z = LENGTH_OF_VOXEL;

@@ -119,7 +119,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
 
             _graph.Display(0, 0);
-            //graph.Display(GUILayout.Width(540), GUILayout.Height(300));
 
             DrawTooltip();
         }
@@ -306,7 +305,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
 
             _graph.horizontalLabel = horizontalLabel;
-            _graph.verticalLabel = verticalLabel;// "Cl\nCd\nCm\nL/D / 10";
+            _graph.verticalLabel = verticalLabel;
             _graph.Update();
         }
 

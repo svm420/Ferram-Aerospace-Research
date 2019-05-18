@@ -138,10 +138,6 @@ namespace ferram4
                 TriggerPartColliderUpdate();
         }
 
-        //public override void OnSave(ConfigNode node)
-        //{
-        //    //By blanking this nothing should be saved to the craft file or the persistance file
-        //}
         protected virtual void OnDestroy()
         {
             OnVesselPartsChange = null;

@@ -181,7 +181,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             if (flatnessRelDiff < 0.05)  //allow for 5% rel difference for merging
                 if (flatnessRatio >= 1.05)  //if it's within 5% of 1, it's good
-                    if (Math.Abs(Vector3.Dot(worldNormalVector, otherSection.worldNormalVector)) <= 0.999)    //allow 5 degrees error for flatnessRatio
+                    //allow 5 degrees error for flatnessRatio
+                    if (Math.Abs(Vector3.Dot(worldNormalVector, otherSection.worldNormalVector)) <= 0.999)
                         return false;         //too different in out-of-roundness, don't merge
 
             float diameterRelDiff = diameter - otherSection.diameter;
@@ -240,12 +241,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 else
                 {
-                    /*tmpOtherData.centroidPartSpace = mergeFactorP1 * (tmpOtherData.centroidPartSpace);     //these must be scaled to completely counter the effect of the downscale at the end
-                    tmpOtherData.xRefVectorPartSpace = (tmpOtherData.xRefVectorPartSpace);
-                    tmpOtherData.nRefVectorPartSpace = (tmpOtherData.nRefVectorPartSpace);
-                    tmpOtherData.dragFactor = invMergeFactor * (tmpOtherData.dragFactor);       //this will already be scaled down at the end
-                    */
-                    tmpOtherData.centroidPartSpace *= mergeFactorP1;      //needs to be scaled this way to place the centroid in the correct location
+                    //needs to be scaled this way to place the centroid in the correct location
+                    tmpOtherData.centroidPartSpace *= mergeFactorP1;
                     partData.Add(tmpOtherData);
 
                     handledAeroModulesIndexDict.Add(tmpOtherData.aeroModule, partData.Count - 1);
@@ -266,9 +263,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void ClearAeroSection()
         {
-            //xForcePressureAoA0 = null;
-            //xForcePressureAoA180 = null;
-            //xForceSkinFriction = null;
             partData.Clear();
             handledAeroModulesIndexDict.Clear();
         }
@@ -369,7 +363,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag,
             IForceContext forceContext)
         {
-            double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);      //this will be the same for each part, so why recalc it multiple times?
+            //this will be the same for each part, so why recalc it multiple times?
+            double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);
             double xForceAoA0 = xForcePressureAoA0.Evaluate(machNumber);
             double xForceAoA180 = xForcePressureAoA180.Evaluate(machNumber);
 
@@ -393,7 +388,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 angVelLocal = aeroModule.partLocalAngVel;
 
-                velLocal += Vector3.Cross(data.centroidPartSpace, angVelLocal); //some transform issue here, needs investigation
+                //some transform issue here, needs investigation
+                velLocal += Vector3.Cross(data.centroidPartSpace, angVelLocal);
                 Vector3 velLocalNorm = velLocal.normalized;
 
                 Vector3 localNormalForceVec = Vector3.ProjectOnPlane(-velLocalNorm, xRefVector).normalized;
@@ -408,22 +404,22 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 //potential flow normal force
                 double nForce = potentialFlowNormalForce * Math.Sign(cosAoA) * cosHalfAoA * sin2AoA;
-                if (nForce < 0)                                                               //potential flow is not significant over the rear face of things
+                //potential flow is not significant over the rear face of things
+                if (nForce < 0)
                     nForce = 0;
-
-                //if (machNumber > 3)
-                //    nForce *= 2d - machNumber * 0.3333333333333333d;
 
                 float normalForceFactor = Math.Abs(Vector3.Dot(localNormalForceVec, nRefVector));
                 normalForceFactor *= normalForceFactor;
 
-                normalForceFactor = invFlatnessRatio * (1 - normalForceFactor) + flatnessRatio * normalForceFactor; //accounts for changes in relative flatness of shape
+                //accounts for changes in relative flatness of shape
+                normalForceFactor = invFlatnessRatio * (1 - normalForceFactor) + flatnessRatio * normalForceFactor;
 
 
                 float crossFlowMach = machNumber * (float)sinAoA;
                 float crossFlowReynolds = reynoldsPerUnitLength * diameter * (float)sinAoA / normalForceFactor;
 
-                nForce += viscCrossflowDrag * sinSqrAoA * CalculateCrossFlowDrag(crossFlowMach, crossFlowReynolds); //viscous crossflow normal force
+                //viscous crossflow normal force
+                nForce += viscCrossflowDrag * sinSqrAoA * CalculateCrossFlowDrag(crossFlowMach, crossFlowReynolds);
 
                 nForce *= normalForceFactor;
 
@@ -449,8 +445,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         float tmp = -0.185185185f * machNumber + 1.11111111111f;
                         momentFactor = tmp * hypersonicMomentBackward * 0.6f + (1 - tmp) * hypersonicMomentForward;
                     }
-                    //if (machNumber < 1.5)
-                    //    momentFactor += hypersonicMomentBackward * (0.5f - machNumber * 0.33333333333333333333333333333333f) * 0.2f;
 
                     moment        *= momentFactor;
                     dampingMoment *= momentFactor;
@@ -458,7 +452,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 else
                 {
                     xForce += cosSqrAoA * xForceAoA180;
-                    float momentFactor; //negative to deal with the ref vector facing the opposite direction, causing the moment vector to point in the opposite direction
+                    //negative to deal with the ref vector facing the opposite direction, causing the moment vector to point in the opposite direction
+                    float momentFactor;
                     if (machNumber > 6)
                         momentFactor = hypersonicMomentBackward;
                     else if (machNumber < 0.6)
@@ -468,17 +463,16 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         float tmp = -0.185185185f * machNumber + 1.11111111111f;
                         momentFactor = tmp * hypersonicMomentForward * 0.6f + (1 - tmp) * hypersonicMomentBackward;
                     }
-                    //if (machNumber < 1.5)
-                    //    momentFactor += hypersonicMomentForward * (0.5f - machNumber * 0.33333333333333333333333333333333f) * 0.2f;
 
                     moment        *= momentFactor;
                     dampingMoment *= momentFactor;
                 }
                 moment        /= normalForceFactor;
                 dampingMoment =  Math.Abs(dampingMoment) * 0.1f;
-                //dampingMoment += (float)Math.Abs(skinFrictionForce) * 0.1f;
-                float rollDampingMoment = (float)(skinFrictionForce * 0.5 * diameter); //skin friction force times avg moment arm for vehicle
-                rollDampingMoment *= 0.75f + flatnessRatio * 0.25f;                  //this is just an approximation for now
+                //skin friction force times avg moment arm for vehicle
+                float rollDampingMoment = (float)(skinFrictionForce * 0.5 * diameter);
+                //this is just an approximation for now
+                rollDampingMoment *= 0.75f + flatnessRatio * 0.25f;
 
                 Vector3 forceVector = (float)xForce * xRefVector + (float)nForce * localNormalForceVec;
                 forceVector -= (float)localVelForce * velLocalNorm;
@@ -492,11 +486,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     torqueVector -= dampingMoment * nonAxialAngLocalVel + rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / velLocal.sqrMagnitude;
                 else
                     torqueVector -= dampingMoment * nonAxialAngLocalVel + rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / 0.001f;
-
-                //float dynPresAndScaling = 0.0005f * atmDensity * velLocal.sqrMagnitude * data.dragFactor;        //dyn pres and N -> kN conversion
-
-                //forceVector *= dynPresAndScaling;
-                //torqueVector *= dynPresAndScaling;
 
                 forceVector  *= data.dragFactor;
                 torqueVector *= data.dragFactor;

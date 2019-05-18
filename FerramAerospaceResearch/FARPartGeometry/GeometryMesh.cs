@@ -82,7 +82,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             for (int i = 0; i < vertices.Length; i++)
             {
-                //vertices[i] = thisToVesselMatrix.MultiplyPoint3x4(untransformedVerts[i]);
                 Vector3 v = meshLocalVerts[i];
                 Vector3 vert = Vector3.zero;
                 vert.x = thisToVesselMatrix.m00 * v.x + thisToVesselMatrix.m01 * v.y + thisToVesselMatrix.m02 * v.z + thisToVesselMatrix.m03;
@@ -138,19 +137,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 // ReSharper disable once InconsistentlySynchronizedField
                 Matrix4x4 tempMatrix = newThisToVesselMatrix * meshLocalToWorld;
-                //Matrix4x4 tempMatrix = thisToVesselMatrix.inverse;
-                //thisToVesselMatrix = newThisToVesselMatrix * meshLocalToWorld;
-
-                //tempMatrix = thisToVesselMatrix * tempMatrix;
-
-                //bounds = TransformBounds(bounds, tempMatrix);
 
                 Vector3 low = Vector3.one * float.PositiveInfinity;
                 Vector3 high = Vector3.one * float.NegativeInfinity;
 
                 for (int i = 0; i < vertices.Length; i++)
                 {
-                    Vector3 vert = tempMatrix.MultiplyPoint3x4(meshLocalVerts[i]); // = Vector3.zero;
+                    Vector3 vert = tempMatrix.MultiplyPoint3x4(meshLocalVerts[i]);
 
                     float tmpTestVert = vert.x + vert.y + vert.z;
                     if (float.IsNaN(tmpTestVert) || float.IsInfinity(tmpTestVert))

@@ -110,29 +110,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             _currentGeoModules = new List<GeometryPartModule>();
 
-            /*if (!vessel.rootPart)
-            {
-                this.enabled = false;
-                return;
-            }*/
-
             foreach (Part p in vessel.parts)
             {
                 p.maximum_drag = 0;
                 p.minimum_drag = 0;
                 p.angularDrag  = 0;
-
-                /*p.dragModel = Part.DragModel.NONE;
-                p.dragReferenceVector = Vector3.zero;
-                p.dragScalar = 0;
-                p.dragVector = Vector3.zero;
-                p.dragVectorDir = Vector3.zero;
-                p.dragVectorDirLocal = Vector3.zero;
-                p.dragVectorMag = 0;
-                p.dragVectorSqrMag = 0;
-
-                p.bodyLiftMultiplier = 0;
-                p.bodyLiftScalar = 0;*/
 
                 var g = p.GetComponent<GeometryPartModule>();
                 if (!(g is null))
@@ -153,12 +135,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             RequestUpdateVoxel(false);
 
             enabled = true;
-            //GameEvents.onVesselLoaded.Add(VesselUpdateEvent);
-            //GameEvents.onVesselChange.Add(VesselUpdateEvent);
-            //GameEvents.onVesselLoaded.Add(VesselUpdate);
-            //GameEvents.onVesselCreate.Add(VesselUpdateEvent);
-
-            //FARLogger.Info("Starting " + _vessel.vesselName + " aero properties");
         }
 
         private PartModule.StartState StartState()
@@ -214,7 +190,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     _flightGUI = vessel.GetComponent<FlightGUI>();
 
                 _flightGUI.UpdateAeroModules(_currentAeroModules, _legacyWingModels);
-                //FARLogger.Info("Updating " + _vessel.vesselName + " aero properties\n\rCross-Sectional Area: " + _vehicleAero.MaxCrossSectionArea + " Crit Mach: " + _vehicleAero.CriticalMach + "\n\rUnusedAeroCount: " + _unusedAeroModules.Count + " UsedAeroCount: " + _currentAeroModules.Count + " sectCount: " + _currentAeroSections.Count);
 
                 foreach (FARAeroPartModule a in _unusedAeroModules)
                 {
@@ -263,8 +238,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Vector3 frameVel = Krakensbane.GetFrameVelocityV3f();
 
-            //if(_updateQueued)       //only happens if we have an voxelization scheduled, then we need to check for null
-            for (int i = _currentAeroModules.Count - 1; i >= 0; i--)        //start from the top and come down to improve performance if it needs to remove anything
+            //start from the top and come down to improve performance if it needs to remove anything
+            for (int i = _currentAeroModules.Count - 1; i >= 0; i--)
             {
                 FARAeroPartModule m = _currentAeroModules[i];
                 if (m != null && m.part != null && m.part.partTransform != null)
@@ -272,15 +247,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 else
                 {
                     _currentAeroModules.RemoveAt(i);
-                    //i++;
                 }
             }
-            /*else                    //otherwise, we don't need to do Unity's expensive "is this part dead" null-check
-                for (int i = _currentAeroModules.Count - 1; i >= 0; i--)        //start from the top and come down to improve performance if it needs to remove anything
-                {
-                    FARAeroPartModule m = _currentAeroModules[i];
-                    m.UpdateVelocityAndAngVelocity(frameVel);
-                }*/
 
             foreach (FARAeroSection aeroSection in _currentAeroSections)
                 aeroSection.FlightCalculateAeroForces((float)MachNumber, (float)(ReynoldsNumber / Length), pseudoKnudsenNumber, skinFrictionDragCoefficient);
@@ -407,7 +375,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                  _vesselIntakeRamDrag = new VesselIntakeRamDrag();
              }
 
-             if (_updateRateLimiter < FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)        //this has been updated recently in the past; queue an update and return
+             //this has been updated recently in the past; queue an update and return
+             if (_updateRateLimiter < FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)
              {
                  _updateQueued = true;
                  return;
@@ -415,7 +384,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
              _updateRateLimiter = 0;
              _updateQueued      = false;
-             if (vessel.rootPart.Modules.Contains<LaunchClamp>())// || _vessel.rootPart.Modules.Contains("KerbalEVA"))
+             if (vessel.rootPart.Modules.Contains<LaunchClamp>())
              {
                  DisableModule();
                  return;
@@ -515,12 +484,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private void DisableModule()
         {
             enabled = false;
-
-            //GameEvents.onVesselLoaded.Remove(VesselUpdateEvent);
-            //GameEvents.onVesselChange.Remove(VesselUpdateEvent);
-            //GameEvents.onVesselLoaded.Add(VesselUpdate);
-            //GameEvents.onVesselCreate.Remove(VesselUpdateEvent);
-            //GameEvents.onVesselStandardModification.Remove(VesselUpdateEvent);
         }
 
         #region Outside State Checkers

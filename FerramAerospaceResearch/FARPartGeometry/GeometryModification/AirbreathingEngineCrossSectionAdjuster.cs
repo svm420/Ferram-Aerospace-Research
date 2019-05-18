@@ -73,9 +73,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         public AirbreathingEngineCrossSectionAdjuster(ModuleEngines engine, Matrix4x4 worldToVesselMatrix)
         {
             vehicleBasisForwardVector = Vector3.forward;
-            //for (int i = 0; i < engine.thrustTransforms.Count; i++)
-            //    vehicleBasisForwardVector += engine.thrustTransforms[i].forward;
-
             thisToVesselMatrix = worldToVesselMatrix * engine.thrustTransforms[0].localToWorldMatrix;
 
             vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);

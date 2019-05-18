@@ -97,7 +97,8 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         // ReSharper disable NotAccessedField.Global -> unity
         //Persistant fields
-        [KSPField(isPersistant = false)]    //this cannot be persistent to ensure that bad values aren't saved, and since these chutes aren't customizable there's no reason to save this
+        //this cannot be persistent to ensure that bad values aren't saved, and since these chutes aren't customizable there's no reason to save this
+        [KSPField(isPersistant = false)]
         public float preDeployedDiameter = 1, deployedDiameter = 25;
         [KSPField(isPersistant = true)]
         public float caseMass, time;
@@ -748,7 +749,8 @@ namespace FerramAerospaceResearch.RealChuteLite
                     {
                         parachute.gameObject.SetActive(true);
                         cap.gameObject.SetActive(false);
-                        part.SkipToAnimationTime(semiDeployedAnimation, 0, 1); // to the end of the animation
+                        // to the end of the animation
+                        part.SkipToAnimationTime(semiDeployedAnimation, 0, 1);
                         break;
                     }
 
@@ -756,7 +758,8 @@ namespace FerramAerospaceResearch.RealChuteLite
                     {
                         parachute.gameObject.SetActive(true);
                         cap.gameObject.SetActive(false);
-                        part.SkipToAnimationTime(fullyDeployedAnimation, 0, 1);  // to the end of the animation
+                        // to the end of the animation
+                        part.SkipToAnimationTime(fullyDeployedAnimation, 0, 1);
                         break;
                     }
             }
@@ -985,7 +988,6 @@ namespace FerramAerospaceResearch.RealChuteLite
                         case DeploymentStates.PREDEPLOYED:
                         {
                             part.AddForceAtPosition(DragForce(0, preDeployedDiameter, 1f / semiDeploymentSpeed), ForcePosition);
-                            //this.rigidbody.AddForceAtPosition(DragForce(0, this.preDeployedDiameter, 1f / this.semiDeploymentSpeed), this.ForcePosition, ForceMode.Force);
                             if (trueAlt <= deployAltitude && dragTimer.Elapsed.TotalSeconds >= 1f / semiDeploymentSpeed) { Deploy(); }
                             break;
                         }
@@ -993,7 +995,6 @@ namespace FerramAerospaceResearch.RealChuteLite
                         case DeploymentStates.DEPLOYED:
                         {
                             part.AddForceAtPosition(DragForce(preDeployedDiameter, deployedDiameter, 1f / deploymentSpeed), ForcePosition);
-                            //this.rigidbody.AddForceAtPosition(DragForce(this.preDeployedDiameter, this.deployedDiameter, 1f / this.deploymentSpeed), this.ForcePosition, ForceMode.Force);
                             break;
                         }
                     }

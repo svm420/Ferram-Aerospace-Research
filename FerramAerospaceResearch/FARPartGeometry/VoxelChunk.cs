@@ -49,8 +49,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     internal class VoxelChunk
     {
-        //private Part[] voxelPoints = null;
-        //private float[] voxelSize = null;
         private readonly PartSizePair[] voxelPoints;
         private DebugVisualVoxel[, ,] visualVoxels;
         private HashSet<Part> overridingParts;
@@ -58,15 +56,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private double _size;
 
         private Vector3d lowerCorner;
-        //int iOffset, jOffset, kOffset;
         private int offset;
 
         public VoxelChunk(double size, Vector3d lowerCorner, int iOffset, int jOffset, int kOffset, HashSet<Part> overridingParts, bool usePartSize256)
         {
             _size = size;
             offset = iOffset + 8 * jOffset + 64 * kOffset;
-            //voxelPoints = new Part[512];
-            //voxelSize = new float[512];
             voxelPoints = new PartSizePair[512];
             if (usePartSize256)
             {
@@ -109,7 +104,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
         {
             zeroBaseIndex -= offset;
-            //voxelPoints[zeroBaseIndex].part = p;
             voxelPoints[zeroBaseIndex].SetPlaneLocation(plane, location);
         }
 
@@ -237,7 +231,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 for (int j = 0; j < 8; j++)
                     for (int k = 0; k < 8; k++)
                     {
-                        //if(voxelPoints[i,j,k] != null)
                         PartSizePair pair = voxelPoints[i + 8 * j + 64 * k];
                         if (pair.part is null)
                             continue;
@@ -263,14 +256,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         visualVoxels[i, j, k] = null;
                     }
         }
-
-        //~VoxelChunk()
-        //{
-        //    ClearVisualVoxels();
-        //}
     }
 
-    //[Flags]
     public enum VoxelOrientationPlane
     {
         NONE = 0,

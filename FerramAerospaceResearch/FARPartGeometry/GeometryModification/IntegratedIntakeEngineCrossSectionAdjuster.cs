@@ -102,17 +102,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             part = intake.part;
             intakeModule = intake;
             intakeTrans = intakeModule.intakeTransform;
-            //ModuleResourceIntake intake = intake;
-
-            /*intakeTrans = part.FindModelTransform(intake.intakeTransformName);
-            vehicleBasisForwardVector = Vector3.forward;//intakeTrans.forward;
-
-            foreach (AttachNode node in part.attachNodes)
-                if (node.nodeType == AttachNode.NodeType.Stack && Vector3.Dot(node.position, (part.transform.worldToLocalMatrix * intakeTrans.localToWorldMatrix).MultiplyVector(Vector3.forward)) > 0)
-                {
-                    frontNode = node;
-                    break;
-                }*/
 
             thisToVesselMatrix = worldToVesselMatrix * intakeTrans.localToWorldMatrix;
 
@@ -136,7 +125,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         {
             if (intakeModule.node == null || intakeModule.node.attachedPart == null)
                 return intakeArea * sign;
-            return -intakeArea * sign; //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
+            //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
+            return -intakeArea * sign;
         }
 
         public double AreaThreshold()
@@ -161,7 +151,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             vehicleBasisForwardVector = tempMatrix.MultiplyVector(vehicleBasisForwardVector);
 
         }
-
 
         public void SetThisToVesselMatrixForTransform()
         {

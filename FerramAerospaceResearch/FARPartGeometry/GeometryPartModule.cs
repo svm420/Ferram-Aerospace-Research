@@ -262,7 +262,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void FixedUpdate()
         {
-            if (ReadyToBuildMesh())                //waiting prevents changes in physics in flight or in predictions because the voxel switches to colliders rather than meshes
+            //waiting prevents changes in physics in flight or in predictions because the voxel switches to colliders rather than meshes
+            if (ReadyToBuildMesh())
             {
                 RebuildAllMeshData();
             }
@@ -273,7 +274,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             if (animStates != null && animStates.Count > 0)
                 CheckAnimations();
-            //FARLogger.Info("Geo PM: " + vessel.CoM + " " + Planetarium.GetUniversalTime());
         }
 
         private bool ReadyToBuildMesh()
@@ -306,7 +306,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             _ready = false;
 
-            while (_meshesToUpdate > 0) //if the previous transform order hasn't been completed yet, wait here to let it
+            //if the previous transform order hasn't been completed yet, wait here to let it
+            while (_meshesToUpdate > 0)
                 if (this == null)
                     return;
 
@@ -334,9 +335,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             _meshesToUpdate = 0;
             _started = true;
-
-            //UpdateTransformMatrixList(worldToVesselMatrix);
-            //overallMeshBounds = part.GetPartOverallMeshBoundsInBasis(worldToVesselMatrix);
         }
 
         private bool IgnoredPredicate(Transform t)
@@ -453,7 +451,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             string intakeType = "", engineType = "";
 
-            if (part.Modules.Contains("ModuleEnginesAJEJet"))       //hard-coded support for AJE; TODO: separate out for more configurable compatibility on 3rd-party end
+            //hard-coded support for AJE; TODO: separate out for more configurable compatibility on 3rd-party end
+            if (part.Modules.Contains("ModuleEnginesAJEJet"))
                 engineType = "ModuleEnginesAJEJet";
             else if (part.Modules.Contains("ModuleEngines"))
                 engineType = "ModuleEngines";
@@ -535,8 +534,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             foreach (ICrossSectionAdjuster adjuster in crossSectionAdjusters)
             {
-                //adjuster.TransformBasis(basis);
-
                 if (!adjuster.AreaRemovedFromCrossSection(vehicleMainAxis).NearlyEqual(0))
                 {
                     adjuster.SetForwardBackwardNoFlowDirection(1);
@@ -571,15 +568,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
                     float prevNormTime = animStateTime[i];
 
-                    //if (state.speed != 0)     //if the animation is playing, send the event
-                    //{
-                    //    UpdateShapeWithAnims(); //event to update voxel, with rate limiter for computer's sanity and error reduction
-                    //    break;
-                    //}
                     //if the anim is not playing, but it was, also send the event to be sure that we closed
                     if (Math.Abs(prevNormTime - state.time) <= 10E-5)
                         continue;
-                    //FARLogger.Info("" + state.time);
                     animStateTime[i] = state.time;
                     updateShape      = true;
                 }
@@ -592,7 +583,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (rebuildOnAnimation)
                 RebuildAllMeshData();
             else
-                UpdateShapeWithAnims(); //event to update voxel, with rate limiter for computer's sanity and error reduction
+                //event to update voxel, with rate limiter for computer's sanity and error reduction
+                UpdateShapeWithAnims();
             UpdateVoxelShape();
         }
 
@@ -622,7 +614,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (meshDataList != null)
             {
                 _ready = false;
-                while (_meshesToUpdate > 0) //if the previous transform order hasn't been completed yet, wait here to let it
+                //if the previous transform order hasn't been completed yet, wait here to let it
+                while (_meshesToUpdate > 0)
                     if (this == null)
                         return;
                 _ready = false;
@@ -633,7 +626,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     GeometryMesh mesh = meshDataList[i];
                     if (mesh.TrySetThisToVesselMatrixForTransform())
                     {
-                        //ThreadPool.QueueUserWorkItem(mesh.MultithreadTransformBasis, worldToVesselMatrix);
                         mesh.TransformBasis(worldToVesselMatrix);
                     }
                     else
@@ -655,7 +647,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 adjuster.TransformBasis(worldToVesselMatrix);
                 adjuster.UpdateArea();
             }
-            //overallMeshBounds = part.GetPartOverallMeshBoundsInBasis(worldToVesselMatrix);
         }
 
         internal void DecrementMeshesToUpdate()
@@ -675,8 +666,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             var mc = t.GetComponent<MeshCollider>();
             if (mc != null)
             {
-                //Mesh m = mc.sharedMesh;       //we can't used mc.sharedMesh because it does not contain all the triangles or verts for some reason
-                                                //must instead get the mesh filter and use its shared mesh
+                //we can't used mc.sharedMesh because it does not contain all the triangles or verts for some reason
+                //must instead get the mesh filter and use its shared mesh
 
                 var mf = t.GetComponent<MeshFilter>();
                 if (mf != null)
@@ -688,7 +679,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
                 else
                 {
-                    Mesh m = mc.sharedMesh;     //but if we can't, grab the sharedMesh anyway and try to use that
+                    //but if we can't, grab the sharedMesh anyway and try to use that
+                    Mesh m = mc.sharedMesh;
 
                     if (m != null)
                         return new MeshData(m.vertices, m.triangles, m.bounds);
@@ -710,7 +702,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Mesh m;
             var mf = t.GetComponent<MeshFilter>();
 
-            if (onlyMeshes && t.GetComponent<MeshCollider>() != null)       //if we've decided to force use of meshes, we don't want colliders
+            //if we've decided to force use of meshes, we don't want colliders
+            if (onlyMeshes && t.GetComponent<MeshCollider>() != null)
                 return null;
 
             if (mf != null)
@@ -734,8 +727,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 #endif
 
                 m = mf.sharedMesh;
-
-                //MeshRenderer mr = t.GetComponent<MeshRenderer>();
 
                 if (part.Modules.Contains<ModuleProceduralFairing>() || part.Modules.Contains<ModuleAsteroid>())
                     return new MeshData(m.vertices, m.triangles, m.bounds);
@@ -836,7 +827,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
 
                 //Voxelize Everything
-                if ((cantUseColliders || forceUseMeshes || isFairing) && !isDrill)       //in this case, voxelize _everything_
+                if ((cantUseColliders || forceUseMeshes || isFairing) && !isDrill)
                 {
                     foreach (Transform t in meshTransforms)
                     {
@@ -855,7 +846,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             else
             {
                 //Voxelize Everything
-                if ((cantUseColliders || forceUseMeshes || isFairing) && !isDrill)       //in this case, voxelize _everything_
+                if ((cantUseColliders || forceUseMeshes || isFairing) && !isDrill)
                 {
                     foreach (Transform t in meshTransforms)
                     {
@@ -941,7 +932,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public void RC_Rescale(Vector3 relativeRescaleFactor)
         {
-            Rescale(relativeRescaleFactor);             //this is currently just a wrapper, in the future if Rescale changes this can change to maintain compatibility
+            //this is currently just a wrapper, in the future if Rescale changes this can change to maintain compatibility
+            Rescale(relativeRescaleFactor);
         }
 
         public void Rescale(Vector3 relativeRescaleFactor)

@@ -392,7 +392,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "StabilityAugmentationSettings");
 
-            Vessel active_vessel = null;
+            Vessel active_vessel;
 
             try
             {

@@ -52,7 +52,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
     //This attempts some manner of handling ram drag at various speeds
     internal class VesselIntakeRamDrag
     {
-        private const float AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM = 0.25f;       //assume value approximately for turbojets
+        //assume value approximately for turbojets
+        private const float AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM = 0.25f;
         private const float AVG_NOZZLE_VEL_FACTOR = AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM * (1 - AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM);
 
         private static readonly int AJE_JET_CLASS_ID = "ModuleEnginesAJEJet".GetHashCode();
@@ -166,7 +167,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     _intakeModules.RemoveAt(i);
                     _intakeTransforms.RemoveAt(i);
                     _aeroModulesWithIntakes.RemoveAt(i);
-                    //++i;
                     continue;
                 }
 
@@ -181,8 +181,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
 
                 Vector3 force = cosAoA * currentRamDrag * (float)intake.area * 100f * -aeroModule.partLocalVelNorm;
-                //if(float.IsNaN(force.sqrMagnitude))
-                //    force = Vector3.zero;
                 aeroModule.AddLocalForce(force, Vector3.zero);
             }
         }

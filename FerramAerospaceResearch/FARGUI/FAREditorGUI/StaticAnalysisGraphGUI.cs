@@ -121,8 +121,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             if (pingPongAoAFactor >= 2)
                 pingPongAoAFactor = 0;
-
-            //FARLogger.Info("" + velArrow.Direction);
         }
 
         private void SetAngleVectors(double lowerAoA, double upperAoA)
@@ -291,7 +289,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
 
             _graph.horizontalLabel = horizontalLabel;
-            _graph.verticalLabel = verticalLabel;// "Cl\nCd\nCm\nL/D / 10";
+            _graph.verticalLabel = verticalLabel;
             _graph.Update();
         }
 

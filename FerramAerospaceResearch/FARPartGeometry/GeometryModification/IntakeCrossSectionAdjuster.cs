@@ -64,11 +64,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         private double nodeOffsetArea;      //used to handle intakes being on the side of fuselage parts
 
-        //ModuleResourceIntake intake;
-        //public ModuleResourceIntake IntakeModule
-        //{
-        //    get { return intake; }
-        //}
         private Part part;
         public Part GetPart()
         {
@@ -181,7 +176,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             vehicleBasisForwardVector = tempMatrix.MultiplyVector(vehicleBasisForwardVector);
 
         }
-
 
         public void SetThisToVesselMatrixForTransform()
         {

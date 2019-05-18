@@ -122,7 +122,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             for (int i = 0; i < 2 * numPoints; i++)
             {
-                double angle = 0;
+                double angle;
                 if (i < numPoints)
                     angle = i / (double)numPoints * (upperBound - lowerBound) + lowerBound;
                 else
@@ -132,7 +132,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
                 _instantCondition.GetClCdCmSteady(input, out InstantConditionSimOutput output, i == 0);
 
-                //                FARLogger.Info("Cl: " + Cl + " Cd: " + Cd);
                 if (i < numPoints)
                 {
                     AlphaValues[i] = angle;

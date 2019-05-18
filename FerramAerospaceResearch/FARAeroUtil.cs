@@ -56,8 +56,6 @@ namespace FerramAerospaceResearch
         private static FloatCurve prandtlMeyerMach;
         private static FloatCurve prandtlMeyerAngle;
         public static double maxPrandtlMeyerTurnAngle;
-//        private static FloatCurve criticalMachNumber = null;
-        //private static FloatCurve liftslope = null;
 
         public static double massPerWingAreaSupported;
         public static double massStressPower;
@@ -234,7 +232,8 @@ namespace FerramAerospaceResearch
             if (M <= 0)
                 return 1;
             double value = RayleighPitotTubeStagPressure(M);
-            value--;                                //and now to convert to pressure coefficient
+            //and now to convert to pressure coefficient
+            value--;
             value *= 2 / (gamma * M * M);
 
             return value;
@@ -357,7 +356,6 @@ namespace FerramAerospaceResearch
                 prandtlMeyerMach  = new FloatCurve();
                 prandtlMeyerAngle = new FloatCurve();
                 double M = 1;
-                //float gamma = 1.4f;
                 double gamma  = CurrentBody.atmosphereAdiabaticIndex;
                 double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
 
@@ -793,8 +791,9 @@ namespace FerramAerospaceResearch
             double theoreticE = straightWingE * AR + 1;
             theoreticE = 1 / theoreticE;
 
-            double eWingInterference = 0.974008 * theoreticE;// 1 - 2 * (fuse dia / span)^2, using avg val for ratio (0.114) because it isn't easy to get here
-                                                             //this results in this being a simple constant
+            // 1 - 2 * (fuse dia / span)^2, using avg val for ratio (0.114) because it isn't easy to get here
+            //this results in this being a simple constant
+            double eWingInterference = 0.974008 * theoreticE;
 
             double e = 0.38 * Cd0 * AR * Math.PI;   //accounts for changes due to Mach number and compressibility
             e *= eWingInterference;

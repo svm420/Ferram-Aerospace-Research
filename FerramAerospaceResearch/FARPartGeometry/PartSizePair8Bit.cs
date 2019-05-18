@@ -68,9 +68,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (x > LENGTH_OF_VOXEL)
                 x -= LENGTH_OF_VOXEL;
 
-            //if (y > LENGTH_OF_VOXEL)
-            //    y -= LENGTH_OF_VOXEL;
-
             if (z > LENGTH_OF_VOXEL)
                 z -= LENGTH_OF_VOXEL;
 
@@ -84,9 +81,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     x = LENGTH_OF_VOXEL;
                     break;
             }
-
-            //if (y == 0)
-            //    y = LENGTH_OF_VOXEL;
 
             if (z == 0)
                 z = LENGTH_OF_VOXEL;

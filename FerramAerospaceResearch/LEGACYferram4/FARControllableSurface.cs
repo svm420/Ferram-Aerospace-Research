@@ -151,7 +151,8 @@ namespace ferram4
         protected int spoilerLocation;
 
         private double AoAsign = 1;
-        private double AoAdesiredControl; //DaMichel: treat desired AoA's from flap and stick inputs separately for different animation rates
+        //DaMichel: treat desired AoA's from flap and stick inputs separately for different animation rates
+        private double AoAdesiredControl;
         private double AoAdesiredFlap;
         private double AoAcurrentControl; // current deflection due to control inputs
         private double AoAcurrentFlap; // current deflection due to flap/spoiler deployment
@@ -169,13 +170,13 @@ namespace ferram4
         private Transform lastReferenceTransform;
 
 
-        [FARAction("FARCtrlActionSpoiler", FARActionGroupConfiguration.ID_SPOILER)] // use our new FARAction for configurable action group assignment
+        [FARAction("FARCtrlActionSpoiler", FARActionGroupConfiguration.ID_SPOILER)]
         public void ActivateSpoiler(KSPActionParam param)
         {
             brake = !(param.type > 0);
         }
 
-        [FARAction("FARCtrlActionIncFlap", FARActionGroupConfiguration.ID_INCREASE_FLAP_DEFLECTION)] // use our new FARAction for configurable action group assignment
+        [FARAction("FARCtrlActionIncFlap", FARActionGroupConfiguration.ID_INCREASE_FLAP_DEFLECTION)]
         public void IncreaseDeflect(KSPActionParam param)
         {
             param.Cooldown = 0.25f;
@@ -189,7 +190,7 @@ namespace ferram4
             UpdateFlapDeflect();
         }
 
-        [FARAction("FARCtrlActionDecFlap", FARActionGroupConfiguration.ID_DECREASE_FLAP_DEFLECTION)] // use our new FARAction for configurable action group assignment
+        [FARAction("FARCtrlActionDecFlap", FARActionGroupConfiguration.ID_DECREASE_FLAP_DEFLECTION)]
         public void DecreaseDeflect(KSPActionParam param)
         {
             param.Cooldown = 0.25f;
@@ -214,7 +215,6 @@ namespace ferram4
             }
         }
 
-        //[KSPEvent(guiName = "Std. Ctrl Settings", guiActiveEditor = true, guiActive = false)]
         private void CheckFieldVisibility()
         {
             if (showStdCtrl != prevStdCtrl)
@@ -316,9 +316,6 @@ namespace ferram4
                     XZmaxForce += tmp;
                     break;
                 }
-
-            //if (HighLogic.LoadedSceneIsEditor)        //should be unneeded now
-            //    FixAllUIRanges();
         }
 
         public override void FixedUpdate()
@@ -425,9 +422,6 @@ namespace ferram4
             BrakeRudderLocation = Vector3.Dot(partForward, forward);
             BrakeRudderSide = Math.Sign(Vector3.Dot(CoMoffset, right));
             AoAsign = Math.Sign(Vector3.Dot(partUp, up));
-            //PitchLocation *= PitchLocation * Mathf.Sign(PitchLocation);
-            //YawLocation *= YawLocation * Mathf.Sign(YawLocation);
-            //RollLocation = RollLocation * RollLocation * Mathf.Sign(RollLocation) + roll2 * roll2 * Mathf.Sign(roll2);
             RollLocation += roll2;
 
             //DaMichel: this is important to force a reset of the flap/spoiler model orientation to the desired value.
@@ -482,9 +476,8 @@ namespace ferram4
                 double   velMag = vel.magnitude;
                 if (velMag > 5)
                 {
-                    //Vector3 tmpVec = vessel.ReferenceTransform.up * Vector3.Dot(vessel.ReferenceTransform.up, vel) + vessel.ReferenceTransform.forward * Vector3.Dot(vessel.ReferenceTransform.forward, vel);   //velocity vector projected onto a plane that divides the airplane into left and right halves
-                    //double AoA = Vector3.Dot(tmpVec.normalized, vessel.ReferenceTransform.forward);
-                    double AoA = base.CalculateAoA(vel); //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
+                    //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
+                    double AoA = base.CalculateAoA(vel);
                     AoA = FARMathUtil.rad2deg * AoA;
                     if (double.IsNaN(AoA))
                         AoA = 0;
@@ -631,8 +624,10 @@ namespace ferram4
             AoAdesiredControl *= maxdeflect;
             if (!pitchaxisDueToAoA.NearlyEqual(0))
             {
-                Vector3 tmpVec = up * Vector3.Dot(up, velocityVec) + forward * Vector3.Dot(forward, velocityVec); //velocity vector projected onto a plane that divides the airplane into left and right halves
-                double  AoA    = base.CalculateAoA(tmpVec.normalized);                                            //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
+                //velocity vector projected onto a plane that divides the airplane into left and right halves
+                Vector3 tmpVec = up * Vector3.Dot(up, velocityVec) + forward * Vector3.Dot(forward, velocityVec);
+                //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
+                double  AoA    = base.CalculateAoA(tmpVec.normalized);
                 AoA = FARMathUtil.rad2deg * AoA;
                 if (double.IsNaN(AoA))
                     AoA = 0;
@@ -724,8 +719,10 @@ namespace ferram4
         // TODO 1.2: ITorqueProvider now reports two Vector3s, positive torque(that produced by control actuation 1,1,1) and negative torque(that produced by -1,-1,-1).
         public void GetPotentialTorque(out Vector3 pos, out Vector3 neg)
         {
-            Vector3 maxLiftVec = FinalLiftSlope * GetLiftDirection() * maxdeflect * Math.PI / 180;       //get max lift coeff
-            maxLiftVec *= (float)(vessel.dynamicPressurekPa * S);             //get an actual lift vector out of it
+            //get max lift coeff
+            Vector3 maxLiftVec = FinalLiftSlope * GetLiftDirection() * maxdeflect * Math.PI / 180;
+            //get an actual lift vector out of it
+            maxLiftVec *= (float)(vessel.dynamicPressurekPa * S);
 
             Vector3 relPosVector = AerodynamicCenter - vessel.CoM;
 

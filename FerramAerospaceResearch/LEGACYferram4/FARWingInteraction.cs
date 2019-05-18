@@ -351,7 +351,8 @@ namespace ferram4
             Vector3 partTransformUp = parentWingPart.partTransform.up;
             for (int i = 0; i < 5; i++)
             {
-                ray.origin = rootChordMidPt + (float)(i * 0.2 + 0.1) * -b_2 * (partTransformRight * srfAttachFlipped + partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));   //shift the raycast origin along the midchord line
+                //shift the raycast origin along the midchord line
+                ray.origin = rootChordMidPt + (float)(i * 0.2 + 0.1) * -b_2 * (partTransformRight * srfAttachFlipped + partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
 
                 RaycastHit[] hits = Physics.RaycastAll(ray, MAC, FARAeroUtil.RaycastMask);
 
@@ -372,11 +373,13 @@ namespace ferram4
             Vector3 partTransformUp = parentWingPart.partTransform.up;
             for (int i = 0; i < 5; i++)
             {
-                ray.origin = rootChordMidPt + 0.5f * -b_2 * (partTransformRight * srfAttachFlipped + partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));   //shift the origin along the midchord line
+                //shift the origin along the midchord line
+                ray.origin = rootChordMidPt + 0.5f * -b_2 * (partTransformRight * srfAttachFlipped + partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
 
                 float chord_length = 2 * MAC / (1 + TaperRatio);    //first, calculate the root chord
 
-                chord_length = chord_length * (1 - 0.5f) + TaperRatio * chord_length * 0.5f;  //determine the chord length based on how far down the span it is
+                //determine the chord length based on how far down the span it is
+                chord_length = chord_length * (1 - 0.5f) + TaperRatio * chord_length * 0.5f;
 
                 ray.origin += chord_length * (-0.4f + 0.2f * i) * partTransformUp;
 
@@ -577,22 +580,29 @@ namespace ferram4
                 return;
             double flapRatio     = (thisWingMAC / (thisWingMAC + EffectiveUpstreamMAC)).Clamp(0, 1);
             float  flt_flapRatio = (float)flapRatio;
-            double flapFactor    = wingCamberFactor.Evaluate(flt_flapRatio); //Flap Effectiveness Factor
-            double dCm_dCl       = wingCamberMoment.Evaluate(flt_flapRatio); //Change in moment due to change in lift from flap
+            //Flap Effectiveness Factor
+            double flapFactor    = wingCamberFactor.Evaluate(flt_flapRatio);
+            //Change in moment due to change in lift from flap
+            double dCm_dCl       = wingCamberMoment.Evaluate(flt_flapRatio);
 
             //This accounts for the wing possibly having a longer span than the flap
             double WingFraction = (thisWingb_2 / EffectiveUpstreamb_2).Clamp(0, 1);
             //This accounts for the flap possibly having a longer span than the wing it's attached to
             double FlapFraction = (EffectiveUpstreamb_2 / thisWingb_2).Clamp(0, 1);
 
-            double ClIncrement = flapFactor * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;                            //Lift created by the flap interaction
-            ClIncrement *= (parentWingModule.S * FlapFraction + EffectiveUpstreamArea * WingFraction) / parentWingModule.S; //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
+            //Lift created by the flap interaction
+            double ClIncrement = flapFactor * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;
+            //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
+            ClIncrement *= (parentWingModule.S * FlapFraction + EffectiveUpstreamArea * WingFraction) / parentWingModule.S;
 
-            ACweight = ClIncrement * MachCoeff; // Total flap Cl for the purpose of applying ACshift, including the bit subtracted below
+            // Total flap Cl for the purpose of applying ACshift, including the bit subtracted below
+            ACweight = ClIncrement * MachCoeff;
 
-            ClIncrement -= FlapFraction * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA; //Removing additional angle so that lift of the flap is calculated as lift at wing angle + lift due to flap interaction rather than being greater
+            //Removing additional angle so that lift of the flap is calculated as lift at wing angle + lift due to flap interaction rather than being greater
+            ClIncrement -= FlapFraction * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;
 
-            ACshift = (dCm_dCl + 0.75 * (1 - flapRatio)) * (thisWingMAC + EffectiveUpstreamMAC); //Change in Cm with change in Cl
+            //Change in Cm with change in Cl
+            ACshift = (dCm_dCl + 0.75 * (1 - flapRatio)) * (thisWingMAC + EffectiveUpstreamMAC);
 
             ClIncrementFromRear = ClIncrement * MachCoeff;
         }
@@ -641,7 +651,8 @@ namespace ferram4
                 EffectiveUpstreamInfluence += wingInfluenceFactor;
 
                 double wAoA = wingModule.CalculateAoA(wingModule.GetVelocity()) * Math.Sign(tmp);
-                tmp = (thisWingAoA - wAoA) * wingInfluenceFactor;                //First, make sure that the AoA are wrt the same direction; then account for any strange angling of the part that shouldn't be there
+                //First, make sure that the AoA are wrt the same direction; then account for any strange angling of the part that shouldn't be there
+                tmp = (thisWingAoA - wAoA) * wingInfluenceFactor;
 
                 EffectiveUpstreamAoA += tmp;
             }

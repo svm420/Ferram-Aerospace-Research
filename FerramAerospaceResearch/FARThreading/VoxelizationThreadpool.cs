@@ -96,7 +96,6 @@ namespace FerramAerospaceResearch.FARThreading
             for (int i = 0; i < _threads.Length; i++)
             {
                 _threads[i] = new Thread(ExecuteQueuedVoxelization);
-                //_threads[i].IsBackground = true;
                 _threads[i].Start();
             }
             // make sure we get main thread while in main thread, ctor is not guaranteed to be run in main thread
@@ -107,7 +106,8 @@ namespace FerramAerospaceResearch.FARThreading
         {
             for (int i = 0; i < _threads.Length; i++)
             {
-                QueueVoxelization(null); //this will pass a null action to each thread, ending it
+                //this will pass a null action to each thread, ending it
+                QueueVoxelization(null);
             }
         }
 
