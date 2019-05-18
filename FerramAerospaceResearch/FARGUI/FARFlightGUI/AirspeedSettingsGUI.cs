@@ -174,49 +174,45 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             double unitConversion = 1;
             string unitString; // = "m/s";
             string caption;
-            if (unitMode == SurfaceVelUnit.KNOTS)
+            switch (unitMode)
             {
-                unitConversion = 1.943844492440604768413343347219;
-                unitString = surfUnit_str[1];
+                case SurfaceVelUnit.KNOTS:
+                    unitConversion = 1.943844492440604768413343347219;
+                    unitString     = surfUnit_str[1];
+                    break;
+                case SurfaceVelUnit.KM_H:
+                    unitConversion = 3.6;
+                    unitString     = surfUnit_str[3];
+                    break;
+                case SurfaceVelUnit.MPH:
+                    unitConversion = 2.236936;
+                    unitString     = surfUnit_str[2];
+                    break;
+                default:
+                    unitString = surfUnit_str[0];
+                    break;
             }
-            else if (unitMode == SurfaceVelUnit.KM_H)
+            switch (velMode)
             {
-                unitConversion = 3.6;
-                unitString = surfUnit_str[3];
-            }
-            else if (unitMode == SurfaceVelUnit.MPH)
-            {
-                unitConversion = 2.236936;
-                unitString = surfUnit_str[2];
-            }
-            else
-            {
-                unitString = surfUnit_str[0];
-            }
-            if (velMode == SurfaceVelMode.TAS)
-            {
-                caption = surfModel_str[0];
-                velString = (_vessel.srfSpeed * unitConversion).ToString("F1") + unitString;
-            }
-            else
-            {
-                if (velMode == SurfaceVelMode.IAS)
-                {
+                case SurfaceVelMode.TAS:
+                    caption   = surfModel_str[0];
+                    velString = (_vessel.srfSpeed * unitConversion).ToString("F1") + unitString;
+                    break;
+                case SurfaceVelMode.IAS:
                     caption = surfModel_str[1];
                     //double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
 
                     velString = (CalculateIAS() * unitConversion).ToString("F1") + unitString;
-                }
-                else if (velMode == SurfaceVelMode.EAS)
-                {
-                    caption = surfModel_str[2];
+                    break;
+                case SurfaceVelMode.EAS:
+                    caption   = surfModel_str[2];
                     velString = (CalculateEAS() * unitConversion).ToString("F1") + unitString;
-                }
-                else // if (velMode == SurfaceVelMode.MACH)
-                {
-                    caption = surfModel_str[3];
+                    break;
+                // if (velMode == SurfaceVelMode.MACH)
+                default:
+                    caption   = surfModel_str[3];
                     velString = _vessel.mach.ToString("F3");
-                }
+                    break;
             }
             active = true;
 

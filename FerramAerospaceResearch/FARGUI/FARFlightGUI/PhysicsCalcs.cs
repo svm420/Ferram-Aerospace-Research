@@ -266,17 +266,20 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
                 foreach (PartModule m in p.Modules)
                 {
-                    if (m is ModuleEngines e)
+                    switch (m)
                     {
-                        FuelConsumptionFromEngineModule(e, ref totalThrust, ref totalThrust_Isp, ref fuelConsumptionVol, ref airDemandVol, invDeltaTime);
-                    }
-
-                    if (m is ModuleResourceIntake intake)
-                    {
-                        if (intake.intakeEnabled)
+                        case ModuleEngines e:
+                            FuelConsumptionFromEngineModule(e, ref totalThrust, ref totalThrust_Isp, ref fuelConsumptionVol, ref airDemandVol, invDeltaTime);
+                            break;
+                        case ModuleResourceIntake intake:
                         {
-                            airAvailableVol     += intake.airFlow * intakeAirDensity / invDeltaTime;
-                            vesselInfo.fullMass -= p.Resources[intake.resourceName].amount * intakeAirDensity;
+                            if (intake.intakeEnabled)
+                            {
+                                airAvailableVol     += intake.airFlow * intakeAirDensity / invDeltaTime;
+                                vesselInfo.fullMass -= p.Resources[intake.resourceName].amount * intakeAirDensity;
+                            }
+
+                            break;
                         }
                     }
                 }

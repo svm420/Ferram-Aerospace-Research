@@ -134,15 +134,19 @@ namespace FerramAerospaceResearch.FARGUI
                 {
                     if (float.TryParse(s, out float val))
                     {
-                        if (curIndex == 0)
-                            color.r = val;
-                        else if (curIndex == 1)
-                            color.g = val;
-                        else
+                        switch (curIndex)
                         {
-                            color.b = val;
-                            return color;
+                            case 0:
+                                color.r = val;
+                                break;
+                            case 1:
+                                color.g = val;
+                                break;
+                            default:
+                                color.b = val;
+                                return color;
                         }
+
                         curIndex++;
                     }
                 }

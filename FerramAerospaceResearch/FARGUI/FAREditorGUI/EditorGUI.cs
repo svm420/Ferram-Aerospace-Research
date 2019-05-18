@@ -525,27 +525,26 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndVertical();
 
             GUILayout.EndHorizontal();
-            //GUILayout.EndHorizontal();
-            if (currentMode == FAREditorMode.STATIC)
+            switch (currentMode)
             {
-                _editorGraph.Display();
-                guiRect.height = useKSPSkin ? 570 : 450;
-            }
-            else if (currentMode == FAREditorMode.STABILITY)
-            {
-                _stabDeriv.Display();
-                guiRect.height = useKSPSkin ? 680 : 450;
-            }
-            else if (currentMode == FAREditorMode.SIMULATION)
-            {
-                _stabDerivLinSim.Display();
-                guiRect.height = useKSPSkin ? 570 : 450;
-            }
-            else if (currentMode == FAREditorMode.AREA_RULING)
-            {
-                CrossSectionAnalysisGUI();
-                DebugVisualizationGUI();
-                guiRect.height = useKSPSkin ? 350 : 220;
+                //GUILayout.EndHorizontal();
+                case FAREditorMode.STATIC:
+                    _editorGraph.Display();
+                    guiRect.height = useKSPSkin ? 570 : 450;
+                    break;
+                case FAREditorMode.STABILITY:
+                    _stabDeriv.Display();
+                    guiRect.height = useKSPSkin ? 680 : 450;
+                    break;
+                case FAREditorMode.SIMULATION:
+                    _stabDerivLinSim.Display();
+                    guiRect.height = useKSPSkin ? 570 : 450;
+                    break;
+                case FAREditorMode.AREA_RULING:
+                    CrossSectionAnalysisGUI();
+                    DebugVisualizationGUI();
+                    guiRect.height = useKSPSkin ? 350 : 220;
+                    break;
             }
 
             GUI.DragWindow();
@@ -636,12 +635,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void ArrowDisplay()
         {
-            if (currentMode == FAREditorMode.STATIC)
-                _editorGraph.ArrowAnim(velocityArrow);
-            else if (currentMode == FAREditorMode.STABILITY || currentMode == FAREditorMode.SIMULATION)
-                _stabDeriv.ArrowAnim(velocityArrow);
-            else
-                velocityArrow.Direction = Vector3.zero;
+            switch (currentMode)
+            {
+                case FAREditorMode.STATIC:
+                    _editorGraph.ArrowAnim(velocityArrow);
+                    break;
+                case FAREditorMode.STABILITY:
+                case FAREditorMode.SIMULATION:
+                    _stabDeriv.ArrowAnim(velocityArrow);
+                    break;
+                default:
+                    velocityArrow.Direction = Vector3.zero;
+                    break;
+            }
         }
         #endregion
 

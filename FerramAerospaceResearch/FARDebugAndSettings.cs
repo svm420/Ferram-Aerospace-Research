@@ -269,12 +269,18 @@ namespace FerramAerospaceResearch
 
             activeTab = (MenuTab)GUILayout.SelectionGrid((int)activeTab, MenuTab_str, 3);
 
-            if (activeTab == MenuTab.DebugAndData)
-                DebugAndDataTab(thisStyle);
-            else if (activeTab == MenuTab.AeroStress)
-                AeroStressTab(buttonStyle, boxStyle);
-            else
-                AeroDataTab(buttonStyle, boxStyle);
+            switch (activeTab)
+            {
+                case MenuTab.DebugAndData:
+                    DebugAndDataTab(thisStyle);
+                    break;
+                case MenuTab.AeroStress:
+                    AeroStressTab(buttonStyle, boxStyle);
+                    break;
+                default:
+                    AeroDataTab(buttonStyle, boxStyle);
+                    break;
+            }
 
             //            SaveWindowPos.x = windowPos.x;3
             //            SaveWindowPos.y = windowPos.y;

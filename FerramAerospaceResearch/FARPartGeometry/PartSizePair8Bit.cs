@@ -74,12 +74,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (z > LENGTH_OF_VOXEL)
                 z -= LENGTH_OF_VOXEL;
 
-            if (x == 0 && y == 0 && z == 0)      //if they're all 0, this is 0
-                return 0f;
-
-            //If a plane actually passes through this, that means that any values that are 0 indicate no planes cutting through this, and thus, that they should fill that dimension
-            if (x == 0)
-                x = LENGTH_OF_VOXEL;
+            switch (x)
+            {
+                //if they're all 0, this is 0
+                case 0 when y == 0 && z == 0:
+                    return 0f;
+                //If a plane actually passes through this, that means that any values that are 0 indicate no planes cutting through this, and thus, that they should fill that dimension
+                case 0:
+                    x = LENGTH_OF_VOXEL;
+                    break;
+            }
 
             //if (y == 0)
             //    y = LENGTH_OF_VOXEL;

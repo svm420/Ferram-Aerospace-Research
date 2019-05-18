@@ -2431,16 +2431,20 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         if (p is null) //If there is a pt there, but no part listed, this is an interior pt or the cross-section is shrinking
                         {
-                            if (pt.mark == SweepPlanePoint.MarkingType.VoxelShell) //label it as active so that it can be determined if it is interior or not once all the points have been updated
+                            switch (pt.mark)
                             {
-                                activePts.Add(pt); //And add it to the list of active interior pts
-                                pt.mark = SweepPlanePoint.MarkingType.Active;
+                                //label it as active so that it can be determined if it is interior or not once all the points have been updated
+                                case SweepPlanePoint.MarkingType.VoxelShell:
+                                    activePts.Add(pt); //And add it to the list of active interior pts
+                                    pt.mark = SweepPlanePoint.MarkingType.Active;
+                                    break;
+                                //if this shell was previously interior, we need to know so that we can set it to the correct active
+                                case SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior:
+                                    activePts.Add(pt); //And add it to the list of active interior pts
+                                    pt.mark = SweepPlanePoint.MarkingType.ActivePassedThroughInternalShell;
+                                    break;
                             }
-                            else if (pt.mark == SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior) //if this shell was previously interior, we need to know so that we can set it to the correct active
-                            {
-                                activePts.Add(pt); //And add it to the list of active interior pts
-                                pt.mark = SweepPlanePoint.MarkingType.ActivePassedThroughInternalShell;
-                            }
+
                             //Only other situation is that it is an inactive point, in which case we do nothing here, because it is already taken care of
                         }
                         else if (pt.mark != SweepPlanePoint.MarkingType.VoxelShell && pt.mark != SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior)  //only run this if it's not already labeled as part of a voxel shell

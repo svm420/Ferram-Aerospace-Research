@@ -824,14 +824,18 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             foreach (ICrossSectionAdjuster adjuster in activeAdjusters)
             {
-                if (adjuster is AirbreathingEngineCrossSectionAdjuster)
-                    engineExitArea += Math.Abs(adjuster.AreaRemovedFromCrossSection());
-                if (adjuster is IntakeCrossSectionAdjuster)
-                    intakeArea += Math.Abs(adjuster.AreaRemovedFromCrossSection());
-                if (adjuster is IntegratedIntakeEngineCrossSectionAdjuster)
+                switch (adjuster)
                 {
-                    engineExitArea += Math.Abs(adjuster.AreaRemovedFromCrossSection());
-                    intakeArea     += Math.Abs(adjuster.AreaRemovedFromCrossSection());
+                    case AirbreathingEngineCrossSectionAdjuster _:
+                        engineExitArea += Math.Abs(adjuster.AreaRemovedFromCrossSection());
+                        break;
+                    case IntakeCrossSectionAdjuster _:
+                        intakeArea += Math.Abs(adjuster.AreaRemovedFromCrossSection());
+                        break;
+                    case IntegratedIntakeEngineCrossSectionAdjuster _:
+                        engineExitArea += Math.Abs(adjuster.AreaRemovedFromCrossSection());
+                        intakeArea     += Math.Abs(adjuster.AreaRemovedFromCrossSection());
+                        break;
                 }
             }
 

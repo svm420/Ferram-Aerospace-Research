@@ -158,16 +158,24 @@ namespace FerramAerospaceResearch
                     parsedTemplate.flowModeNeeded = true;
                     string flowString = resources.GetValue("flowMode").ToLowerInvariant();
 
-                    if (flowString == "all_vessel")
-                        parsedTemplate.flowMode = ResourceFlowMode.ALL_VESSEL;
-                    else if (flowString == "stack_priority_search")
-                        parsedTemplate.flowMode = ResourceFlowMode.STACK_PRIORITY_SEARCH;
-                    else if (flowString == "stage_priority_flow")
-                        parsedTemplate.flowMode = ResourceFlowMode.STAGE_PRIORITY_FLOW;
-                    else if (flowString == "no_flow")
-                        parsedTemplate.flowMode = ResourceFlowMode.NO_FLOW;
-                    else
-                        parsedTemplate.flowModeNeeded = false;
+                    switch (flowString)
+                    {
+                        case "all_vessel":
+                            parsedTemplate.flowMode = ResourceFlowMode.ALL_VESSEL;
+                            break;
+                        case "stack_priority_search":
+                            parsedTemplate.flowMode = ResourceFlowMode.STACK_PRIORITY_SEARCH;
+                            break;
+                        case "stage_priority_flow":
+                            parsedTemplate.flowMode = ResourceFlowMode.STAGE_PRIORITY_FLOW;
+                            break;
+                        case "no_flow":
+                            parsedTemplate.flowMode = ResourceFlowMode.NO_FLOW;
+                            break;
+                        default:
+                            parsedTemplate.flowModeNeeded = false;
+                            break;
+                    }
                 }
 
                 PartResourceLibrary l = PartResourceLibrary.Instance;
