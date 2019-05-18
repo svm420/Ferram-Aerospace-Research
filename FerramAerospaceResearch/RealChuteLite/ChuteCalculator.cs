@@ -45,7 +45,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                         * PhysicsGlobals.DragCurveValue(PhysicsGlobals.SurfaceCurves, (Vector3.Dot(Vector3.up, DragCubeList.GetFaceDirection((DragCube.DragFace)i)) + 1) * 0.5f, 0);
 
             }
-            return (float)Math.Max(Math.Round(Math.Sqrt((area * 0.1f * PhysicsGlobals.DragMultiplier) / Math.PI) * 2, 1, MidpointRounding.AwayFromZero), 0.1);
+            return (float)Math.Max(Math.Round(Math.Sqrt(area * 0.1f * PhysicsGlobals.DragMultiplier / Math.PI) * 2, 1, MidpointRounding.AwayFromZero), 0.1);
         }
         #endregion
     }

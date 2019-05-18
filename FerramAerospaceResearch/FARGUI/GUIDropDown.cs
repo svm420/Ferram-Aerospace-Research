@@ -187,7 +187,7 @@ namespace FerramAerospaceResearch.FARGUI
             for (int i = 0; i < stringOptions.Length; i++)
             {
                 // Highlight the selected item
-                GUIStyle tmpStyle = (selectedOption == i) ? selectedItemStyle : dropdownItemStyle;
+                GUIStyle tmpStyle = selectedOption == i ? selectedItemStyle : dropdownItemStyle;
                 if (GUILayout.Button(stringOptions[i], tmpStyle))
                 {
                     FARLogger.Info("Selected " + stringOptions[i]);

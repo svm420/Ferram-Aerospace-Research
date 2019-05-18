@@ -181,11 +181,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             switch (type)
             {
                 case OverlayType.AREA:
-                    return (_areaRenderer != null) && _areaRenderer.enabled;
+                    return _areaRenderer != null && _areaRenderer.enabled;
                 case OverlayType.DERIV:
-                    return (_derivRenderer != null) && _derivRenderer.enabled;
+                    return _derivRenderer != null && _derivRenderer.enabled;
                 case OverlayType.COEFF:
-                    return (_coeffRenderer != null) && _coeffRenderer.enabled;
+                    return _coeffRenderer != null && _coeffRenderer.enabled;
                 default:
                     return false;
             }

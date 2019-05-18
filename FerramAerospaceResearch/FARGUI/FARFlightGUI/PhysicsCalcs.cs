@@ -237,8 +237,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 vesselInfo.headingAngle = vesselRot.eulerAngles.y;
                 //vesselRot *= Quaternion.Euler(0, -yawAngle, 0);
                 //yawAngle = 360 - yawAngle;
-                vesselInfo.pitchAngle = (vesselRot.eulerAngles.x > 180) ? (360 - vesselRot.eulerAngles.x) : -vesselRot.eulerAngles.x;
-                vesselInfo.rollAngle = (vesselRot.eulerAngles.z > 180) ? (360 - vesselRot.eulerAngles.z) : -vesselRot.eulerAngles.z;
+                vesselInfo.pitchAngle = vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
+                vesselInfo.rollAngle = vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
             }
         }
 

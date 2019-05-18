@@ -314,7 +314,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if(xv_yvPairs.Count < 5)
                 for(int i = 0; i < xv_yvPairs.Count; i += 2)
                 {
-                    _graph.AddLine(key + (j++), new[] { xv_yvPairs[i], xv_yvPairs[i] }, new[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
+                    _graph.AddLine(key + j++, new[] { xv_yvPairs[i], xv_yvPairs[i] }, new[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
                 }
         }
 

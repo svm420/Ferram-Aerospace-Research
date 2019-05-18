@@ -114,7 +114,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 else if(panelBounds != prevPanelBounds[i])
                 {
                     rebuildMesh = true;
-                    prevPanelBounds[i] = (panelBounds);
+                    prevPanelBounds[i] = panelBounds;
                 }
             }
 

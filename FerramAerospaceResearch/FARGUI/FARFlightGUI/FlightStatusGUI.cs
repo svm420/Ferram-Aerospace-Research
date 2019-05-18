@@ -99,7 +99,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 statusColor = Color.yellow;
                 statusBlinker = false;
             }
-            else if ((Math.Abs(infoParameters.aoA) > 20 && Math.Abs(infoParameters.aoA) < 160) || (Math.Abs(infoParameters.sideslipAngle) > 20 && Math.Abs(infoParameters.sideslipAngle) < 160))
+            else if (Math.Abs(infoParameters.aoA) > 20 && Math.Abs(infoParameters.aoA) < 160 || Math.Abs(infoParameters.sideslipAngle) > 20 && Math.Abs(infoParameters.sideslipAngle) < 160)
             {
                 statusString = Localizer.Format("FARFlightStatus3");
                 statusColor = Color.yellow;

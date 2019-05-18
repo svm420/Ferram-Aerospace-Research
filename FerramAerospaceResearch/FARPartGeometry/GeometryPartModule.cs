@@ -287,7 +287,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             bool returnVal = !_started && _sceneSetup;
 
-            returnVal &= (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready) || (HighLogic.LoadedSceneIsEditor && ApplicationLauncher.Ready);
+            returnVal &= HighLogic.LoadedSceneIsFlight && FlightGlobals.ready || HighLogic.LoadedSceneIsEditor && ApplicationLauncher.Ready;
 
             returnVal &= part.collider != null || part.Modules.Contains<ModuleWheelBase>() || part.Modules.Contains<KerbalEVA>() || part.Modules.Contains<FlagSite>();
 
@@ -797,7 +797,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             bool isDrill = part.Modules.Contains<ModuleAsteroidDrill>() || part.Modules.Contains<ModuleResourceHarvester>();
 
             //Voxelize colliders
-            if ((forceUseColliders || isFairing || isDrill || (rendererBounds.size.x * rendererBounds.size.z < colliderBounds.size.x * colliderBounds.size.z * 1.6f && rendererBounds.size.y < colliderBounds.size.y * 1.2f && (rendererBounds.center - colliderBounds.center).magnitude < 0.3f)) && !forceUseMeshes)
+            if ((forceUseColliders || isFairing || isDrill || rendererBounds.size.x * rendererBounds.size.z < colliderBounds.size.x * colliderBounds.size.z * 1.6f && rendererBounds.size.y < colliderBounds.size.y * 1.2f && (rendererBounds.center - colliderBounds.center).magnitude < 0.3f) && !forceUseMeshes)
             {
                 foreach (Transform t in meshTransforms)
                 {

@@ -278,7 +278,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             get
             {
                 if (chuteTemperature < 293.15) { return 0.72; }
-                return chuteTemperature > 403.15 ? 0.9 : UtilMath.Lerp(0.72, 0.9, ((chuteTemperature - 293.15) / 110) + 293.15);
+                return chuteTemperature > 403.15 ? 0.9 : UtilMath.Lerp(0.72, 0.9, (chuteTemperature - 293.15) / 110 + 293.15);
             }
         }
 
@@ -462,7 +462,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         //Returns the canopy area of the given Diameter
         public static float GetArea(float diameter)
         {
-            return (float)((diameter * diameter * Math.PI) / 4);
+            return (float)(diameter * diameter * Math.PI / 4);
         }
 
         //Activates the parachute
@@ -510,7 +510,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         //Drag formula calculations
         public float DragCalculation(float area)
         {
-            return ((float)atmDensity * sqrSpeed * staticCd * area) / 2000;
+            return (float)atmDensity * sqrSpeed * staticCd * area / 2000;
         }
 
         //Gives the cost for this parachute
@@ -655,7 +655,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         //Calculates convective flux
         private void CalculateChuteFlux()
         {
-            convFlux = vessel.convectiveCoefficient * UtilMath.Lerp(1, 1 + (Math.Sqrt(vessel.mach * vessel.mach * vessel.mach) * (vessel.dynamicPressurekPa / 101.325)),
+            convFlux = vessel.convectiveCoefficient * UtilMath.Lerp(1, 1 + Math.Sqrt(vessel.mach * vessel.mach * vessel.mach) * (vessel.dynamicPressurekPa / 101.325),
                             (vessel.mach - PhysicsGlobals.FullToCrossSectionLerpStart) / PhysicsGlobals.FullToCrossSectionLerpEnd)
                             * (vessel.externalTemperature - chuteTemperature);
         }
@@ -671,7 +671,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 double temp2 = chuteTemperature * chuteTemperature;
                 emissiveFlux = 2 * PhysicsGlobals.StefanBoltzmanConstant * ChuteEmissivity * PhysicsGlobals.RadiationFactor * temp2 * temp2;
             }
-            chuteTemperature = Math.Max(PhysicsGlobals.SpaceTemperature, chuteTemperature + ((convFlux - emissiveFlux) * 0.001 * ConvectionArea * InvThermalMass * TimeWarp.fixedDeltaTime));
+            chuteTemperature = Math.Max(PhysicsGlobals.SpaceTemperature, chuteTemperature + (convFlux - emissiveFlux) * 0.001 * ConvectionArea * InvThermalMass * TimeWarp.fixedDeltaTime);
             if (chuteTemperature > maxTemp)
             {
 
@@ -690,7 +690,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             if (vessel.externalTemperature <= maxTemp || convFlux < 0) { s = SafeState.SAFE; }
             else
             {
-                s = chuteTemperature + (0.001 * convFlux * InvThermalMass * DeployedArea * 0.35) <= maxTemp ? SafeState.RISKY : SafeState.DANGEROUS;
+                s = chuteTemperature + 0.001 * convFlux * InvThermalMass * DeployedArea * 0.35 <= maxTemp ? SafeState.RISKY : SafeState.DANGEROUS;
             }
 
             if (safeState != s)

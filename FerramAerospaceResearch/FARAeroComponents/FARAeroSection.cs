@@ -341,7 +341,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 localVelNorm = Vector3.Normalize(localVel);
                 Vector3 localForceTemp = Vector3.Dot(localVelNorm, forceVector) * localVelNorm;
-                Vector3 partLocalForce = (localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor);
+                Vector3 partLocalForce = localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor;
                 forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
                 torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)dynamicPressurekPa);
                 if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
@@ -448,7 +448,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         momentFactor = 0.6f * hypersonicMomentBackward;
                     else
                     {
-                        float tmp = (-0.185185185f * machNumber + 1.11111111111f);
+                        float tmp = -0.185185185f * machNumber + 1.11111111111f;
                         momentFactor = tmp * hypersonicMomentBackward * 0.6f + (1 - tmp) * hypersonicMomentForward;
                     }
                     //if (machNumber < 1.5)
@@ -467,7 +467,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         momentFactor = 0.6f * hypersonicMomentForward;
                     else
                     {
-                        float tmp = (-0.185185185f * machNumber + 1.11111111111f);
+                        float tmp = -0.185185185f * machNumber + 1.11111111111f;
                         momentFactor = tmp * hypersonicMomentForward * 0.6f + (1 - tmp) * hypersonicMomentBackward;
                     }
                     //if (machNumber < 1.5)
@@ -480,7 +480,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 dampingMoment =  Math.Abs(dampingMoment) * 0.1f;
                 //dampingMoment += (float)Math.Abs(skinFrictionForce) * 0.1f;
                 float rollDampingMoment = (float)(skinFrictionForce * 0.5 * diameter); //skin friction force times avg moment arm for vehicle
-                rollDampingMoment *= (0.75f + flatnessRatio * 0.25f);                  //this is just an approximation for now
+                rollDampingMoment *= 0.75f + flatnessRatio * 0.25f;                  //this is just an approximation for now
 
                 Vector3 forceVector = (float)xForce * xRefVector + (float)nForce * localNormalForceVec;
                 forceVector -= (float)localVelForce * velLocalNorm;
@@ -491,9 +491,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 nonAxialAngLocalVel = angVelLocal - axialAngLocalVel;
 
                 if (velLocal.sqrMagnitude > 0.001f)
-                    torqueVector -= (dampingMoment * nonAxialAngLocalVel) + (rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude) / velLocal.sqrMagnitude;
+                    torqueVector -= dampingMoment * nonAxialAngLocalVel + rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / velLocal.sqrMagnitude;
                 else
-                    torqueVector -= (dampingMoment * nonAxialAngLocalVel) + (rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude) / 0.001f;
+                    torqueVector -= dampingMoment * nonAxialAngLocalVel + rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / 0.001f;
 
                 //float dynPresAndScaling = 0.0005f * atmDensity * velLocal.sqrMagnitude * data.dragFactor;        //dyn pres and N -> kN conversion
 

@@ -219,7 +219,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             nominalOutput = _instantCondition.iterationOutput;
             //alpha_str = (alpha * Mathf.PI / 180).ToString();
 
-            input.alpha = (alpha + 2);
+            input.alpha = alpha + 2;
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true, true);
 
@@ -228,7 +228,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivOutput.stableAoA = alpha;
             stabDerivOutput.stableAoAState = "";
             if (Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
-                stabDerivOutput.stableAoAState = ((nominalOutput.Cl > neededCl) ? "<" : ">");
+                stabDerivOutput.stableAoAState = nominalOutput.Cl > neededCl ? "<" : ">";
 
             FARLogger.Info("Cl needed: " + neededCl + ", AoA: " + alpha + ", Cl: " + nominalOutput.Cl + ", Cd: " + nominalOutput.Cd);
 
@@ -311,7 +311,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             //Lateral Mess
 
             input.pitchValue = 0;
-            input.beta = (beta + 2);
+            input.beta = beta + 2;
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true);
             pertOutput.Cy = (pertOutput.Cy - nominalOutput.Cy) / (2 * FARMathUtil.deg2rad);                   //sideslip angle derivs

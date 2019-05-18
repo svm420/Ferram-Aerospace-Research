@@ -329,7 +329,7 @@ namespace ferram4
 
             if (HighLogic.LoadedSceneIsFlight && !(part is null) && !(vessel is null))
             {
-                bool process = part.isControllable || (justStarted && isFlap);
+                bool process = part.isControllable || justStarted && isFlap;
 
                 if (process && !(MovableSection is null) && part.Rigidbody)
                 {

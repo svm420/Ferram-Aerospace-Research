@@ -421,7 +421,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 int count = threadsQueued;
                 for (int i = 0; i < count; i++)
                 {
-                    var meshParams = new VoxelShellMeshParams((geoModules.Count * i) / count, ((i + 1) * geoModules.Count) / count, geoModules);
+                    var meshParams = new VoxelShellMeshParams(geoModules.Count * i / count, (i + 1) * geoModules.Count / count, geoModules);
 
                     ThreadPool.QueueUserWorkItem(UpdateFromMesh, meshParams);
                 }
@@ -437,9 +437,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (multiThreaded)
                 {
-                    var data = new VoxelSolidParams(0, (yLength / 2) * 8, true);
+                    var data = new VoxelSolidParams(0, yLength / 2 * 8, true);
                     ThreadPool.QueueUserWorkItem(SolidifyVoxel, data);
-                    data = new VoxelSolidParams((yLength / 2) * 8, yCellLength, false);
+                    data = new VoxelSolidParams(yLength / 2 * 8, yCellLength, false);
                     ThreadPool.QueueUserWorkItem(SolidifyVoxel, data);
                 }
                 else
@@ -566,13 +566,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             if (plane.x * plane.z > 0.0)        //Determine high and low points on this quad of the plane
                             {
-                                jSect1 = (int)(-(plane.x * iOverall + plane.z * kOverall + plane.w));             //End points of the plane
-                                jSect3 = (int)(-(plane.x * (iOverall + 7) + plane.z * (kOverall + 7) + plane.w));
+                                jSect1 = (int)-(plane.x * iOverall + plane.z * kOverall + plane.w);             //End points of the plane
+                                jSect3 = (int)-(plane.x * (iOverall + 7) + plane.z * (kOverall + 7) + plane.w);
                             }
                             else
                             {
-                                jSect1 = (int)(-(plane.x * (iOverall + 7) + plane.z * kOverall + plane.w));
-                                jSect3 = (int)(-(plane.x * iOverall + plane.z * (kOverall + 7) + plane.w));
+                                jSect1 = (int)-(plane.x * (iOverall + 7) + plane.z * kOverall + plane.w);
+                                jSect3 = (int)-(plane.x * iOverall + plane.z * (kOverall + 7) + plane.w);
                             }
                             int jSect2 = (int)((jSect1 + jSect3) * 0.5);     //Central point
 
@@ -605,7 +605,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                     double tmp = plane.x * i + plane.w;
                                     for (int k = kOverall; k < kOverall + 8; k++)
                                     {
-                                        int j = (int)(-(plane.z * k + tmp));
+                                        int j = (int)-(plane.z * k + tmp);
 
                                         if (j < jMin || j > jMax)
                                             continue;
@@ -658,7 +658,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 if (!(jSect3 >= yLength))
                                 {
                                     sect3 = voxelChunks[iSect, jSect3, kSect];
-                                    if (sect3 != null && (sect3 != sect2 && sect3 != sect1))
+                                    if (sect3 != null && sect3 != sect2 && sect3 != sect1)
                                         validSects = true;
                                 }
 
@@ -670,7 +670,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                     double tmp = plane.x * i + plane.w;
                                     for (int k = kOverall; k < kOverall + 8; k++)
                                     {
-                                        int j = (int)(-(plane.z * k + tmp));
+                                        int j = (int)-(plane.z * k + tmp);
 
                                         if (j < jMin || j > jMax)
                                             continue;
@@ -915,7 +915,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 if (!(iSect3 >= xLength))
                                 {
                                     sect3 = voxelChunks[iSect3, jSect, kSect];
-                                    if (sect3 != null && (sect3 != sect2 && sect3 != sect1))
+                                    if (sect3 != null && sect3 != sect2 && sect3 != sect1)
                                         validSects = true;
                                 }
 
@@ -1176,7 +1176,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 if (!(kSect3 >= zLength))
                                 {
                                     sect3 = voxelChunks[iSect, jSect, kSect3];
-                                    if (sect3 != null && (sect3 != sect2 && sect3 != sect1))
+                                    if (sect3 != null && sect3 != sect2 && sect3 != sect1)
                                         validSects = true;
                                 }
 
@@ -1324,7 +1324,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     areaP1 = crossSections[i + 1].area;
                 }
 
-                double areaSecondDeriv = (areaM1 + areaP1) - 2 * area0;
+                double areaSecondDeriv = areaM1 + areaP1 - 2 * area0;
                 areaSecondDeriv *= denom;
 
                 crossSections[i].secondAreaDeriv = areaSecondDeriv;
@@ -1750,9 +1750,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Vector3 min = (minMesh - lowerRightCorner) * invElementSize;
             Vector3 max = (maxMesh - lowerRightCorner) * invElementSize;
 
-            int lowerI = (int)(min.x);
-            int lowerJ = (int)(min.y);
-            int lowerK = (int)(min.z);
+            int lowerI = (int)min.x;
+            int lowerJ = (int)min.y;
+            int lowerK = (int)min.z;
 
             int upperI = (int)(max.x + 1);
             int upperJ = (int)(max.y + 1);
@@ -1832,9 +1832,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             double invDenom = 1 / (dot12_12 * dot13_13 - dot12_13 * dot12_13);
 
             int lowJ = (int)(Math.Min(vert1Proj.y, Math.Min(vert2Proj.y, vert3Proj.y)) - 1);
-            int highJ = (int)(Math.Ceiling(Math.Max(vert1Proj.y, Math.Max(vert2Proj.y, vert3Proj.y)) + 1));
+            int highJ = (int)Math.Ceiling(Math.Max(vert1Proj.y, Math.Max(vert2Proj.y, vert3Proj.y)) + 1);
             int lowK = (int)(Math.Min(vert1Proj.z, Math.Min(vert2Proj.z, vert3Proj.z)) - 1);
-            int highK = (int)(Math.Ceiling(Math.Max(vert1Proj.z, Math.Max(vert2Proj.z, vert3Proj.z)) + 1));
+            int highK = (int)Math.Ceiling(Math.Max(vert1Proj.z, Math.Max(vert2Proj.z, vert3Proj.z)) + 1);
 
             if (lowJ < 0)
                 lowJ = 0;
@@ -1893,9 +1893,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     Vector3 p2TestPt = pt - vert2Proj;
                     Vector3 p3TestPt = pt - vert3Proj;
-                    if ((u + v < 0.5 && p1TestPt.magnitude <= RC) ||
-                        ((u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC) ||
-                        ((v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC))
+                    if (u + v < 0.5 && p1TestPt.magnitude <= RC ||
+                        (u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC ||
+                        (v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC)
                     {
 
                         double floatLoc = (i - iFloat) * signW + 0.5;
@@ -1977,9 +1977,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             double invDenom = 1 / (dot12_12 * dot13_13 - dot12_13 * dot12_13);
 
             int lowI = (int)(Math.Min(vert1Proj.x, Math.Min(vert2Proj.x, vert3Proj.x)) - 1);
-            int highI = (int)(Math.Ceiling(Math.Max(vert1Proj.x, Math.Max(vert2Proj.x, vert3Proj.x)) + 1));
+            int highI = (int)Math.Ceiling(Math.Max(vert1Proj.x, Math.Max(vert2Proj.x, vert3Proj.x)) + 1);
             int lowK = (int)(Math.Min(vert1Proj.z, Math.Min(vert2Proj.z, vert3Proj.z)) - 1);
-            int highK = (int)(Math.Ceiling(Math.Max(vert1Proj.z, Math.Max(vert2Proj.z, vert3Proj.z)) + 1));
+            int highK = (int)Math.Ceiling(Math.Max(vert1Proj.z, Math.Max(vert2Proj.z, vert3Proj.z)) + 1);
 
 
             if (lowI < 0)
@@ -2042,9 +2042,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     Vector3 p2TestPt = pt - vert2Proj;
                     Vector3 p3TestPt = pt - vert3Proj;
 
-                    if ((u + v < 0.5 && p1TestPt.magnitude <= RC) ||
-                        ((u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC) ||
-                        ((v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC))
+                    if (u + v < 0.5 && p1TestPt.magnitude <= RC ||
+                        (u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC ||
+                        (v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC)
                     {
                         double floatLoc = (j - jFloat) * signW + 0.5;
                         floatLoc *= maxLocation * 0.25d;
@@ -2122,9 +2122,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             double invDenom = 1 / (dot12_12 * dot13_13 - dot12_13 * dot12_13);
 
             int lowI = (int)(Math.Min(vert1Proj.x, Math.Min(vert2Proj.x, vert3Proj.x)) - 1);
-            int highI = (int)(Math.Ceiling(Math.Max(vert1Proj.x, Math.Max(vert2Proj.x, vert3Proj.x)) + 1));
+            int highI = (int)Math.Ceiling(Math.Max(vert1Proj.x, Math.Max(vert2Proj.x, vert3Proj.x)) + 1);
             int lowJ = (int)(Math.Min(vert1Proj.y, Math.Min(vert2Proj.y, vert3Proj.y)) - 1);
-            int highJ = (int)(Math.Ceiling(Math.Max(vert1Proj.y, Math.Max(vert2Proj.y, vert3Proj.y)) + 1));
+            int highJ = (int)Math.Ceiling(Math.Max(vert1Proj.y, Math.Max(vert2Proj.y, vert3Proj.y)) + 1);
 
 
             if (lowJ < 0)
@@ -2185,9 +2185,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                     Vector3 p2TestPt = pt - vert2Proj;
                     Vector3 p3TestPt = pt - vert3Proj;
-                    if ((u + v < 0.5 && p1TestPt.magnitude <= RC) ||
-                        ((u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC) ||
-                        ((v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC))
+                    if (u + v < 0.5 && p1TestPt.magnitude <= RC ||
+                        (u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC ||
+                        (v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC)
                     {
                         double floatLoc = (k - kFloat) * signW + 0.5;
                         floatLoc *= maxLocation * 0.25d;
@@ -2251,7 +2251,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (sideDot > sideSqMag)
                 return 1;
 
-            Vector3 perpVector = (sideDot / sideSqMag) * sideVector;
+            Vector3 perpVector = sideDot / sideSqMag * sideVector;
             perpVector = testVec - perpVector;
 
             return perpVector.magnitude;

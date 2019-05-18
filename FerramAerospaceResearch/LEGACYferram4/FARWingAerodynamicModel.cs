@@ -211,7 +211,7 @@ namespace ferram4
                 sum             += model.NUFAR_areaExposedFactor;
                 totalExposedSum += model.NUFAR_totalExposedAreaFactor;
             }
-            double tmp = 1 / (counterpartsCount);
+            double tmp = 1 / counterpartsCount;
             sum *= tmp;
             totalExposedSum *= tmp;
 
@@ -367,7 +367,7 @@ namespace ferram4
                 WC += -b_2_actual / 3 * (1 + TaperRatio * 2) / (1 + TaperRatio) * (Vector3d.right * srfAttachNegative + Vector3d.up * Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
             }
             else
-                WC += (-MAC_actual * 0.7) * Vector3d.up;
+                WC += -MAC_actual * 0.7 * Vector3d.up;
 
             localWingCentroid = WC;
         }
@@ -559,7 +559,7 @@ namespace ferram4
                     double v_scalar = velocity.magnitude;
 
                     if (partVessel.mainBody.ocean)
-                        rho = (partVessel.mainBody.oceanDensity * 1000 * part.submergedPortion + part.atmDensity * (1 - part.submergedPortion));
+                        rho = partVessel.mainBody.oceanDensity * 1000 * part.submergedPortion + part.atmDensity * (1 - part.submergedPortion);
                     else
                         rho = part.atmDensity;
 
@@ -756,14 +756,14 @@ namespace ferram4
             if(updateAeroArrows)
                 UpdateAeroDisplay(L, D);
 
-            Vector3d force = (L + D);
+            Vector3d force = L + D;
             if (double.IsNaN(force.sqrMagnitude) || double.IsNaN(AerodynamicCenter.sqrMagnitude))// || float.IsNaN(moment.magnitude))
             {
                 FARLogger.Warning("Error: Aerodynamic force = " + force.magnitude + " AC Loc = " + AerodynamicCenter.magnitude + " AoA = " + AoA + "\n\rMAC = " + effective_MAC + " B_2 = " + effective_b_2 + " sweepAngle = " + cosSweepAngle + "\n\rMidChordSweep = " + MidChordSweep + " MidChordSweepSideways = " + MidChordSweepSideways + "\n\r at " + part.name);
                 force = AerodynamicCenter = Vector3d.zero;
             }
 
-            double numericalControlFactor = (part.rb.mass * v_scalar * 0.67) / (force.magnitude * TimeWarp.fixedDeltaTime);
+            double numericalControlFactor = part.rb.mass * v_scalar * 0.67 / (force.magnitude * TimeWarp.fixedDeltaTime);
             force *= Math.Min(numericalControlFactor, 1);
 
 
@@ -881,10 +881,10 @@ namespace ferram4
                 effectiveUpstreamInfluence = wingInteraction.EffectiveUpstreamInfluence;
 
                 AoAmax = wingInteraction.EffectiveUpstreamAoAMax;
-                liftslope *= (1 - effectiveUpstreamInfluence);
+                liftslope *= 1 - effectiveUpstreamInfluence;
                 liftslope += wingInteraction.EffectiveUpstreamLiftSlope;
 
-                cosSweepAngle *= (1 - effectiveUpstreamInfluence);
+                cosSweepAngle *= 1 - effectiveUpstreamInfluence;
                 cosSweepAngle += wingInteraction.EffectiveUpstreamCosSweepAngle;
                 cosSweepAngle = cosSweepAngle.Clamp(0d, 1d);
             }
@@ -977,7 +977,7 @@ namespace ferram4
 
                 if (Math.Abs(Cl) > Math.Abs(ACweight))
                     ACshift *= Math.Abs(ACweight / Cl).Clamp(0, 1);
-                Cd = (Cl * Cl / piARe);     //Drag due to 3D effects on wing and base constant
+                Cd = Cl * Cl / piARe;     //Drag due to 3D effects on wing and base constant
                 Cd += Cd0;
             }
             /*
@@ -1028,7 +1028,7 @@ namespace ferram4
                         ACshift *= Math.Abs(ACweight / Cl).Clamp(0, 1);
                 }
                 finalLiftSlope = Cn * (1 - supScale);
-                Cl *= (1 - supScale);
+                Cl *= 1 - supScale;
 
                 double M = MachNumber.Clamp(1.2, double.PositiveInfinity);
 
@@ -1145,7 +1145,7 @@ namespace ferram4
             double p4 = PMExpansionCalculation(2 * halfAngle, M3) * p3;
 
             //FARLogger.Info("" + p1 + " " + p2 + " " + p3 + " " + p4);
-            double pRatio = ((p3 + p4) - (p1 + p2)) * 0.5;
+            double pRatio = (p3 + p4 - (p1 + p2)) * 0.5;
 
             return pRatio;
         }
@@ -1332,7 +1332,7 @@ namespace ferram4
                     return zeroLiftCdIncrement;
                 }
 
-                thisInteractionFactor = (1 - wingInteraction.EffectiveUpstreamInfluence);
+                thisInteractionFactor = 1 - wingInteraction.EffectiveUpstreamInfluence;
             }
 
             //Based on the method of DATCOM Section 4.1.5.1-C
@@ -1444,7 +1444,7 @@ namespace ferram4
             {
                 PartModule m = part.Modules["TweakScale"];
                 float massScale = (float)m.Fields.GetValue("MassScale");
-                baseMass = part.partInfo.partPrefab.mass + (part.partInfo.partPrefab.mass * (massScale - 1));
+                baseMass = part.partInfo.partPrefab.mass + part.partInfo.partPrefab.mass * (massScale - 1);
                 FARLogger.Info("TweakScale massScale for FAR usage: " + massScale);
             }
             massScaleReady = false;

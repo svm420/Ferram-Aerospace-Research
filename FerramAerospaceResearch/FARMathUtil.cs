@@ -98,7 +98,7 @@ namespace FerramAerospaceResearch
         public static double Lerp(double x1, double x2, double y1, double y2, double x)
         {
             double y = (y2 - y1) / (x2 - x1);
-            y *= (x - x1);
+            y *= x - x1;
             y += y1;
             return y;
         }
@@ -156,7 +156,7 @@ namespace FerramAerospaceResearch
         {
             int tmp = (int)(BitConverter.DoubleToInt64Bits(a) >> 32);
             int tmp2 = (int)(b * (tmp - 1072632447) + 1072632447);
-            return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
+            return BitConverter.Int64BitsToDouble((long)tmp2 << 32);
         }
 
         public static double BrentsMethod(Func<double, double> function, double a, double b, double epsilon = 0.001, int maxIter = int.MaxValue)
@@ -187,7 +187,7 @@ namespace FerramAerospaceResearch
             int iter = 0;
             while (!fs.NearlyEqual(0) && Math.Abs(a - b) > epsilon && iter < maxIter)
             {
-                if ((fa - fc) > double.Epsilon && (fb - fc) > double.Epsilon)    //inverse quadratic interpolation
+                if (fa - fc > double.Epsilon && fb - fc > double.Epsilon)    //inverse quadratic interpolation
                 {
                     s = a * fc * fb / ((fa - fb) * (fa - fc));
                     s += b * fc * fa / ((fb - fa) * (fb - fc));

@@ -246,7 +246,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void Update()
         {
-            FlightGUIDrawer.SetGUIActive(this,(_vessel == FlightGlobals.ActiveVessel && showGUI && showAllGUI));
+            FlightGUIDrawer.SetGUIActive(this,_vessel == FlightGlobals.ActiveVessel && showGUI && showAllGUI);
             if (frameCountForSaving >= 120)
             {
                 SaveActiveData();
@@ -315,14 +315,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _strBuilder.Length = 0;
             _strBuilder.Append(Localizer.Format("FARAbbrevMach"));
             _strBuilder.Append(": ");
-            _strBuilder.Concat((float)(_vesselAero.MachNumber),3).AppendLine();
+            _strBuilder.Concat((float)_vesselAero.MachNumber,3).AppendLine();
             _strBuilder.AppendFormat(Localizer.Format("FARFlightGUIReynolds"),_vesselAero.ReynoldsNumber);
             GUILayout.Box(_strBuilder.ToString(), boxStyle, GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
 
             _strBuilder.Length = 0;
             _strBuilder.Append(Localizer.Format("FARFlightGUIAtmDens"));
-            _strBuilder.Concat((float)(vessel.atmDensity),3);
+            _strBuilder.Concat((float)vessel.atmDensity,3);
 
             GUILayout.Box(_strBuilder.ToString(), boxStyle, GUILayout.ExpandWidth(true));
 

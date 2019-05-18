@@ -88,7 +88,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (mf != null)
                 {
                     m = mf.sharedMesh;
-                    if ((t.gameObject.layer == ignoreLayers))
+                    if (t.gameObject.layer == ignoreLayers)
                         m = null;
                 }
                 else

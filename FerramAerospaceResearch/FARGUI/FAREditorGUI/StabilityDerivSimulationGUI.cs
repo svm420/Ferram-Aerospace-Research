@@ -245,7 +245,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             Color color = Color.white;
             if (sign != 0)
-                color = (Math.Sign(val) == sign) ? Color.green : Color.red;
+                color = Math.Sign(val) == sign ? Color.green : Color.red;
 
             var style = new GUIStyle(GUI.skin.label);
             style.normal.textColor = style.hover.textColor = color;

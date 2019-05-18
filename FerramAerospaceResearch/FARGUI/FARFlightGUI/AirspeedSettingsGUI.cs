@@ -148,7 +148,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public double CalculateEAS()
         {
-            double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
+            double densityRatio = FARAeroUtil.GetCurrentDensity(_vessel) / 1.225;
             return _vessel.srfSpeed * Math.Sqrt(densityRatio);
         }
 

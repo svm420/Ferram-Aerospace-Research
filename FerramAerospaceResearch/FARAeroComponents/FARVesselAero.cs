@@ -536,7 +536,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public bool HasValidVoxelizationCurrently()
         {
-            return (FlightGlobals.ready && _currentAeroSections != null && vessel) && (!_updateQueued);
+            return FlightGlobals.ready && _currentAeroSections != null && vessel && !_updateQueued;
         }
         #endregion
     }

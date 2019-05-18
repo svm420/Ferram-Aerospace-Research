@@ -73,7 +73,7 @@ namespace ferram4
 
         public static bool inBounds(this Texture2D tex, int i, int j)
         {
-            return (i >= 0 && i < tex.width) && (j >= 0 && j < tex.height);
+            return i >= 0 && i < tex.width && j >= 0 && j < tex.height;
         }
 
         // ReSharper disable once UnusedMember.Global -> for reference
@@ -82,7 +82,7 @@ namespace ferram4
         /// </summary>
         public static void DrawLineBresenham(this Texture2D tex, int x0, int y0, int x1, int y1, Color color)
         {
-            bool steep = (y1 - y0) > (x1 - x0);
+            bool steep = y1 - y0 > x1 - x0;
 
             if (steep)
             {

@@ -168,7 +168,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Part currentPart = pair.part;
             //if we update the plane location with this, then we can consider replacing the part here.  Otherwise, we don't
             bool largerThanLast = pair.SetPlaneLocation(plane, location);
-            if (currentPart is null || overridingParts.Contains(p) || (largerThanLast && !overridingParts.Contains(currentPart)))
+            if (currentPart is null || overridingParts.Contains(p) || largerThanLast && !overridingParts.Contains(currentPart))
                 pair.part = p;
 
         }
@@ -176,26 +176,26 @@ namespace FerramAerospaceResearch.FARPartGeometry
         // ReSharper disable once UnusedMember.Global
         public bool VoxelPointExistsLocalIndex(int zeroBaseIndex)
         {
-            return (voxelPoints[zeroBaseIndex].GetSize() > 0);
+            return voxelPoints[zeroBaseIndex].GetSize() > 0;
         }
 
         // ReSharper disable once UnusedMember.Global
         public bool VoxelPointExistsLocalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k;
-            return (voxelPoints[index].GetSize() > 0);
+            return voxelPoints[index].GetSize() > 0;
         }
 
         public bool VoxelPointExistsGlobalIndex(int zeroBaseIndex)
         {
-            return (voxelPoints[zeroBaseIndex - offset].GetSize() > 0);
+            return voxelPoints[zeroBaseIndex - offset].GetSize() > 0;
         }
 
         // ReSharper disable once UnusedMember.Global
         public bool VoxelPointExistsGlobalIndex(int i, int j, int k)
         {
             int index = i + 8 * j + 64 * k - offset;
-            return (voxelPoints[index].GetSize() > 0);
+            return voxelPoints[index].GetSize() > 0;
         }
 
 

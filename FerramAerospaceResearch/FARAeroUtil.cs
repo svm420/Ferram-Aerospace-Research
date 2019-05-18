@@ -247,7 +247,7 @@ namespace FerramAerospaceResearch
             double gamma = CurrentBody.atmosphereAdiabaticIndex;
 
             double ratio = M * M;
-            ratio *= (gamma - 1);
+            ratio *= gamma - 1;
             ratio *= 0.5;
             ratio++;
 
@@ -264,11 +264,11 @@ namespace FerramAerospaceResearch
             //Rayleigh Pitot Tube Formula; gives max stagnation pressure behind shock
             double value = (gamma + 1) * M;
             value *= value;
-            value /= (4 * gamma * M * M - 2 * (gamma - 1));
+            value /= 4 * gamma * M * M - 2 * (gamma - 1);
             value = Math.Pow(value, gamma / (gamma - 1));
 
-            value *= (1 - gamma + 2 * gamma * M * M);
-            value /= (gamma + 1);
+            value *= 1 - gamma + 2 * gamma * M * M;
+            value /= gamma + 1;
 
             return value;
         }
@@ -279,8 +279,8 @@ namespace FerramAerospaceResearch
 
             double ratio = M * M;
             ratio *= 2 * gamma;
-            ratio -= (gamma - 1);
-            ratio /= (gamma + 1);
+            ratio -= gamma - 1;
+            ratio /= gamma + 1;
 
             return ratio;
 
@@ -290,10 +290,10 @@ namespace FerramAerospaceResearch
         {
             double gamma = CurrentBody.atmosphereAdiabaticIndex;
 
-            double ratio = (gamma - 1);
+            double ratio = gamma - 1;
             ratio *= M * M;
             ratio += 2;
-            ratio /= (2 * gamma * M * M - (gamma - 1));
+            ratio /= 2 * gamma * M * M - (gamma - 1);
             ratio = Math.Sqrt(ratio);
 
             return ratio;
@@ -407,9 +407,9 @@ namespace FerramAerospaceResearch
         public static bool IsNonphysical(Part p)
         {
             return p.physicalSignificance == Part.PhysicalSignificance.NONE ||
-                   (HighLogic.LoadedSceneIsEditor &&
-                    p != EditorLogic.RootPart &&
-                    p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE);
+                   HighLogic.LoadedSceneIsEditor &&
+                   p != EditorLogic.RootPart &&
+                   p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE;
         }
 
         private static List<FARWingAerodynamicModel> curEditorWingCache;
@@ -447,7 +447,7 @@ namespace FerramAerospaceResearch
             return HighLogic.LoadedSceneIsEditor &&
                    EditorLogic.SelectedPart != null &&
                    (EditorLogic.SelectedPart.potentialParent != null ||
-                     (move_too && EditorLogic.SelectedPart == EditorLogic.RootPart));
+                     move_too && EditorLogic.SelectedPart == EditorLogic.RootPart);
         }
 
         public static List<Part> ListEditorParts(bool include_selected)
@@ -507,7 +507,7 @@ namespace FerramAerospaceResearch
                 if (RaycastMaskVal == 0)
                 {
                     foreach (string name in RaycastLayers)
-                        RaycastMaskVal |= (1 << LayerMask.NameToLayer(name));
+                        RaycastMaskVal |= 1 << LayerMask.NameToLayer(name);
 
                     // When parts are being dragged in the editor, they are put into this
                     // layer; however we have to raycast them, or the visible CoL will be
@@ -577,7 +577,7 @@ namespace FerramAerospaceResearch
             if(counter > 0)
                 density /= counter;
             density *= 2000;        //need answers in Pa, not kPa
-            density /= (v.srfSpeed * v.srfSpeed);
+            density /= v.srfSpeed * v.srfSpeed;
 
             return density;
         }
@@ -590,8 +590,8 @@ namespace FerramAerospaceResearch
             tempRat *= tempRat * tempRat;
             tempRat = Math.Sqrt(tempRat);
 
-            visc *= (currentBodyVisc[1] + 110);
-            visc /= (tempInK + 110);
+            visc *= currentBodyVisc[1] + 110;
+            visc /= tempInK + 110;
             visc *= tempRat;
 
             return visc;
@@ -601,7 +601,7 @@ namespace FerramAerospaceResearch
         public static double ReferenceTemperatureRatio(double machNumber, double recoveryFactor, double gamma)
         {
             double tempRatio = machNumber * machNumber;
-            tempRatio *= (gamma - 1);
+            tempRatio *= gamma - 1;
             tempRatio *= 0.5;       //account for stagnation temp
 
             tempRatio *= recoveryFactor;    //this accounts for adiabatic wall temp ratio
@@ -737,7 +737,7 @@ namespace FerramAerospaceResearch
             double tmp = b * b - 4 * a * c;
 
             double sin2def = -b + Math.Sqrt(tmp.Clamp(0, double.PositiveInfinity));
-            sin2def /= (2 * a);
+            sin2def /= 2 * a;
 
             return Math.Sqrt(sin2def);
         }

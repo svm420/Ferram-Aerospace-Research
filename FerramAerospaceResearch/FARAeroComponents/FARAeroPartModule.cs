@@ -395,7 +395,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             // Stall tinting overrides Cl / Cd tinting
             if (LegacyWingModel != null && aeroVizGUI.TintForStall)
-                return new Color((float)((LegacyWingModel.GetStall() * 100.0) / aeroVizGUI.FullySaturatedStall), 0f, 0f, 0.5f);
+                return new Color((float)(LegacyWingModel.GetStall() * 100.0 / aeroVizGUI.FullySaturatedStall), 0f, 0f, 0.5f);
 
             if (!aeroVizGUI.TintForCl && !aeroVizGUI.TintForCd)
                 return new Color(0, 0, 0, 0);
@@ -448,7 +448,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Vector3 localForceTemp = Vector3.Dot(partLocalVelNorm, partLocalForce) * partLocalVelNorm;
 
-            partLocalForce = (localForceTemp * part.dragScalar + (partLocalForce - localForceTemp) * part.bodyLiftScalar);
+            partLocalForce = localForceTemp * part.dragScalar + (partLocalForce - localForceTemp) * part.bodyLiftScalar;
             partLocalTorque *= part.dragScalar;
 
             part.dragScalar = 0;

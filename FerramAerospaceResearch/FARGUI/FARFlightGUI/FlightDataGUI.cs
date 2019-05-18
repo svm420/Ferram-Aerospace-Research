@@ -94,7 +94,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             bool change = false;
             for(int i=0; i<activeFlightDataSections.Length;++i)
             {
-                change |= (oldFlightDataSections[i] == activeFlightDataSections[i]);
+                change |= oldFlightDataSections[i] == activeFlightDataSections[i];
             }
             if(!change && labelStringBuilder.Length != 0) //no need to recreate string, we still have one, and the settings have not been changed.
                 return;
@@ -159,62 +159,62 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             dataStringBuilder.AppendLine();
             if (activeFlightDataSections[0])        //PYR angles
             {
-                dataStringBuilder.Concat((float)(infoParameters.pitchAngle),1);
+                dataStringBuilder.Concat((float)infoParameters.pitchAngle,1);
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitDeg"));
-		        dataStringBuilder.Concat((float)(infoParameters.headingAngle),1);
+		        dataStringBuilder.Concat((float)infoParameters.headingAngle,1);
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitDeg"));
-		        dataStringBuilder.Concat((float)(infoParameters.rollAngle),1);
+		        dataStringBuilder.Concat((float)infoParameters.rollAngle,1);
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitDeg"));
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[1])        //AoA and sideslip
             {
-                dataStringBuilder.Concat((float)(infoParameters.aoA),1);
+                dataStringBuilder.Concat((float)infoParameters.aoA,1);
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitDeg"));
-                dataStringBuilder.Concat((float)(infoParameters.sideslipAngle),1);
+                dataStringBuilder.Concat((float)infoParameters.sideslipAngle,1);
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitDeg"));
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[2])        //Dyn pres
             {
-                dataStringBuilder.Concat((float)(infoParameters.dynPres),3);
+                dataStringBuilder.Concat((float)infoParameters.dynPres,3);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitKPa"));
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[3])        //Raw Forces
             {
-                dataStringBuilder.Concat((float)(infoParameters.liftForce),3);
+                dataStringBuilder.Concat((float)infoParameters.liftForce,3);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitKN"));
-                dataStringBuilder.Concat((float)(infoParameters.dragForce), 3);
+                dataStringBuilder.Concat((float)infoParameters.dragForce, 3);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitKN"));
-                dataStringBuilder.Concat((float)(infoParameters.sideForce), 3);
+                dataStringBuilder.Concat((float)infoParameters.sideForce, 3);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitKN"));
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[4])        //Coeffs + refArea
             {
-                dataStringBuilder.Concat((float)(infoParameters.liftCoeff),4).AppendLine();
-                dataStringBuilder.Concat((float)(infoParameters.dragCoeff),4).AppendLine();
-                dataStringBuilder.Concat((float)(infoParameters.sideCoeff),4).AppendLine();
-                dataStringBuilder.Concat((float)(infoParameters.refArea),3);
+                dataStringBuilder.Concat((float)infoParameters.liftCoeff,4).AppendLine();
+                dataStringBuilder.Concat((float)infoParameters.dragCoeff,4).AppendLine();
+                dataStringBuilder.Concat((float)infoParameters.sideCoeff,4).AppendLine();
+                dataStringBuilder.Concat((float)infoParameters.refArea,3);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitMSq"));
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[5])        //L/D and VL/D
             {
-                dataStringBuilder.Concat((float)(infoParameters.liftToDragRatio),3).AppendLine();
-                dataStringBuilder.Concat((float)(infoParameters.velocityLiftToDragRatio),3).AppendLine();
+                dataStringBuilder.Concat((float)infoParameters.liftToDragRatio,3).AppendLine();
+                dataStringBuilder.Concat((float)infoParameters.velocityLiftToDragRatio,3).AppendLine();
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[6])        //Engine and intake data
             {
                 dataStringBuilder.Concat((float)((infoParameters.fullMass - infoParameters.dryMass) / infoParameters.fullMass),2).AppendLine();
-                dataStringBuilder.Concat((float)(infoParameters.tSFC),3);
+                dataStringBuilder.Concat((float)infoParameters.tSFC,3);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitInvHr"));
                 if (double.IsInfinity(infoParameters.intakeAirFrac))
@@ -224,27 +224,27 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     dataStringBuilder.Concat((float)(infoParameters.intakeAirFrac * 100),1); //Note: Originally this was output using P1 format, leading to an effective factor of 100*100.
                     dataStringBuilder.AppendLine(Localizer.Format("FARUnitPercent"));
                 }
-                dataStringBuilder.Concat((float)(infoParameters.specExcessPower),2); //this is a noticeable change to original code: Here N2 format was used...
+                dataStringBuilder.Concat((float)infoParameters.specExcessPower,2); //this is a noticeable change to original code: Here N2 format was used...
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitSpecPower"));
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[7])        //Range, Endurance est
             {
-                dataStringBuilder.Concat((float)(infoParameters.endurance),2);
+                dataStringBuilder.Concat((float)infoParameters.endurance,2);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitHr"));
-                dataStringBuilder.Concat((float)(infoParameters.range), 2); //also here: original N2 format.
+                dataStringBuilder.Concat((float)infoParameters.range, 2); //also here: original N2 format.
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitkM"));
                 dataStringBuilder.AppendLine();
             }
             if (activeFlightDataSections[8])        //Ballistic Coeff and Term Vel
             {
-                dataStringBuilder.Concat((float)(infoParameters.ballisticCoeff),2);
+                dataStringBuilder.Concat((float)infoParameters.ballisticCoeff,2);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitBC"));
-                dataStringBuilder.Concat((float)(infoParameters.termVelEst), 2);
+                dataStringBuilder.Concat((float)infoParameters.termVelEst, 2);
                 dataStringBuilder.Append(" ");
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitMPerSec"));
                 dataStringBuilder.AppendLine();
@@ -287,7 +287,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 bool newVal = GUILayout.Toggle(currentVal, flightDataOptionLabels[i], GUILayout.Width(100));
                 activeFlightDataSections[i] = newVal;
 
-                change |= (newVal != currentVal);
+                change |= newVal != currentVal;
             }
             GUILayout.EndVertical();
 

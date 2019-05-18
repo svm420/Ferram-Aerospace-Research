@@ -120,7 +120,7 @@ namespace ferram4
                     {
                         lineLegend.SetPixel(i,
                                             j,
-                                            Mathf.Abs((int) (j - (lineLegend.height / 2f))) < lineThickness
+                                            Mathf.Abs((int) (j - lineLegend.height / 2f)) < lineThickness
                                                 ? lineColor
                                                 : backgroundColor);
                     }
@@ -241,8 +241,8 @@ namespace ferram4
 
         public void SetGridScaleUsingValues(double gridWidth, double gridHeight)
         {
-            int pixelWidth = (int)Math.Round(((gridWidth * displayRect.width) / (bounds.y - bounds.x)));
-            int pixelHeight = (int)Math.Round(((gridHeight * displayRect.height) / (bounds.w - bounds.z)));
+            int pixelWidth = (int)Math.Round(gridWidth * displayRect.width / (bounds.y - bounds.x));
+            int pixelHeight = (int)Math.Round(gridHeight * displayRect.height / (bounds.w - bounds.z));
 
             if (pixelWidth <= 1)
             {

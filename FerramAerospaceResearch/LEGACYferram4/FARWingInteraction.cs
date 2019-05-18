@@ -403,7 +403,7 @@ namespace ferram4
             nearbyWings = new FARWingAerodynamicModel[1];
 
             double exposure = 1;
-            ray.origin = rootChordMidPt - (MAC * 0.7f) * parentWingPart.partTransform.up;
+            ray.origin = rootChordMidPt - MAC * 0.7f * parentWingPart.partTransform.up;
 
             RaycastHit[] hits = Physics.RaycastAll(ray.origin, ray.direction, rayCastDist, FARAeroUtil.RaycastMask);
 
@@ -710,10 +710,10 @@ namespace ferram4
             wingrootExposure = 1 - wingrootExposure;
 
 
-            double effective_AR_modifier = (wingrootExposure + wingtipExposure);
+            double effective_AR_modifier = wingrootExposure + wingtipExposure;
 
             if (effective_AR_modifier < 1)
-                return (effective_AR_modifier + 1);
+                return effective_AR_modifier + 1;
             return 2 * (2 - effective_AR_modifier) + 8 * (effective_AR_modifier - 1);
         }
     }
