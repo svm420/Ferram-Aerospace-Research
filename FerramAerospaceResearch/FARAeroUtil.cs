@@ -494,7 +494,7 @@ namespace FerramAerospaceResearch
         }
 
         private static int RaycastMaskVal, RaycastMaskEdit;
-        private static readonly String[] RaycastLayers = {
+        private static readonly string[] RaycastLayers = {
             "Default", "TransparentFX", "Local Scenery", "Disconnected Parts"
         };
 
@@ -506,7 +506,7 @@ namespace FerramAerospaceResearch
                 // document what layers come into it, but this is more explicit.
                 if (RaycastMaskVal == 0)
                 {
-                    foreach (String name in RaycastLayers)
+                    foreach (string name in RaycastLayers)
                         RaycastMaskVal |= (1 << LayerMask.NameToLayer(name));
 
                     // When parts are being dragged in the editor, they are put into this

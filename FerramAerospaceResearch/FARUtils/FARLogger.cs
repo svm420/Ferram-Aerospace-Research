@@ -360,7 +360,7 @@ namespace FerramAerospaceResearch.FARUtils
             //             return method
             // #endif
             string trace = Environment.StackTrace;
-            if (String.IsNullOrEmpty(trace))
+            if (string.IsNullOrEmpty(trace))
             {
                 return "";
             }

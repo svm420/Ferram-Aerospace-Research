@@ -239,7 +239,7 @@ namespace StringLeakTest
 				// but it is close enough.
 				int round_to_places = (int)decimal_places;
 				if (round_to_places > 5) round_to_places = 5;
-				Decimal decimal_val = (Decimal)Math.Round(float_val, round_to_places);
+				decimal decimal_val = (decimal)Math.Round(float_val, round_to_places);
 				int int_part = (int)decimal_val;
 
 				// Special case: -0.xx
@@ -253,7 +253,7 @@ namespace StringLeakTest
 				string_builder.Append('.');
 
 				// Work out remainder we need to print after the d.p.
-				Decimal remainder = Math.Abs(decimal_val - int_part);
+				decimal remainder = Math.Abs(decimal_val - int_part);
 
 				// Multiply up to become an int that we can print
 				do

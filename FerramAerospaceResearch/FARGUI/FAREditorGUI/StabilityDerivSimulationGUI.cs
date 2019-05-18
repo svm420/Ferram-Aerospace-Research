@@ -241,7 +241,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndHorizontal();
         }
 
-        private static void StabilityLabel(String text1, double val, String text2, String tooltip, int width, int sign)
+        private static void StabilityLabel(string text1, double val, string text2, string tooltip, int width, int sign)
         {
             Color color = Color.white;
             if (sign != 0)

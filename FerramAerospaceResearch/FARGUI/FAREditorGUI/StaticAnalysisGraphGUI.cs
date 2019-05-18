@@ -295,7 +295,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _graph.Update();
         }
 
-        private void AddZeroMarks(String key, double[] x, double[] y, double ysize, Color color)
+        private void AddZeroMarks(string key, double[] x, double[] y, double ysize, Color color)
         {
             int j = 0;
 
