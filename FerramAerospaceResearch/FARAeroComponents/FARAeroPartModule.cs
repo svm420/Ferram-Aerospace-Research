@@ -77,6 +77,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private ProjectedArea projectedArea;
 
+        // ReSharper disable once ConvertToConstant.Local
         private readonly bool partStressOverride = false; // currently not changed
         private double partStressMaxY = double.MaxValue;
         private double partStressMaxXZ = double.MaxValue;

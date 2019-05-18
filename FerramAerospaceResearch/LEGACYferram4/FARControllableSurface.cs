@@ -94,8 +94,6 @@ namespace ferram4
         private bool MovableOrigReady;
 
 //        protected int MovableSectionFlip = 1;
-        [KSPField(guiName = "FARCtrlSurfStdTitle", guiActiveEditor = true, guiActive = true), UI_Toggle(affectSymCounterparts = UI_Scene.All, scene = UI_Scene.All, disabledText = "FARCtrlSurfStdText", enabledText = "FARCtrlSurfStdText")]
-        private bool showStdCtrl = false;
 
         private bool prevStdCtrl = true;
 
@@ -117,8 +115,15 @@ namespace ferram4
         [KSPField(guiName = "FARCtrlSurfCtrlDeflect", guiActiveEditor = false, isPersistant = true), UI_FloatRange(affectSymCounterparts = UI_Scene.All, maxValue = 40, minValue = -40, scene = UI_Scene.All, stepIncrement = 0.5f)]
         public float maxdeflect = 15;
 
+        // ReSharper disable ConvertToConstant.Local
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
         [KSPField(guiName = "FARCtrlSurfFlapSpoiler", guiActiveEditor = true, guiActive = true), UI_Toggle(affectSymCounterparts = UI_Scene.All, scene = UI_Scene.All, disabledText = "FARCtrlSurfStdText", enabledText = "FARCtrlSurfStdText")]
         private bool showFlpCtrl = false;
+
+        [KSPField(guiName = "FARCtrlSurfStdTitle", guiActiveEditor = true, guiActive = true), UI_Toggle(affectSymCounterparts = UI_Scene.All, scene = UI_Scene.All, disabledText = "FARCtrlSurfStdText", enabledText = "FARCtrlSurfStdText")]
+        private bool showStdCtrl = false;
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
+        // ReSharper restore ConvertToConstant.Local
 
         private bool prevFlpCtrl = true;
 

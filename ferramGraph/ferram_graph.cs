@@ -185,7 +185,7 @@ namespace ferram4
         private Dictionary<string, ferramGraphLine> allLines = new Dictionary<string, ferramGraphLine>();
 
         private Vector4d bounds;
-        public bool autoscale = false;
+        public readonly bool autoscale;
 
         public Color backgroundColor = Color.black;
         public Color gridColor = new Color(0.2f, 0.2f, 0.2f); //new Color(0.42f, 0.35f, 0.11f, 1);
@@ -201,9 +201,10 @@ namespace ferram4
 
         #region Constructors
 
-        public ferramGraph(int width, int height, double minx = 0, double maxx = 1, double miny = 0, double maxy = 1)
+        public ferramGraph(int width, int height, double minx = 0, double maxx = 1, double miny = 0, double maxy = 1, bool autoscale = false)
         {
             graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
+            this.autoscale = autoscale;
             SetBoundaries(minx, maxx, miny, maxy);
             displayRect = new Rect(1, 1, graph.width, graph.height);
             GridInit();
@@ -291,7 +292,7 @@ namespace ferram4
 
         private void GridInit()
         {
-            int squareSize = 25;
+            const int squareSize = 25;
             GridInit(squareSize, squareSize);
         }
 
@@ -337,14 +338,14 @@ namespace ferram4
         // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName, double[] xValues, double[] yValues)
         {
-            int lineThickness = 1;
+            const int lineThickness = 1;
             AddLine(lineName, xValues, yValues, lineThickness);
         }
 
         // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName, double[] xValues, double[] yValues, Color lineColor)
         {
-            int lineThickness = 1;
+            const int lineThickness = 1;
             AddLine(lineName, xValues, yValues, lineColor, lineThickness);
         }
 

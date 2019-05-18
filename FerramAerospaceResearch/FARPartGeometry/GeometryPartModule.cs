@@ -126,8 +126,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private static int ignoreLayer0 = -1;
 
-        private readonly float currentScaleFactor = 1;
-
         [SerializeField] private bool forceUseColliders;
         [SerializeField] private bool forceUseMeshes;
         [SerializeField] private bool ignoreForMainAxis;
@@ -952,7 +950,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (meshDataList == null)
                 return;
 
-            Rescale(factor.absolute.linear / currentScaleFactor * Vector3.one);
+            Rescale(factor.absolute.linear * Vector3.one);
         }
 
         public void RC_Rescale(Vector3 relativeRescaleFactor)
@@ -963,15 +961,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public void Rescale(Vector3 relativeRescaleFactor)
         {
             RebuildAllMeshData();
-            /*Matrix4x4 transformMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, relativeRescaleFactor);
-            if (HighLogic.LoadedSceneIsFlight)
-                transformMatrix = vessel.vesselTransform.worldToLocalMatrix * transformMatrix;
-            else
-                transformMatrix = EditorLogic.RootPart.partTransform.worldToLocalMatrix * transformMatrix;
-
-            currentScaleFactor *= relativeRescaleFactor.x;
-
-            UpdateTransformMatrixList(transformMatrix);*/
         }
 
         public override void OnLoad(ConfigNode node)

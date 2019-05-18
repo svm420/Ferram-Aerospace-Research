@@ -138,7 +138,7 @@ namespace ferram4
         }
         protected double zeroLiftCdIncrement;
 
-        protected double criticalCl = 1.6;
+        protected const double criticalCl = 1.6;
 
         private double refAreaChildren;
 
@@ -1125,7 +1125,7 @@ namespace ferram4
             double maxSinBeta = FARAeroUtil.CalculateSinMaxShockAngle(M, FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex);//GetBetaMax(M) * FARMathUtil.deg2rad;
             double minSinBeta = 1 / M;
 
-            double halfAngle = 0.05;            //In radians, Corresponds to ~2.8 degrees or approximately what you would get from a ~4.8% thick diamond airfoil
+            const double halfAngle = 0.05; //In radians, Corresponds to ~2.8 degrees or approximately what you would get from a ~4.8% thick diamond airfoil
 
             double AbsAoA = Math.Abs(AoA);
 

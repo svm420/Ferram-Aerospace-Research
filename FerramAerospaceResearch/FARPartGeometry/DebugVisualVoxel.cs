@@ -49,7 +49,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     internal class DebugVisualVoxel
     {
-        public static float globalScale = 0.9f;
+        public const float globalScale = 0.9f;
         private float scale;
 
         public DebugVisualVoxel(Vector3 pos, double elementScale)

@@ -1525,7 +1525,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (vehicleCrossSection.Length > indexSqrt.Length + 1)
                     GenerateIndexSqrtLookup(vehicleCrossSection.Length + 2);
 
-            double machTest = 1.2;
+            const double machTest = 1.2;
             double beta = Math.Sqrt(machTest * machTest - 1);
 
             double cP90 = CalcMaxCp(machTest);

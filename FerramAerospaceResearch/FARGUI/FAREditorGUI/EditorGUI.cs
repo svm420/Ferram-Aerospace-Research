@@ -71,6 +71,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private bool _updateQueued = true;
 
         private static bool showGUI;
+        // ReSharper disable once ConvertToConstant.Local
         private readonly bool useKSPSkin = true; // currently cannot be changed from outside
         private Rect guiRect;
         public static Rect GUIRect
@@ -674,7 +675,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             for (int i = 0; i < bodyNames.Length; i++)
                 bodyNames[i] = bodies[i].bodyName;
 
-            int kerbinIndex = 1;
+            const int kerbinIndex = 1;
             GUIDropDown<CelestialBody> celestialBodyDropdown = new GUIDropDown<CelestialBody>(bodyNames, bodies, kerbinIndex);
             return celestialBodyDropdown;
         }
