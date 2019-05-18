@@ -94,17 +94,21 @@ namespace FerramAerospaceResearch
 
         private void SetNextPrevIndices(int upperIndex, int lowerIndex, int curIndex)
         {
-            if (upperIndex <= lowerIndex)
-                return;
+            while (true)
+            {
+                if (upperIndex <= lowerIndex)
+                    return;
 
-            int nextIndex = (upperIndex + curIndex + 1) / 2;
-            int prevIndex = (lowerIndex + curIndex - 1) / 2;
+                int nextIndex = (upperIndex + curIndex + 1) / 2;
+                int prevIndex = (lowerIndex + curIndex - 1) / 2;
 
-            sections[curIndex].nextIndex = nextIndex;
-            sections[curIndex].prevIndex = prevIndex;
+                sections[curIndex].nextIndex = nextIndex;
+                sections[curIndex].prevIndex = prevIndex;
 
-            SetNextPrevIndices(curIndex - 1, lowerIndex, prevIndex);
-            SetNextPrevIndices(upperIndex, curIndex + 1, nextIndex);
+                SetNextPrevIndices(curIndex - 1, lowerIndex, prevIndex);
+                lowerIndex = curIndex + 1;
+                curIndex   = nextIndex;
+            }
         }
 
         //uses x for x point, y for y point and z for dy/dx
