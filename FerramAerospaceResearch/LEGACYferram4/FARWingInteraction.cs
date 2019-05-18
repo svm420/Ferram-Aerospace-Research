@@ -323,6 +323,7 @@ namespace ferram4
                         {
                             Collider[] colliders = w.PartColliders;
 
+                            // ReSharper disable once LoopCanBeConvertedToQuery -> closure
                             foreach (Collider collider in colliders)
                                 if (h.collider == collider && h.distance > 0)
                                 {
@@ -447,6 +448,7 @@ namespace ferram4
                         else
                             colliders = new[] { p.collider };
 
+                        // ReSharper disable once LoopCanBeConvertedToQuery -> closure
                         foreach (Collider collider in colliders)
                             if (h.collider == collider && h.distance > 0)
                             {

@@ -988,10 +988,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             if (node.HasValue(nodeName))
             {
-                foreach (string _name in node.GetValues(nodeName))
-                {
-                    list.Add(_name);
-                }
+                list.AddRange(node.GetValues(nodeName));
                 _ready = false;
             }
         }

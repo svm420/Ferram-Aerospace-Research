@@ -45,6 +45,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
@@ -453,11 +454,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             var xAxis = new double[areas.Length];
 
-            double maxValue = 0;
-            foreach (double area in areas)
-            {
-                maxValue = Math.Max(maxValue, area);
-            }
+            double maxValue = Math.Max(0, areas.Max());
 
             for (int i = 0; i < xAxis.Length; i++)
             {

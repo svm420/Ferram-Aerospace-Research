@@ -270,9 +270,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         if(!template.HasValue("PartModuleName"))
                             continue;
                         var transformExceptions = new List<string> {template.GetValue("PartModuleName")};
-
-                        foreach(string value in template.GetValues("TransformException"))
-                            transformExceptions.Add(value);
+                        transformExceptions.AddRange(template.GetValues("TransformException"));
 
                         ignorePartModuleTransforms.Add(transformExceptions);
                     }
