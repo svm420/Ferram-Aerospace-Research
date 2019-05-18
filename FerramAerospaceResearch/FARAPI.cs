@@ -132,10 +132,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselDynPres(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.dynPres;
+            return VesselFlightInfo(v)?.InfoParameters.dynPres ?? 0;
         }
 
         public static double ActiveVesselLiftCoeff()
@@ -145,10 +142,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselLiftCoeff(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.liftCoeff;
+            return VesselFlightInfo(v)?.InfoParameters.liftCoeff ?? 0;
         }
 
         public static double ActiveVesselDragCoeff()
@@ -158,10 +152,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselDragCoeff(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.dragCoeff;
+            return VesselFlightInfo(v)?.InfoParameters.dragCoeff ?? 0;
         }
 
         public static double ActiveVesselRefArea()
@@ -171,10 +162,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselRefArea(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.refArea;
+            return VesselFlightInfo(v)?.InfoParameters.refArea ?? 0;
         }
 
         public static double ActiveVesselTermVelEst()
@@ -184,10 +172,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselTermVelEst(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.termVelEst;
+            return VesselFlightInfo(v)?.InfoParameters.termVelEst ?? 0;
         }
 
         public static double ActiveVesselBallisticCoeff()
@@ -197,10 +182,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselBallisticCoeff(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.ballisticCoeff;
+            return VesselFlightInfo(v)?.InfoParameters.ballisticCoeff ?? 0;
         }
 
         public static double ActiveVesselAoA()
@@ -210,10 +192,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselAoA(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.aoA;
+            return VesselFlightInfo(v)?.InfoParameters.aoA ?? 0;
         }
 
         public static double ActiveVesselSideslip()
@@ -223,10 +202,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselSideslip(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.sideslipAngle;
+            return VesselFlightInfo(v)?.InfoParameters.sideslipAngle ?? 0;
         }
 
         public static double ActiveVesselTSFC()
@@ -236,10 +212,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselTSFC(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.tSFC;
+            return VesselFlightInfo(v)?.InfoParameters.tSFC ?? 0;
         }
 
         public static double ActiveVesselStallFrac()
@@ -249,10 +222,7 @@ namespace FerramAerospaceResearch
 
         public static double VesselStallFrac(Vessel v)
         {
-            FlightGUI gui = VesselFlightInfo(v);
-            if(gui == null)
-                return 0;
-            return gui.InfoParameters.stallFraction;
+            return VesselFlightInfo(v)?.InfoParameters.stallFraction ?? 0;
         }
 
         /// <summary>
