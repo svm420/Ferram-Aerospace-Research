@@ -99,27 +99,26 @@ namespace FerramAerospaceResearch.FARAeroComponents
             else
             {
                 Rigidbody rb = part.rb;
-                if (rb)
+                if (!rb)
+                    return;
+                part.dragVector       = rb.velocity + Krakensbane.GetFrameVelocity() - FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
+                part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
+                if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
                 {
-                    part.dragVector = rb.velocity + Krakensbane.GetFrameVelocity() - FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
-                    part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
-                    if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
-                    {
-                        part.dragVectorMag = 0f;
-                        part.dragVectorDir = Vector3.zero;
-                        part.dragVectorDirLocal = Vector3.zero;
-                        part.dragScalar = 0f;
-                    }
-                    else
-                    {
-                        part.dragVectorMag = (float)Math.Sqrt(part.dragVectorSqrMag);
-                        part.dragVectorDir = part.dragVector / part.dragVectorMag;
-                        part.dragVectorDirLocal = -part.partTransform.InverseTransformDirection(part.dragVectorDir);
-                        CalculateLocalDynPresAndAngularDrag(fi, part);
-                    }
-                    if (!part.DragCubes.None)
-                        part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
+                    part.dragVectorMag      = 0f;
+                    part.dragVectorDir      = Vector3.zero;
+                    part.dragVectorDirLocal = Vector3.zero;
+                    part.dragScalar         = 0f;
                 }
+                else
+                {
+                    part.dragVectorMag      = (float)Math.Sqrt(part.dragVectorSqrMag);
+                    part.dragVectorDir      = part.dragVector / part.dragVectorMag;
+                    part.dragVectorDirLocal = -part.partTransform.InverseTransformDirection(part.dragVectorDir);
+                    CalculateLocalDynPresAndAngularDrag(fi, part);
+                }
+                if (!part.DragCubes.None)
+                    part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
             }
         }
 
@@ -162,14 +161,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private static double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
             //double dragCubeExposed = fi.BaseFICalculateAreaExposed(part);
-            if (!(aeroModule is null))
-            {
-                double radArea = aeroModule.ProjectedAreas.totalArea;
+            if (aeroModule is null)
+                return fi.BaseFICalculateAreaRadiative(part);
+            double radArea = aeroModule.ProjectedAreas.totalArea;
 
-                return radArea > 0 ? radArea : fi.BaseFICalculateAreaRadiative(part);
-            }
+            return radArea > 0 ? radArea : fi.BaseFICalculateAreaRadiative(part);
 
-            return fi.BaseFICalculateAreaRadiative(part);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -184,14 +181,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static double CalculateAreaExposed(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
-            if (!(aeroModule is null))
-            {
-                double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
+            if (aeroModule is null)
+                return fi.BaseFICalculateAreaExposed(part);
+            double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
 
-                return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
-            }
+            return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
 
-            return fi.BaseFICalculateAreaExposed(part);
             /*else
             {
                 if (stockRadArea > 0)
@@ -207,14 +202,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (ptd.part.Modules.Contains<FARAeroPartModule>())
                 module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
-            if (!(module is null))
-            {
-                double sunArea = module.ProjectedAreaWorld(fi.sunVector) * ptd.sunAreaMultiplier;
+            if (module is null)
+                return fi.BaseFIGetSunArea(ptd);
+            double sunArea = module.ProjectedAreaWorld(fi.sunVector) * ptd.sunAreaMultiplier;
 
-                return sunArea > 0 ? sunArea : fi.BaseFIGetSunArea(ptd);
-            }
+            return sunArea > 0 ? sunArea : fi.BaseFIGetSunArea(ptd);
 
-            return fi.BaseFIGetSunArea(ptd);
         }
 
         private static double CalculateBodyArea(ModularFlightIntegrator fi, PartThermalData ptd)
@@ -223,14 +216,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (ptd.part.Modules.Contains<FARAeroPartModule>())
                 module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
-            if (!(module is null))
-            {
-                double bodyArea = module.ProjectedAreaWorld(-fi.Vessel.upAxis) * ptd.bodyAreaMultiplier;
+            if (module is null)
+                return fi.BaseFIBodyArea(ptd);
+            double bodyArea = module.ProjectedAreaWorld(-fi.Vessel.upAxis) * ptd.bodyAreaMultiplier;
 
-                return bodyArea > 0 ? bodyArea : fi.BaseFIBodyArea(ptd);
-            }
+            return bodyArea > 0 ? bodyArea : fi.BaseFIBodyArea(ptd);
 
-            return fi.BaseFIBodyArea(ptd);
         }
     }
 }

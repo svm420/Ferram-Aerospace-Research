@@ -262,20 +262,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void UpdateGeometryEvent(ConstructionEventType type, Part pEvent)
         {
-            if (type == ConstructionEventType.PartRotated ||
-                type == ConstructionEventType.PartOffset ||
-                type == ConstructionEventType.PartAttached ||
-                type == ConstructionEventType.PartDetached ||
-                type == ConstructionEventType.PartRootSelected ||
-                type == ConstructionEventType.Unknown)
-            {
-                if (EditorLogic.SortedShipList.Count > 0)
-                    UpdateGeometryModule(type, pEvent);
-                RequestUpdateVoxel();
+            if (type != ConstructionEventType.PartRotated &&
+                type != ConstructionEventType.PartOffset &&
+                type != ConstructionEventType.PartAttached &&
+                type != ConstructionEventType.PartDetached &&
+                type != ConstructionEventType.PartRootSelected &&
+                type != ConstructionEventType.Unknown)
+                return;
+            if (EditorLogic.SortedShipList.Count > 0)
+                UpdateGeometryModule(type, pEvent);
+            RequestUpdateVoxel();
 
-                if (type != ConstructionEventType.Unknown)
-                    partMovement = true;
-            }
+            if (type != ConstructionEventType.Unknown)
+                partMovement = true;
         }
         // ReSharper restore MemberCanBeMadeStatic.Local
 
@@ -283,13 +282,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             if (p is null) return;
             var g = p.GetComponent<GeometryPartModule>();
-            if (g != null && g.Ready)
-            {
-                if (type == ConstructionEventType.Unknown)
-                    g.RebuildAllMeshData();
-                else
-                    g.EditorUpdate();
-            }
+            if (g == null || !g.Ready)
+                return;
+            if (type == ConstructionEventType.Unknown)
+                g.RebuildAllMeshData();
+            else
+                g.EditorUpdate();
         }
 
         private static void UpdateGeometryModule(Part p)
@@ -309,21 +307,22 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _wingAerodynamicModel.Clear();
             foreach (Part p in partsList)
             {
-                if(p != null)
-                    if (p.Modules.Contains<FARWingAerodynamicModel>())
-                    {
-                        var w = p.Modules.GetModule<FARWingAerodynamicModel>();
-                        if(updateWingInteractions)
-                            w.EditorUpdateWingInteractions();
-                        _wingAerodynamicModel.Add(w);
-                    }
-                    else if (p.Modules.Contains<FARControllableSurface>())
-                    {
-                        var c = p.Modules.GetModule<FARControllableSurface>();
-                        if (updateWingInteractions)
-                            c.EditorUpdateWingInteractions();
-                        _wingAerodynamicModel.Add(c);
-                    }
+                if (p == null)
+                    continue;
+                if (p.Modules.Contains<FARWingAerodynamicModel>())
+                {
+                    var w = p.Modules.GetModule<FARWingAerodynamicModel>();
+                    if(updateWingInteractions)
+                        w.EditorUpdateWingInteractions();
+                    _wingAerodynamicModel.Add(w);
+                }
+                else if (p.Modules.Contains<FARControllableSurface>())
+                {
+                    var c = p.Modules.GetModule<FARControllableSurface>();
+                    if (updateWingInteractions)
+                        c.EditorUpdateWingInteractions();
+                    _wingAerodynamicModel.Add(c);
+                }
             }
         }
         #endregion
@@ -404,37 +403,37 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             foreach (Part p in partList)
             {
-                if (p.Modules.Contains<GeometryPartModule>())
+                if (!p.Modules.Contains<GeometryPartModule>())
+                    continue;
+                var g = p.Modules.GetModule<GeometryPartModule>();
+                if (g == null)
+                    continue;
+                if (g.Ready)
+                    _currentGeometryModules.Add(g);
+                else
                 {
-                    var g = p.Modules.GetModule<GeometryPartModule>();
-                    if (g != null)
-                    {
-                        if (g.Ready)
-                            _currentGeometryModules.Add(g);
-                        else
-                        {
-                            _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
-                            _updateQueued      = true;
-                            //FARLogger.Info("We're not ready!");
-                            return;
-                        }
-                    }
+                    _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
+                    _updateQueued      = true;
+                    //FARLogger.Info("We're not ready!");
+                    return;
                 }
             }
             TriggerIGeometryUpdaters();
 
 
-            if (_currentGeometryModules.Count > 0)
-            {
-                voxelWatch.Start();
-                if (!_vehicleAero.TryVoxelUpdate(EditorLogic.RootPart.partTransform.worldToLocalMatrix, EditorLogic.RootPart.partTransform.localToWorldMatrix, FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel, partList, _currentGeometryModules))
-                {
-                    voxelWatch.Stop();
-                    voxelWatch.Reset();
-                    _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
-                    _updateQueued = true;
-                }
-            }
+            if (_currentGeometryModules.Count <= 0)
+                return;
+            voxelWatch.Start();
+            if (_vehicleAero.TryVoxelUpdate(EditorLogic.RootPart.partTransform.worldToLocalMatrix,
+                                            EditorLogic.RootPart.partTransform.localToWorldMatrix,
+                                            FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel,
+                                            partList,
+                                            _currentGeometryModules))
+                return;
+            voxelWatch.Stop();
+            voxelWatch.Reset();
+            _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
+            _updateQueued      = true;
         }
 
         private void TriggerIGeometryUpdaters()
@@ -655,13 +654,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private static void GenerateBlizzyToolbarButton()
         {
-            if (blizzyEditorGUIButton == null)
-            {
-                blizzyEditorGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FAREditorButtonBlizzy");
-                blizzyEditorGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
-                blizzyEditorGUIButton.ToolTip = "FAR Editor";
-                blizzyEditorGUIButton.OnClick += e => showGUI = !showGUI;
-            }
+            if (blizzyEditorGUIButton != null)
+                return;
+            blizzyEditorGUIButton             =  ToolbarManager.Instance.add("FerramAerospaceResearch", "FAREditorButtonBlizzy");
+            blizzyEditorGUIButton.TexturePath =  "FerramAerospaceResearch/Textures/icon_button_blizzy";
+            blizzyEditorGUIButton.ToolTip     =  "FAR Editor";
+            blizzyEditorGUIButton.OnClick     += e => showGUI = !showGUI;
         }
 
         public static void onAppLaunchToggle()
@@ -713,6 +711,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     else
                         method.Invoke(m, gearToggle ? new object[] { "Deploy" } : new object[] { "Retract" });
                 }
+                // ReSharper disable once InvertIf
                 if (p.Modules.Contains("KSPWheelAdjustableGear"))
                 {
                     PartModule m      = p.Modules["KSPWheelAdjustableGear"];

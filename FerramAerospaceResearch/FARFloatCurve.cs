@@ -150,17 +150,13 @@ namespace FerramAerospaceResearch
                         continue;
                     }
 
-                if (check < 0) //below this cubic's range
-                    if (curIndex <= 0)
-                        return sections[curIndex].EvalLowerLim(); //at lower end of curve, return min val of first cubic
-                    else
-                    {
-                        //highIndex = curIndex - 1;
-                        curIndex = sections[curIndex].prevIndex; //otherwise, find next cubic to check and continue
-                        continue;
-                    }
-
-                return sections[curIndex].Evaluate(x);          //if we get here, we're in range and should evaluate this cubic
+                if (check >= 0)
+                    //if we get here, we're in range and should evaluate this cubic
+                    return sections[curIndex].Evaluate(x);
+                if (curIndex <= 0)
+                    return sections[curIndex].EvalLowerLim(); //at lower end of curve, return min val of first cubic
+                //below this cubic's range
+                curIndex = sections[curIndex].prevIndex; //otherwise, find next cubic to check and continue
             }
         }
 

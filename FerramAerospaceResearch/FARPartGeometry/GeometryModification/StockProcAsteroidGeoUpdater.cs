@@ -63,13 +63,11 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void FlightGeometryUpdate()
         {
-            if (!hasLoaded)
-            {
-                FARLogger.Info("Asteroid Geometry Update");
-                hasLoaded = true;
-                geoModule.GeometryPartModuleRebuildMeshData();
-
-            }
+	        if (hasLoaded)
+		        return;
+	        FARLogger.Info("Asteroid Geometry Update");
+            hasLoaded = true;
+            geoModule.GeometryPartModuleRebuildMeshData();
         }
     }
 }

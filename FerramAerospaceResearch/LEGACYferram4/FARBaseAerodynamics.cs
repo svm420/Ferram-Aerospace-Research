@@ -110,18 +110,16 @@ namespace ferram4
         public Vector3d GetVelocity(Vector3 refPoint)
         {
             Vector3d velocity = Vector3.zero;
-            if (HighLogic.LoadedSceneIsFlight)
-            {
-                if (part.Rigidbody)
-                    velocity += part.Rigidbody.GetPointVelocity(refPoint);
+            if (!HighLogic.LoadedSceneIsFlight)
+                return velocityEditor;
+            if (part.Rigidbody)
+                velocity += part.Rigidbody.GetPointVelocity(refPoint);
 
-                velocity += Krakensbane.GetFrameVelocity() - Krakensbane.GetLastCorrection() * TimeWarp.fixedDeltaTime;
-                velocity -= FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
+            velocity += Krakensbane.GetFrameVelocity() - Krakensbane.GetLastCorrection() * TimeWarp.fixedDeltaTime;
+            velocity -= FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
 
-                return velocity;
-            }
+            return velocity;
 
-            return velocityEditor;
         }
 
         protected virtual void ResetCenterOfLift()

@@ -122,21 +122,19 @@ namespace ferram4
                 wingCamberFactor.Add(1, 1);
             }
 
-            if (wingCamberMoment == null)
+            if (wingCamberMoment != null)
+                return;
+            wingCamberMoment = new FloatCurve();
+            for (double i = 0; i <= 1; i += 0.1)
             {
-                wingCamberMoment = new FloatCurve();
-                for (double i = 0; i <= 1; i += 0.1)
-                {
-                    double tmp = i * 2;
-                    tmp--;
-                    tmp = Math.Acos(tmp);
+                double tmp = i * 2;
+                tmp--;
+                tmp = Math.Acos(tmp);
 
-                    tmp = (Math.Sin(2 * tmp) - 2 * Math.Sin(tmp)) / (8 * (Math.PI - tmp + Math.Sin(tmp)));
+                tmp = (Math.Sin(2 * tmp) - 2 * Math.Sin(tmp)) / (8 * (Math.PI - tmp + Math.Sin(tmp)));
 
-                    wingCamberMoment.Add((float)i, (float)tmp);
-                }
+                wingCamberMoment.Add((float)i, (float)tmp);
             }
-
         }
 
         public void Destroy()
@@ -228,35 +226,31 @@ namespace ferram4
 
             foreach (FARWingAerodynamicModel w in nearbyWingModulesForwardList)
             {
-                if (!wingsHandled.Contains(w))
-                {
-                    w.UpdateThisWingInteractions();
-                    wingsHandled.Add(w);
-                }
+                if (wingsHandled.Contains(w))
+                    continue;
+                w.UpdateThisWingInteractions();
+                wingsHandled.Add(w);
             }
             foreach (FARWingAerodynamicModel w in nearbyWingModulesBackwardList)
             {
-                if (!wingsHandled.Contains(w))
-                {
-                    w.UpdateThisWingInteractions();
-                    wingsHandled.Add(w);
-                }
+                if (wingsHandled.Contains(w))
+                    continue;
+                w.UpdateThisWingInteractions();
+                wingsHandled.Add(w);
             }
             foreach (FARWingAerodynamicModel w in nearbyWingModulesRightwardList)
             {
-                if (!wingsHandled.Contains(w))
-                {
-                    w.UpdateThisWingInteractions();
-                    wingsHandled.Add(w);
-                }
+                if (wingsHandled.Contains(w))
+                    continue;
+                w.UpdateThisWingInteractions();
+                wingsHandled.Add(w);
             }
             foreach (FARWingAerodynamicModel w in nearbyWingModulesLeftwardList)
             {
-                if (!wingsHandled.Contains(w))
-                {
-                    w.UpdateThisWingInteractions();
-                    wingsHandled.Add(w);
-                }
+                if (wingsHandled.Contains(w))
+                    continue;
+                w.UpdateThisWingInteractions();
+                wingsHandled.Add(w);
             }
             return wingsHandled;
         }
@@ -307,40 +301,39 @@ namespace ferram4
             RaycastHit[] hits = Physics.RaycastAll(ray, dist, FARAeroUtil.RaycastMask);
             foreach (RaycastHit h in hits)
             {
-                if (h.collider != null)
+                if (h.collider == null)
+                    continue;
+                foreach (Part p in PartList)
                 {
-                    foreach (Part p in PartList)
+                    if (p == null)
+                        continue;
+
+                    if (p == parentWingPart)
+                        continue;
+
+                    var w = p.GetComponent<FARWingAerodynamicModel>();
+
+                    if (w != null)
                     {
-                        if (p == null)
-                            continue;
+                        Collider[] colliders = w.PartColliders;
 
-                        if (p == parentWingPart)
-                            continue;
+                        // ReSharper disable once LoopCanBeConvertedToQuery -> closure
+                        foreach (Collider collider in colliders)
+                            if (h.collider == collider && h.distance > 0)
+                            {
 
-                        var w = p.GetComponent<FARWingAerodynamicModel>();
+                                double tmp = h.distance / dist;
+                                tmp = tmp.Clamp(0, 1);
+                                double tmp2 = Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward, w.part.partTransform.forward));
+                                tmp               = 1 - (1 - tmp) * tmp2;
+                                interferenceValue = Math.Min(tmp, interferenceValue);
+                                gotSomething      = true;
 
-                        if (w != null)
-                        {
-                            Collider[] colliders = w.PartColliders;
-
-                            // ReSharper disable once LoopCanBeConvertedToQuery -> closure
-                            foreach (Collider collider in colliders)
-                                if (h.collider == collider && h.distance > 0)
-                                {
-
-                                    double tmp = h.distance / dist;
-                                    tmp = tmp.Clamp(0, 1);
-                                    double tmp2 = Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward, w.part.partTransform.forward));
-                                    tmp               = 1 - (1 - tmp) * tmp2;
-                                    interferenceValue = Math.Min(tmp, interferenceValue);
-                                    gotSomething      = true;
-
-                                    break;
-                                }
-                        }
-                        if (gotSomething)
-                            break;
+                                break;
+                            }
                     }
+                    if (gotSomething)
+                        break;
                 }
             }
             return interferenceValue;
@@ -425,56 +418,55 @@ namespace ferram4
             foreach (RaycastHit h in sortedHits)
             {
                 bool gotSomething = false;
-                if (h.collider != null)
+                if (h.collider == null)
+                    continue;
+                foreach (Part p in vesselPartList)
                 {
-                    foreach (Part p in vesselPartList)
+                    if (p == null || p == parentWingPart)
+                        continue;
+
+                    var farModule = p.GetComponent<FARPartModule>();
+
+                    Collider[] colliders;
+
+                    if (!(farModule is null))
                     {
-                        if (p == null || p == parentWingPart)
-                            continue;
-
-                        var farModule = p.GetComponent<FARPartModule>();
-
-                        Collider[] colliders;
-
-                        if (!(farModule is null))
+                        colliders = farModule.PartColliders;
+                        if (colliders == null)
                         {
+                            farModule.TriggerPartColliderUpdate();
                             colliders = farModule.PartColliders;
-                            if (colliders == null)
-                            {
-                                farModule.TriggerPartColliderUpdate();
-                                colliders = farModule.PartColliders;
-                            }
                         }
-                        else
-                            colliders = new[] { p.collider };
+                    }
+                    else
+                        colliders = new[] { p.collider };
 
-                        // ReSharper disable once LoopCanBeConvertedToQuery -> closure
-                        foreach (Collider collider in colliders)
-                            if (h.collider == collider && h.distance > 0)
+                    // ReSharper disable once LoopCanBeConvertedToQuery -> closure
+                    foreach (Collider collider in colliders)
+                        if (h.collider == collider && h.distance > 0)
+                        {
+                            if (firstHit)
                             {
-                                if (firstHit)
-                                {
-                                    exposure -= exposureDecreasePerHit;
-                                    firstHit =  false;
-                                }
-
-                                var hitModule = p.GetComponent<FARWingAerodynamicModel>();
-                                if (hitModule != null)
-                                {
-                                    double tmp = Math.Abs(Vector3.Dot(p.transform.forward, parentWingPart.partTransform.forward));
-                                    if (tmp > wingInteractionFactor + 0.01)
-                                    {
-                                        wingInteractionFactor = tmp;
-                                        wingHit               = hitModule;
-                                    }
-                                }
-                                gotSomething = true;
-                                break;
+                                exposure -= exposureDecreasePerHit;
+                                firstHit =  false;
                             }
 
-                        if (gotSomething)
+                            var hitModule = p.GetComponent<FARWingAerodynamicModel>();
+                            if (hitModule != null)
+                            {
+                                double tmp = Math.Abs(Vector3.Dot(p.transform.forward, parentWingPart.partTransform.forward));
+                                if (tmp > wingInteractionFactor + 0.01)
+                                {
+                                    wingInteractionFactor = tmp;
+                                    wingHit               = hitModule;
+                                }
+                            }
+                            gotSomething = true;
                             break;
-                    }
+                        }
+
+                    if (gotSomething)
+                        break;
                 }
             }
             return wingHit;
@@ -581,29 +573,28 @@ namespace ferram4
 
             double MachCoeff = (1 - thisWingMachNumber * thisWingMachNumber).Clamp(0, 1);
 
-            if (!MachCoeff.NearlyEqual(0))
-            {
-                double flapRatio = (thisWingMAC / (thisWingMAC + EffectiveUpstreamMAC)).Clamp(0, 1);
-                float flt_flapRatio = (float)flapRatio;
-                double flapFactor = wingCamberFactor.Evaluate(flt_flapRatio);        //Flap Effectiveness Factor
-                double dCm_dCl = wingCamberMoment.Evaluate(flt_flapRatio);           //Change in moment due to change in lift from flap
+            if (MachCoeff.NearlyEqual(0))
+                return;
+            double flapRatio     = (thisWingMAC / (thisWingMAC + EffectiveUpstreamMAC)).Clamp(0, 1);
+            float  flt_flapRatio = (float)flapRatio;
+            double flapFactor    = wingCamberFactor.Evaluate(flt_flapRatio); //Flap Effectiveness Factor
+            double dCm_dCl       = wingCamberMoment.Evaluate(flt_flapRatio); //Change in moment due to change in lift from flap
 
-                //This accounts for the wing possibly having a longer span than the flap
-                double WingFraction = (thisWingb_2 / EffectiveUpstreamb_2).Clamp(0, 1);
-                //This accounts for the flap possibly having a longer span than the wing it's attached to
-                double FlapFraction = (EffectiveUpstreamb_2 / thisWingb_2).Clamp(0, 1);
+            //This accounts for the wing possibly having a longer span than the flap
+            double WingFraction = (thisWingb_2 / EffectiveUpstreamb_2).Clamp(0, 1);
+            //This accounts for the flap possibly having a longer span than the wing it's attached to
+            double FlapFraction = (EffectiveUpstreamb_2 / thisWingb_2).Clamp(0, 1);
 
-                double ClIncrement = flapFactor * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;   //Lift created by the flap interaction
-                ClIncrement *= (parentWingModule.S * FlapFraction + EffectiveUpstreamArea * WingFraction) / parentWingModule.S;                   //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
+            double ClIncrement = flapFactor * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;                            //Lift created by the flap interaction
+            ClIncrement *= (parentWingModule.S * FlapFraction + EffectiveUpstreamArea * WingFraction) / parentWingModule.S; //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
 
-                ACweight = ClIncrement * MachCoeff; // Total flap Cl for the purpose of applying ACshift, including the bit subtracted below
+            ACweight = ClIncrement * MachCoeff; // Total flap Cl for the purpose of applying ACshift, including the bit subtracted below
 
-                ClIncrement -= FlapFraction * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;        //Removing additional angle so that lift of the flap is calculated as lift at wing angle + lift due to flap interaction rather than being greater
+            ClIncrement -= FlapFraction * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA; //Removing additional angle so that lift of the flap is calculated as lift at wing angle + lift due to flap interaction rather than being greater
 
-                ACshift = (dCm_dCl + 0.75 * (1 - flapRatio)) * (thisWingMAC + EffectiveUpstreamMAC);      //Change in Cm with change in Cl
+            ACshift = (dCm_dCl + 0.75 * (1 - flapRatio)) * (thisWingMAC + EffectiveUpstreamMAC); //Change in Cm with change in Cl
 
-                ClIncrementFromRear = ClIncrement * MachCoeff;
-            }
+            ClIncrementFromRear = ClIncrement * MachCoeff;
         }
 
         /// <summary>

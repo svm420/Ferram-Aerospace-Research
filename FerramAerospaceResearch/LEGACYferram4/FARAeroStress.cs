@@ -144,51 +144,50 @@ namespace FerramAerospaceResearch
             if (template.HasValue("requiresCrew"))
                 bool.TryParse(template.GetValue("requiresCrew"), out parsedTemplate.crewed);
 
-            if (template.HasNode("Resources"))
+            if (!template.HasNode("Resources"))
+                return parsedTemplate;
+            ConfigNode resources = template.GetNode("Resources");
+            if(resources.HasValue("numReq"))
+                int.TryParse(resources.GetValue("numReq"), out parsedTemplate.minNumResources);
+
+            if (resources.HasValue("rejectUnlistedResources"))
+                bool.TryParse(resources.GetValue("rejectUnlistedResources"), out parsedTemplate.rejectUnlistedResources);
+
+            if (resources.HasValue("flowMode"))
             {
-                ConfigNode resources = template.GetNode("Resources");
-                if(resources.HasValue("numReq"))
-                    int.TryParse(resources.GetValue("numReq"), out parsedTemplate.minNumResources);
+                parsedTemplate.flowModeNeeded = true;
+                string flowString = resources.GetValue("flowMode").ToLowerInvariant();
 
-                if (resources.HasValue("rejectUnlistedResources"))
-                    bool.TryParse(resources.GetValue("rejectUnlistedResources"), out parsedTemplate.rejectUnlistedResources);
-
-                if (resources.HasValue("flowMode"))
+                switch (flowString)
                 {
-                    parsedTemplate.flowModeNeeded = true;
-                    string flowString = resources.GetValue("flowMode").ToLowerInvariant();
+                    case "all_vessel":
+                        parsedTemplate.flowMode = ResourceFlowMode.ALL_VESSEL;
+                        break;
+                    case "stack_priority_search":
+                        parsedTemplate.flowMode = ResourceFlowMode.STACK_PRIORITY_SEARCH;
+                        break;
+                    case "stage_priority_flow":
+                        parsedTemplate.flowMode = ResourceFlowMode.STAGE_PRIORITY_FLOW;
+                        break;
+                    case "no_flow":
+                        parsedTemplate.flowMode = ResourceFlowMode.NO_FLOW;
+                        break;
+                    default:
+                        parsedTemplate.flowModeNeeded = false;
+                        break;
+                }
+            }
 
-                    switch (flowString)
-                    {
-                        case "all_vessel":
-                            parsedTemplate.flowMode = ResourceFlowMode.ALL_VESSEL;
-                            break;
-                        case "stack_priority_search":
-                            parsedTemplate.flowMode = ResourceFlowMode.STACK_PRIORITY_SEARCH;
-                            break;
-                        case "stage_priority_flow":
-                            parsedTemplate.flowMode = ResourceFlowMode.STAGE_PRIORITY_FLOW;
-                            break;
-                        case "no_flow":
-                            parsedTemplate.flowMode = ResourceFlowMode.NO_FLOW;
-                            break;
-                        default:
-                            parsedTemplate.flowModeNeeded = false;
-                            break;
-                    }
-                }
-
-                PartResourceLibrary l = PartResourceLibrary.Instance;
-                foreach (string resString in resources.GetValues("res"))
-                {
-                    if (l.resourceDefinitions.Contains(resString))
-                        parsedTemplate.resources.Add(resString);
-                }
-                foreach (string resString in resources.GetValues("excludeRes"))
-                {
-                    if (l.resourceDefinitions.Contains(resString))
-                        parsedTemplate.excludeResources.Add(resString);
-                }
+            PartResourceLibrary l = PartResourceLibrary.Instance;
+            foreach (string resString in resources.GetValues("res"))
+            {
+                if (l.resourceDefinitions.Contains(resString))
+                    parsedTemplate.resources.Add(resString);
+            }
+            foreach (string resString in resources.GetValues("excludeRes"))
+            {
+                if (l.resourceDefinitions.Contains(resString))
+                    parsedTemplate.excludeResources.Add(resString);
             }
 
             return parsedTemplate;

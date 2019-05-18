@@ -132,11 +132,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             for (int i = 0; i < moduleList.Count; i++)
             {
                 Part p = moduleList[i].part;
-                if (partWorldToLocalMatrixDict.ContainsKey(p))
-                {
-                    worldSpaceAvgPos += partWorldToLocalMatrixDict[p].worldPosition * dragFactor[i];
-                    totalDragFactor += dragFactor[i];
-                }
+                if (!partWorldToLocalMatrixDict.ContainsKey(p))
+                    continue;
+                worldSpaceAvgPos += partWorldToLocalMatrixDict[p].worldPosition * dragFactor[i];
+                totalDragFactor  += dragFactor[i];
             }
 
             worldSpaceAvgPos /= totalDragFactor;
@@ -344,12 +343,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 partLocalForce = localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor;
                 forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
                 torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)dynamicPressurekPa);
-                if (!float.IsNaN(forceVector.x) && !float.IsNaN(torqueVector.x))
-                {
-                    Vector3 centroid = pd.aeroModule.part.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
-                    center.AddForce(centroid, forceVector);
-                    center.AddTorque(torqueVector);
-                }
+                if (float.IsNaN(forceVector.x) || float.IsNaN(torqueVector.x))
+                    return;
+                Vector3 centroid = pd.aeroModule.part.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
+                center.AddForce(centroid, forceVector);
+                center.AddTorque(torqueVector);
             }
         }
 

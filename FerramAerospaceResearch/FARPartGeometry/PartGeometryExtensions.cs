@@ -195,18 +195,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
             foreach (List<string> currentPartModuleTransforms in ignorePartModuleTransforms)
             {
                 //The first index of each list is the name of the part module; the rest are the transforms
-                if(p.Modules.Contains(currentPartModuleTransforms[0]))
-                {
-                    //   FARLogger.Info("Part " + p.partInfo.title + " has module " + currentPartModuleTransforms[0] + ".  Getting exempt transforms");
-                    PartModule module = p.Modules[currentPartModuleTransforms[0]];
+                if (!p.Modules.Contains(currentPartModuleTransforms[0]))
+                    continue;
+                //   FARLogger.Info("Part " + p.partInfo.title + " has module " + currentPartModuleTransforms[0] + ".  Getting exempt transforms");
+                PartModule module = p.Modules[currentPartModuleTransforms[0]];
 
-                    for (int j = 1; j < currentPartModuleTransforms.Count; ++j)
-                    {
-                        string transformString = (string)module.GetType().GetField(currentPartModuleTransforms[j]).GetValue(module);
-                        Transform.AddRange(string.IsNullOrEmpty(transformString)
-                                               ? p.FindModelComponents<Transform>(transformString)
-                                               : p.FindModelComponents<Transform>(currentPartModuleTransforms[j]));
-                    }
+                for (int j = 1; j < currentPartModuleTransforms.Count; ++j)
+                {
+                    string transformString = (string)module.GetType().GetField(currentPartModuleTransforms[j]).GetValue(module);
+                    Transform.AddRange(string.IsNullOrEmpty(transformString)
+                                           ? p.FindModelComponents<Transform>(transformString)
+                                           : p.FindModelComponents<Transform>(currentPartModuleTransforms[j]));
                 }
             }
             foreach (Transform t in p.FindModelComponents<Transform>())

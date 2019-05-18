@@ -130,11 +130,10 @@ namespace FerramAerospaceResearch
 
         private void Update()
         {
-            if (hasScenarioChanged)
-            {
-                OnScenarioChanged();
-                hasScenarioChanged = false;
-            }
+            if (!hasScenarioChanged)
+                return;
+            OnScenarioChanged();
+            hasScenarioChanged = false;
         }
         #endregion Unity MonoBehaviour messages
 
@@ -144,16 +143,14 @@ namespace FerramAerospaceResearch
             FARLogger.Info("check scene");
             if(fromToScenes.to == GameScenes.SPACECENTER)
             {
-                if (FARDebugValues.useBlizzyToolbar)
-                {
-                    if (FARDebugButtonBlizzy == null)
-                    {
-                        FARDebugButtonBlizzy = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARDebugButtonBlizzy");
-                        FARDebugButtonBlizzy.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
-                        FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
-                        FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
-                    }
-                }
+                if (!FARDebugValues.useBlizzyToolbar)
+                    return;
+                if (FARDebugButtonBlizzy != null)
+                    return;
+                FARDebugButtonBlizzy             =  ToolbarManager.Instance.add("FerramAerospaceResearch", "FARDebugButtonBlizzy");
+                FARDebugButtonBlizzy.TexturePath =  "FerramAerospaceResearch/Textures/icon_button_blizzy";
+                FARDebugButtonBlizzy.ToolTip     =  "FAR Debug Options";
+                FARDebugButtonBlizzy.OnClick     += e => debugMenu = !debugMenu;
             }
             else
             {
@@ -209,11 +206,10 @@ namespace FerramAerospaceResearch
             if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
             {
                 debugMenu = false;
-                if (inputLocked)
-                {
-                    InputLockManager.RemoveControlLock("FARDebugLock");
-                    inputLocked = false;
-                }
+                if (!inputLocked)
+                    return;
+                InputLockManager.RemoveControlLock("FARDebugLock");
+                inputLocked = false;
                 return;
             }
 

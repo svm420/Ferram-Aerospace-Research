@@ -86,28 +86,25 @@ namespace ferram4
             //Set up part collider list to easy runtime overhead with memory churning
             foreach (PartModule m in part.Modules)
             {
-                if (m is FARPartModule farModule)
-                {
-                    if (farModule.partColliders != null)
-                    {
-                        partColliders = farModule.partColliders;
-                        break;
-                    }
-                }
+                if (!(m is FARPartModule farModule))
+                    continue;
+                if (farModule.partColliders == null)
+                    continue;
+                partColliders = farModule.partColliders;
+                break;
             }
 
             // For some reason fuelLine throws NRE when trying to get colliders
-            if (partColliders == null)
+            if (partColliders != null)
+                return;
+            try
             {
-                try
-                {
-                    partColliders = part.GetPartColliders();
-                }
-                catch (NullReferenceException)
-                {
-                    FARLogger.Info("NullReferenceException trying to get part colliders from " + part + ", defaulting to no colliders");
-                    partColliders = new Collider[0];
-                }
+                partColliders = part.GetPartColliders();
+            }
+            catch (NullReferenceException)
+            {
+                FARLogger.Info("NullReferenceException trying to get part colliders from " + part + ", defaulting to no colliders");
+                partColliders = new Collider[0];
             }
         }
         protected void UpdateShipPartsList()
@@ -135,9 +132,10 @@ namespace ferram4
         public override void OnLoad(ConfigNode node)
         {
             base.OnLoad(node);
-            if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
-                if(!(part is CompoundPart))
-                    TriggerPartColliderUpdate();
+            if (!HighLogic.LoadedSceneIsFlight && !HighLogic.LoadedSceneIsEditor)
+                return;
+            if(!(part is CompoundPart))
+                TriggerPartColliderUpdate();
         }
 
         //public override void OnSave(ConfigNode node)

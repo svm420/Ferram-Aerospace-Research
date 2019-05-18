@@ -119,11 +119,10 @@ namespace ferram4
                 }
 
                 error -= dy;
-                if (error < 0)
-                {
-                    y += ystep;
-                    error += dx;
-                }
+                if (error >= 0)
+                    continue;
+                y     += ystep;
+                error += dx;
             }
         }
 
@@ -231,12 +230,11 @@ namespace ferram4
         public static void SetPixelAA(this Texture2D tex, int x, int y, Color color, double alpha = 1.0)
         {
             // for now assuming that all lines on tex will be drawn with the same color
-            if (tex.inBounds(x, y))
-            {
-                float a = tex.GetPixel(x, y).a;
-                color.a = a + (1 - a) * (float)alpha;
-                tex.SetPixel(x, y, color);
-            }
+            if (!tex.inBounds(x, y))
+                return;
+            float a = tex.GetPixel(x, y).a;
+            color.a = a + (1 - a) * (float)alpha;
+            tex.SetPixel(x, y, color);
         }
 
         private static void Swap(ref double x, ref double y)

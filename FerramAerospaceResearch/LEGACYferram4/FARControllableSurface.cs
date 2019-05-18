@@ -57,18 +57,17 @@ namespace ferram4
         {
             get
             {
-                if (movableSection == null)
+                if (movableSection != null)
+                    return movableSection;
+                movableSection = part.FindModelTransform(transformName); //And the transform
+                if (!MovableOrigReady)
                 {
-                    movableSection = part.FindModelTransform(transformName);     //And the transform
-                    if (!MovableOrigReady)
-                    {
-                        // In parts copied by symmetry, these fields should already be set,
-                        // while the transform may not be in the original orientation anymore.
-                        MovableOrig = movableSection.localRotation;         //Its original orientation
-                        MovableOrigReady = true;
-                    }
-                    flipAxis = Vector3.Dot(MovableSection.right, part.partTransform.right) <= 0;
+                    // In parts copied by symmetry, these fields should already be set,
+                    // while the transform may not be in the original orientation anymore.
+                    MovableOrig      = movableSection.localRotation; //Its original orientation
+                    MovableOrigReady = true;
                 }
+                flipAxis = Vector3.Dot(movableSection.right, part.partTransform.right) <= 0;
                 return movableSection;
             }
         }
@@ -253,6 +252,7 @@ namespace ferram4
                 prevIsSpoiler = false;
                 UpdateEvents();
             }
+            // ReSharper disable once InvertIf
             if(isSpoiler != prevIsSpoiler)
             {
                 prevIsSpoiler = isSpoiler;
@@ -296,27 +296,26 @@ namespace ferram4
             if(vessel)
                 lastReferenceTransform = vessel.ReferenceTransform;
 
-            if (FARDebugValues.allowStructuralFailures)
-            {
-                foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
-                    if (temp.name == "ctrlSurfStress")
-                    {
-                        FARPartStressTemplate template = temp;
-                        double maxForceMult = Math.Pow(massMultiplier, FARAeroUtil.massStressPower);
+            if (!FARDebugValues.allowStructuralFailures)
+                return;
+            foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
+                if (temp.name == "ctrlSurfStress")
+                {
+                    FARPartStressTemplate template     = temp;
+                    double                maxForceMult = Math.Pow(massMultiplier, FARAeroUtil.massStressPower);
 
-                        YmaxForce *= 1 - ctrlSurfFrac;
-                        XZmaxForce *= 1 - ctrlSurfFrac;
+                    YmaxForce  *= 1 - ctrlSurfFrac;
+                    XZmaxForce *= 1 - ctrlSurfFrac;
 
-                        double tmp = template.YmaxStress;    //in MPa
-                        tmp *= S * ctrlSurfFrac * maxForceMult;
-                        YmaxForce += tmp;
+                    double tmp = template.YmaxStress; //in MPa
+                    tmp       *= S * ctrlSurfFrac * maxForceMult;
+                    YmaxForce += tmp;
 
-                        tmp = template.XZmaxStress;    //in MPa
-                        tmp *= S * ctrlSurfFrac * maxForceMult;
-                        XZmaxForce += tmp;
-                        break;
-                    }
-            }
+                    tmp        =  template.XZmaxStress; //in MPa
+                    tmp        *= S * ctrlSurfFrac * maxForceMult;
+                    XZmaxForce += tmp;
+                    break;
+                }
 
             //if (HighLogic.LoadedSceneIsEditor)        //should be unneeded now
             //    FixAllUIRanges();
@@ -349,11 +348,10 @@ namespace ferram4
             base.FixedUpdate();
             justStarted = false;
 
-            if(vessel && vessel.ReferenceTransform != lastReferenceTransform)
-            {
-                justStarted = true;
-                lastReferenceTransform = vessel.ReferenceTransform;
-            }
+            if (!vessel || vessel.ReferenceTransform == lastReferenceTransform)
+                return;
+            justStarted            = true;
+            lastReferenceTransform = vessel.ReferenceTransform;
 
         }
 
@@ -459,44 +457,43 @@ namespace ferram4
         private void AoAOffsetFromControl()
         {
             AoAdesiredControl = 0;
-            if (!(vessel is null) && vessel.atmDensity > 0)
+            if (vessel is null || vessel.atmDensity <= 0)
+                return;
+            if (!pitchaxis.NearlyEqual(0))
             {
-                if (!pitchaxis.NearlyEqual(0))
-                {
-                    AoAdesiredControl += PitchLocation * vessel.ctrlState.pitch * pitchaxis * 0.01;
-                }
-                if (!yawaxis.NearlyEqual(0))
-                {
-                    AoAdesiredControl += YawLocation * vessel.ctrlState.yaw * yawaxis * 0.01;
-                }
-                if (!rollaxis.NearlyEqual(0))
-                {
-                    AoAdesiredControl += RollLocation * vessel.ctrlState.roll * rollaxis * 0.01;
-                }
-                if (!brakeRudder.NearlyEqual(0))
-                {
-                    AoAdesiredControl += BrakeRudderLocation * Math.Max(0.0, BrakeRudderSide * vessel.ctrlState.yaw) * brakeRudder * 0.01;
-                }
-                AoAdesiredControl *= maxdeflect;
-                if (!pitchaxisDueToAoA.NearlyEqual(0))
-				{
-                    Vector3d vel = GetVelocity();
-                    double velMag = vel.magnitude;
-                    if (velMag > 5)
-                    {
-                        //Vector3 tmpVec = vessel.ReferenceTransform.up * Vector3.Dot(vessel.ReferenceTransform.up, vel) + vessel.ReferenceTransform.forward * Vector3.Dot(vessel.ReferenceTransform.forward, vel);   //velocity vector projected onto a plane that divides the airplane into left and right halves
-                        //double AoA = Vector3.Dot(tmpVec.normalized, vessel.ReferenceTransform.forward);
-                        double AoA = base.CalculateAoA(vel);      //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
-                        AoA = FARMathUtil.rad2deg * AoA;
-                        if (double.IsNaN(AoA))
-                            AoA = 0;
-                        AoAdesiredControl += AoA * pitchaxisDueToAoA * 0.01;
-                    }
-				}
-
-                AoAdesiredControl *= AoAsign;
-                AoAdesiredControl = AoAdesiredControl.Clamp(-Math.Abs(maxdeflect), Math.Abs(maxdeflect));
+                AoAdesiredControl += PitchLocation * vessel.ctrlState.pitch * pitchaxis * 0.01;
             }
+            if (!yawaxis.NearlyEqual(0))
+            {
+                AoAdesiredControl += YawLocation * vessel.ctrlState.yaw * yawaxis * 0.01;
+            }
+            if (!rollaxis.NearlyEqual(0))
+            {
+                AoAdesiredControl += RollLocation * vessel.ctrlState.roll * rollaxis * 0.01;
+            }
+            if (!brakeRudder.NearlyEqual(0))
+            {
+                AoAdesiredControl += BrakeRudderLocation * Math.Max(0.0, BrakeRudderSide * vessel.ctrlState.yaw) * brakeRudder * 0.01;
+            }
+            AoAdesiredControl *= maxdeflect;
+            if (!pitchaxisDueToAoA.NearlyEqual(0))
+            {
+                Vector3d vel    = GetVelocity();
+                double   velMag = vel.magnitude;
+                if (velMag > 5)
+                {
+                    //Vector3 tmpVec = vessel.ReferenceTransform.up * Vector3.Dot(vessel.ReferenceTransform.up, vel) + vessel.ReferenceTransform.forward * Vector3.Dot(vessel.ReferenceTransform.forward, vel);   //velocity vector projected onto a plane that divides the airplane into left and right halves
+                    //double AoA = Vector3.Dot(tmpVec.normalized, vessel.ReferenceTransform.forward);
+                    double AoA = base.CalculateAoA(vel); //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
+                    AoA = FARMathUtil.rad2deg * AoA;
+                    if (double.IsNaN(AoA))
+                        AoA = 0;
+                    AoAdesiredControl += AoA * pitchaxisDueToAoA * 0.01;
+                }
+            }
+
+            AoAdesiredControl *= AoAsign;
+            AoAdesiredControl =  AoAdesiredControl.Clamp(-Math.Abs(maxdeflect), Math.Abs(maxdeflect));
         }
 
         public override double CalculateAoA(Vector3d velocity)
@@ -594,85 +591,84 @@ namespace ferram4
 
         public void SetControlStateEditor(Vector3 CoM, Vector3 velocityVec, float pitch, float yaw, float roll, int flap, bool braking)
         {
-            if (HighLogic.LoadedSceneIsEditor)
+            if (!HighLogic.LoadedSceneIsEditor)
+                return;
+            Transform partTransform = part.partTransform;
+            Transform rootTransform = EditorLogic.RootPart.partTransform;
+
+            // cache transform vectors
+            Vector3 partPosition = partTransform.position;
+            Vector3 CoMoffset    = partPosition - CoM;
+
+            Vector3 partForward = partTransform.forward;
+            Vector3 forward     = rootTransform.forward;
+            Vector3 up          = rootTransform.up;
+            Vector3 right       = rootTransform.right;
+
+            PitchLocation       = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, up));
+            YawLocation         = -Vector3.Dot(partForward, right) * Math.Sign(Vector3.Dot(CoMoffset, up));
+            RollLocation        = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, -right));
+            BrakeRudderLocation = Vector3.Dot(partForward, forward);
+            BrakeRudderSide     = Mathf.Sign(Vector3.Dot(CoMoffset, right));
+            AoAsign             = Math.Sign(Vector3.Dot(partTransform.up, up));
+            AoAdesiredControl   = 0;
+            if (!pitchaxis.NearlyEqual(0))
             {
-                Transform partTransform = part.partTransform;
-                Transform rootTransform = EditorLogic.RootPart.partTransform;
-
-                // cache transform vectors
-                Vector3 partPosition = partTransform.position;
-                Vector3 CoMoffset = partPosition - CoM;
-
-                Vector3 partForward = partTransform.forward;
-                Vector3 forward = rootTransform.forward;
-                Vector3 up = rootTransform.up;
-                Vector3 right = rootTransform.right;
-
-                PitchLocation = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, up));
-                YawLocation = -Vector3.Dot(partForward, right) * Math.Sign(Vector3.Dot(CoMoffset, up));
-                RollLocation = Vector3.Dot(partForward, forward) * Math.Sign(Vector3.Dot(CoMoffset, -right));
-                BrakeRudderLocation = Vector3.Dot(partForward, forward);
-                BrakeRudderSide = Mathf.Sign(Vector3.Dot(CoMoffset, right));
-                AoAsign = Math.Sign(Vector3.Dot(partTransform.up, up));
-                AoAdesiredControl = 0;
-                if (!pitchaxis.NearlyEqual(0))
-                {
-                    AoAdesiredControl += PitchLocation * pitch * pitchaxis * 0.01;
-                }
-                if (!yawaxis.NearlyEqual(0))
-                {
-                    AoAdesiredControl += YawLocation * yaw * yawaxis * 0.01;
-                }
-                if (!rollaxis.NearlyEqual(0))
-                {
-                    AoAdesiredControl += RollLocation * roll * rollaxis * 0.01;
-                }
-                if (!brakeRudder.NearlyEqual(0))
-                {
-                    AoAdesiredControl += BrakeRudderLocation * Math.Max(0.0, BrakeRudderSide * yawaxis) * brakeRudder * 0.01;
-                }
-                AoAdesiredControl *= maxdeflect;
-                if (!pitchaxisDueToAoA.NearlyEqual(0))
-                {
-                    Vector3 tmpVec = up * Vector3.Dot(up, velocityVec) + forward * Vector3.Dot(forward, velocityVec);   //velocity vector projected onto a plane that divides the airplane into left and right halves
-                    double AoA = base.CalculateAoA(tmpVec.normalized);      //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
-                    AoA = FARMathUtil.rad2deg * AoA;
-                    if (double.IsNaN(AoA))
-                        AoA = 0;
-                    AoAdesiredControl += AoA * pitchaxisDueToAoA * 0.01;
-                }
-
-                AoAdesiredControl *= AoAsign;
-                AoAdesiredControl = AoAdesiredControl.Clamp(-Math.Abs(maxdeflect), Math.Abs(maxdeflect));
-                AoAcurrentControl = AoAdesiredControl;
-                AoAcurrentFlap = 0;
-
-                if (part.symMethod == SymmetryMethod.Mirror || part.symmetryCounterparts.Count < 1)
-                {
-                    flapLocation = Math.Sign(Vector3.Dot(HighLogic.LoadedSceneIsFlight ? vessel.ReferenceTransform.forward : EditorLogic.RootPart.partTransform.forward, partForward));
-
-                    spoilerLocation = -flapLocation;
-                }
-                else if (part.parent != null)
-                {
-                    flapLocation = Math.Sign(Vector3.Dot(partPosition - part.parent.partTransform.position, partForward));
-                    spoilerLocation = flapLocation;
-                }
-                else
-                {
-                    flapLocation = 1;
-                    spoilerLocation = flapLocation;
-                }
-
-                if (isFlap)
-                    AoAcurrentFlap += maxdeflectFlap * flapLocation * flap * 0.3333333333333;
-                else if (isSpoiler)
-                    AoAcurrentFlap += braking ? maxdeflectFlap * spoilerLocation : 0;
-
-                AoAdesiredFlap = AoAcurrentFlap;
-                AoAoffset = AoAcurrentFlap + AoAcurrentControl;
-                DeflectionAnimation();
+                AoAdesiredControl += PitchLocation * pitch * pitchaxis * 0.01;
             }
+            if (!yawaxis.NearlyEqual(0))
+            {
+                AoAdesiredControl += YawLocation * yaw * yawaxis * 0.01;
+            }
+            if (!rollaxis.NearlyEqual(0))
+            {
+                AoAdesiredControl += RollLocation * roll * rollaxis * 0.01;
+            }
+            if (!brakeRudder.NearlyEqual(0))
+            {
+                AoAdesiredControl += BrakeRudderLocation * Math.Max(0.0, BrakeRudderSide * yawaxis) * brakeRudder * 0.01;
+            }
+            AoAdesiredControl *= maxdeflect;
+            if (!pitchaxisDueToAoA.NearlyEqual(0))
+            {
+                Vector3 tmpVec = up * Vector3.Dot(up, velocityVec) + forward * Vector3.Dot(forward, velocityVec); //velocity vector projected onto a plane that divides the airplane into left and right halves
+                double  AoA    = base.CalculateAoA(tmpVec.normalized);                                            //using base.CalculateAoA gets the deflection using WingAeroModel's code, which does not account for deflection; this gives us the AoA that the surface _would_ be at if it hadn't deflected at all.
+                AoA = FARMathUtil.rad2deg * AoA;
+                if (double.IsNaN(AoA))
+                    AoA = 0;
+                AoAdesiredControl += AoA * pitchaxisDueToAoA * 0.01;
+            }
+
+            AoAdesiredControl *= AoAsign;
+            AoAdesiredControl =  AoAdesiredControl.Clamp(-Math.Abs(maxdeflect), Math.Abs(maxdeflect));
+            AoAcurrentControl =  AoAdesiredControl;
+            AoAcurrentFlap    =  0;
+
+            if (part.symMethod == SymmetryMethod.Mirror || part.symmetryCounterparts.Count < 1)
+            {
+                flapLocation = Math.Sign(Vector3.Dot(HighLogic.LoadedSceneIsFlight ? vessel.ReferenceTransform.forward : EditorLogic.RootPart.partTransform.forward, partForward));
+
+                spoilerLocation = -flapLocation;
+            }
+            else if (part.parent != null)
+            {
+                flapLocation    = Math.Sign(Vector3.Dot(partPosition - part.parent.partTransform.position, partForward));
+                spoilerLocation = flapLocation;
+            }
+            else
+            {
+                flapLocation    = 1;
+                spoilerLocation = flapLocation;
+            }
+
+            if (isFlap)
+                AoAcurrentFlap += maxdeflectFlap * flapLocation * flap * 0.3333333333333;
+            else if (isSpoiler)
+                AoAcurrentFlap += braking ? maxdeflectFlap * spoilerLocation : 0;
+
+            AoAdesiredFlap = AoAcurrentFlap;
+            AoAoffset      = AoAcurrentFlap + AoAcurrentControl;
+            DeflectionAnimation();
         }
         #endregion
 
@@ -694,6 +690,7 @@ namespace ferram4
                     yawaxis = tmpBool ? 100 : 0;
                 }
             }
+            // ReSharper disable once InvertIf
             if (node.HasValue("rollaxis"))
             {
                 if (bool.TryParse(node.GetValue("rollaxis"), out tmpBool))

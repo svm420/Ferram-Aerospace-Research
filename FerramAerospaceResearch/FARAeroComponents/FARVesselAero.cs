@@ -141,14 +141,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     if (g.Ready)
                         geoModulesReady++;
                 }
-                if (p.Modules.Contains<KerbalEVA>() || p.Modules.Contains<FlagSite>())
-                {
-                    FARLogger.Info("Handling Stuff for KerbalEVA / Flag");
-                    g = (GeometryPartModule)p.AddModule("GeometryPartModule");
-                    g.OnStart(StartState());
-                    p.AddModule("FARAeroPartModule").OnStart(StartState());
-                    _currentGeoModules.Add(g);
-                }
+
+                if (!p.Modules.Contains<KerbalEVA>() && !p.Modules.Contains<FlagSite>())
+                    continue;
+                FARLogger.Info("Handling Stuff for KerbalEVA / Flag");
+                g = (GeometryPartModule)p.AddModule("GeometryPartModule");
+                g.OnStart(StartState());
+                p.AddModule("FARAeroPartModule").OnStart(StartState());
+                _currentGeoModules.Add(g);
             }
             RequestUpdateVoxel(false);
 
@@ -372,15 +372,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public void VesselUpdateEvent(Vessel v)
         {
-            if (v == vessel)
+            if (v != vessel)
+                return;
+            if (_vehicleAero == null)
             {
-                if (_vehicleAero == null)
-                {
-                    _vehicleAero = new VehicleAerodynamics();
-                    _vesselIntakeRamDrag = new VesselIntakeRamDrag();
-                }
-                RequestUpdateVoxel(true);
+                _vehicleAero         = new VehicleAerodynamics();
+                _vesselIntakeRamDrag = new VesselIntakeRamDrag();
             }
+            RequestUpdateVoxel(true);
         }
 
         public void RequestUpdateVoxel(bool recalcGeoModules)
@@ -428,12 +427,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
                  foreach (Part p in vessel.Parts)
                  {
                      var g = p.Modules.GetModule<GeometryPartModule>();
-                     if (!(g is null))
-                     {
-                         _currentGeoModules.Add(g);
-                         if (g.Ready)
-                             geoModulesReady++;
-                     }
+                     if (g is null)
+                         continue;
+                     _currentGeoModules.Add(g);
+                     if (g.Ready)
+                         geoModulesReady++;
                  }
              }
              if (_currentGeoModules.Count > geoModulesReady)
@@ -454,12 +452,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
              {
                  for (int i = _currentGeoModules.Count - 1; i >= 0; --i)
                  {
-                     if (!_currentGeoModules[i].Ready)
-                     {
-                         _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
-                         _updateQueued = true;
-                         return;
-                     }
+                     if (_currentGeoModules[i].Ready)
+                         continue;
+                     _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
+                     _updateQueued      = true;
+                     return;
                  }
              }
 

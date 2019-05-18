@@ -246,17 +246,16 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             else
                 sys.errorIntegral = 0;
             sys = systemInstances[4];
-            if (sys.active)
-            {
-                double scalingFactor = scalingDynPres / info.dynPres;
+            if (!sys.active)
+                return;
+            double scalingFactor = scalingDynPres / info.dynPres;
 
-                if (scalingFactor > 1)
-                    scalingFactor = 1;
+            if (scalingFactor > 1)
+                scalingFactor = 1;
 
-                state.pitch = state.pitchTrim + (state.pitch - state.pitchTrim) * (float)scalingFactor;
-                state.yaw = state.yawTrim + (state.yaw - state.yawTrim) * (float)scalingFactor;
-                state.roll = state.rollTrim + (state.roll - state.rollTrim) * (float)scalingFactor;
-            }
+            state.pitch = state.pitchTrim + (state.pitch - state.pitchTrim) * (float)scalingFactor;
+            state.yaw   = state.yawTrim + (state.yaw - state.yawTrim) * (float)scalingFactor;
+            state.roll  = state.rollTrim + (state.roll - state.rollTrim) * (float)scalingFactor;
         }
 
         private static double ControlStateChange(ControlSystem system, double error)
@@ -282,33 +281,30 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "StabilityAugmentationSettings");
 
-            if (systemTemplates == null)
+            if (systemTemplates != null)
+                return;
+            systemTemplates = new ControlSystem[5];
+            for (int i = 0; i < systemTemplates.Length; i++)
+                systemTemplates[i] = new ControlSystem();
+
+            if (node != null)
             {
-                systemTemplates = new ControlSystem[5];
                 for (int i = 0; i < systemTemplates.Length; i++)
-                    systemTemplates[i] = new ControlSystem();
-
-
-
-                if (node != null)
                 {
-                    for (int i = 0; i < systemTemplates.Length; i++)
-                    {
-                        string nodeName = "ControlSys" + i;
-                        if (node.HasNode(nodeName))
-                            TryLoadSystem(node.GetNode(nodeName), i);
-                    }
-                    if (node.HasValue("aoALowLim"))
-                        double.TryParse(node.GetValue("aoALowLim"), out aoALowLim);
-                    if (node.HasValue("aoAHighLim"))
-                        double.TryParse(node.GetValue("aoAHighLim"), out aoAHighLim);
-                    if (node.HasValue("scalingDynPres"))
-                        double.TryParse(node.GetValue("scalingDynPres"), out scalingDynPres);
+                    string nodeName = "ControlSys" + i;
+                    if (node.HasNode(nodeName))
+                        TryLoadSystem(node.GetNode(nodeName), i);
                 }
-                else
-                {
-                    BuildDefaultSystems();
-                }
+                if (node.HasValue("aoALowLim"))
+                    double.TryParse(node.GetValue("aoALowLim"), out aoALowLim);
+                if (node.HasValue("aoAHighLim"))
+                    double.TryParse(node.GetValue("aoAHighLim"), out aoAHighLim);
+                if (node.HasValue("scalingDynPres"))
+                    double.TryParse(node.GetValue("scalingDynPres"), out scalingDynPres);
+            }
+            else
+            {
+                BuildDefaultSystems();
             }
         }
 
@@ -408,26 +404,25 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             }
 
-            if (_vessel == active_vessel)
+            if (_vessel != active_vessel)
+                return;
+            systemTemplates = systemInstances;
+
+            if (node == null)
             {
-                systemTemplates = systemInstances;
-
-                if (node == null)
-                {
-                    node = new ConfigNode("StabilityAugmentationSettings");
-                    flightGUISettings.Add(node);
-                }
-                else
-                    node.ClearData();
-
-                for (int i = 0; i < systemTemplates.Length; i++)
-                {
-                    node.AddNode(BuildSystemNode(i));
-                }
-                node.AddValue("aoALowLim", aoALowLim);
-                node.AddValue("aoAHighLim", aoAHighLim);
-                node.AddValue("scalingDynPres", scalingDynPres);
+                node = new ConfigNode("StabilityAugmentationSettings");
+                flightGUISettings.Add(node);
             }
+            else
+                node.ClearData();
+
+            for (int i = 0; i < systemTemplates.Length; i++)
+            {
+                node.AddNode(BuildSystemNode(i));
+            }
+            node.AddValue("aoALowLim", aoALowLim);
+            node.AddValue("aoAHighLim", aoAHighLim);
+            node.AddValue("scalingDynPres", scalingDynPres);
         }
 
         public static ConfigNode BuildSystemNode(int index)

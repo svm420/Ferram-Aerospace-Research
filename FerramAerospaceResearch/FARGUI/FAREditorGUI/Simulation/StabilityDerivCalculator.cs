@@ -108,18 +108,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 CoM  += partMass * (Vector3d)p.transform.TransformPoint(p.CoMOffset);
                 mass += partMass;
                 var w = p.GetComponent<FARWingAerodynamicModel>();
-                if (w != null)
-                {
-                    if (w.isShielded)
-                        continue;
+                if (w == null)
+                    continue;
+                if (w.isShielded)
+                    continue;
 
-                    area += w.S;
-                    MAC  += w.GetMAC() * w.S;
-                    b    += w.Getb_2() * w.S;
-                    if (w is FARControllableSurface controllableSurface)
-                    {
-                        controllableSurface.SetControlStateEditor(CoM, p.transform.up, 0, 0, 0, input.flaps, input.spoilers);
-                    }
+                area += w.S;
+                MAC  += w.GetMAC() * w.S;
+                b    += w.Getb_2() * w.S;
+                if (w is FARControllableSurface controllableSurface)
+                {
+                    controllableSurface.SetControlStateEditor(CoM, p.transform.up, 0, 0, 0, input.flaps, input.spoilers);
                 }
             }
             if (area.NearlyEqual(0))

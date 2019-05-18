@@ -311,11 +311,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 xv_yvPairs.Add(xv);
                 xv_yvPairs.Add(yv);
             }
-            if(xv_yvPairs.Count < 5)
-                for(int i = 0; i < xv_yvPairs.Count; i += 2)
-                {
-                    _graph.AddLine(key + j++, new[] { xv_yvPairs[i], xv_yvPairs[i] }, new[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
-                }
+
+            if (xv_yvPairs.Count >= 5)
+                return;
+            for(int i = 0; i < xv_yvPairs.Count; i += 2)
+            {
+                _graph.AddLine(key + j++, new[] { xv_yvPairs[i], xv_yvPairs[i] }, new[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
+            }
         }
 
         private class GraphInputs

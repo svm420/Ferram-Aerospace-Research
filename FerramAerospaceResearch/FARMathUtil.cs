@@ -410,13 +410,10 @@ namespace FerramAerospaceResearch
                     goto LblLoop;
                 }
 
-                if (fx > 0d)
-                {
-                    x1 = x; f1 = fx;
-                    goto LblLoop;
-                }
-
-                return x;
+                if (fx <= 0d)
+                    return x;
+                x1 = x; f1 = fx;
+                goto LblLoop;
             }
 
             public double BrentSolve(string dbgmsg)

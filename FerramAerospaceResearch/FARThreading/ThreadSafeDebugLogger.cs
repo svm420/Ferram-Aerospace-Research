@@ -86,31 +86,29 @@ namespace FerramAerospaceResearch.FARThreading
         [Conditional("DEBUG"), Conditional("INFO")]
         private void UpdateInfo()
         {
-            if (_infoMessages.Count > 0)
-            {
-                var sB = new StringBuilder();
-                foreach (string message in _infoMessages)
-                    sB.AppendLine(message);
+            if (_infoMessages.Count <= 0)
+                return;
+            var sB = new StringBuilder();
+            foreach (string message in _infoMessages)
+                sB.AppendLine(message);
 
-                _infoMessages.Clear();
+            _infoMessages.Clear();
 
-                FARLogger.Info("" + sB);
-            }
+            FARLogger.Info("" + sB);
         }
 
         [Conditional("DEBUG")]
         private void UpdateDebug()
         {
-            if (_debugMessages.Count > 0)
-            {
-                var sB = new StringBuilder();
-                foreach (string message in _debugMessages)
-                    sB.AppendLine(message);
+            if (_debugMessages.Count <= 0)
+                return;
+            var sB = new StringBuilder();
+            foreach (string message in _debugMessages)
+                sB.AppendLine(message);
 
-                _debugMessages.Clear();
+            _debugMessages.Clear();
 
-                FARLogger.Debug("" + sB);
-            }
+            FARLogger.Debug("" + sB);
         }
 
         [Conditional("DEBUG"), Conditional("INFO")]

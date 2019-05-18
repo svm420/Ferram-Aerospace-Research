@@ -138,19 +138,18 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "AeroVizSettings");
 
-            if (node != null)
-            {
-                if (double.TryParse(node.GetValue("fullySaturatedCl"), out double tmp))
-                    FullySaturatedCl = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedCd"), out tmp))
-                    FullySaturatedCd = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedClBody"), out tmp))
-                    FullySaturatedClBody = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedCdBody"), out tmp))
-                    FullySaturatedCdBody = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedStall"), out tmp))
-                    FullySaturatedStall = tmp;
-            }
+            if (node == null)
+                return;
+            if (double.TryParse(node.GetValue("fullySaturatedCl"), out double tmp))
+                FullySaturatedCl = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedCd"), out tmp))
+                FullySaturatedCd = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedClBody"), out tmp))
+                FullySaturatedClBody = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedCdBody"), out tmp))
+                FullySaturatedCdBody = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedStall"), out tmp))
+                FullySaturatedStall = tmp;
         }
     }
 }

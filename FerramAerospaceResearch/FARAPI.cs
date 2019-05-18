@@ -80,23 +80,20 @@ namespace FerramAerospaceResearch
             }
 
             FlightGUI gui = VesselFlightInfo(v);
-            if (gui != null)
+            if (gui == null)
+                return false;
+            AirspeedSettingsGUI airspeedSettingsGUI = gui.airSpeedGUI;
+            if (airspeedSettingsGUI == null)
+                return false;
+            if (enabled == null)
             {
-                AirspeedSettingsGUI airspeedSettingsGUI = gui.airSpeedGUI;
-                if (airspeedSettingsGUI != null)
-                {
-                    if (enabled == null)
-                    {
-                        airspeedSettingsGUI.enabled = !airspeedSettingsGUI.enabled;
-                    }
-                    else
-                    {
-                        airspeedSettingsGUI.enabled = (bool) enabled;
-                    }
-                    return true;
-                }
+                airspeedSettingsGUI.enabled = !airspeedSettingsGUI.enabled;
             }
-            return false;
+            else
+            {
+                airspeedSettingsGUI.enabled = (bool) enabled;
+            }
+            return true;
         }
 
         public static FlightGUI VesselFlightInfo(Vessel v)
@@ -232,11 +229,10 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if(p.Modules.Contains<FARControllableSurface>())
-                {
-                    var surface = p.Modules.GetModule<FARControllableSurface>();
-                    surface.SetDeflection(surface.flapDeflectionLevel + 1);
-                }
+                if (!p.Modules.Contains<FARControllableSurface>())
+                    continue;
+                var surface = p.Modules.GetModule<FARControllableSurface>();
+                surface.SetDeflection(surface.flapDeflectionLevel + 1);
             }
         }
 
@@ -247,11 +243,10 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (p.Modules.Contains<FARControllableSurface>())
-                {
-                    var surface = p.Modules.GetModule<FARControllableSurface>();
-                    surface.SetDeflection(surface.flapDeflectionLevel - 1);
-                }
+                if (!p.Modules.Contains<FARControllableSurface>())
+                    continue;
+                var surface = p.Modules.GetModule<FARControllableSurface>();
+                surface.SetDeflection(surface.flapDeflectionLevel - 1);
             }
         }
 
@@ -264,12 +259,11 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (p.Modules.Contains<FARControllableSurface>())
-                {
-                    var surface = p.Modules.GetModule<FARControllableSurface>();
-                    if (surface.isFlap)
-                        return surface.flapDeflectionLevel;
-                }
+                if (!p.Modules.Contains<FARControllableSurface>())
+                    continue;
+                var surface = p.Modules.GetModule<FARControllableSurface>();
+                if (surface.isFlap)
+                    return surface.flapDeflectionLevel;
             }
 
             return -1;
@@ -282,11 +276,10 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (p.Modules.Contains<FARControllableSurface>())
-                {
-                    var surface = p.Modules.GetModule<FARControllableSurface>();
-                    surface.brake = spoilerActive;
-                }
+                if (!p.Modules.Contains<FARControllableSurface>())
+                    continue;
+                var surface = p.Modules.GetModule<FARControllableSurface>();
+                surface.brake = spoilerActive;
             }
         }
 
@@ -299,12 +292,11 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (p.Modules.Contains<FARControllableSurface>())
-                {
-                    var surface = p.Modules.GetModule<FARControllableSurface>();
-                    if (surface.isSpoiler)
-                        return surface.brake;
-                }
+                if (!p.Modules.Contains<FARControllableSurface>())
+                    continue;
+                var surface = p.Modules.GetModule<FARControllableSurface>();
+                if (surface.isSpoiler)
+                    return surface.brake;
             }
 
             return false;
@@ -394,11 +386,10 @@ namespace FerramAerospaceResearch
             FARVesselAero vesselAeroModule = null;
             foreach (VesselModule vM in vessel.vesselModules)
             {
-                if(vM is FARVesselAero vesselAero)
-                {
-                    vesselAeroModule = vesselAero;
-                    break;
-                }
+                if (!(vM is FARVesselAero vesselAero))
+                    continue;
+                vesselAeroModule = vesselAero;
+                break;
             }
 
             return !(vesselAeroModule is null) && vesselAeroModule.HasEverValidVoxelization();
@@ -418,11 +409,10 @@ namespace FerramAerospaceResearch
             FARVesselAero vesselAeroModule = null;
             foreach (VesselModule vM in vessel.vesselModules)
             {
-                if(vM is FARVesselAero vesselAero)
-                {
-                    vesselAeroModule = vesselAero;
-                    break;
-                }
+                if (!(vM is FARVesselAero vesselAero))
+                    continue;
+                vesselAeroModule = vesselAero;
+                break;
             }
 
             return !(vesselAeroModule is null) && vesselAeroModule.HasValidVoxelizationCurrently();

@@ -165,27 +165,26 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public void SetShielded(bool value)
         {
             part.ShieldedFromAirstream = value;
-            if (value)
-            {
-                worldSpaceAeroForce = Vector3.zero;
-                worldSpaceTorque = Vector3.zero;
+            if (!value)
+                return;
+            worldSpaceAeroForce = Vector3.zero;
+            worldSpaceTorque    = Vector3.zero;
 
-                totalWorldSpaceAeroForce = Vector3.zero;
+            totalWorldSpaceAeroForce = Vector3.zero;
 
-                partLocalForce = Vector3.zero;
-                partLocalTorque = Vector3.zero;
+            partLocalForce  = Vector3.zero;
+            partLocalTorque = Vector3.zero;
 
-                partLocalAngVel = Vector3.zero;
-                partLocalVel = Vector3.zero;
-                partLocalVelNorm = Vector3.zero;
+            partLocalAngVel  = Vector3.zero;
+            partLocalVel     = Vector3.zero;
+            partLocalVelNorm = Vector3.zero;
 
-                part.dragVectorMag = 0f;
-                part.dragVectorDir = Vector3.zero;
-                part.dragVectorDirLocal = Vector3.zero;
-                part.dragScalar = 0f;
+            part.dragVectorMag      = 0f;
+            part.dragVectorDir      = Vector3.zero;
+            part.dragVectorDirLocal = Vector3.zero;
+            part.dragScalar         = 0f;
 
-                UpdateAeroDisplay();
-            }
+            UpdateAeroDisplay();
         }
 
         public void ForceLegacyAeroUpdates()
@@ -356,34 +355,34 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (aeroVizGUI == null) return;
 
             bool anyActive = aeroVizGUI.AnyVisualizationActive;
-            if ((anyActive || updateVisualization) && HighLogic.LoadedSceneIsFlight && !PhysicsGlobals.ThermalColorsDebug)
-            {
-                Color tintColor = AeroVisualizationTintingCalculation(aeroVizGUI);
-                materialColorUpdater.Update(tintColor);
+            if (!anyActive && !updateVisualization ||
+                !HighLogic.LoadedSceneIsFlight ||
+                PhysicsGlobals.ThermalColorsDebug)
+                return;
+            Color tintColor = AeroVisualizationTintingCalculation(aeroVizGUI);
+            materialColorUpdater.Update(tintColor);
 
-                // this will disable visualization if none are active delayed by 1 frame to clean up any tint
-                updateVisualization = anyActive;
-            }
+            // this will disable visualization if none are active delayed by 1 frame to clean up any tint
+            updateVisualization = anyActive;
         }
 
         //Do this so FlightGUI can read off of the numbers from this
         private void CalculateTotalAeroForce()
         {
-            if (projectedArea.totalArea > 0.0)
-            {
-                totalWorldSpaceAeroForce = worldSpaceAeroForce;
+            if (projectedArea.totalArea <= 0.0)
+                return;
+            totalWorldSpaceAeroForce = worldSpaceAeroForce;
 
-                // Combine forces from legacy wing model
-                if (LegacyWingModel != null)
-                    totalWorldSpaceAeroForce += LegacyWingModel.worldSpaceForce;
+            // Combine forces from legacy wing model
+            if (LegacyWingModel != null)
+                totalWorldSpaceAeroForce += LegacyWingModel.worldSpaceForce;
 
-                // Combine forces from stock code
-                //totalWorldSpaceAeroForce += -part.dragVectorDir * part.dragScalar; // dragVectorDir is actually the velocity vector direction
+            // Combine forces from stock code
+            //totalWorldSpaceAeroForce += -part.dragVectorDir * part.dragScalar; // dragVectorDir is actually the velocity vector direction
 
-                // Handle airbrakes
-                if (stockAeroSurfaceModule != null)
-                    totalWorldSpaceAeroForce += stockAeroSurfaceModule.dragForce + stockAeroSurfaceModule.liftForce;
-            }
+            // Handle airbrakes
+            if (stockAeroSurfaceModule != null)
+                totalWorldSpaceAeroForce += stockAeroSurfaceModule.dragForce + stockAeroSurfaceModule.liftForce;
         }
 
         //Returns the tinted color if active; else it returns an alpha 0 color
@@ -520,16 +519,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
         //just to make water drag work in some possibly sane way
         public void FixedUpdate()
         {
-            if (waterSlowDragNew > 0 && vessel && part.submergedPortion > 0)
-            {
-                PhysicsGlobals.BuoyancyWaterDragSlow = Math.Max(hackWaterDragVal, 0f);
-                hackWaterDragVal = 0;
+            if (waterSlowDragNew <= 0 || !vessel || part.submergedPortion <= 0)
+                return;
+            PhysicsGlobals.BuoyancyWaterDragSlow = Math.Max(hackWaterDragVal, 0f);
+            hackWaterDragVal                     = 0;
 
-                float vel = partLocalVel.magnitude;
+            float vel = partLocalVel.magnitude;
 
-                if (vel < PhysicsGlobals.BuoyancyWaterDragMinVel || vel > vessel.srfSpeed * minVelVesselMultNew)
-                    PhysicsGlobals.BuoyancyWaterDragSlow += waterSlowDragNew;
-            }
+            if (vel < PhysicsGlobals.BuoyancyWaterDragMinVel || vel > vessel.srfSpeed * minVelVesselMultNew)
+                PhysicsGlobals.BuoyancyWaterDragSlow += waterSlowDragNew;
         }
 
         public void AddLocalForce(Vector3 localForce, Vector3 localLocation)
@@ -641,18 +639,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 failureOccured = true;
             }
 
-            if (failureOccured)
+            if (!failureOccured || !vessel)
+                return;
+            vessel.SendMessage("AerodynamicFailureStatus");
+            string msg = Localizer.Format("FARFlightLogAeroFailure", KSPUtil.PrintTimeStamp(FlightLogger.met), part.partInfo.title);
+            FlightLogger.eventLog.Add(msg);
+            if (FARDebugValues.aeroFailureExplosions)
             {
-                if (vessel)
-                {
-                    vessel.SendMessage("AerodynamicFailureStatus");
-                    string msg = Localizer.Format("FARFlightLogAeroFailure", KSPUtil.PrintTimeStamp(FlightLogger.met), part.partInfo.title);
-                    FlightLogger.eventLog.Add(msg);
-                    if (FARDebugValues.aeroFailureExplosions)
-                    {
-                        FXMonger.Explode(part, partTransform.position, (float)projectedArea.totalArea * 0.0005f);
-                    }
-                }
+                FXMonger.Explode(part, partTransform.position, (float)projectedArea.totalArea * 0.0005f);
             }
         }
 
@@ -741,21 +735,20 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             base.OnLoad(node);
 
-            if(FARDebugValues.allowStructuralFailures && node.HasNode("FARPartStressTemplate"))
+            if (!FARDebugValues.allowStructuralFailures || !node.HasNode("FARPartStressTemplate"))
+                return;
+            ConfigNode            stressTemplate  = node.GetNode("FARPartStressTemplate");
+            FARPartStressTemplate defaultTemplate = FARAeroStress.DetermineStressTemplate(part);
+            if(stressTemplate.HasValue("YmaxStress"))
             {
-                ConfigNode stressTemplate = node.GetNode("FARPartStressTemplate");
-                FARPartStressTemplate defaultTemplate = FARAeroStress.DetermineStressTemplate(part);
-                if(stressTemplate.HasValue("YmaxStress"))
-                {
-                    if (!double.TryParse(stressTemplate.GetValue("YmaxStress"), out partStressMaxY))
-                        partStressMaxY = defaultTemplate.YmaxStress;
-                }
-                if (stressTemplate.HasValue("XZmaxStress"))
-                {
-                    if (!double.TryParse(stressTemplate.GetValue("XZmaxStress"), out partStressMaxXZ))
-                        partStressMaxXZ = defaultTemplate.XZmaxStress;
-                }
-
+                if (!double.TryParse(stressTemplate.GetValue("YmaxStress"), out partStressMaxY))
+                    partStressMaxY = defaultTemplate.YmaxStress;
+            }
+            // ReSharper disable once InvertIf
+            if (stressTemplate.HasValue("XZmaxStress"))
+            {
+                if (!double.TryParse(stressTemplate.GetValue("XZmaxStress"), out partStressMaxXZ))
+                    partStressMaxXZ = defaultTemplate.XZmaxStress;
             }
         }
 

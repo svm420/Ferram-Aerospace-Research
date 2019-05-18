@@ -71,14 +71,12 @@ namespace FerramAerospaceResearch
         {
             get
             {
-                if (currentBody is null)
-                {
-                    if (FlightGlobals.Bodies[1] || !FlightGlobals.ActiveVessel)
-                        currentBody = FlightGlobals.Bodies[1];
-                    else
-                        currentBody = FlightGlobals.ActiveVessel.mainBody;
-
-                }
+                if (!(currentBody is null))
+                    return currentBody;
+                if (FlightGlobals.Bodies[1] || !FlightGlobals.ActiveVessel)
+                    currentBody = FlightGlobals.Bodies[1];
+                else
+                    currentBody = FlightGlobals.ActiveVessel.mainBody;
 
                 return currentBody;
             }
@@ -301,52 +299,50 @@ namespace FerramAerospaceResearch
         public static FloatCurve PrandtlMeyerMach
         {
             get{
-                if (prandtlMeyerMach == null)
+                if (prandtlMeyerMach != null)
+                    return prandtlMeyerMach;
+                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
+                prandtlMeyerMach  = new FloatCurve();
+                prandtlMeyerAngle = new FloatCurve();
+                double M     = 1;
+                double gamma = CurrentBody.atmosphereAdiabaticIndex;
+
+                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
+
+                while (M < 250)
                 {
-                    FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
-                    prandtlMeyerMach = new FloatCurve();
-                    prandtlMeyerAngle = new FloatCurve();
-                    double M = 1;
-                    double gamma = CurrentBody.atmosphereAdiabaticIndex;
+                    double mach = Math.Sqrt(M * M - 1);
 
-                    double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
+                    double nu = Math.Atan(mach / gamma_);
+                    nu *= gamma_;
+                    nu -= Math.Atan(mach);
+                    nu *= FARMathUtil.rad2deg;
 
-                    while (M < 250)
-                    {
-                        double mach = Math.Sqrt(M * M - 1);
+                    double nu_mach = (gamma - 1) / 2;
+                    nu_mach *= M * M;
+                    nu_mach++;
+                    nu_mach *= M;
+                    nu_mach =  mach / nu_mach;
+                    nu_mach *= FARMathUtil.rad2deg;
 
-                        double nu = Math.Atan(mach / gamma_);
-                        nu *= gamma_;
-                        nu -= Math.Atan(mach);
-                        nu *= FARMathUtil.rad2deg;
+                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
 
-                        double nu_mach = (gamma - 1) / 2;
-                        nu_mach *= M * M;
-                        nu_mach++;
-                        nu_mach *= M;
-                        nu_mach = mach / nu_mach;
-                        nu_mach *= FARMathUtil.rad2deg;
+                    nu_mach = 1 / nu_mach;
 
-                        prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
+                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
 
-                        nu_mach = 1 / nu_mach;
-
-                        prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
-
-                        if (M < 3)
-                            M += 0.1f;
-                        else if (M < 10)
-                            M += 0.5f;
-                        else if (M < 25)
-                            M += 2;
-                        else
-                            M += 25;
-                    }
-
-                    maxPrandtlMeyerTurnAngle = gamma_ - 1;
-                    maxPrandtlMeyerTurnAngle *= 90;
-
+                    if (M < 3)
+                        M += 0.1f;
+                    else if (M < 10)
+                        M += 0.5f;
+                    else if (M < 25)
+                        M += 2;
+                    else
+                        M += 25;
                 }
+
+                maxPrandtlMeyerTurnAngle =  gamma_ - 1;
+                maxPrandtlMeyerTurnAngle *= 90;
                 return prandtlMeyerMach;
             }
         }
@@ -355,51 +351,50 @@ namespace FerramAerospaceResearch
         {
             get
             {
-                if (prandtlMeyerAngle == null)
+                if (prandtlMeyerAngle != null)
+                    return prandtlMeyerAngle;
+                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
+                prandtlMeyerMach  = new FloatCurve();
+                prandtlMeyerAngle = new FloatCurve();
+                double M = 1;
+                //float gamma = 1.4f;
+                double gamma  = CurrentBody.atmosphereAdiabaticIndex;
+                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
+
+                while (M < 250)
                 {
-                    FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
-                    prandtlMeyerMach = new FloatCurve();
-                    prandtlMeyerAngle = new FloatCurve();
-                    double M = 1;
-                    //float gamma = 1.4f;
-                    double gamma = CurrentBody.atmosphereAdiabaticIndex;
-                    double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
+                    double mach = Math.Sqrt(M * M - 1);
 
-                    while (M < 250)
-                    {
-                        double mach = Math.Sqrt(M * M - 1);
+                    double nu = Math.Atan(mach / gamma_);
+                    nu *= gamma_;
+                    nu -= Math.Atan(mach);
+                    nu *= FARMathUtil.rad2deg;
 
-                        double nu = Math.Atan(mach / gamma_);
-                        nu *= gamma_;
-                        nu -= Math.Atan(mach);
-                        nu *= FARMathUtil.rad2deg;
+                    double nu_mach = (gamma - 1) / 2;
+                    nu_mach *= M * M;
+                    nu_mach++;
+                    nu_mach *= M;
+                    nu_mach =  mach / nu_mach;
+                    nu_mach *= FARMathUtil.rad2deg;
 
-                        double nu_mach = (gamma - 1) / 2;
-                        nu_mach *= M * M;
-                        nu_mach++;
-                        nu_mach *= M;
-                        nu_mach = mach / nu_mach;
-                        nu_mach *= FARMathUtil.rad2deg;
+                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
 
-                        prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
+                    nu_mach = 1 / nu_mach;
 
-                        nu_mach = 1 / nu_mach;
+                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
 
-                        prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
-
-                        if (M < 3)
-                            M += 0.1;
-                        else if (M < 10)
-                            M += 0.5;
-                        else if (M < 25)
-                            M += 2;
-                        else
-                            M += 25;
-                    }
-
-                    maxPrandtlMeyerTurnAngle = gamma_ - 1;
-                    maxPrandtlMeyerTurnAngle *= 90;
+                    if (M < 3)
+                        M += 0.1;
+                    else if (M < 10)
+                        M += 0.5;
+                    else if (M < 25)
+                        M += 2;
+                    else
+                        M += 25;
                 }
+
+                maxPrandtlMeyerTurnAngle =  gamma_ - 1;
+                maxPrandtlMeyerTurnAngle *= 90;
                 return prandtlMeyerAngle;
             }
         }
@@ -457,14 +452,13 @@ namespace FerramAerospaceResearch
             if (EditorLogic.RootPart)
                 RecursePartList(list, EditorLogic.RootPart);
 
-            if (include_selected && EditorAboutToAttach())
-            {
-                RecursePartList(list, EditorLogic.SelectedPart);
+            if (!include_selected || !EditorAboutToAttach())
+                return list;
+            RecursePartList(list, EditorLogic.SelectedPart);
 
-                foreach (Part sym in EditorLogic.SelectedPart.symmetryCounterparts)
-                {
-                    RecursePartList(list, sym);
-                }
+            foreach (Part sym in EditorLogic.SelectedPart.symmetryCounterparts)
+            {
+                RecursePartList(list, sym);
             }
 
             return list;
@@ -504,18 +498,17 @@ namespace FerramAerospaceResearch
             {
                 // Just to avoid the opaque integer constant; maybe it's enough to
                 // document what layers come into it, but this is more explicit.
-                if (RaycastMaskVal == 0)
-                {
-                    foreach (string name in RaycastLayers)
-                        RaycastMaskVal |= 1 << LayerMask.NameToLayer(name);
+                if (RaycastMaskVal != 0)
+                    return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
+                foreach (string name in RaycastLayers)
+                    RaycastMaskVal |= 1 << LayerMask.NameToLayer(name);
 
-                    // When parts are being dragged in the editor, they are put into this
-                    // layer; however we have to raycast them, or the visible CoL will be
-                    // different from the one after the parts are attached.
-                    RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
+                // When parts are being dragged in the editor, they are put into this
+                // layer; however we have to raycast them, or the visible CoL will be
+                // different from the one after the parts are attached.
+                RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
 
-                    FARLogger.Info("Raycast mask: "+RaycastMaskVal+" "+RaycastMaskEdit);
-                }
+                FARLogger.Info("Raycast mask: "+RaycastMaskVal+" "+RaycastMaskEdit);
 
                 return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
             }
@@ -668,15 +661,14 @@ namespace FerramAerospaceResearch
 
         public static void UpdateCurrentActiveBody(int index, CelestialBody body)
         {
-            if (index != prevBodyIndex)
-            {
-                prevBodyIndex = index;
-                currentBodyVisc = bodyAtmosphereConfiguration[prevBodyIndex];
-                currentBody = body;
+            if (index == prevBodyIndex)
+                return;
+            prevBodyIndex   = index;
+            currentBodyVisc = bodyAtmosphereConfiguration[prevBodyIndex];
+            currentBody     = body;
 
-                prandtlMeyerMach = null;
-                prandtlMeyerAngle = null;
-            }
+            prandtlMeyerMach  = null;
+            prandtlMeyerAngle = null;
         }
 
         //Based on NASA Contractor Report 187173, Exact and Approximate Oblique Shock Equations for Real-Time Applications

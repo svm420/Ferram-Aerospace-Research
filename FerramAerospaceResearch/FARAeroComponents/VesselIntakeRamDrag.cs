@@ -82,17 +82,16 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 foreach (PartModule m in p.Modules)
                 {
-                    if (m is ModuleResourceIntake intake)
-                    {
-                        if (intake.node != null && intake.node.attachedPart != null)
-                            continue;
+                    if (!(m is ModuleResourceIntake intake))
+                        continue;
+                    if (intake.node != null && intake.node.attachedPart != null)
+                        continue;
 
-                        _aeroModulesWithIntakes.Add(aeroModule);
-                        _intakeModules.Add(intake);
-                        _intakeTransforms.Add(p.FindModelTransform(intake.intakeTransformName));
-                        if (!intakeResourceNames.Contains(intake.resourceName))
-                            intakeResourceNames.Add(intake.resourceName);
-                    }
+                    _aeroModulesWithIntakes.Add(aeroModule);
+                    _intakeModules.Add(intake);
+                    _intakeTransforms.Add(p.FindModelTransform(intake.intakeTransformName));
+                    if (!intakeResourceNames.Contains(intake.resourceName))
+                        intakeResourceNames.Add(intake.resourceName);
                 }
             }
 
@@ -105,23 +104,21 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 foreach (PartModule m in p.Modules)
                 {
-                    if (m is ModuleEngines e)
-                    {
-                        if (FARAeroUtil.AJELoaded)
-                            if (e.ClassID == AJE_JET_CLASS_ID || e.ClassID == AJE_PROP_CLASS_ID)
-                            {
-                                _airBreathingEngines.Add(e);
-                                continue;
-                            }
-
-                        foreach (Propellant prop in e.propellants)
+                    if (!(m is ModuleEngines e))
+                        continue;
+                    if (FARAeroUtil.AJELoaded)
+                        if (e.ClassID == AJE_JET_CLASS_ID || e.ClassID == AJE_PROP_CLASS_ID)
                         {
-                            if (intakeResourceNames.Contains(prop.name))
-                            {
-                                _airBreathingEngines.Add(e);
-                                break;
-                            }
+                            _airBreathingEngines.Add(e);
+                            continue;
                         }
+
+                    foreach (Propellant prop in e.propellants)
+                    {
+                        if (!intakeResourceNames.Contains(prop.name))
+                            continue;
+                        _airBreathingEngines.Add(e);
+                        break;
                     }
                 }
             }

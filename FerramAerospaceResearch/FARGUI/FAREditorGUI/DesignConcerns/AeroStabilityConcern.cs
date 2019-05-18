@@ -64,20 +64,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 
         public override bool TestCondition()
         {
-            if (EditorLogic.SortedShipList.Count > 0 && _instantSim.Ready)
-            {
-                _simInput.alpha = -1;
-                _simInput.machNumber = 0.5;
-                _instantSim.GetClCdCmSteady(_simInput, out InstantConditionSimOutput output, true, true);
+            if (EditorLogic.SortedShipList.Count <= 0 || !_instantSim.Ready)
+                return true;
+            _simInput.alpha      = -1;
+            _simInput.machNumber = 0.5;
+            _instantSim.GetClCdCmSteady(_simInput, out InstantConditionSimOutput output, true, true);
 
-                double Cm_1 = output.Cm;
-                _simInput.alpha = 1;
-                _instantSim.GetClCdCmSteady(_simInput, out output, true, true);
+            double Cm_1 = output.Cm;
+            _simInput.alpha = 1;
+            _instantSim.GetClCdCmSteady(_simInput, out output, true, true);
 
-                if (output.Cm - Cm_1 > 0)
-                    return false;
-            }
-            return true;
+            return output.Cm <= Cm_1;
         }
 
         public override string GetConcernTitle()

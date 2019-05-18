@@ -488,24 +488,23 @@ namespace ferram4
 
             PrecomputeCentroid();
 
-            if (FARDebugValues.allowStructuralFailures)
-            {
-                foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
-                    if (temp.name == "wingStress")
-                    {
-                        FARPartStressTemplate template = temp;
+            if (!FARDebugValues.allowStructuralFailures)
+                return;
+            foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
+                if (temp.name == "wingStress")
+                {
+                    FARPartStressTemplate template = temp;
 
-                        YmaxForce = template.YmaxStress;    //in MPa
-                        YmaxForce *= S;
+                    YmaxForce =  template.YmaxStress; //in MPa
+                    YmaxForce *= S;
 
-                        XZmaxForce = template.XZmaxStress;
-                        XZmaxForce *= S;
-                        break;
-                    }
-                double maxForceMult = Math.Pow(massMultiplier, FARAeroUtil.massStressPower);
-                YmaxForce *= maxForceMult;
-                XZmaxForce *= maxForceMult;
-            }
+                    XZmaxForce =  template.XZmaxStress;
+                    XZmaxForce *= S;
+                    break;
+                }
+            double maxForceMult = Math.Pow(massMultiplier, FARAeroUtil.massStressPower);
+            YmaxForce  *= maxForceMult;
+            XZmaxForce *= maxForceMult;
         }
 
         public void EditorUpdateWingInteractions()
@@ -680,6 +679,7 @@ namespace ferram4
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
+                // ReSharper disable once InvertIf
                 if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
@@ -829,11 +829,10 @@ namespace ferram4
                 refAreaChildren += (childWing.refAreaChildren + childWing.S) * 0.33333333333333333333; //Take 1/3 of the area of the child wings
             }
 
-            if (!(parentWing is null))
-            {
-                parentWing.GetRefAreaChildren();
-                parentWing.UpdateMassToAccountForArea();
-            }
+            if (parentWing is null)
+                return;
+            parentWing.GetRefAreaChildren();
+            parentWing.UpdateMassToAccountForArea();
         }
 
         public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
@@ -1304,13 +1303,11 @@ namespace ferram4
                 return 2;
             if (M > 1.2)
                 return 0.4 / (beta * beta) + 1.75;
-            if(M < 1)
-            {
-                double result = M - 0.5;
-                result *= result;
-                return result * 2 + 2;
-            }
-            return 3.39 - 0.609091 * M;
+            if (M >= 1)
+                return 3.39 - 0.609091 * M;
+            double result = M - 0.5;
+            result *= result;
+            return result * 2 + 2;
 
         }
 
@@ -1518,6 +1515,7 @@ namespace ferram4
                 Destroy(dragArrow);
                 dragArrow = null;
             }
+            // ReSharper disable once InvertIf
             if (wingInteraction != null)
             {
                 wingInteraction.Destroy();

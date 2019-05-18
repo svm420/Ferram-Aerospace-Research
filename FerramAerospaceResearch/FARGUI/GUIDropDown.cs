@@ -137,47 +137,45 @@ namespace FerramAerospaceResearch.FARGUI
                     }
                 };
             }
-            if (selectedItemStyle == null)
+
+            if (selectedItemStyle != null)
+                return;
+            selectedItemStyle = new GUIStyle(GUI.skin.button)
             {
-                selectedItemStyle = new GUIStyle(GUI.skin.button)
+                padding = new RectOffset(2, 2, 2, 2),
+                margin =
                 {
-                    padding = new RectOffset(2, 2, 2, 2),
-                    margin =
-                    {
-                        top    = 1,
-                        bottom = 1
-                    }
-                };
-                selectedItemStyle.normal.textColor
-                    = selectedItemStyle.focused.textColor
-                    = selectedItemStyle.hover.textColor
-                    = selectedItemStyle.active.textColor
-                    = selectedItemStyle.onActive.textColor
-                    = selectedItemStyle.onNormal.textColor
-                    = selectedItemStyle.onFocused.textColor
-                    = selectedItemStyle.onHover.textColor
-                    = XKCDColors.KSPNotSoGoodOrange;
-            }
+                    top    = 1,
+                    bottom = 1
+                }
+            };
+            selectedItemStyle.normal.textColor
+                = selectedItemStyle.focused.textColor
+                      = selectedItemStyle.hover.textColor
+                            = selectedItemStyle.active.textColor
+                                  = selectedItemStyle.onActive.textColor
+                                        = selectedItemStyle.onNormal.textColor
+                                              = selectedItemStyle.onFocused.textColor
+                                                    = selectedItemStyle.onHover.textColor
+                                                          = XKCDColors.KSPNotSoGoodOrange;
         }
 
         private void ShowList(Rect btnRect, Rect dropdownRect)
         {
-            if (!isActive)
-            {
-                toggleBtnState = isActive = true;
-                FARGUIDropDownDisplay.Instance.ActivateDisplay(GetHashCode(), btnRect, dropdownRect, OnDisplayList, listStyle);
-                InputLockManager.SetControlLock(ControlTypes.All, "DropdownScrollLock");
-            }
+            if (isActive)
+                return;
+            toggleBtnState = isActive = true;
+            FARGUIDropDownDisplay.Instance.ActivateDisplay(GetHashCode(), btnRect, dropdownRect, OnDisplayList, listStyle);
+            InputLockManager.SetControlLock(ControlTypes.All, "DropdownScrollLock");
         }
 
         private void HideList()
         {
-            if (isActive)
-            {
-                toggleBtnState = isActive = false;
-                FARGUIDropDownDisplay.Instance.DisableDisplay();
-                InputLockManager.RemoveControlLock("DropdownScrollLock");
-            }
+            if (!isActive)
+                return;
+            toggleBtnState = isActive = false;
+            FARGUIDropDownDisplay.Instance.DisableDisplay();
+            InputLockManager.RemoveControlLock("DropdownScrollLock");
         }
 
         private void OnDisplayList(int id)
@@ -188,12 +186,11 @@ namespace FerramAerospaceResearch.FARGUI
             {
                 // Highlight the selected item
                 GUIStyle tmpStyle = selectedOption == i ? selectedItemStyle : dropdownItemStyle;
-                if (GUILayout.Button(stringOptions[i], tmpStyle))
-                {
-                    FARLogger.Info("Selected " + stringOptions[i]);
-                    selectedOption = i;
-                    HideList();
-                }
+                if (!GUILayout.Button(stringOptions[i], tmpStyle))
+                    continue;
+                FARLogger.Info("Selected " + stringOptions[i]);
+                selectedOption = i;
+                HideList();
             }
             GUILayout.EndScrollView();
         }

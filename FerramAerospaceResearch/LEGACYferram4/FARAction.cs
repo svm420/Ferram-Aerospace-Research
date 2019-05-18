@@ -130,11 +130,10 @@ namespace ferram4
                 int initIndex = 0;
                 for(int j = 0; j < agTypes.Length; j++)
                 {
-                    if(id2actionGroup[i] == agTypes[j])
-                    {
-                        initIndex = j;
-                        break;
-                    }
+                    if (id2actionGroup[i] != agTypes[j])
+                        continue;
+                    initIndex = j;
+                    break;
                 }
                 var dropDown = new GUIDropDown<KSPActionGroup>(names, agTypes, initIndex);
                 actionGroupDropDown[i] = dropDown;

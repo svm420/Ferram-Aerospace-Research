@@ -64,22 +64,23 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void EditorGeometryUpdate()
         {
-            if (ObjectsNotNull())
-                if (fairingVisible != engineFairing.jettisonTransform.gameObject.activeSelf)
-                {
-                    geoModule.RebuildAllMeshData();
-                    fairingVisible = !fairingVisible;
-                }
+            if (!ObjectsNotNull())
+                return;
+            if (fairingVisible == engineFairing.jettisonTransform.gameObject.activeSelf)
+                return;
+            geoModule.RebuildAllMeshData();
+            fairingVisible = !fairingVisible;
         }
 
         public void FlightGeometryUpdate()
         {
-            if (ObjectsNotNull())
-                if (fairingVisible != engineFairing.jettisonTransform.gameObject.activeSelf || fairingVisible != !engineFairing.isJettisoned)
-                {
-                    geoModule.RebuildAllMeshData();
-                    fairingVisible = !fairingVisible;
-                }
+            if (!ObjectsNotNull())
+                return;
+            if (fairingVisible == engineFairing.jettisonTransform.gameObject.activeSelf &&
+                fairingVisible == !engineFairing.isJettisoned)
+                return;
+            geoModule.RebuildAllMeshData();
+            fairingVisible = !fairingVisible;
         }
 
         private bool ObjectsNotNull()

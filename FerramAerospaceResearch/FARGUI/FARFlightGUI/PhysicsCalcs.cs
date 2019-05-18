@@ -76,11 +76,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             PartResourceLibrary resLibrary = PartResourceLibrary.Instance;
             PartResourceDefinition r = resLibrary.resourceDefinitions["IntakeAir"];
-            if (r != null)
-            {
-                intakeAirId = r.id;
-                intakeAirDensity = r.density;
-            }
+            if (r == null)
+                return;
+            intakeAirId      = r.id;
+            intakeAirDensity = r.density;
         }
 
         public void UpdateAeroModules(List<FARAeroPartModule> newAeroModules, List<FARWingAerodynamicModel> legacyWingModels)
@@ -91,11 +90,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             useWingArea = false;
             foreach (FARWingAerodynamicModel w in legacyWingModels)
             {
-                if (!(w is null))
-                {
-                    useWingArea =  true;
-                    wingArea    += w.S;
-                }
+                if (w is null)
+                    continue;
+                useWingArea =  true;
+                wingArea    += w.S;
             }
         }
 
@@ -129,15 +127,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (_vessel.dynamicPressurekPa <= 0.00001)
                 return;
 
-            if (_currentAeroModules != null)
+            if (_currentAeroModules == null)
+                return;
+            foreach (FARAeroPartModule m in _currentAeroModules)
             {
-                foreach (FARAeroPartModule m in _currentAeroModules)
-                {
-                    if (!(m is null)) {
-                        aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
-                        aeroForces.AddTorque(m.worldSpaceTorque);
-                    }
-                }
+                if (m is null)
+                    continue;
+                aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
+                aeroForces.AddTorque(m.worldSpaceTorque);
             }
 
             /*
@@ -230,16 +227,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             if (_navball == null)
                 GetNavball();
-            if (_navball)
-            {
-                Quaternion vesselRot = Quaternion.Inverse(_navball.relativeGymbal);
+            if (!_navball)
+                return;
+            Quaternion vesselRot = Quaternion.Inverse(_navball.relativeGymbal);
 
-                vesselInfo.headingAngle = vesselRot.eulerAngles.y;
-                //vesselRot *= Quaternion.Euler(0, -yawAngle, 0);
-                //yawAngle = 360 - yawAngle;
-                vesselInfo.pitchAngle = vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
-                vesselInfo.rollAngle = vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
-            }
+            vesselInfo.headingAngle = vesselRot.eulerAngles.y;
+            //vesselRot *= Quaternion.Euler(0, -yawAngle, 0);
+            //yawAngle = 360 - yawAngle;
+            vesselInfo.pitchAngle = vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
+            vesselInfo.rollAngle  = vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
         }
 
         private void CalculateEngineAndIntakeBasedParameters(double vesselSpeed)
@@ -318,18 +314,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void FuelConsumptionFromEngineModule(ModuleEngines e, ref double totalThrust, ref double totalThrust_Isp, ref double fuelConsumptionVol, ref double airDemandVol, double invDeltaTime)
         {
-            if (e.EngineIgnited && !e.engineShutdown)
+            if (!e.EngineIgnited || e.engineShutdown)
+                return;
+            totalThrust     += e.finalThrust;
+            totalThrust_Isp += e.finalThrust * e.realIsp;
+            foreach (Propellant v in e.propellants)
             {
-                totalThrust += e.finalThrust;
-                totalThrust_Isp += e.finalThrust * e.realIsp;
-                foreach (Propellant v in e.propellants)
-                {
-                    if (v.id == intakeAirId)
-                        airDemandVol += v.currentRequirement;
+                if (v.id == intakeAirId)
+                    airDemandVol += v.currentRequirement;
 
-                    if(!v.ignoreForIsp)
-                        fuelConsumptionVol += v.currentRequirement * invDeltaTime;
-                }
+                if(!v.ignoreForIsp)
+                    fuelConsumptionVol += v.currentRequirement * invDeltaTime;
             }
         }
 

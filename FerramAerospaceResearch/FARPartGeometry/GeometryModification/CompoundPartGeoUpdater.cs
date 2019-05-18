@@ -61,22 +61,24 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void EditorGeometryUpdate()
         {
-            if (lastAttachState != part.attachState || lastTarget != part.target || !EditorLogic.SortedShipList.Contains(part.target))
-            {
-                geoModule.RebuildAllMeshData();
-                lastAttachState = part.attachState;
-                lastTarget = part.target;
-            }
+            if (lastAttachState == part.attachState &&
+                lastTarget == part.target &&
+                EditorLogic.SortedShipList.Contains(part.target))
+                return;
+            geoModule.RebuildAllMeshData();
+            lastAttachState = part.attachState;
+            lastTarget      = part.target;
         }
 
         public void FlightGeometryUpdate()
         {
-            if (lastAttachState != part.attachState || lastTarget != part.target || !part.vessel.parts.Contains(part.target))
-            {
-                geoModule.RebuildAllMeshData();
-                lastAttachState = part.attachState;
-                lastTarget = part.target;
-            }
+            if (lastAttachState == part.attachState &&
+                lastTarget == part.target &&
+                part.vessel.parts.Contains(part.target))
+                return;
+            geoModule.RebuildAllMeshData();
+            lastAttachState = part.attachState;
+            lastTarget      = part.target;
         }
     }
 }

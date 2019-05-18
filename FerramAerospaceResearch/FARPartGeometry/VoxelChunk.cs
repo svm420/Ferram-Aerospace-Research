@@ -239,29 +239,29 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         //if(voxelPoints[i,j,k] != null)
                         PartSizePair pair = voxelPoints[i + 8 * j + 64 * k];
-                        if ((object) pair.part != null)
-                        {
-                            double elementSize = pair.GetSize();
-                            if (elementSize > 1)
-                                elementSize = 1;
+                        if (pair.part is null)
+                            continue;
+                        double elementSize = pair.GetSize();
+                        if (elementSize > 1)
+                            elementSize = 1;
 
-                            elementSize *= _size * 0.5f;
-                            var vx = new DebugVisualVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner + new Vector3d(i, j, k) * _size), elementSize);
-                            voxelMesh.DebugVoxels.Add(vx);
-                            visualVoxels[i, j, k] = vx;
-                        }
+                        elementSize *= _size * 0.5f;
+                        var vx = new DebugVisualVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner + new Vector3d(i, j, k) * _size), elementSize);
+                        voxelMesh.DebugVoxels.Add(vx);
+                        visualVoxels[i, j, k] = vx;
                     }
         }
 
         public void ClearVisualVoxels()
         {
-            if (visualVoxels != null)
-                for (int i = 0; i < 8; i++)
-                    for (int j = 0; j < 8; j++)
-                        for (int k = 0; k < 8; k++)
-                        {
-                            visualVoxels[i, j, k] = null;
-                        }
+            if (visualVoxels == null)
+                return;
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                    for (int k = 0; k < 8; k++)
+                    {
+                        visualVoxels[i, j, k] = null;
+                    }
         }
 
         //~VoxelChunk()

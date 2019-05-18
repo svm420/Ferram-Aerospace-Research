@@ -146,6 +146,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 labelStringBuilder.AppendLine(Localizer.Format("FARFlightData7"));
                 labelStringBuilder.AppendLine();
             }
+            // ReSharper disable once InvertIf
             if (activeFlightDataSections[8])        //Ballistic Coeff and Term Vel
             {
                 labelStringBuilder.AppendLine(Localizer.Format("FARFlightData8"));
@@ -239,6 +240,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 dataStringBuilder.AppendLine(Localizer.Format("FARUnitkM"));
                 dataStringBuilder.AppendLine();
             }
+            // ReSharper disable once InvertIf
             if (activeFlightDataSections[8])        //Ballistic Coeff and Term Vel
             {
                 dataStringBuilder.Concat((float)infoParameters.ballisticCoeff,2);
@@ -291,13 +293,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
             GUILayout.EndVertical();
 
-            if (change)
-            {
-                CreateDataString();
-                CreateLabelString();
-            }
+            if (!change)
+                return false;
+            CreateDataString();
+            CreateLabelString();
 
-            return change;
+            return true;
         }
 
         public void SaveSettings()
@@ -329,14 +330,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "FlightDataSettings");
 
-            if (node != null)
+            if (node == null)
+                return;
+            for(int i = 0; i < activeFlightDataSections.Length; i++)
             {
-                for(int i = 0; i < activeFlightDataSections.Length; i++)
-                {
-                    bool tmp = true;
-                    if (bool.TryParse(node.GetValue("section" + i + "active"), out tmp))
-                        activeFlightDataSections[i] = tmp;
-                }
+                if (bool.TryParse(node.GetValue("section" + i + "active"), out bool tmp))
+                    activeFlightDataSections[i] = tmp;
             }
         }
     }

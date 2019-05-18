@@ -211,22 +211,20 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (p.Modules.Contains<FARWingAerodynamicModel>())
                 {
                     var w = p.Modules.GetModule<FARWingAerodynamicModel>();
-                    if (!(w is null))
-                    {
-                        w.isShielded = false;
-                        w.NUFAR_ClearExposedAreaFactor();
-                        _legacyWingModels.Add(w);
-                    }
+                    if (w is null)
+                        continue;
+                    w.isShielded = false;
+                    w.NUFAR_ClearExposedAreaFactor();
+                    _legacyWingModels.Add(w);
                 }
                 else if (p.Modules.Contains<FARControllableSurface>())
                 {
                     FARWingAerodynamicModel w = p.Modules.GetModule<FARControllableSurface>();
-                    if (!(w is null))
-                    {
-                        w.isShielded = false;
-                        w.NUFAR_ClearExposedAreaFactor();
-                        _legacyWingModels.Add(w);
-                    }
+                    if (w is null)
+                        continue;
+                    w.isShielded = false;
+                    w.NUFAR_ClearExposedAreaFactor();
+                    _legacyWingModels.Add(w);
                 }
             }
 
@@ -347,47 +345,46 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             //set to true when this function ends; only continue to voxelizing if the voxelization thread has not been queued
             //this should catch conditions where this function is called again before the voxelization thread starts
-            if (!voxelizing)
-                if (Monitor.TryEnter(this, 0))         //only continue if the voxelizing thread has not locked this object
+            if (voxelizing)
+                return false;
+            //only continue if the voxelizing thread has not locked this object
+            if (!Monitor.TryEnter(this, 0))
+                return false;
+            try
+            {
+                CalculationCompleted = false; //ensure that the main thread isn't going to try to read the updated section data while it is being worked with
+                //Bunch of voxel setup data
+                _voxelCount = voxelCount;
+
+                _worldToLocalMatrix = worldToLocalMatrix;
+                _localToWorldMatrix = localToWorldMatrix;
+                _vehiclePartList    = vehiclePartList;
+                _currentGeoModules  = currentGeoModules;
+
+                _partWorldToLocalMatrixDict.Clear();
+
+                foreach (GeometryPartModule g in _currentGeoModules)
                 {
-                    try
-                    {
-                        CalculationCompleted = false;      //ensure that the main thread isn't going to try to read the updated section data while it is being worked with
-                        //Bunch of voxel setup data
-                        _voxelCount = voxelCount;
-
-                        _worldToLocalMatrix = worldToLocalMatrix;
-                        _localToWorldMatrix = localToWorldMatrix;
-                        _vehiclePartList = vehiclePartList;
-                        _currentGeoModules = currentGeoModules;
-
-                        _partWorldToLocalMatrixDict.Clear();
-
-                        foreach (GeometryPartModule g in _currentGeoModules)
-                        {
-                            _partWorldToLocalMatrixDict.Add(g.part, new PartTransformInfo(g.part.partTransform));
-                            if (updateGeometryPartModules)
-                                g.UpdateTransformMatrixList(_worldToLocalMatrix);
-                        }
-
-                        _vehicleMainAxis = CalculateVehicleMainAxis();
-                        //If the voxel still exists, cleanup everything so we can continue;
-                        visualizing = false;
-
-                        _voxel?.CleanupVoxel();
-
-                        //set flag so that this function can't run again before voxelizing completes and queue voxelizing thread
-                        voxelizing = true;
-                        VoxelizationThreadpool.Instance.QueueVoxelization(CreateVoxel);
-                        return true;
-                    }
-                    finally
-                    {
-                        Monitor.Exit(this);
-                    }
+                    _partWorldToLocalMatrixDict.Add(g.part, new PartTransformInfo(g.part.partTransform));
+                    if (updateGeometryPartModules)
+                        g.UpdateTransformMatrixList(_worldToLocalMatrix);
                 }
 
-            return false;
+                _vehicleMainAxis = CalculateVehicleMainAxis();
+                //If the voxel still exists, cleanup everything so we can continue;
+                visualizing = false;
+
+                _voxel?.CleanupVoxel();
+
+                //set flag so that this function can't run again before voxelizing completes and queue voxelizing thread
+                voxelizing = true;
+                VoxelizationThreadpool.Instance.QueueVoxelization(CreateVoxel);
+                return true;
+            }
+            finally
+            {
+                Monitor.Exit(this);
+            }
         }
 
         //And this actually creates the voxel and then begins the aero properties determination
@@ -518,27 +515,25 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (axis == Vector3.zero)
                 axis = Vector3.up;      //something in case things fall through somehow
 
-            if (hasPartsForAxis)
-            {
-                float dotProdX = Math.Abs(Vector3.Dot(axis, Vector3.right));
-                float dotProdY = Math.Abs(Vector3.Dot(axis, Vector3.up));
-                float dotProdZ = Math.Abs(Vector3.Dot(axis, Vector3.forward));
+            if (!hasPartsForAxis)
+                return Vector3.up; //welp, no parts that we can rely on for determining the axis; fall back to up
+            float dotProdX = Math.Abs(Vector3.Dot(axis, Vector3.right));
+            float dotProdY = Math.Abs(Vector3.Dot(axis, Vector3.up));
+            float dotProdZ = Math.Abs(Vector3.Dot(axis, Vector3.forward));
 
-                if (dotProdY > 2 * dotProdX && dotProdY > 2 * dotProdZ)
-                    return Vector3.up;
+            if (dotProdY > 2 * dotProdX && dotProdY > 2 * dotProdZ)
+                return Vector3.up;
 
-                if (dotProdX > 2 * dotProdY && dotProdX > 2 * dotProdZ)
-                    return Vector3.right;
+            if (dotProdX > 2 * dotProdY && dotProdX > 2 * dotProdZ)
+                return Vector3.right;
 
-                if (dotProdZ > 2 * dotProdX && dotProdZ > 2 * dotProdY)
-                    return Vector3.forward;
+            if (dotProdZ > 2 * dotProdX && dotProdZ > 2 * dotProdY)
+                return Vector3.forward;
 
-                //Otherwise, now we need to use axis, since it's obviously not close to anything else
+            //Otherwise, now we need to use axis, since it's obviously not close to anything else
 
-                return axis.normalized;
-            }
+            return axis.normalized;
 
-            return Vector3.up; //welp, no parts that we can rely on for determining the axis; fall back to up
         }
 
         //Smooths out area and area 2nd deriv distributions to deal with noise in the representation
@@ -852,18 +847,18 @@ namespace FerramAerospaceResearch.FARAeroComponents
                             Part p = adjuster.GetPart();
 
                             //see if you can find that in this section
-                            if (vehicleCrossSection[i].partSideAreaValues.TryGetValue(p, out VoxelCrossSection.SideAreaValues val))
+                            if (!vehicleCrossSection[i]
+                                 .partSideAreaValues.TryGetValue(p, out VoxelCrossSection.SideAreaValues val))
+                                continue;
+                            if (adjuster.AreaRemovedFromCrossSection() > 0)
                             {
-                                if (adjuster.AreaRemovedFromCrossSection() > 0)
-                                {
-                                    //actualArea += adjuster.AreaRemovedFromCrossSection();
-                                    ductedArea += Math.Max(0, val.crossSectionalAreaCount * voxelCountScale + adjuster.AreaThreshold());
-                                }
-                                else
-                                {
-                                    //actualArea -= adjuster.AreaRemovedFromCrossSection();
-                                    ductedArea -= Math.Max(0, val.crossSectionalAreaCount * voxelCountScale + adjuster.AreaThreshold());
-                                }
+                                //actualArea += adjuster.AreaRemovedFromCrossSection();
+                                ductedArea += Math.Max(0, val.crossSectionalAreaCount * voxelCountScale + adjuster.AreaThreshold());
+                            }
+                            else
+                            {
+                                //actualArea -= adjuster.AreaRemovedFromCrossSection();
+                                ductedArea -= Math.Max(0, val.crossSectionalAreaCount * voxelCountScale + adjuster.AreaThreshold());
                             }
                         }
 
@@ -891,16 +886,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                     tmpArea = areaAdjustment;       //store for next iteration
 
-                    if (areaAdjustment > 0 && prevAreaAdjustment > 0)
+                    if (areaAdjustment <= 0 || prevAreaAdjustment <= 0)
+                        continue;
+                    double areaChange = areaAdjustment - prevAreaAdjustment;
+                    if (areaChange > 0)
+                        _ductedAreaAdjustment[i] = areaChange; //this transforms this into a change in area, but only for increases (intakes)
+                    else
                     {
-                        double areaChange = areaAdjustment - prevAreaAdjustment;
-                        if (areaChange > 0)
-                            _ductedAreaAdjustment[i] = areaChange;     //this transforms this into a change in area, but only for increases (intakes)
-                        else
-                        {
-                            tmpArea = prevAreaAdjustment;
-                            _ductedAreaAdjustment[i] = 0;
-                        }
+                        tmpArea                  = prevAreaAdjustment;
+                        _ductedAreaAdjustment[i] = 0;
                     }
 
                 }
@@ -914,16 +908,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                     tmpArea = areaAdjustment;       //store for next iteration
 
-                    if (areaAdjustment < 0 && prevAreaAdjustment < 0)
+                    if (areaAdjustment >= 0 || prevAreaAdjustment >= 0)
+                        continue;
+                    double areaChange = areaAdjustment - prevAreaAdjustment;
+                    if (areaChange < 0)
+                        _ductedAreaAdjustment[i] = areaChange; //this transforms this into a change in area, but only for decreases (engines)
+                    else
                     {
-                        double areaChange = areaAdjustment - prevAreaAdjustment;
-                        if (areaChange < 0)
-                            _ductedAreaAdjustment[i] = areaChange;     //this transforms this into a change in area, but only for decreases (engines)
-                        else
-                        {
-                            tmpArea = prevAreaAdjustment;
-                            _ductedAreaAdjustment[i] = 0;
-                        }
+                        tmpArea                  = prevAreaAdjustment;
+                        _ductedAreaAdjustment[i] = 0;
                     }
                 }
 
@@ -951,11 +944,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         Part p = adjuster.GetPart();
 
                         //see if you can find that in this section
-                        if (vehicleCrossSection[i].partSideAreaValues.TryGetValue(p, out VoxelCrossSection.SideAreaValues val))
-                        {
-                            ductedArea += val.crossSectionalAreaCount;
-                            actualArea += adjuster.AreaRemovedFromCrossSection();
-                        }
+                        if (!vehicleCrossSection[i]
+                             .partSideAreaValues.TryGetValue(p, out VoxelCrossSection.SideAreaValues val))
+                            continue;
+                        ductedArea += val.crossSectionalAreaCount;
+                        actualArea += adjuster.AreaRemovedFromCrossSection();
                     }
 
                     ductedArea *= _voxelElementSize * _voxelElementSize * 0.75;

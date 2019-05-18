@@ -98,11 +98,10 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public void Start()
         {
-            if (!IsRunning)
-            {
-                lastCheck = Planetarium.GetUniversalTime();
-                IsRunning = true;
-            }
+            if (IsRunning)
+                return;
+            lastCheck = Planetarium.GetUniversalTime();
+            IsRunning = true;
         }
 
         /// <summary>
@@ -110,11 +109,10 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         public void Stop()
         {
-            if (IsRunning)
-            {
-                UpdateWatch();
-                IsRunning = false;
-            }
+            if (!IsRunning)
+                return;
+            UpdateWatch();
+            IsRunning = false;
         }
 
         /// <summary>

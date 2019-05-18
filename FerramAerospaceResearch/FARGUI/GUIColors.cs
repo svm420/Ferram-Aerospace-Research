@@ -130,26 +130,24 @@ namespace FerramAerospaceResearch.FARGUI
             var color = new Color {a = 1};
             foreach (string s in splitValues)
             {
-                if (s.Length > 0)
+                if (s.Length <= 0)
+                    continue;
+                if (!float.TryParse(s, out float val))
+                    continue;
+                switch (curIndex)
                 {
-                    if (float.TryParse(s, out float val))
-                    {
-                        switch (curIndex)
-                        {
-                            case 0:
-                                color.r = val;
-                                break;
-                            case 1:
-                                color.g = val;
-                                break;
-                            default:
-                                color.b = val;
-                                return color;
-                        }
-
-                        curIndex++;
-                    }
+                    case 0:
+                        color.r = val;
+                        break;
+                    case 1:
+                        color.g = val;
+                        break;
+                    default:
+                        color.b = val;
+                        return color;
                 }
+
+                curIndex++;
             }
 
             return color;

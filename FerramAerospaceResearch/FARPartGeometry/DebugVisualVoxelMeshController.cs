@@ -68,11 +68,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
             get { return active; }
             set
             {
-                if (active != value)
-                {
-                    active = value;
-                    QueueMainThreadTask(UpdateActive);
-                }
+                if (active == value)
+                    return;
+                active = value;
+                QueueMainThreadTask(UpdateActive);
             }
         }
 

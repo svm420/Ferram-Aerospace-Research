@@ -18,17 +18,16 @@ namespace FerramAerospaceResearch.RealChuteLite
             foreach (AvailablePart part in PartLoader.Instance.loadedParts)
             {
                 Part prefab = part.partPrefab;
-                if (prefab != null && prefab.Modules.Contains<RealChuteFAR>())
-                {
-                    //Updates the part's GetInfo.
-                    var module = prefab.Modules.GetModule<RealChuteFAR>();
-                    DragCubeSystem.Instance.LoadDragCubes(prefab);
-                    DragCube semi = prefab.DragCubes.Cubes.Find(c => c.Name == "SEMIDEPLOYED"), deployed = prefab.DragCubes.Cubes.Find(c => c.Name == "DEPLOYED");
-                    if (semi == null || deployed == null) { FARLogger.Info("" + part.title + " cannot find drag cube for RealChuteLite"); }
-                    module.preDeployedDiameter = GetApparentDiameter(semi);
-                    module.deployedDiameter = GetApparentDiameter(deployed);
-                    part.moduleInfos.Find(m => m.moduleName == "RealChute").info = module.GetInfo();
-                }
+                if (prefab == null || !prefab.Modules.Contains<RealChuteFAR>())
+                    continue;
+                //Updates the part's GetInfo.
+                var module = prefab.Modules.GetModule<RealChuteFAR>();
+                DragCubeSystem.Instance.LoadDragCubes(prefab);
+                DragCube semi = prefab.DragCubes.Cubes.Find(c => c.Name == "SEMIDEPLOYED"), deployed = prefab.DragCubes.Cubes.Find(c => c.Name == "DEPLOYED");
+                if (semi == null || deployed == null) { FARLogger.Info("" + part.title + " cannot find drag cube for RealChuteLite"); }
+                module.preDeployedDiameter                                   = GetApparentDiameter(semi);
+                module.deployedDiameter                                      = GetApparentDiameter(deployed);
+                part.moduleInfos.Find(m => m.moduleName == "RealChute").info = module.GetInfo();
             }
         }
         #endregion
