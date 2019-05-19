@@ -255,8 +255,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _vehicleAero = null;
         }
 
-        #region EditorEvents
-
         // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void ResetEditorEvent(ShipConstruct construct)
         {
@@ -355,8 +353,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
         }
 
-        #endregion
-
         private void Awake()
         {
             VoxelizationThreadpool.RunInMainThread = Debug.isDebugBuild;
@@ -406,8 +402,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
             }
         }
-
-        #region voxel
 
         public static void RequestUpdateVoxel()
         {
@@ -497,10 +491,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                                               pressureCoeff,
                                               maxValue);
         }
-
-        #endregion
-
-        #region GUIFunctions
 
         private void OnGUI()
         {
@@ -649,10 +639,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndHorizontal();
         }
 
-        #endregion
-
-        #region AoAArrow
-
         private void LateUpdate()
         {
             if (arrowTransform == null)
@@ -698,10 +684,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
         }
 
-        #endregion
-
-        #region AppLauncher
-
         private static void GenerateBlizzyToolbarButton()
         {
             if (blizzyEditorGUIButton != null)
@@ -716,10 +698,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             showGUI = !showGUI;
         }
-
-        #endregion
-
-        #region UtilFuncs
 
         private static GUIDropDown<CelestialBody> CreateBodyDropdown()
         {
@@ -789,7 +767,5 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             gearToggle = !gearToggle;
         }
-
-        #endregion
     }
 }

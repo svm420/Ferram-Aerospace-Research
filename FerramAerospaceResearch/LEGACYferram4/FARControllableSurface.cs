@@ -407,8 +407,6 @@ namespace ferram4
                 isShielded = Math.Abs(AoAoffset) <= 5;
         }
 
-        #region Deflection
-
         public void CalculateSurfaceFunctions()
         {
             if (HighLogic.LoadedSceneIsEditor && (!FlightGlobals.ready || vessel is null || part.partTransform is null))
@@ -738,8 +736,6 @@ namespace ferram4
             AoAoffset = AoAcurrentFlap + AoAcurrentControl;
             DeflectionAnimation();
         }
-
-        #endregion
 
         public override void OnLoad(ConfigNode node)
         {

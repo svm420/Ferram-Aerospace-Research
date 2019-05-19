@@ -39,8 +39,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             DANGEROUS
         }
 
-        #region Constants
-
         //Material constants
         public static readonly string materialName = Localizer.Format("RCLMatNylon");
         public const float areaDensity = 5.65E-5f, areaCost = 0.075f, staticCd = 1; //t/m², and F/m² for the first two
@@ -57,37 +55,23 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         //Quick enum parsing/tostring dictionaries
         private static readonly Dictionary<DeploymentStates, string> names = new Dictionary<DeploymentStates, string>(5)
-
-            #region Names
-
-            {
-                {DeploymentStates.NONE, string.Empty},
-                {DeploymentStates.STOWED, stowed},
-                {DeploymentStates.PREDEPLOYED, predeployed},
-                {DeploymentStates.DEPLOYED, deployed},
-                {DeploymentStates.CUT, cut}
-            };
-
-        #endregion
+        {
+            {DeploymentStates.NONE, string.Empty},
+            {DeploymentStates.STOWED, stowed},
+            {DeploymentStates.PREDEPLOYED, predeployed},
+            {DeploymentStates.DEPLOYED, deployed},
+            {DeploymentStates.CUT, cut}
+        };
 
         private static readonly Dictionary<string, DeploymentStates> states =
             new Dictionary<string, DeploymentStates>(5)
-
-                #region States
-
-                {
-                    {string.Empty, DeploymentStates.NONE},
-                    {stowed, DeploymentStates.STOWED},
-                    {predeployed, DeploymentStates.PREDEPLOYED},
-                    {deployed, DeploymentStates.DEPLOYED},
-                    {cut, DeploymentStates.CUT}
-                };
-
-        #endregion
-
-        #endregion
-
-        #region KSPFields
+            {
+                {string.Empty, DeploymentStates.NONE},
+                {stowed, DeploymentStates.STOWED},
+                {predeployed, DeploymentStates.PREDEPLOYED},
+                {deployed, DeploymentStates.DEPLOYED},
+                {cut, DeploymentStates.CUT}
+            };
 
         //Stealing values from the stock module
         [KSPField] public float autoCutSpeed = 0.5f;
@@ -129,10 +113,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         [KSPField(guiActive = false, guiName = "RCLStatusMaxTemp", guiFormat = "0.00", guiUnits = "RCLTempUnit")]
         public float chuteDisplayMaxTemp = (float)(maxTemp + absoluteZero);
         // ReSharper restore NotAccessedField.Global
-
-        #endregion
-
-        #region Propreties
 
         // If the vessel is stopped on the ground
         public bool GroundStop
@@ -366,10 +346,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             get { return repack ?? (repack = Events["GUIRepack"]); }
         }
 
-        #endregion
-
-        #region Fields
-
         //Flight
         private Vector3 dragVector, pos = new Vector3d();
         private readonly PhysicsWatch failedTimer = new PhysicsWatch(), randomTimer = new PhysicsWatch();
@@ -393,10 +369,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         private readonly int id = Guid.NewGuid().GetHashCode();
         private Rect window, drag;
         private Vector2 scroll;
-
-        #endregion
-
-        #region Part GUI
 
         //Deploys the parachutes if possible
         [KSPEvent(guiActive = true,
@@ -493,10 +465,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             visible = !visible;
         }
 
-        #endregion
-
-        #region Action groups
-
         //Deploys the parachutes if possible
         [KSPAction("Deploy chute", guiName = "RCLEventDeploy")]
         public void ActionDeploy(KSPActionParam param)
@@ -518,10 +486,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             if (armed)
                 GUIDisarm();
         }
-
-        #endregion
-
-        #region Methods
 
         //Returns the canopy area of the given Diameter
         public static float GetArea(float diameter)
@@ -978,10 +942,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             GUILayout.EndVertical();
         }
 
-        #endregion
-
-        #region Static methods
-
         //Creates a centered GUI button
         public static void CenteredButton(string text, Callback callback)
         {
@@ -992,10 +952,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
-
-        #endregion
-
-        #region Functions
 
         private void Update()
         {
@@ -1177,10 +1133,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             GameEvents.onShowUI.Remove(ShowUI);
         }
 
-        #endregion
-
-        #region Overrides
-
         public override void OnStart(StartState startState)
         {
             if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight)
@@ -1332,7 +1284,5 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             return true;
         }
-
-        #endregion
     }
 }

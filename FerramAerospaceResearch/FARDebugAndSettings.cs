@@ -96,8 +96,6 @@ namespace FerramAerospaceResearch
         private int aeroStressIndex;
         private int atmBodyIndex = 1;
 
-        #region Unity MonoBehaviour messages
-
         private void Awake()
         {
             cLTexture = new Texture2D(25, 15);
@@ -132,8 +130,6 @@ namespace FerramAerospaceResearch
             OnScenarioChanged();
             hasScenarioChanged = false;
         }
-
-        #endregion Unity MonoBehaviour messages
 
         // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void OnSceneChange(GameEvents.FromToAction<GameScenes, GameScenes> fromToScenes)

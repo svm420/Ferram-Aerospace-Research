@@ -508,8 +508,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             enabled = false;
         }
 
-        #region Outside State Checkers
-
         public bool HasEverValidVoxelization()
         {
             return FlightGlobals.ready && _currentAeroSections != null && vessel;
@@ -519,7 +517,5 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             return FlightGlobals.ready && _currentAeroSections != null && vessel && !_updateQueued;
         }
-
-        #endregion
     }
 }

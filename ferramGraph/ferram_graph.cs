@@ -49,8 +49,6 @@ namespace ferram4
             private double verticalScaling;
             private double horizontalScaling;
 
-            #region Constructor
-
             public ferramGraphLine(int width, int height)
             {
                 lineDisplay = new Texture2D(width, height, TextureFormat.ARGB32, false);
@@ -61,20 +59,12 @@ namespace ferram4
                 horizontalScaling = 1;
             }
 
-            #endregion
-
-            #region InputData
-
             public void InputData(double[] xValues, double[] yValues)
             {
                 rawDataX = xValues.replaceNaNs(0, "xValues");
                 rawDataY = yValues.replaceNaNs(0, "yValues");
                 ConvertRawToPixels(false);
             }
-
-            #endregion
-
-            #region ConvertRawToPixels
 
             private void ConvertRawToPixels(bool update = true)
             {
@@ -85,8 +75,6 @@ namespace ferram4
                 if (update)
                     Update();
             }
-
-            #endregion
 
             public void SetBoundaries(Vector4 boundaries)
             {
@@ -201,8 +189,6 @@ namespace ferram4
         public string verticalLabel = "Axis Label Here";
         private Vector2 ScrollView = Vector2.zero;
 
-        #region Constructors
-
         public ferramGraph(
             int width,
             int height,
@@ -219,10 +205,6 @@ namespace ferram4
             displayRect = new Rect(1, 1, graph.width, graph.height);
             GridInit();
         }
-
-        #endregion
-
-        #region Scaling Functions
 
         public void SetBoundaries(double minx, double maxx, double miny, double maxy)
         {
@@ -300,10 +282,6 @@ namespace ferram4
             line.UpdateHorizontalScaling(scaling);
         }
 
-        #endregion
-
-        #region GridInit
-
         private void GridInit()
         {
             const int squareSize = 25;
@@ -329,10 +307,6 @@ namespace ferram4
 
             graph.Apply();
         }
-
-        #endregion
-
-        #region Add / Remove Line Functions
 
         // ReSharper disable once UnusedMember.Global
         public void AddLine(string lineName)
@@ -426,10 +400,6 @@ namespace ferram4
             Update();
         }
 
-        #endregion
-
-        #region Update Data Functions
-
         // ReSharper disable once UnusedMember.Global
         public void UpdateLineData(string lineName, double[] xValues, double[] yValues)
         {
@@ -453,18 +423,12 @@ namespace ferram4
             }
         }
 
-        #endregion
-
-
-        #region Update Visual Functions
 
         /// <summary>
         ///     Use this to update the graph display
         /// </summary>
         public void Update()
         {
-            #region Autoscaling
-
             if (autoscale)
             {
                 Vector4d extremes = Vector4.zero;
@@ -498,8 +462,6 @@ namespace ferram4
                 SetBoundaries(extremes);
             }
 
-            #endregion
-
             foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
             {
                 pair.Value.backgroundColor = backgroundColor;
@@ -528,8 +490,6 @@ namespace ferram4
             allLines.Remove(lineName);
             allLines.Add(lineName, line);
         }
-
-        #endregion
 
 
         /// <summary>

@@ -11,8 +11,6 @@ namespace FerramAerospaceResearch.RealChuteLite
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class ChuteCalculator : MonoBehaviour
     {
-        #region Initialization
-
         private void Start()
         {
             FARLogger.Info("Initiating RealChuteLite Chute Property Calculation");
@@ -34,10 +32,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             }
         }
 
-        #endregion
-
-        #region Methods
-
         //Retrieves an "apparent" diameter from a DragCube
         private static float GetApparentDiameter(DragCube cube)
         {
@@ -58,7 +52,5 @@ namespace FerramAerospaceResearch.RealChuteLite
                                               MidpointRounding.AwayFromZero),
                                    0.1);
         }
-
-        #endregion
     }
 }

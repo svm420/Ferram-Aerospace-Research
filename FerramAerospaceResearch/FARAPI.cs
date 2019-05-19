@@ -56,8 +56,6 @@ namespace FerramAerospaceResearch
     {
         public static FARVersion Version { get; } = new FARVersion();
 
-        #region CurrentFlightInfo
-
         /// <summary>
         ///     Toggle or enable/disable FAR speed display.
         /// </summary>
@@ -335,10 +333,6 @@ namespace FerramAerospaceResearch
             return VesselAerodynamicTorque(FlightGlobals.ActiveVessel);
         }
 
-        #endregion
-
-        #region AeroPredictions
-
         /// <summary>
         ///     Calculates the forces and torque on a vessel at a given condition at the CoM
         /// </summary>
@@ -375,10 +369,6 @@ namespace FerramAerospaceResearch
 
             vesselAero.SimulateAeroProperties(out aeroForce, out aeroTorque, velocityWorldVector, altitude);
         }
-
-        #endregion
-
-        #region Misc State
 
         /// <summary>
         ///     Method to determine if the given vessel has been successfully voxelized at any time after being loaded
@@ -430,7 +420,5 @@ namespace FerramAerospaceResearch
 
             return !(vesselAeroModule is null) && vesselAeroModule.HasValidVoxelizationCurrently();
         }
-
-        #endregion
     }
 }

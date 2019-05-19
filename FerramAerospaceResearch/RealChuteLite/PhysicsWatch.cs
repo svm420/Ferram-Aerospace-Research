@@ -13,8 +13,6 @@ namespace FerramAerospaceResearch.RealChuteLite
     /// </summary>
     public sealed class PhysicsWatch
     {
-        #region Constants
-
         /// <summary>
         ///     The amount of ticks in a second
         /// </summary>
@@ -25,10 +23,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         /// </summary>
         private const long millisecondPerSecond = 1000L;
 
-        #endregion
-
-        #region Fields
-
         /// <summary>
         ///     UT of the last frame
         /// </summary>
@@ -38,10 +32,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         ///     Total elapsed time calculated by the watch in seconds
         /// </summary>
         private double totalSeconds;
-
-        #endregion
-
-        #region Propreties
 
         /// <summary>
         ///     If the watch is currently counting down time
@@ -82,10 +72,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             }
         }
 
-        #endregion
-
-        #region Constructor
-
         /// <summary>
         ///     Creates a new PhysicsWatch
         /// </summary>
@@ -101,10 +87,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             totalSeconds = seconds;
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         ///     Starts the watch
@@ -148,10 +130,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             IsRunning = false;
         }
 
-        #endregion
-
-        #region Virtual Methods
-
         /// <summary>
         ///     Updates the time on the watch
         /// </summary>
@@ -162,10 +140,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             lastCheck = current;
         }
 
-        #endregion
-
-        #region Overrides
-
         /// <summary>
         ///     Returns a string representation fo this instance
         /// </summary>
@@ -173,10 +147,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             return Elapsed.ToString();
         }
-
-        #endregion
-
-        #region Static Methods
 
         /// <summary>
         ///     Creates a new PhysicsWatch, starts it, and returns the current instance
@@ -198,7 +168,5 @@ namespace FerramAerospaceResearch.RealChuteLite
             watch.Start();
             return watch;
         }
-
-        #endregion
     }
 }

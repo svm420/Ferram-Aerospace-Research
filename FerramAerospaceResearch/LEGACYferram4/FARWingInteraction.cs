@@ -401,8 +401,6 @@ namespace ferram4
             return interferenceValue;
         }
 
-        #region StandardWingExposureDetection
-
         private double ExposureInChordDirection(
             out FARWingAerodynamicModel[] nearbyWings,
             Vector3 rayDirection,
@@ -478,10 +476,6 @@ namespace ferram4
             return exposure;
         }
 
-        #endregion
-
-        #region SmallSrfExposureDetection
-
         private double ExposureSmallSrf(
             out FARWingAerodynamicModel[] nearbyWings,
             Vector3 rayDirection,
@@ -503,8 +497,6 @@ namespace ferram4
 
             return exposure;
         }
-
-        #endregion
 
         private FARWingAerodynamicModel ExposureHitDetectionAndWingDetection(
             RaycastHit[] hits,

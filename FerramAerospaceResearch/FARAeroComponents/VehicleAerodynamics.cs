@@ -165,8 +165,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 indexSqrt[i] = Math.Sqrt(i);
         }
 
-        #region UpdateAeroData
-
         //Used by other classes to update their aeroModule and aeroSection lists
         //When these functions fire, all the data that was once restricted to the voxelization thread is passed over to the main unity thread
 
@@ -250,10 +248,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return _legacyWingModels;
         }
 
-        #endregion
-
-        #region GetFunctions
-
         //returns various data for use in displaying outside this class
 
         public Matrix4x4 VoxelAxisToLocalCoordMatrix()
@@ -312,10 +306,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return areaDerivs;
         }
 
-        #endregion
-
-        #region VoxelDebug
-
         //Handling for display of debug voxels
 
         private void ClearDebugVoxel()
@@ -337,10 +327,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             else
                 DisplayDebugVoxels(localToWorldMatrix);
         }
-
-        #endregion
-
-        #region Voxelization
 
         //This function will attempt to voxelize the vessel, as long as it isn't being voxelized currently all data that is on the Unity thread should be processed here before being passed to the other threads
         public bool TryVoxelUpdate(
@@ -433,8 +419,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
             }
         }
-
-        #endregion
 
 
         private Vector3 CalculateVehicleMainAxis()
@@ -1026,8 +1010,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             activeAdjusters.Clear();
         }
-
-        #region Aerodynamics Calculations
 
         private void CalculateVesselAeroProperties()
         {
@@ -1627,8 +1609,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return -moment * sectionThickness;
         }
 
-        #region AreaRulingCalculations
-
         private static void CalculateSonicPressure(
             VoxelCrossSection[] vehicleCrossSection,
             int front,
@@ -1938,8 +1918,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return nu;
         }
 
-        #endregion
-
         private static double CalculateHypersonicDrag(double lowArea, double highArea, double sectionThickness)
         {
             if (lowArea >= highArea)
@@ -2118,8 +2096,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             return critAdjustmentFactor;
         }
-
-        #endregion
 
         private static double MathClampAbs(double value, double abs)
         {

@@ -225,8 +225,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _flightStatusGUI?.AerodynamicFailureStatus();
         }
 
-        #region PhysicsAndOrientationBlock
-
         private void FixedUpdate()
         {
             if (_physicsCalcs == null)
@@ -253,8 +251,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
         }
 
-        #endregion
-
         private void LateUpdate()
         {
             if (airSpeedGUI != null)
@@ -262,8 +258,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             else if (_vessel != null)
                 airSpeedGUI = new AirspeedSettingsGUI(_vessel);
         }
-
-        #region GUI Functions
 
         public void DrawGUI()
         {
@@ -388,10 +382,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GUI.DragWindow();
         }
 
-        #endregion
-
-        #region AppLauncher
-
         private static void ClearBlizzyToolbarButton()
         {
             blizzyFlightGUIButton.Destroy();
@@ -424,8 +414,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             showAllGUI = true;
         }
         // ReSharper restore MemberCanBeMadeStatic.Local
-
-        #endregion
 
         private static void SaveConfigs()
         {

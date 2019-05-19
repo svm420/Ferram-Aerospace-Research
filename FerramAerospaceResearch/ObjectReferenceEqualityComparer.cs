@@ -12,8 +12,6 @@ namespace FerramAerospaceResearch
             get { return _defaultComparer ?? (_defaultComparer = new ObjectReferenceEqualityComparer<T>()); }
         }
 
-        #region IEqualityComparer<T> Members
-
         public override bool Equals(T x, T y)
         {
             return ReferenceEquals(x, y);
@@ -23,7 +21,5 @@ namespace FerramAerospaceResearch
         {
             return RuntimeHelpers.GetHashCode(obj);
         }
-
-        #endregion
     }
 }

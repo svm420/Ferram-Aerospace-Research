@@ -378,8 +378,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     }
         }
 
-        #region CrossSection Calcs
-
         public void CrossSectionData(
             VoxelCrossSection[] crossSections,
             Vector3 orientationVector,
@@ -1345,10 +1343,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return tanAngle;
         }
 
-        #endregion
-
-        #region VoxelViz
-
         public void ClearVisualVoxels()
         {
             FARLogger.Debug("Clearing visual voxels");
@@ -1380,8 +1374,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             voxelMesh.RebuildSafe();
             voxelMesh.Active = true;
         }
-
-        #endregion
 
         //Only use to change size, not part
         private void SetVoxelPointNoLock(int i, int j, int k)

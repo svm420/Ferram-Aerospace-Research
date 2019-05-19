@@ -60,8 +60,6 @@ namespace FerramAerospaceResearch.FARUtils
 
         public static string Tag { get; } = defaultTag;
 
-        #region Info
-
         [Conditional("DEBUG"), Conditional("INFO")]
         public static void Info(object message)
         {
@@ -109,10 +107,6 @@ namespace FerramAerospaceResearch.FARUtils
         {
             UnityEngine.Debug.LogFormat(context, Tag + GetCallerInfo() + " - " + format, args);
         }
-
-        #endregion // Info
-
-        #region Debug
 
         [Conditional("DEBUG")]
         public static void Debug(object message)
@@ -162,10 +156,6 @@ namespace FerramAerospaceResearch.FARUtils
             UnityEngine.Debug.LogFormat(context, Tag + GetCallerInfo() + " - " + format, args);
         }
 
-        #endregion // Debug
-
-        #region Warning
-
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void Warning(object message)
         {
@@ -213,10 +203,6 @@ namespace FerramAerospaceResearch.FARUtils
         {
             UnityEngine.Debug.LogWarningFormat(context, Tag + GetCallerInfo() + " - " + format, args);
         }
-
-        #endregion // Warning
-
-        #region Error
 
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void Error(object message)
@@ -266,10 +252,6 @@ namespace FerramAerospaceResearch.FARUtils
             UnityEngine.Debug.LogErrorFormat(context, Tag + GetCallerInfo() + " - " + format, args);
         }
 
-        #endregion // Error
-
-        #region Assertion
-
         [Conditional("UNITY_ASSERTIONS")]
         public static void Assertion(object message)
         {
@@ -318,10 +300,6 @@ namespace FerramAerospaceResearch.FARUtils
             UnityEngine.Debug.LogAssertionFormat(context, Tag + GetCallerInfo() + " - " + format, args);
         }
 
-        #endregion // Assertion
-
-        #region Exception
-
         public static void Exception(Exception exception)
         {
             Error("Logged exception:");
@@ -345,8 +323,6 @@ namespace FerramAerospaceResearch.FARUtils
             Error(GetCallerInfo() + " - Logged exception:");
             UnityEngine.Debug.LogException(exception, context);
         }
-
-        #endregion // Exception
 
         //http://geekswithblogs.net/BlackRabbitCoder/archive/2013/07/25/c.net-little-wonders-getting-caller-information.aspx
         private static string GetCallerInfo()

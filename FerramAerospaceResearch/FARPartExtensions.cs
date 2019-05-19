@@ -135,8 +135,6 @@ namespace FerramAerospaceResearch
                 return bounds;
             }
 
-            #region RealChuteLite
-
             /// <summary>
             ///     Returns the total mass of the part
             /// </summary>
@@ -206,8 +204,6 @@ namespace FerramAerospaceResearch
                     animation.Play(animationName);
                 }
             }
-
-            #endregion
         }
     }
 }

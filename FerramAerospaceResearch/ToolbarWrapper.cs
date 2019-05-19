@@ -93,8 +93,6 @@ namespace FerramAerospaceResearch
         }
     }
 
-    #region interfaces
-
     /// <summary>
     ///     A toolbar manager.
     /// </summary>
@@ -308,10 +306,6 @@ namespace FerramAerospaceResearch
         Vector2 Draw(Vector2 position);
     }
 
-    #endregion
-
-    #region events
-
     /// <summary>
     ///     Event describing a click on a button.
     /// </summary>
@@ -374,10 +368,6 @@ namespace FerramAerospaceResearch
     /// <param name="e">An event describing the mouse pointer leaving.</param>
     public delegate void MouseLeaveHandler(MouseLeaveEvent e);
 
-    #endregion
-
-    #region visibility
-
     /// <summary>
     ///     Determines visibility of a button.
     /// </summary>
@@ -418,10 +408,6 @@ namespace FerramAerospaceResearch
             visibleProperty = ToolbarTypes.getProperty(gameScenesVisibilityType, "Visible");
         }
     }
-
-    #endregion
-
-    #region drawable
 
     /// <summary>
     ///     A drawable that draws a popup menu.
@@ -494,10 +480,6 @@ namespace FerramAerospaceResearch
             destroyMethod.Invoke(realPopupMenuDrawable, null);
         }
     }
-
-    #endregion
-
-    #region private implementations
 
     public partial class ToolbarManager : IToolbarManager
     {
@@ -797,6 +779,4 @@ namespace FerramAerospaceResearch
             destroyMethod = ToolbarTypes.getMethod(iButtonType, "Destroy");
         }
     }
-
-    #endregion
 }

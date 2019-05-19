@@ -579,8 +579,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
         }
 
-        #region voxelUpdates
-
         private void CheckAnimations()
         {
             bool updateShape = false;
@@ -696,8 +694,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     _meshesToUpdate = 0;
             }
         }
-
-        #endregion
 
         private static MeshData GetColliderMeshData(Transform t)
         {

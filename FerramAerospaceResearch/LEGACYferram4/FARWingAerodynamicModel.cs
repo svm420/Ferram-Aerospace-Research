@@ -235,8 +235,6 @@ namespace ferram4
             isShielded = NUFAR_areaExposedFactor < 0.1 * S;
         }
 
-        #region GetFunctions
-
         public double GetStall()
         {
             return stall;
@@ -293,10 +291,6 @@ namespace ferram4
         {
             return zeroLiftCdIncrement;
         }
-
-        #endregion
-
-        #region Editor Functions
 
         public Vector3d ComputeForceEditor(Vector3d velocityVector, double M, double density)
         {
@@ -357,10 +351,6 @@ namespace ferram4
                 stall = 0;
         }
 
-        #endregion
-
-        #region Wing Centroid and Aerodynamic Center
-
         private void PrecomputeCentroid()
         {
             Vector3d WC = rootMidChordOffsetFromOrig;
@@ -418,10 +408,6 @@ namespace ferram4
 
             return WC; //WC updated to AC
         }
-
-        #endregion
-
-        #region Initialization
 
         public override void Initialization()
         {
@@ -524,10 +510,6 @@ namespace ferram4
 
             wingInteraction.UpdateWingInteraction(VesselPartList, nonSideAttach == 1);
         }
-
-        #endregion
-
-        #region Physics Frame
 
         public virtual void FixedUpdate()
         {
@@ -820,10 +802,6 @@ namespace ferram4
             return force;
         }
 
-        #endregion
-
-        #region Wing Mass For Structure
-
         private void Update()
         {
             if (updateMassNextFrame)
@@ -901,15 +879,11 @@ namespace ferram4
             return ModifierChangeWhen.FIXED;
         }
 
-        #endregion
-
         public virtual double CalculateAoA(Vector3d velocity)
         {
             double PerpVelocity = Vector3d.Dot(part_transform.forward, velocity.normalized);
             return Math.Asin(PerpVelocity.Clamp(-1, 1));
         }
-
-        #region Interactive Effects
 
         //Calculates camber and flap effects due to wing interactions
         private void CalculateWingCamberInteractions(
@@ -955,8 +929,6 @@ namespace ferram4
 
             AoAmax += rawAoAmax;
         }
-
-        #endregion
 
         //Calculates current stall fraction based on previous stall fraction and current data.
         private void DetermineStall(double AoA)
@@ -1129,8 +1101,6 @@ namespace ferram4
             ClIncrementFromRear = 0;
         }
 
-        #region Supersonic Calculations
-
         //Calculates effect of the Mach cone being in front of, along, or behind the leading edge of the wing
         private double CalculateSupersonicLEFactor(double beta, double TanSweep, double beta_TanSweep)
         {
@@ -1263,8 +1233,6 @@ namespace ferram4
             return FARAeroUtil.StagnationPressureCalc(inM) / FARAeroUtil.StagnationPressureCalc(outM);
         }
 
-        #endregion
-
         //Short calculation for peak AoA for stalling
         protected double CalculateAoAmax(double MachNumber)
         {
@@ -1348,8 +1316,6 @@ namespace ferram4
                 cosSweepAngle = 1d;
         }
 
-
-        #region Compressibility
 
         /// <summary>
         ///     Calculates Cd at 90 degrees AoA so that the numbers are done correctly
@@ -1470,8 +1436,6 @@ namespace ferram4
 
             return zeroLiftCdIncrement;
         }
-
-        #endregion
 
         public override void OnLoad(ConfigNode node)
         {

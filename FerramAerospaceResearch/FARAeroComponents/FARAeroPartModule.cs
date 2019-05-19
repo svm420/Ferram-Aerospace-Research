@@ -586,8 +586,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         // TODO 1.2: provide actual implementation of new 1.2 methods
 
-        #region ILiftProvider
-
         public bool DisableBodyLift
         {
             get { return false; }
@@ -607,8 +605,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;
         }
-
-        #endregion ILiftProvider
 
         private void CheckAeroStressFailure()
         {
