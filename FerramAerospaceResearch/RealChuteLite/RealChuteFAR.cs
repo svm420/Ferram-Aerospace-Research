@@ -39,14 +39,15 @@ namespace FerramAerospaceResearch.RealChuteLite
             DANGEROUS
         }
 
-        //Material constants
-        public static readonly string materialName = Localizer.Format("RCLMatNylon");
         public const float areaDensity = 5.65E-5f, areaCost = 0.075f, staticCd = 1; //t/m², and F/m² for the first two
         public const double startTemp = 300, maxTemp = 493.15;                      //In °K
         public const double specificHeat = 1700, absoluteZero = -273.15;            //Specific heat in J/kg*K
 
         //More useful constants
         public const int maxSpares = 5;
+
+        //Material constants
+        public static readonly string materialName = Localizer.Format("RCLMatNylon");
         public static readonly string stowed = Localizer.Format("RCLStatusStowed");
         public static readonly string predeployed = Localizer.Format("RCLStatusPreDep");
         public static readonly string deployed = Localizer.Format("RCLStatusDep");
@@ -73,6 +74,17 @@ namespace FerramAerospaceResearch.RealChuteLite
                 {cut, DeploymentStates.CUT}
             };
 
+        //Bold KSP style GUI label
+        private static GUIStyle boldLabel;
+
+        //Yellow KSP style GUI label
+        private static GUIStyle yellowLabel;
+
+        //Red KSP style GUI label
+        private static GUIStyle redLabel;
+        private readonly PhysicsWatch failedTimer = new PhysicsWatch(), randomTimer = new PhysicsWatch();
+        private readonly int id = Guid.NewGuid().GetHashCode();
+
         //Stealing values from the stock module
         [KSPField] public float autoCutSpeed = 0.5f;
 
@@ -89,7 +101,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         [KSPField] public float semiDeploymentSpeed = 0.5f, deploymentSpeed = 0.16667f;
         [KSPField] public bool invertCanopy = true;
 
-        // ReSharper disable NotAccessedField.Global -> unity
+        // ReSharper disable once NotAccessedField.Global -> unity
         //Persistant fields
         //this cannot be persistent to ensure that bad values aren't saved, and since these chutes aren't customizable there's no reason to save this
         [KSPField(isPersistant = false)] public float preDeployedDiameter = 1, deployedDiameter = 25;
@@ -103,6 +115,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         [KSPField(isPersistant = true)] public float currentArea;
         [KSPField(isPersistant = true)] public double chuteTemperature = 300;
 
+        // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = true,
             guiActive = false,
             guiName = "RCLStatusChuteTemp",
@@ -110,9 +123,34 @@ namespace FerramAerospaceResearch.RealChuteLite
             guiUnits = "RCLTempUnit")]
         public float currentTemp = 20;
 
+        // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(guiActive = false, guiName = "RCLStatusMaxTemp", guiFormat = "0.00", guiUnits = "RCLTempUnit")]
         public float chuteDisplayMaxTemp = (float)(maxTemp + absoluteZero);
-        // ReSharper restore NotAccessedField.Global
+
+        //Quick access to the part GUI events
+        private BaseEvent deploy, disarm, cutE, repack;
+
+        //Flight
+        private Vector3 dragVector, pos = new Vector3d();
+        private PhysicsWatch dragTimer = new PhysicsWatch();
+        private bool displayed, showDisarm;
+        private double asl, trueAlt;
+        private double atmPressure, atmDensity;
+        private float sqrSpeed;
+        private double thermMass, convFlux;
+
+        //Part
+        private Transform parachute, cap;
+        private Rigidbody rigidbody;
+        private float randomX, randomY, randomTime;
+        private DeploymentStates state = DeploymentStates.NONE;
+        private SafeState safeState = SafeState.SAFE;
+        private float massDelta;
+
+        //GUI
+        private bool visible, hid;
+        private Rect window, drag;
+        private Vector2 scroll;
 
         // If the vessel is stopped on the ground
         public bool GroundStop
@@ -283,16 +321,10 @@ namespace FerramAerospaceResearch.RealChuteLite
             }
         }
 
-        //Bold KSP style GUI label
-        private static GUIStyle boldLabel;
-
         public static GUIStyle BoldLabel
         {
             get { return boldLabel ?? (boldLabel = new GUIStyle(HighLogic.Skin.label) {fontStyle = FontStyle.Bold}); }
         }
-
-        //Yellow KSP style GUI label
-        private static GUIStyle yellowLabel;
 
         public static GUIStyle YellowLabel
         {
@@ -307,9 +339,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             }
         }
 
-        //Red KSP style GUI label
-        private static GUIStyle redLabel;
-
         public static GUIStyle RedLabel
         {
             get
@@ -322,9 +351,6 @@ namespace FerramAerospaceResearch.RealChuteLite
                            });
             }
         }
-
-        //Quick access to the part GUI events
-        private BaseEvent deploy, disarm, cutE, repack;
 
         private BaseEvent DeployE
         {
@@ -346,29 +372,136 @@ namespace FerramAerospaceResearch.RealChuteLite
             get { return repack ?? (repack = Events["GUIRepack"]); }
         }
 
-        //Flight
-        private Vector3 dragVector, pos = new Vector3d();
-        private readonly PhysicsWatch failedTimer = new PhysicsWatch(), randomTimer = new PhysicsWatch();
-        private PhysicsWatch dragTimer = new PhysicsWatch();
-        private bool displayed, showDisarm;
-        private double asl, trueAlt;
-        private double atmPressure, atmDensity;
-        private float sqrSpeed;
-        private double thermMass, convFlux;
+        //Not needed
+        public Callback<Rect> GetDrawModulePanelCallback()
+        {
+            return null;
+        }
 
-        //Part
-        private Transform parachute, cap;
-        private Rigidbody rigidbody;
-        private float randomX, randomY, randomTime;
-        private DeploymentStates state = DeploymentStates.NONE;
-        private SafeState safeState = SafeState.SAFE;
-        private float massDelta;
+        //Sets module info title
+        public string GetModuleTitle()
+        {
+            return "RealChute";
+        }
 
-        //GUI
-        private bool visible, hid;
-        private readonly int id = Guid.NewGuid().GetHashCode();
-        private Rect window, drag;
-        private Vector2 scroll;
+        //Sets part info field
+        public string GetPrimaryField()
+        {
+            return string.Empty;
+        }
+
+        public override string GetInfo()
+        {
+            if (!CompatibilityChecker.IsAllCompatible())
+                return string.Empty;
+            //Info in the editor part window
+            float tmpPartMass = TotalMass;
+            massDelta = 0;
+            if (!(part.partInfo?.partPrefab is null))
+                massDelta = tmpPartMass - part.partInfo.partPrefab.mass;
+
+            var b = new StringBuilder();
+            b.Append(Localizer.Format("RCLModuleInfo0", caseMass));
+            b.Append(Localizer.Format("RCLModuleInfo1", maxSpares));
+            b.Append(Localizer.Format("RCLModuleInfo2", autoCutSpeed));
+            b.AppendLine(Localizer.Format("RCLModuleInfo3", materialName));
+            b.Append(Localizer.Format("RCLModuleInfo4", staticCd));
+            b.Append(Localizer.Format("RCLModuleInfo5", maxTemp + absoluteZero));
+            b.Append(Localizer.Format("RCLModuleInfo6", preDeployedDiameter));
+            b.Append(Localizer.Format("RCLModuleInfo7", deployedDiameter));
+            b.Append(Localizer.Format("RCLModuleInfo8", minAirPressureToOpen));
+            b.Append(Localizer.Format("RCLModuleInfo9", deployAltitude));
+            b.Append(Localizer.Format("RCLModuleInfo10",
+                                      Math.Round(1 / semiDeploymentSpeed, 1, MidpointRounding.AwayFromZero)));
+            b.Append(Localizer.Format("RCLModuleInfo11",
+                                      Math.Round(1 / deploymentSpeed, 1, MidpointRounding.AwayFromZero)));
+
+            return b.ToString();
+        }
+
+        //Sets the part in the correct position for DragCube rendering
+        public void AssumeDragCubePosition(string cubeName)
+        {
+            if (string.IsNullOrEmpty(cubeName))
+                return;
+            InitializeAnimationSystem();
+            switch (cubeName)
+            {
+                //DaMichel: now we handle the stock behaviour, too.
+                case "PACKED": //stock
+                case "STOWED":
+                {
+                    parachute.gameObject.SetActive(false);
+                    cap.gameObject.SetActive(true);
+                    break;
+                }
+
+                case "RCDEPLOYED": //This is not a predeployed state, no touchy
+                {
+                    parachute.gameObject.SetActive(false);
+                    cap.gameObject.SetActive(false);
+                    break;
+                }
+
+                case "SEMIDEPLOYED": //  stock
+                {
+                    parachute.gameObject.SetActive(true);
+                    cap.gameObject.SetActive(false);
+                    // to the end of the animation
+                    part.SkipToAnimationTime(semiDeployedAnimation, 0, 1);
+                    break;
+                }
+
+                case "DEPLOYED": //  stock
+                {
+                    parachute.gameObject.SetActive(true);
+                    cap.gameObject.SetActive(false);
+                    // to the end of the animation
+                    part.SkipToAnimationTime(fullyDeployedAnimation, 0, 1);
+                    break;
+                }
+            }
+        }
+
+        //Gives DragCube names
+        public string[] GetDragCubeNames()
+        {
+            return cubeNames;
+        }
+
+        //Unused
+        public bool UsesProceduralDragCubes()
+        {
+            return false;
+        }
+
+        // TODO 1.2: provide actual implementation of this new method
+        public bool IsMultipleCubesActive
+        {
+            get { return true; }
+        }
+
+        //Gives the cost for this parachute
+        public float GetModuleCost(float defaultCost, ModifierStagingSituation sit)
+        {
+            return (float)Math.Round(DeployedArea * areaCost);
+        }
+
+        public ModifierChangeWhen GetModuleCostChangeWhen()
+        {
+            return ModifierChangeWhen.FIXED;
+        }
+
+        //For IPartMassModifier
+        public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
+        {
+            return massDelta;
+        }
+
+        public ModifierChangeWhen GetModuleMassChangeWhen()
+        {
+            return ModifierChangeWhen.FIXED;
+        }
 
         //Deploys the parachutes if possible
         [KSPEvent(guiActive = true,
@@ -543,49 +676,9 @@ namespace FerramAerospaceResearch.RealChuteLite
             return (float)atmDensity * sqrSpeed * staticCd * area / 2000;
         }
 
-        //Gives the cost for this parachute
-        public float GetModuleCost(float defaultCost, ModifierStagingSituation sit)
-        {
-            return (float)Math.Round(DeployedArea * areaCost);
-        }
-
-        public ModifierChangeWhen GetModuleCostChangeWhen()
-        {
-            return ModifierChangeWhen.FIXED;
-        }
-
-        //For IPartMassModifier
-        public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
-        {
-            return massDelta;
-        }
-
-        public ModifierChangeWhen GetModuleMassChangeWhen()
-        {
-            return ModifierChangeWhen.FIXED;
-        }
-
-        //Not needed
-        public Callback<Rect> GetDrawModulePanelCallback()
-        {
-            return null;
-        }
-
-        //Sets module info title
-        public string GetModuleTitle()
-        {
-            return "RealChute";
-        }
-
         public override string GetModuleDisplayName()
         {
             return Localizer.Format("RCLModuleTitle");
-        }
-
-        //Sets part info field
-        public string GetPrimaryField()
-        {
-            return string.Empty;
         }
 
         //Event when the UI is hidden (F2)
@@ -779,68 +872,6 @@ namespace FerramAerospaceResearch.RealChuteLite
             part.InitiateAnimation(semiDeployedAnimation);
             part.InitiateAnimation(fullyDeployedAnimation);
             parachute.gameObject.SetActive(false);
-        }
-
-        //Sets the part in the correct position for DragCube rendering
-        public void AssumeDragCubePosition(string cubeName)
-        {
-            if (string.IsNullOrEmpty(cubeName))
-                return;
-            InitializeAnimationSystem();
-            switch (cubeName)
-            {
-                //DaMichel: now we handle the stock behaviour, too.
-                case "PACKED": //stock
-                case "STOWED":
-                {
-                    parachute.gameObject.SetActive(false);
-                    cap.gameObject.SetActive(true);
-                    break;
-                }
-
-                case "RCDEPLOYED": //This is not a predeployed state, no touchy
-                {
-                    parachute.gameObject.SetActive(false);
-                    cap.gameObject.SetActive(false);
-                    break;
-                }
-
-                case "SEMIDEPLOYED": //  stock
-                {
-                    parachute.gameObject.SetActive(true);
-                    cap.gameObject.SetActive(false);
-                    // to the end of the animation
-                    part.SkipToAnimationTime(semiDeployedAnimation, 0, 1);
-                    break;
-                }
-
-                case "DEPLOYED": //  stock
-                {
-                    parachute.gameObject.SetActive(true);
-                    cap.gameObject.SetActive(false);
-                    // to the end of the animation
-                    part.SkipToAnimationTime(fullyDeployedAnimation, 0, 1);
-                    break;
-                }
-            }
-        }
-
-        //Gives DragCube names
-        public string[] GetDragCubeNames()
-        {
-            return cubeNames;
-        }
-
-        //Unused
-        public bool UsesProceduralDragCubes()
-        {
-            return false;
-        }
-
-        // TODO 1.2: provide actual implementation of this new method
-        public bool IsMultipleCubesActive
-        {
-            get { return true; }
         }
 
         //Info window
@@ -1249,35 +1280,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             if (!staged)
                 ActivateRC();
-        }
-
-        public override string GetInfo()
-        {
-            if (!CompatibilityChecker.IsAllCompatible())
-                return string.Empty;
-            //Info in the editor part window
-            float tmpPartMass = TotalMass;
-            massDelta = 0;
-            if (!(part.partInfo?.partPrefab is null))
-                massDelta = tmpPartMass - part.partInfo.partPrefab.mass;
-
-            var b = new StringBuilder();
-            b.Append(Localizer.Format("RCLModuleInfo0", caseMass));
-            b.Append(Localizer.Format("RCLModuleInfo1", maxSpares));
-            b.Append(Localizer.Format("RCLModuleInfo2", autoCutSpeed));
-            b.AppendLine(Localizer.Format("RCLModuleInfo3", materialName));
-            b.Append(Localizer.Format("RCLModuleInfo4", staticCd));
-            b.Append(Localizer.Format("RCLModuleInfo5", maxTemp + absoluteZero));
-            b.Append(Localizer.Format("RCLModuleInfo6", preDeployedDiameter));
-            b.Append(Localizer.Format("RCLModuleInfo7", deployedDiameter));
-            b.Append(Localizer.Format("RCLModuleInfo8", minAirPressureToOpen));
-            b.Append(Localizer.Format("RCLModuleInfo9", deployAltitude));
-            b.Append(Localizer.Format("RCLModuleInfo10",
-                                      Math.Round(1 / semiDeploymentSpeed, 1, MidpointRounding.AwayFromZero)));
-            b.Append(Localizer.Format("RCLModuleInfo11",
-                                      Math.Round(1 / deploymentSpeed, 1, MidpointRounding.AwayFromZero)));
-
-            return b.ToString();
         }
 
         public override bool IsStageable()

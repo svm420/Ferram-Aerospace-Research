@@ -57,6 +57,22 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private FlightGUI _flightGUI;
         private int _voxelCount;
 
+        private List<GeometryPartModule> _currentGeoModules;
+        private int geoModulesReady;
+
+        private List<FARAeroPartModule> _currentAeroModules;
+        private List<FARAeroPartModule> _unusedAeroModules;
+        private List<FARAeroSection> _currentAeroSections;
+        private List<FARWingAerodynamicModel> _legacyWingModels;
+
+        private int _updateRateLimiter = 20;
+        private bool _updateQueued = true;
+        private bool _recalcGeoModules;
+        private bool setup;
+
+        private VehicleAerodynamics _vehicleAero;
+        private VesselIntakeRamDrag _vesselIntakeRamDrag;
+
         public double Length
         {
             get { return _vehicleAero.Length; }
@@ -75,22 +91,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public double MachNumber { get; private set; }
 
         public double ReynoldsNumber { get; private set; }
-
-        private List<GeometryPartModule> _currentGeoModules;
-        private int geoModulesReady;
-
-        private List<FARAeroPartModule> _currentAeroModules;
-        private List<FARAeroPartModule> _unusedAeroModules;
-        private List<FARAeroSection> _currentAeroSections;
-        private List<FARWingAerodynamicModel> _legacyWingModels;
-
-        private int _updateRateLimiter = 20;
-        private bool _updateQueued = true;
-        private bool _recalcGeoModules;
-        private bool setup;
-
-        private VehicleAerodynamics _vehicleAero;
-        private VesselIntakeRamDrag _vesselIntakeRamDrag;
 
         protected override void OnStart()
         {

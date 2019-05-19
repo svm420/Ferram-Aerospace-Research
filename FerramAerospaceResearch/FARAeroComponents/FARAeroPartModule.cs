@@ -58,6 +58,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
     //Used to hold relevant aero data for each part before applying it
     public class FARAeroPartModule : PartModule, ILiftProvider
     {
+        public static float waterSlowDragNew = -1;
+        public static float minVelVesselMultNew;
+
+        // ReSharper disable once ConvertToConstant.Local
+        private readonly bool partStressOverride = false; // currently not changed
         public Vector3 partLocalVel;
         public Vector3 partLocalVelNorm;
         public Vector3 partLocalAngVel;
@@ -72,13 +77,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private Vector3 partLocalTorque;
 
         public float hackWaterDragVal;
-        public static float waterSlowDragNew = -1;
-        public static float minVelVesselMultNew;
 
         private ProjectedArea projectedArea;
-
-        // ReSharper disable once ConvertToConstant.Local
-        private readonly bool partStressOverride = false; // currently not changed
         private double partStressMaxY = double.MaxValue;
         private double partStressMaxXZ = double.MaxValue;
         private double partForceMaxY = double.MaxValue;
@@ -90,7 +90,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private bool fieldsVisible;
 
-        // ReSharper disable NotAccessedField.Global -> unity
+        // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
             guiActive = false,
             guiActiveEditor = false,
@@ -98,69 +98,46 @@ namespace FerramAerospaceResearch.FARAeroComponents
             guiUnits = "FARUnitKN")]
         public float dragForce;
 
+        // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
             guiActive = false,
             guiActiveEditor = false,
             guiFormat = "F3",
             guiUnits = "FARUnitKN")]
         public float liftForce;
-        // ReSharper restore NotAccessedField.Global
 
         private Transform partTransform;
 
         private MaterialColorUpdater materialColorUpdater;
-        public FARWingAerodynamicModel LegacyWingModel { get; private set; }
         private ModuleLiftingSurface stockAeroSurfaceModule;
         private bool updateVisualization;
+        public FARWingAerodynamicModel LegacyWingModel { get; private set; }
 
         public ProjectedArea ProjectedAreas
         {
             get { return projectedArea; }
         }
 
-        public struct ProjectedArea
+        // TODO 1.2: provide actual implementation of new 1.2 methods
+
+        public bool DisableBodyLift
         {
-            public double iN, iP; //area in x direction
-            public double jN, jP; //area in y direction
-            public double kN, kP; //area in z direction
-            public double totalArea;
+            get { return false; }
+        }
 
+        public bool IsLifting
+        {
+            get { return true; }
+        }
 
-            public static ProjectedArea operator +(ProjectedArea a, ProjectedArea b)
-            {
-                a.iN += b.iN;
-                a.iP += b.iP;
-                a.jN += b.jN;
-                a.jP += b.jP;
-                a.kN += b.kN;
-                a.kP += b.kP;
-                return a;
-            }
-
-            public static ProjectedArea operator +(ProjectedArea a, VoxelCrossSection.SideAreaValues b)
-            {
-                a.iN += b.iN;
-                a.iP += b.iP;
-                a.jN += b.jN;
-                a.jP += b.jP;
-                a.kN += b.kN;
-                a.kP += b.kP;
-                return a;
-            }
-
-            public static implicit operator ProjectedArea(VoxelCrossSection.SideAreaValues b)
-            {
-                var a = new ProjectedArea
-                {
-                    iN = b.iN,
-                    iP = b.iP,
-                    jN = b.jN,
-                    jP = b.jP,
-                    kN = b.kN,
-                    kP = b.kP
-                };
-                return a;
-            }
+        public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
+        {
+            // Compute the actual center ourselves once per frame
+            // Feed the precomputed values to the vanilla indicator
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter; //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
+            CoLMarker.dir = Vector3.zero;
+            CoLMarker.lift = 1;
         }
 
         public void SetShielded(bool value)
@@ -584,28 +561,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             partLocalAngVel = partTransform.InverseTransformDirection(partLocalAngVel);
         }
 
-        // TODO 1.2: provide actual implementation of new 1.2 methods
-
-        public bool DisableBodyLift
-        {
-            get { return false; }
-        }
-
-        public bool IsLifting
-        {
-            get { return true; }
-        }
-
-        public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
-        {
-            // Compute the actual center ourselves once per frame
-            // Feed the precomputed values to the vanilla indicator
-            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter; //hacking the old stuff to work with the new
-            CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
-            CoLMarker.dir = Vector3.zero;
-            CoLMarker.lift = 1;
-        }
-
         private void CheckAeroStressFailure()
         {
             if (partForceMaxY * (1 + part.submergedPortion * 1000) < partLocalForce.y ||
@@ -799,6 +754,51 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             LegacyWingModel = null;
             stockAeroSurfaceModule = null;
+        }
+
+        public struct ProjectedArea
+        {
+            public double iN, iP; //area in x direction
+            public double jN, jP; //area in y direction
+            public double kN, kP; //area in z direction
+            public double totalArea;
+
+
+            public static ProjectedArea operator +(ProjectedArea a, ProjectedArea b)
+            {
+                a.iN += b.iN;
+                a.iP += b.iP;
+                a.jN += b.jN;
+                a.jP += b.jP;
+                a.kN += b.kN;
+                a.kP += b.kP;
+                return a;
+            }
+
+            public static ProjectedArea operator +(ProjectedArea a, VoxelCrossSection.SideAreaValues b)
+            {
+                a.iN += b.iN;
+                a.iP += b.iP;
+                a.jN += b.jN;
+                a.jP += b.jP;
+                a.kN += b.kN;
+                a.kP += b.kP;
+                return a;
+            }
+
+            public static implicit operator ProjectedArea(VoxelCrossSection.SideAreaValues b)
+            {
+                var a = new ProjectedArea
+                {
+                    iN = b.iN,
+                    iP = b.iP,
+                    jN = b.jN,
+                    jP = b.jP,
+                    kN = b.kN,
+                    kP = b.kP
+                };
+                return a;
+            }
         }
     }
 }

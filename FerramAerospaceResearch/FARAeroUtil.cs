@@ -53,6 +53,14 @@ namespace FerramAerospaceResearch
 {
     public static class FARAeroUtil
     {
+        //Based on ratio of density of water to density of air at SL
+        private const double UNDERWATER_DENSITY_FACTOR_MINUS_ONE = 814.51020408163265306122448979592;
+
+        //Standard Reynolds number for transition from laminar to turbulent flow
+        private const double TRANSITION_REYNOLDS_NUMBER = 5e5;
+
+        //Multiplier to skin friction due to surface roughness; approximately an 8% increase in drag
+        private const double ROUGHNESS_SKIN_FRICTION_MULTIPLIER = 1.08;
         private static FloatCurve prandtlMeyerMach;
         private static FloatCurve prandtlMeyerAngle;
         public static double maxPrandtlMeyerTurnAngle;
@@ -65,6 +73,23 @@ namespace FerramAerospaceResearch
         public static int prevBodyIndex = -1;
         public static double[] currentBodyVisc = new double[2];
         private static CelestialBody currentBody;
+
+        public static bool loaded;
+
+        private static List<FARWingAerodynamicModel> curEditorWingCache;
+
+        // Parts currently added to the vehicle in the editor
+        private static List<Part> CurEditorPartsCache;
+
+        // Parts currently added, plus the ghost part(s) about to be attached
+        private static List<Part> AllEditorPartsCache;
+
+        private static int RaycastMaskVal, RaycastMaskEdit;
+
+        private static readonly string[] RaycastLayers =
+        {
+            "Default", "TransparentFX", "Local Scenery", "Disconnected Parts"
+        };
 
         public static CelestialBody CurrentBody
         {
@@ -81,16 +106,146 @@ namespace FerramAerospaceResearch
             }
         }
 
-        public static bool loaded;
+        public static FloatCurve PrandtlMeyerMach
+        {
+            get
+            {
+                if (prandtlMeyerMach != null)
+                    return prandtlMeyerMach;
+                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
+                prandtlMeyerMach = new FloatCurve();
+                prandtlMeyerAngle = new FloatCurve();
+                double M = 1;
+                double gamma = CurrentBody.atmosphereAdiabaticIndex;
 
-        //Based on ratio of density of water to density of air at SL
-        private const double UNDERWATER_DENSITY_FACTOR_MINUS_ONE = 814.51020408163265306122448979592;
+                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
 
-        //Standard Reynolds number for transition from laminar to turbulent flow
-        private const double TRANSITION_REYNOLDS_NUMBER = 5e5;
+                while (M < 250)
+                {
+                    double mach = Math.Sqrt(M * M - 1);
 
-        //Multiplier to skin friction due to surface roughness; approximately an 8% increase in drag
-        private const double ROUGHNESS_SKIN_FRICTION_MULTIPLIER = 1.08;
+                    double nu = Math.Atan(mach / gamma_);
+                    nu *= gamma_;
+                    nu -= Math.Atan(mach);
+                    nu *= FARMathUtil.rad2deg;
+
+                    double nu_mach = (gamma - 1) / 2;
+                    nu_mach *= M * M;
+                    nu_mach++;
+                    nu_mach *= M;
+                    nu_mach = mach / nu_mach;
+                    nu_mach *= FARMathUtil.rad2deg;
+
+                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
+
+                    nu_mach = 1 / nu_mach;
+
+                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
+
+                    if (M < 3)
+                        M += 0.1f;
+                    else if (M < 10)
+                        M += 0.5f;
+                    else if (M < 25)
+                        M += 2;
+                    else
+                        M += 25;
+                }
+
+                maxPrandtlMeyerTurnAngle = gamma_ - 1;
+                maxPrandtlMeyerTurnAngle *= 90;
+                return prandtlMeyerMach;
+            }
+        }
+
+        public static FloatCurve PrandtlMeyerAngle
+        {
+            get
+            {
+                if (prandtlMeyerAngle != null)
+                    return prandtlMeyerAngle;
+                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
+                prandtlMeyerMach = new FloatCurve();
+                prandtlMeyerAngle = new FloatCurve();
+                double M = 1;
+                double gamma = CurrentBody.atmosphereAdiabaticIndex;
+                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
+
+                while (M < 250)
+                {
+                    double mach = Math.Sqrt(M * M - 1);
+
+                    double nu = Math.Atan(mach / gamma_);
+                    nu *= gamma_;
+                    nu -= Math.Atan(mach);
+                    nu *= FARMathUtil.rad2deg;
+
+                    double nu_mach = (gamma - 1) / 2;
+                    nu_mach *= M * M;
+                    nu_mach++;
+                    nu_mach *= M;
+                    nu_mach = mach / nu_mach;
+                    nu_mach *= FARMathUtil.rad2deg;
+
+                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
+
+                    nu_mach = 1 / nu_mach;
+
+                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
+
+                    if (M < 3)
+                        M += 0.1;
+                    else if (M < 10)
+                        M += 0.5;
+                    else if (M < 25)
+                        M += 2;
+                    else
+                        M += 25;
+                }
+
+                maxPrandtlMeyerTurnAngle = gamma_ - 1;
+                maxPrandtlMeyerTurnAngle *= 90;
+                return prandtlMeyerAngle;
+            }
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        public static List<FARWingAerodynamicModel> CurEditorWings
+        {
+            get { return curEditorWingCache ?? (curEditorWingCache = ListEditorWings()); }
+        }
+
+        public static List<Part> CurEditorParts
+        {
+            get { return CurEditorPartsCache ?? (CurEditorPartsCache = ListEditorParts(false)); }
+        }
+
+        public static List<Part> AllEditorParts
+        {
+            get { return AllEditorPartsCache ?? (AllEditorPartsCache = ListEditorParts(true)); }
+        }
+
+        public static int RaycastMask
+        {
+            get
+            {
+                // Just to avoid the opaque integer constant; maybe it's enough to
+                // document what layers come into it, but this is more explicit.
+                if (RaycastMaskVal != 0)
+                    return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
+                foreach (string name in RaycastLayers)
+                    RaycastMaskVal |= 1 << LayerMask.NameToLayer(name);
+
+                // When parts are being dragged in the editor, they are put into this
+                // layer; however we have to raycast them, or the visible CoL will be
+                // different from the one after the parts are attached.
+                RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
+
+                FARLogger.Info("Raycast mask: " + RaycastMaskVal + " " + RaycastMaskEdit);
+
+                return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
+            }
+        }
 
         public static void SaveCustomAeroDataToConfig()
         {
@@ -297,139 +452,12 @@ namespace FerramAerospaceResearch
             return ratio;
         }
 
-        public static FloatCurve PrandtlMeyerMach
-        {
-            get
-            {
-                if (prandtlMeyerMach != null)
-                    return prandtlMeyerMach;
-                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
-                prandtlMeyerMach = new FloatCurve();
-                prandtlMeyerAngle = new FloatCurve();
-                double M = 1;
-                double gamma = CurrentBody.atmosphereAdiabaticIndex;
-
-                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
-
-                while (M < 250)
-                {
-                    double mach = Math.Sqrt(M * M - 1);
-
-                    double nu = Math.Atan(mach / gamma_);
-                    nu *= gamma_;
-                    nu -= Math.Atan(mach);
-                    nu *= FARMathUtil.rad2deg;
-
-                    double nu_mach = (gamma - 1) / 2;
-                    nu_mach *= M * M;
-                    nu_mach++;
-                    nu_mach *= M;
-                    nu_mach = mach / nu_mach;
-                    nu_mach *= FARMathUtil.rad2deg;
-
-                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
-
-                    nu_mach = 1 / nu_mach;
-
-                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
-
-                    if (M < 3)
-                        M += 0.1f;
-                    else if (M < 10)
-                        M += 0.5f;
-                    else if (M < 25)
-                        M += 2;
-                    else
-                        M += 25;
-                }
-
-                maxPrandtlMeyerTurnAngle = gamma_ - 1;
-                maxPrandtlMeyerTurnAngle *= 90;
-                return prandtlMeyerMach;
-            }
-        }
-
-        public static FloatCurve PrandtlMeyerAngle
-        {
-            get
-            {
-                if (prandtlMeyerAngle != null)
-                    return prandtlMeyerAngle;
-                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
-                prandtlMeyerMach = new FloatCurve();
-                prandtlMeyerAngle = new FloatCurve();
-                double M = 1;
-                double gamma = CurrentBody.atmosphereAdiabaticIndex;
-                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
-
-                while (M < 250)
-                {
-                    double mach = Math.Sqrt(M * M - 1);
-
-                    double nu = Math.Atan(mach / gamma_);
-                    nu *= gamma_;
-                    nu -= Math.Atan(mach);
-                    nu *= FARMathUtil.rad2deg;
-
-                    double nu_mach = (gamma - 1) / 2;
-                    nu_mach *= M * M;
-                    nu_mach++;
-                    nu_mach *= M;
-                    nu_mach = mach / nu_mach;
-                    nu_mach *= FARMathUtil.rad2deg;
-
-                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
-
-                    nu_mach = 1 / nu_mach;
-
-                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
-
-                    if (M < 3)
-                        M += 0.1;
-                    else if (M < 10)
-                        M += 0.5;
-                    else if (M < 25)
-                        M += 2;
-                    else
-                        M += 25;
-                }
-
-                maxPrandtlMeyerTurnAngle = gamma_ - 1;
-                maxPrandtlMeyerTurnAngle *= 90;
-                return prandtlMeyerAngle;
-            }
-        }
-
         public static bool IsNonphysical(Part p)
         {
             return p.physicalSignificance == Part.PhysicalSignificance.NONE ||
                    HighLogic.LoadedSceneIsEditor &&
                    p != EditorLogic.RootPart &&
                    p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE;
-        }
-
-        private static List<FARWingAerodynamicModel> curEditorWingCache;
-
-        // ReSharper disable once UnusedMember.Global
-        public static List<FARWingAerodynamicModel> CurEditorWings
-        {
-            get { return curEditorWingCache ?? (curEditorWingCache = ListEditorWings()); }
-        }
-
-        // Parts currently added to the vehicle in the editor
-        private static List<Part> CurEditorPartsCache;
-
-        public static List<Part> CurEditorParts
-        {
-            get { return CurEditorPartsCache ?? (CurEditorPartsCache = ListEditorParts(false)); }
-        }
-
-        // Parts currently added, plus the ghost part(s) about to be attached
-        private static List<Part> AllEditorPartsCache;
-
-        public static List<Part> AllEditorParts
-        {
-            get { return AllEditorPartsCache ?? (AllEditorPartsCache = ListEditorParts(true)); }
         }
 
         public static void ResetEditorParts()
@@ -484,35 +512,6 @@ namespace FerramAerospaceResearch
             list.Add(part);
             foreach (Part p in part.children)
                 RecursePartList(list, p);
-        }
-
-        private static int RaycastMaskVal, RaycastMaskEdit;
-
-        private static readonly string[] RaycastLayers =
-        {
-            "Default", "TransparentFX", "Local Scenery", "Disconnected Parts"
-        };
-
-        public static int RaycastMask
-        {
-            get
-            {
-                // Just to avoid the opaque integer constant; maybe it's enough to
-                // document what layers come into it, but this is more explicit.
-                if (RaycastMaskVal != 0)
-                    return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
-                foreach (string name in RaycastLayers)
-                    RaycastMaskVal |= 1 << LayerMask.NameToLayer(name);
-
-                // When parts are being dragged in the editor, they are put into this
-                // layer; however we have to raycast them, or the visible CoL will be
-                // different from the one after the parts are attached.
-                RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
-
-                FARLogger.Info("Raycast mask: " + RaycastMaskVal + " " + RaycastMaskEdit);
-
-                return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
-            }
         }
 
         //This approximates e^x; it's slightly inaccurate, but good enough.  It's much faster than an actual exponential function

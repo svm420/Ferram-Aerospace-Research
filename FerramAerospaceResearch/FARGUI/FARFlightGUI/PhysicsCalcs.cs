@@ -54,16 +54,16 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     internal class PhysicsCalcs
     {
-        private NavBall _navball;
         private readonly Vessel _vessel;
         private readonly FARVesselAero _vesselAero;
-
-        private List<FARAeroPartModule> _currentAeroModules;
-        private List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
 
         private readonly FARCenterQuery aeroForces = new FARCenterQuery();
         private readonly int intakeAirId;
         private readonly double intakeAirDensity = 1;
+        private NavBall _navball;
+
+        private List<FARAeroPartModule> _currentAeroModules;
+        private List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
         private bool useWingArea;
         private double wingArea;
 

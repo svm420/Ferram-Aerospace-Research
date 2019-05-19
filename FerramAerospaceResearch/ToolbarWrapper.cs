@@ -393,11 +393,6 @@ namespace FerramAerospaceResearch
     /// <seealso cref="IButton.Visibility" />
     public class GameScenesVisibility : IVisibility
     {
-        public bool Visible
-        {
-            get { return (bool)visibleProperty.GetValue(realGameScenesVisibility, null); }
-        }
-
         private object realGameScenesVisibility;
         private PropertyInfo visibleProperty;
 
@@ -407,6 +402,11 @@ namespace FerramAerospaceResearch
             realGameScenesVisibility = Activator.CreateInstance(gameScenesVisibilityType, gameScenes);
             visibleProperty = ToolbarTypes.getProperty(gameScenesVisibilityType, "Visible");
         }
+
+        public bool Visible
+        {
+            get { return (bool)visibleProperty.GetValue(realGameScenesVisibility, null); }
+        }
     }
 
     /// <summary>
@@ -414,15 +414,6 @@ namespace FerramAerospaceResearch
     /// </summary>
     public class PopupMenuDrawable : IDrawable
     {
-        /// <summary>
-        ///     Event handler that can be registered with to receive "any menu option clicked" events.
-        /// </summary>
-        public event Action OnAnyOptionClicked
-        {
-            add { onAnyOptionClickedEvent.AddEventHandler(realPopupMenuDrawable, value); }
-            remove { onAnyOptionClickedEvent.RemoveEventHandler(realPopupMenuDrawable, value); }
-        }
-
         private object realPopupMenuDrawable;
         private MethodInfo updateMethod;
         private MethodInfo drawMethod;
@@ -451,6 +442,15 @@ namespace FerramAerospaceResearch
         public Vector2 Draw(Vector2 position)
         {
             return (Vector2)drawMethod.Invoke(realPopupMenuDrawable, new object[] {position});
+        }
+
+        /// <summary>
+        ///     Event handler that can be registered with to receive "any menu option clicked" events.
+        /// </summary>
+        public event Action OnAnyOptionClicked
+        {
+            add { onAnyOptionClickedEvent.AddEventHandler(realPopupMenuDrawable, value); }
+            remove { onAnyOptionClickedEvent.RemoveEventHandler(realPopupMenuDrawable, value); }
         }
 
         /// <summary>
@@ -515,6 +515,10 @@ namespace FerramAerospaceResearch
         private Delegate realMouseEnterHandler;
         private Delegate realMouseLeaveHandler;
 
+        private IVisibility visibility_;
+
+        private IDrawable drawable_;
+
         internal Button(object realButton, ToolbarTypes types)
         {
             this.realButton = realButton;
@@ -523,14 +527,6 @@ namespace FerramAerospaceResearch
             realClickHandler = attachEventHandler(types.button.onClickEvent, "clicked", realButton);
             realMouseEnterHandler = attachEventHandler(types.button.onMouseEnterEvent, "mouseEntered", realButton);
             realMouseLeaveHandler = attachEventHandler(types.button.onMouseLeaveEvent, "mouseLeft", realButton);
-        }
-
-        private Delegate attachEventHandler(EventInfo @event, string methodName, object realButton)
-        {
-            MethodInfo method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-            Delegate d = Delegate.CreateDelegate(@event.EventHandlerType, this, method);
-            @event.AddEventHandler(realButton, d);
-            return d;
         }
 
         public string Text
@@ -580,8 +576,6 @@ namespace FerramAerospaceResearch
             get { return visibility_; }
         }
 
-        private IVisibility visibility_;
-
         public bool EffectivelyVisible
         {
             get { return (bool)types.button.effectivelyVisibleProperty.GetValue(realButton, null); }
@@ -617,9 +611,28 @@ namespace FerramAerospaceResearch
             get { return drawable_; }
         }
 
-        private IDrawable drawable_;
-
         public event ClickHandler OnClick;
+
+        public event MouseEnterHandler OnMouseEnter;
+
+        public event MouseLeaveHandler OnMouseLeave;
+
+        public void Destroy()
+        {
+            detachEventHandler(types.button.onClickEvent, realClickHandler, realButton);
+            detachEventHandler(types.button.onMouseEnterEvent, realMouseEnterHandler, realButton);
+            detachEventHandler(types.button.onMouseLeaveEvent, realMouseLeaveHandler, realButton);
+
+            types.button.destroyMethod.Invoke(realButton, null);
+        }
+
+        private Delegate attachEventHandler(EventInfo @event, string methodName, object realButton)
+        {
+            MethodInfo method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+            Delegate d = Delegate.CreateDelegate(@event.EventHandlerType, this, method);
+            @event.AddEventHandler(realButton, d);
+            return d;
+        }
 
         private void clicked(object realEvent)
         {
@@ -629,8 +642,6 @@ namespace FerramAerospaceResearch
             }
         }
 
-        public event MouseEnterHandler OnMouseEnter;
-
         private void mouseEntered(object realEvent)
         {
             if (OnMouseEnter != null)
@@ -639,23 +650,12 @@ namespace FerramAerospaceResearch
             }
         }
 
-        public event MouseLeaveHandler OnMouseLeave;
-
         private void mouseLeft(object realEvent)
         {
             if (OnMouseLeave != null)
             {
                 OnMouseLeave(new MouseLeaveEvent(this));
             }
-        }
-
-        public void Destroy()
-        {
-            detachEventHandler(types.button.onClickEvent, realClickHandler, realButton);
-            detachEventHandler(types.button.onMouseEnterEvent, realMouseEnterHandler, realButton);
-            detachEventHandler(types.button.onMouseLeaveEvent, realMouseLeaveHandler, realButton);
-
-            types.button.destroyMethod.Invoke(realButton, null);
         }
 
         private void detachEventHandler(EventInfo @event, Delegate d, object realButton)

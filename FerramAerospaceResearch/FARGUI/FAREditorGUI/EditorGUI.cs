@@ -66,28 +66,31 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class EditorGUI : MonoBehaviour
     {
-        public static EditorGUI Instance { get; private set; }
-
-        private int _updateRateLimiter;
-        private bool _updateQueued = true;
-
         private static bool showGUI;
-
-        // ReSharper disable once ConvertToConstant.Local
-        private readonly bool useKSPSkin = true; // currently cannot be changed from outside
-        private Rect guiRect;
-
-        public static Rect GUIRect
-        {
-            get { return Instance.guiRect; }
-        }
 
         private static IButton blizzyEditorGUIButton;
 
-        private VehicleAerodynamics _vehicleAero;
+        private static readonly string[] FAReditorMode_str =
+        {
+            Localizer.Format("FAREditorModeStatic"),
+            Localizer.Format("FAREditorModeDataStab"),
+            Localizer.Format("FAREditorModeDerivSim"),
+            Localizer.Format("FAREditorModeTrans")
+        };
+
+        // ReSharper disable once ConvertToConstant.Local
+        private readonly bool useKSPSkin = true; // currently cannot be changed from outside
         private readonly List<GeometryPartModule> _currentGeometryModules = new List<GeometryPartModule>();
         private readonly List<FARWingAerodynamicModel> _wingAerodynamicModel = new List<FARWingAerodynamicModel>();
         private readonly Stopwatch voxelWatch = new Stopwatch();
+
+        private readonly List<IDesignConcern> _customDesignConcerns = new List<IDesignConcern>();
+
+        private int _updateRateLimiter;
+        private bool _updateQueued = true;
+        private Rect guiRect;
+
+        private VehicleAerodynamics _vehicleAero;
 
         private int prevPartCount;
         private bool partMovement;
@@ -100,8 +103,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private StabilityDerivGUI _stabDeriv;
         private StabilityDerivSimulationGUI _stabDerivLinSim;
 
-        private readonly List<IDesignConcern> _customDesignConcerns = new List<IDesignConcern>();
-
         private MethodInfo editorReportUpdate;
 
         private bool gearToggle;
@@ -112,22 +113,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private GUIDropDown<FAREditorMode> modeDropdown;
         private FAREditorMode currentMode = FAREditorMode.STATIC;
+        public static EditorGUI Instance { get; private set; }
 
-        private enum FAREditorMode
+        public static Rect GUIRect
         {
-            STATIC,
-            STABILITY,
-            SIMULATION,
-            AREA_RULING
+            get { return Instance.guiRect; }
         }
-
-        private static readonly string[] FAReditorMode_str =
-        {
-            Localizer.Format("FAREditorModeStatic"),
-            Localizer.Format("FAREditorModeDataStab"),
-            Localizer.Format("FAREditorModeDerivSim"),
-            Localizer.Format("FAREditorModeTrans")
-        };
 
         private void Start()
         {
@@ -255,7 +246,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _vehicleAero = null;
         }
 
-        // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void ResetEditorEvent(ShipConstruct construct)
         {
             // Rodhern: Partial fix to https://github.com/ferram4/Ferram-Aerospace-Research/issues/177 .
@@ -271,22 +262,26 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             RequestUpdateVoxel();
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void ResetEditorEvent(ShipConstruct construct, CraftBrowserDialog.LoadType type)
         {
             ResetEditor();
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         public static void ResetEditor()
         {
             Instance._areaRulingOverlay.RestartOverlay();
             RequestUpdateVoxel();
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void UpdateGeometryEvent(Part part, PartVariant partVariant)
         {
             UpdateGeometryEvent(ConstructionEventType.Unknown, part);
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void UpdateGeometryEvent(ConstructionEventType type, Part pEvent)
         {
             if (type != ConstructionEventType.PartRotated &&
@@ -303,7 +298,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (type != ConstructionEventType.Unknown)
                 partMovement = true;
         }
-        // ReSharper restore MemberCanBeMadeStatic.Local
 
         private static void UpdateGeometryModule(ConstructionEventType type, Part p)
         {
@@ -766,6 +760,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
 
             gearToggle = !gearToggle;
+        }
+
+        private enum FAREditorMode
+        {
+            STATIC,
+            STABILITY,
+            SIMULATION,
+            AREA_RULING
         }
     }
 }

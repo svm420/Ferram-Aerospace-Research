@@ -49,27 +49,14 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
     internal class AirbreathingEngineCrossSectionAdjuster : ICrossSectionAdjuster
     {
-        private Vector3 vehicleBasisForwardVector;
-
         private readonly double exitArea;
+
+        private readonly Part part;
+        private Vector3 vehicleBasisForwardVector;
         private int sign = 1;
 
         private Matrix4x4 thisToVesselMatrix;
         private Matrix4x4 meshLocalToWorld;
-
-        public ModuleEngines EngineModule { get; }
-
-        private readonly Part part;
-
-        public Part GetPart()
-        {
-            return part;
-        }
-
-        public bool IntegratedCrossSectionIncreaseDecrease()
-        {
-            return false;
-        }
 
         public AirbreathingEngineCrossSectionAdjuster(ModuleEngines engine, Matrix4x4 worldToVesselMatrix)
         {
@@ -92,6 +79,18 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             exitArea *= Math.PI;
 
             exitArea *= -1; //make this negative to note that it is a removal of area
+        }
+
+        public ModuleEngines EngineModule { get; }
+
+        public Part GetPart()
+        {
+            return part;
+        }
+
+        public bool IntegratedCrossSectionIncreaseDecrease()
+        {
+            return false;
         }
 
         public double AreaRemovedFromCrossSection(Vector3 vehicleAxis)

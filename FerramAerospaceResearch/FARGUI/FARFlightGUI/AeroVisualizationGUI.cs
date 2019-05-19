@@ -52,6 +52,11 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class AeroVisualizationGUI
     {
+        public AeroVisualizationGUI()
+        {
+            LoadSettings();
+        }
+
         public bool TintForCl { get; private set; }
 
         public bool TintForCd { get; private set; }
@@ -76,11 +81,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public bool AnyVisualizationActive
         {
             get { return TintForCl || TintForCd || TintForStall; }
-        }
-
-        public AeroVisualizationGUI()
-        {
-            LoadSettings();
         }
 
         public void SettingsDisplay()

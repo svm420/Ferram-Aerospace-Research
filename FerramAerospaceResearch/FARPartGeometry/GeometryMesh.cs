@@ -55,18 +55,19 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private readonly Vector3[] meshLocalVerts;
         public readonly int[] triangles;
         public readonly Transform meshTransform;
-        public Matrix4x4 thisToVesselMatrix;
-        public Matrix4x4 meshLocalToWorld;
-        public Bounds bounds;
         public readonly Part part;
         private readonly GeometryPartModule module;
-        public bool valid;
         public readonly bool isSkinned;
 
         public readonly int invertXYZ;
 
         /// <summary> cache activity state of gameobject locally as we cannot access it from other threads </summary>
         public readonly bool gameObjectActiveInHierarchy;
+
+        public Matrix4x4 thisToVesselMatrix;
+        public Matrix4x4 meshLocalToWorld;
+        public Bounds bounds;
+        public bool valid;
 
         public GeometryMesh(
             MeshData meshData,

@@ -55,8 +55,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class VehicleVoxel
     {
-        private static int MAX_CHUNKS_IN_QUEUE = 4500;
         private const int MAX_SWEEP_PLANES_IN_QUEUE = 8;
+
+        private const double RC = 0.5;
+        private static int MAX_CHUNKS_IN_QUEUE = 4500;
         private static readonly Stack<VoxelChunk> clearedChunks = new Stack<VoxelChunk>();
         private static Stack<SweepPlanePoint[,]> clearedPlanes;
 
@@ -66,21 +68,24 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private static double maxLocation = 255;
         private static byte maxLocationByte = 255;
         private static bool useHigherResVoxels;
-
-        public double ElementSize { get; private set; }
+        private readonly DebugVisualVoxelMeshController voxelMesh;
+        private readonly object _locker = new object();
 
         private double invElementSize;
         private VoxelChunk[,,] voxelChunks;
-        private readonly DebugVisualVoxelMeshController voxelMesh;
         private HashSet<Part> overridingParts;
         private int xLength, yLength, zLength;
         private int xCellLength, yCellLength, zCellLength;
         private int threadsQueued;
-        private readonly object _locker = new object();
+
+        private VehicleVoxel()
+        {
+            voxelMesh = new DebugVisualVoxelMeshController {Active = false};
+        }
+
+        public double ElementSize { get; private set; }
 
         public Vector3d LocalLowerRightCorner { get; private set; }
-
-        private const double RC = 0.5;
 
         public VoxelCrossSection[] EmptyCrossSectionArray
         {
@@ -256,11 +261,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 ThreadSafeDebugLogger.Instance.RegisterException(e);
             }
-        }
-
-        private VehicleVoxel()
-        {
-            voxelMesh = new DebugVisualVoxelMeshController {Active = false};
         }
 
         private static bool CheckPartForOverridingPartList(GeometryPartModule g)
@@ -2462,29 +2462,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private class SweepPlanePoint
         {
-            public Part part;
-            public readonly int i;
-            public readonly int k;
-            public int jLastInactive;
-            public bool ductingParts;
-
-            public MarkingType mark = MarkingType.VoxelShell;
-
-            public void Clear()
-            {
-                jLastInactive = 0;
-                mark = MarkingType.Clear;
-                ductingParts = false;
-                part = null;
-            }
-
-            public SweepPlanePoint(Part part, int i, int k)
-            {
-                this.i = i;
-                this.k = k;
-                this.part = part;
-            }
-
             public enum MarkingType
             {
                 VoxelShell,
@@ -2493,6 +2470,29 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 ActivePassedThroughInternalShell,
                 InactiveInterior,
                 Clear
+            }
+
+            public readonly int i;
+            public readonly int k;
+            public Part part;
+            public int jLastInactive;
+            public bool ductingParts;
+
+            public MarkingType mark = MarkingType.VoxelShell;
+
+            public SweepPlanePoint(Part part, int i, int k)
+            {
+                this.i = i;
+                this.k = k;
+                this.part = part;
+            }
+
+            public void Clear()
+            {
+                jLastInactive = 0;
+                mark = MarkingType.Clear;
+                ductingParts = false;
+                part = null;
             }
         }
 

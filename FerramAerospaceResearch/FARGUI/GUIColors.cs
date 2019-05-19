@@ -51,18 +51,17 @@ namespace FerramAerospaceResearch.FARGUI
 {
     internal class GUIColors
     {
-        private List<Color> colors;
-
         private static GUIColors _instance;
-
-        public static GUIColors Instance
-        {
-            get { return _instance ?? (_instance = new GUIColors()); }
-        }
+        private List<Color> colors;
 
         private GUIColors()
         {
             LoadColors();
+        }
+
+        public static GUIColors Instance
+        {
+            get { return _instance ?? (_instance = new GUIColors()); }
         }
 
         public Color this[int index]

@@ -55,11 +55,15 @@ namespace ferram4
     {
         private static readonly RaycastHitComparer _comparer = new RaycastHitComparer();
 
+
+        private static FloatCurve wingCamberFactor;
+        private static FloatCurve wingCamberMoment;
+        private readonly Vector3 rootChordMidLocal;
+        private readonly short srfAttachFlipped;
+
         private FARWingAerodynamicModel parentWingModule;
         private Part parentWingPart;
-        private readonly Vector3 rootChordMidLocal;
         private Vector3 rootChordMidPt;
-        private readonly short srfAttachFlipped;
 
         private List<FARWingAerodynamicModel> nearbyWingModulesForwardList = new List<FARWingAerodynamicModel>();
         private List<FARWingAerodynamicModel> nearbyWingModulesBackwardList = new List<FARWingAerodynamicModel>();
@@ -75,26 +79,6 @@ namespace ferram4
         private double backwardExposure;
         private double leftwardExposure;
         private double rightwardExposure;
-
-        public double EffectiveUpstreamMAC { get; private set; }
-        public double EffectiveUpstreamb_2 { get; private set; }
-        public double EffectiveUpstreamLiftSlope { get; private set; }
-        public double EffectiveUpstreamArea { get; private set; }
-        public double EffectiveUpstreamStall { get; private set; }
-        public double EffectiveUpstreamCosSweepAngle { get; private set; }
-        public double EffectiveUpstreamAoAMax { get; private set; }
-        public double EffectiveUpstreamAoA { get; private set; }
-        public double EffectiveUpstreamCd0 { get; private set; }
-        public double EffectiveUpstreamInfluence { get; private set; }
-        public bool HasWingsUpstream { get; private set; }
-
-
-        private static FloatCurve wingCamberFactor;
-        private static FloatCurve wingCamberMoment;
-
-        public double ARFactor { get; private set; } = 1;
-
-        public double ClInterferenceFactor { get; private set; } = 1;
 
         public FARWingInteraction(
             FARWingAerodynamicModel parentModule,
@@ -142,6 +126,22 @@ namespace ferram4
                 wingCamberMoment.Add((float)i, (float)tmp);
             }
         }
+
+        public double EffectiveUpstreamMAC { get; private set; }
+        public double EffectiveUpstreamb_2 { get; private set; }
+        public double EffectiveUpstreamLiftSlope { get; private set; }
+        public double EffectiveUpstreamArea { get; private set; }
+        public double EffectiveUpstreamStall { get; private set; }
+        public double EffectiveUpstreamCosSweepAngle { get; private set; }
+        public double EffectiveUpstreamAoAMax { get; private set; }
+        public double EffectiveUpstreamAoA { get; private set; }
+        public double EffectiveUpstreamCd0 { get; private set; }
+        public double EffectiveUpstreamInfluence { get; private set; }
+        public bool HasWingsUpstream { get; private set; }
+
+        public double ARFactor { get; private set; } = 1;
+
+        public double ClInterferenceFactor { get; private set; } = 1;
 
         public void Destroy()
         {
@@ -582,14 +582,6 @@ namespace ferram4
             return sortedHits.ToArray();
         }
 
-        private class RaycastHitComparer : IComparer<RaycastHit>
-        {
-            public int Compare(RaycastHit h1, RaycastHit h2)
-            {
-                return h1.distance.CompareTo(h2.distance);
-            }
-        }
-
         private bool DetermineWingsUpstream(double wingForwardDir, double wingRightwardDir)
         {
             if (wingForwardDir > 0)
@@ -843,6 +835,14 @@ namespace ferram4
             if (effective_AR_modifier < 1)
                 return effective_AR_modifier + 1;
             return 2 * (2 - effective_AR_modifier) + 8 * (effective_AR_modifier - 1);
+        }
+
+        private class RaycastHitComparer : IComparer<RaycastHit>
+        {
+            public int Compare(RaycastHit h1, RaycastHit h2)
+            {
+                return h1.distance.CompareTo(h2.distance);
+            }
         }
     }
 }

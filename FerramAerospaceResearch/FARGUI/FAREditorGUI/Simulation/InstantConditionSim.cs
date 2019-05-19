@@ -52,12 +52,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
     internal class InstantConditionSim
     {
+        private readonly InstantConditionSimInput iterationInput = new InstantConditionSimInput();
         private List<FARAeroSection> _currentAeroSections;
         private List<FARAeroPartModule> _currentAeroModules;
         private List<FARWingAerodynamicModel> _wingAerodynamicModel;
 
         public double _maxCrossSectionFromBody;
         public double _bodyLength;
+
+        private double neededCl;
+        public InstantConditionSimOutput iterationOutput;
 
         public bool Ready
         {
@@ -252,11 +256,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             output.Cn *= recipArea / b_2;
             output.C_roll *= recipArea / b_2;
         }
-
-        private double neededCl;
-
-        private readonly InstantConditionSimInput iterationInput = new InstantConditionSimInput();
-        public InstantConditionSimOutput iterationOutput;
 
         public void SetState(double machNumber, double Cl, Vector3d CoM, double pitch, int flapSetting, bool spoilers)
         {

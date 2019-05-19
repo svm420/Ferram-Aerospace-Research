@@ -62,6 +62,7 @@ namespace ferram4
     /// </summary>
     public class FARWingAerodynamicModel : FARBaseAerodynamics, IRescalable<FARWingAerodynamicModel>, IPartMassModifier
     {
+        protected const double criticalCl = 1.6;
         public double rawAoAmax = 15;
         private double AoAmax = 15;
 
@@ -117,7 +118,7 @@ namespace ferram4
 
         private bool fieldsVisible;
 
-        // ReSharper disable NotAccessedField.Global -> unity
+        // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
             guiActive = false,
             guiActiveEditor = false,
@@ -125,20 +126,17 @@ namespace ferram4
             guiUnits = "FARUnitKN")]
         public float dragForceWing;
 
+        // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
             guiActive = false,
             guiActiveEditor = false,
             guiFormat = "F3",
             guiUnits = "FARUnitKN")]
         public float liftForceWing;
-        // ReSharper restore NotAccessedField.Global
 
         private double rawLiftSlope;
         private double liftslope;
-        public double FinalLiftSlope { get; private set; }
         protected double zeroLiftCdIncrement;
-
-        protected const double criticalCl = 1.6;
 
         private double refAreaChildren;
 
@@ -175,6 +173,36 @@ namespace ferram4
         protected double NUFAR_totalExposedAreaFactor;
 
         private bool massScaleReady;
+        public double FinalLiftSlope { get; private set; }
+
+        public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
+        {
+            if (massScaleReady)
+                return desiredMass - baseMass;
+            return 0;
+        }
+
+        public ModifierChangeWhen GetModuleMassChangeWhen()
+        {
+            return ModifierChangeWhen.FIXED;
+        }
+
+        public void OnRescale(ScalingFactor factor)
+        {
+            b_2_actual = factor.absolute.linear * b_2;
+            MAC_actual = factor.absolute.linear * MAC;
+            if (part.Modules.Contains("TweakScale"))
+            {
+                PartModule m = part.Modules["TweakScale"];
+                float massScale = (float)m.Fields.GetValue("MassScale");
+                baseMass = part.partInfo.partPrefab.mass + part.partInfo.partPrefab.mass * (massScale - 1);
+                FARLogger.Info("TweakScale massScale for FAR usage: " + massScale);
+            }
+
+            massScaleReady = false;
+
+            StartInitialization();
+        }
 
         public void NUFAR_ClearExposedAreaFactor()
         {
@@ -867,18 +895,6 @@ namespace ferram4
             parentWing.UpdateMassToAccountForArea();
         }
 
-        public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
-        {
-            if (massScaleReady)
-                return desiredMass - baseMass;
-            return 0;
-        }
-
-        public ModifierChangeWhen GetModuleMassChangeWhen()
-        {
-            return ModifierChangeWhen.FIXED;
-        }
-
         public virtual double CalculateAoA(Vector3d velocity)
         {
             double PerpVelocity = Vector3d.Dot(part_transform.forward, velocity.normalized);
@@ -1450,23 +1466,6 @@ namespace ferram4
                 int.TryParse(node.GetValue("nonSideAttach"), out nonSideAttach);
             if (node.HasValue("MidChordSweep"))
                 double.TryParse(node.GetValue("MidChordSweep"), out MidChordSweep);
-        }
-
-        public void OnRescale(ScalingFactor factor)
-        {
-            b_2_actual = factor.absolute.linear * b_2;
-            MAC_actual = factor.absolute.linear * MAC;
-            if (part.Modules.Contains("TweakScale"))
-            {
-                PartModule m = part.Modules["TweakScale"];
-                float massScale = (float)m.Fields.GetValue("MassScale");
-                baseMass = part.partInfo.partPrefab.mass + part.partInfo.partPrefab.mass * (massScale - 1);
-                FARLogger.Info("TweakScale massScale for FAR usage: " + massScale);
-            }
-
-            massScaleReady = false;
-
-            StartInitialization();
         }
 
         private void UpdateAeroDisplay(Vector3 lift, Vector3 drag)

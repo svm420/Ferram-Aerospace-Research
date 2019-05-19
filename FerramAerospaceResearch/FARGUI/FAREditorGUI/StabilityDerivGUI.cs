@@ -55,13 +55,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private readonly GUIDropDown<int> _flapSettingDropdown;
         private readonly GUIDropDown<CelestialBody> _bodySettingDropdown;
 
+        private readonly EditorSimManager simManager;
+
         private StabilityDerivOutput stabDerivOutput;
 
         private string altitude = "0";
         private string machNumber = "0.35";
         private bool spoilersDeployed;
-
-        private readonly EditorSimManager simManager;
 
         private Vector3 aoAVec;
 

@@ -52,9 +52,9 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
     internal class StockProcFairingGeoUpdater : IGeometryUpdater
     {
+        private static Dictionary<Part, GeometryPartModule> validParts;
         private readonly ModuleProceduralFairing fairing;
         private readonly GeometryPartModule geoModule;
-        private static Dictionary<Part, GeometryPartModule> validParts;
 
         private readonly List<Bounds> prevPanelBounds;
 

@@ -59,19 +59,37 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     public class GeometryPartModule : PartModule, IRescalable<GeometryPartModule>
     {
+        private static int ignoreLayer0 = -1;
         public bool destroyed;
 
-        // ReSharper disable NotAccessedField.Global -> unity
+        // ReSharper disable once NotAccessedField.Global -> unity
         public Transform partTransform;
 
+        // ReSharper disable once NotAccessedField.Global -> unity
         public Rigidbody partRigidBody;
-        // ReSharper restore NotAccessedField.Global
 
         public Bounds overallMeshBounds;
 
         public List<GeometryMesh> meshDataList;
         private List<IGeometryUpdater> geometryUpdaters;
         private List<ICrossSectionAdjuster> crossSectionAdjusters;
+
+        private List<AnimationState> animStates;
+        private List<float> animStateTime;
+
+        private bool _started;
+        private bool _ready;
+        private bool _sceneSetup;
+
+        private int _sendUpdateTick;
+        private int _meshesToUpdate = -1;
+
+        [SerializeField] private bool forceUseColliders;
+        [SerializeField] private bool forceUseMeshes;
+        [SerializeField] private bool ignoreForMainAxis;
+        [SerializeField] private List<string> ignoredTransforms, unignoredTransforms;
+        [SerializeField] private bool ignoreIfNoRenderer;
+        [SerializeField] private bool rebuildOnAnimation;
 
         public bool HasCrossSectionAdjusters
         {
@@ -104,81 +122,26 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private List<AnimationState> animStates;
-        private List<float> animStateTime;
-
-        private bool _started;
-        private bool _ready;
-        private bool _sceneSetup;
-
         public bool Ready
         {
             get { return _ready && _started && _sceneSetup; }
         }
 
-        private int _sendUpdateTick;
-        private int _meshesToUpdate = -1;
-
         public bool Valid { get; private set; } = true;
 
-        private static int ignoreLayer0 = -1;
 
-        [SerializeField] private bool forceUseColliders;
-        [SerializeField] private bool forceUseMeshes;
-        [SerializeField] private bool ignoreForMainAxis;
-        [SerializeField] private List<string> ignoredTransforms, unignoredTransforms;
-        [SerializeField] private bool ignoreIfNoRenderer;
-        [SerializeField] private bool rebuildOnAnimation;
-
-#if DEBUG
-        private class DebugInfoBuilder
+        public bool IgnoreForMainAxis
         {
-            public readonly List<string> meshes;
-            public readonly List<string> colliders;
-            public readonly List<string> noRenderer;
-
-            public DebugInfoBuilder()
-            {
-                meshes = new List<string>();
-                colliders = new List<string>();
-                noRenderer = new List<string>();
-            }
-
-            public void Clear()
-            {
-                meshes.Clear();
-                colliders.Clear();
-                noRenderer.Clear();
-            }
-
-            public void Print(Part p)
-            {
-                var sb = new StringBuilder();
-                sb.Append($"{p.name} - mesh build info:");
-                if (meshes.Count > 0)
-                {
-                    sb.Append("\n     Meshes: ");
-                    sb.Append(string.Join(", ", meshes.ToArray()));
-                }
-
-                if (colliders.Count > 0)
-                {
-                    sb.Append("\n     Colliders: ");
-                    sb.Append(string.Join(", ", colliders.ToArray()));
-                }
-
-                if (noRenderer.Count > 0)
-                {
-                    sb.Append("\n     No renderer found: ");
-                    sb.Append(string.Join(", ", noRenderer.ToArray()));
-                }
-
-                FARLogger.Debug(sb.ToStringAndRelease());
-            }
+            get { return ignoreForMainAxis; }
         }
 
-        private readonly DebugInfoBuilder debugInfo = new DebugInfoBuilder();
-#endif
+        public void OnRescale(ScalingFactor factor)
+        {
+            if (meshDataList == null)
+                return;
+
+            Rescale(factor.absolute.linear * Vector3.one);
+        }
 
         [Conditional("DEBUG")]
         private void DebugAddMesh(Transform t)
@@ -218,12 +181,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 #if DEBUG
             debugInfo.Print(part);
 #endif
-        }
-
-
-        public bool IgnoreForMainAxis
-        {
-            get { return ignoreForMainAxis; }
         }
 
         public override void OnAwake()
@@ -994,14 +951,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return CreateBoxMeshFromBoxCollider(new Vector3(0.5f, 0.8f, 0.5f), Vector3.zero);
         }
 
-        public void OnRescale(ScalingFactor factor)
-        {
-            if (meshDataList == null)
-                return;
-
-            Rescale(factor.absolute.linear * Vector3.one);
-        }
-
         public void RC_Rescale(Vector3 relativeRescaleFactor)
         {
             //this is currently just a wrapper, in the future if Rescale changes this can change to maintain compatibility
@@ -1040,5 +989,55 @@ namespace FerramAerospaceResearch.FARPartGeometry
             list.AddRange(node.GetValues(nodeName));
             _ready = false;
         }
+
+#if DEBUG
+        private class DebugInfoBuilder
+        {
+            public readonly List<string> meshes;
+            public readonly List<string> colliders;
+            public readonly List<string> noRenderer;
+
+            public DebugInfoBuilder()
+            {
+                meshes = new List<string>();
+                colliders = new List<string>();
+                noRenderer = new List<string>();
+            }
+
+            public void Clear()
+            {
+                meshes.Clear();
+                colliders.Clear();
+                noRenderer.Clear();
+            }
+
+            public void Print(Part p)
+            {
+                var sb = new StringBuilder();
+                sb.Append($"{p.name} - mesh build info:");
+                if (meshes.Count > 0)
+                {
+                    sb.Append("\n     Meshes: ");
+                    sb.Append(string.Join(", ", meshes.ToArray()));
+                }
+
+                if (colliders.Count > 0)
+                {
+                    sb.Append("\n     Colliders: ");
+                    sb.Append(string.Join(", ", colliders.ToArray()));
+                }
+
+                if (noRenderer.Count > 0)
+                {
+                    sb.Append("\n     No renderer found: ");
+                    sb.Append(string.Join(", ", noRenderer.ToArray()));
+                }
+
+                FARLogger.Debug(sb.ToStringAndRelease());
+            }
+        }
+
+        private readonly DebugInfoBuilder debugInfo = new DebugInfoBuilder();
+#endif
     }
 }

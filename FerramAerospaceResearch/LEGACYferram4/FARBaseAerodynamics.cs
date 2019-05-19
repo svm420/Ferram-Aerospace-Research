@@ -52,16 +52,15 @@ namespace ferram4
 {
     public class FARBaseAerodynamics : FARPartModule, ILiftProvider
     {
-        // ReSharper disable NotAccessedField.Global
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCl")]
         public double Cl;
 
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCd")]
         public double Cd;
 
+        // ReSharper disable once NotAccessedField.Global
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCm")]
         public double Cm;
-        // ReSharper restore NotAccessedField.Global
 
         protected Vector3d velocityEditor = Vector3.zero;
 
@@ -74,6 +73,29 @@ namespace ferram4
         public bool isShielded = true;
 
         public double rho;
+
+        // TODO 1.2: provide actual implementation of these new methods
+
+        public bool DisableBodyLift
+        {
+            get { return false; }
+        }
+
+        public bool IsLifting
+        {
+            get { return true; }
+        }
+
+        public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
+        {
+            // Compute the actual center ourselves once per frame
+            // Feed the precomputed values to the vanilla indicator
+            //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;
+            CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
+            CoLMarker.dir = Vector3.zero;
+            CoLMarker.lift = 1;
+        }
 
         public override void OnAwake()
         {
@@ -162,29 +184,6 @@ namespace ferram4
                 ba.PrecomputeCenterOfLift(vel, 0.5, density, dummy);
             foreach (FARBaseAerodynamics ba in parts)
                 ba.PrecomputeCenterOfLift(vel, 0.5, density, lift);
-        }
-
-        // TODO 1.2: provide actual implementation of these new methods
-
-        public bool DisableBodyLift
-        {
-            get { return false; }
-        }
-
-        public bool IsLifting
-        {
-            get { return true; }
-        }
-
-        public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
-        {
-            // Compute the actual center ourselves once per frame
-            // Feed the precomputed values to the vanilla indicator
-            //hacking the old stuff to work with the new
-            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;
-            CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
-            CoLMarker.dir = Vector3.zero;
-            CoLMarker.lift = 1;
         }
 
         public override void OnLoad(ConfigNode node)

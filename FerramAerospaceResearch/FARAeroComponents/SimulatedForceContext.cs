@@ -33,8 +33,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             this.worldVel = worldVel;
             this.center = center;
             this.atmDensity = atmDensity;
+            // ReSharper restore ParameterHidesMember
         }
-        // ReSharper restore ParameterHidesMember
 
         public Vector3 LocalVelocity(FARAeroSection.PartData pd)
         {

@@ -52,17 +52,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
     internal class EditorAreaRulingOverlay
     {
-        private LineRenderer _areaRenderer;
-        private LineRenderer _derivRenderer;
-        private LineRenderer _coeffRenderer;
-        private List<LineRenderer> _markingRenderers;
-
         public enum OverlayType
         {
             AREA,
             DERIV,
             COEFF
         }
+
+        private LineRenderer _areaRenderer;
+        private LineRenderer _derivRenderer;
+        private LineRenderer _coeffRenderer;
+        private List<LineRenderer> _markingRenderers;
 
         private Color _axisColor;
         private Color _crossSectionColor;
@@ -72,6 +72,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private int _numGridLines;
 
         private Material _rendererMaterial;
+
+        private EditorAreaRulingOverlay()
+        {
+        }
 
         public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(
             Color axisColor,
@@ -94,10 +98,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             overlay.Initialize();
 
             return overlay;
-        }
-
-        private EditorAreaRulingOverlay()
-        {
         }
 
         private void Initialize()

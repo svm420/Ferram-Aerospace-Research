@@ -33,149 +33,13 @@ namespace ferram4
 {
     public class ferramGraph : IDisposable
     {
-        private class ferramGraphLine
-        {
-            private Texture2D lineDisplay;
-            private Texture2D lineLegend;
-            public bool displayInLegend;
-            private double[] rawDataX = new double[1];
-            private double[] rawDataY = new double[1];
-            private double[] pixelDataX = new double[1];
-            private double[] pixelDataY = new double[1];
-            private Vector4d bounds;
-            public int lineThickness;
-            public Color lineColor;
-            public Color backgroundColor;
-            private double verticalScaling;
-            private double horizontalScaling;
-
-            public ferramGraphLine(int width, int height)
-            {
-                lineDisplay = new Texture2D(width, height, TextureFormat.ARGB32, false);
-                SetBoundaries(new Vector4(0, 1, 0, 1));
-                lineThickness = 1;
-                lineColor = Color.red;
-                verticalScaling = 1;
-                horizontalScaling = 1;
-            }
-
-            public void InputData(double[] xValues, double[] yValues)
-            {
-                rawDataX = xValues.replaceNaNs(0, "xValues");
-                rawDataY = yValues.replaceNaNs(0, "yValues");
-                ConvertRawToPixels(false);
-            }
-
-            private void ConvertRawToPixels(bool update = true)
-            {
-                double xScaling = lineDisplay.width / (bounds.y - bounds.x);
-                double yScaling = lineDisplay.height / (bounds.w - bounds.z);
-                pixelDataX = rawDataX.toPixelsF(bounds.x, horizontalScaling, xScaling);
-                pixelDataY = rawDataY.toPixelsF(bounds.z, verticalScaling, yScaling);
-                if (update)
-                    Update();
-            }
-
-            public void SetBoundaries(Vector4 boundaries)
-            {
-                bounds = boundaries;
-                if (rawDataX.Length > 0)
-                    ConvertRawToPixels();
-            }
-
-            public void Update()
-            {
-                ClearLine();
-                if (lineThickness < 1)
-                    lineThickness = 1;
-                int prev = 0;
-
-                for (int k = 1; k < pixelDataX.Length; k++)
-                {
-                    lineDisplay.DrawLineAAF(pixelDataX[prev],
-                                            pixelDataY[prev],
-                                            pixelDataX[k],
-                                            pixelDataY[k],
-                                            lineColor,
-                                            lineThickness);
-                    prev = k;
-                }
-
-                lineDisplay.Apply();
-                UpdateLineLegend();
-            }
-
-            private void UpdateLineLegend()
-            {
-                lineLegend = new Texture2D(25, 15, TextureFormat.ARGB32, false);
-                for (int i = 0; i < lineLegend.width; i++)
-                    for (int j = 0; j < lineLegend.height; j++)
-                        lineLegend.SetPixel(i,
-                                            j,
-                                            Mathf.Abs((int)(j - lineLegend.height / 2f)) < lineThickness
-                                                ? lineColor
-                                                : backgroundColor);
-                lineLegend.Apply();
-            }
-
-            private void ClearLine()
-            {
-                lineDisplay.Clear(ferramDrawingExtensions.EmptyColor);
-                lineDisplay.Apply();
-            }
-
-            /// <summary>
-            ///     XMin, XMax, YMin, YMax
-            /// </summary>
-            public Vector4d GetExtremeData()
-            {
-                Vector4d extremes = Vector4d.zero;
-                extremes.x = rawDataX.Min();
-                extremes.y = rawDataX.Max();
-                extremes.z = rawDataY.Min();
-                extremes.w = rawDataY.Max();
-
-                return extremes;
-            }
-
-            public Texture2D Line()
-            {
-                return lineDisplay;
-            }
-
-            public Texture2D LegendImage()
-            {
-                return lineLegend;
-            }
-
-            public void UpdateVerticalScaling(double scaling)
-            {
-                verticalScaling = scaling;
-                ConvertRawToPixels();
-            }
-
-            public void UpdateHorizontalScaling(double scaling)
-            {
-                horizontalScaling = scaling;
-                ConvertRawToPixels();
-            }
-
-            public void ClearTextures()
-            {
-                Object.Destroy(lineLegend);
-                Object.Destroy(lineDisplay);
-                lineDisplay = null;
-                lineLegend = null;
-            }
-        }
-
         protected readonly Texture2D graph;
+        public readonly bool autoscale;
         protected Rect displayRect;
 
         private Dictionary<string, ferramGraphLine> allLines = new Dictionary<string, ferramGraphLine>();
 
         private Vector4d bounds;
-        public readonly bool autoscale;
 
         public Color backgroundColor = Color.black;
         public Color gridColor = new Color(0.2f, 0.2f, 0.2f);
@@ -204,6 +68,13 @@ namespace ferram4
             SetBoundaries(minx, maxx, miny, maxy);
             displayRect = new Rect(1, 1, graph.width, graph.height);
             GridInit();
+        }
+
+        public void Dispose()
+        {
+            foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
+                pair.Value.ClearTextures();
+            allLines = null;
         }
 
         public void SetBoundaries(double minx, double maxx, double miny, double maxy)
@@ -590,11 +461,140 @@ namespace ferram4
             GUILayout.EndScrollView();
         }
 
-        public void Dispose()
+        private class ferramGraphLine
         {
-            foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
-                pair.Value.ClearTextures();
-            allLines = null;
+            private Texture2D lineDisplay;
+            private Texture2D lineLegend;
+            public bool displayInLegend;
+            private double[] rawDataX = new double[1];
+            private double[] rawDataY = new double[1];
+            private double[] pixelDataX = new double[1];
+            private double[] pixelDataY = new double[1];
+            private Vector4d bounds;
+            public int lineThickness;
+            public Color lineColor;
+            public Color backgroundColor;
+            private double verticalScaling;
+            private double horizontalScaling;
+
+            public ferramGraphLine(int width, int height)
+            {
+                lineDisplay = new Texture2D(width, height, TextureFormat.ARGB32, false);
+                SetBoundaries(new Vector4(0, 1, 0, 1));
+                lineThickness = 1;
+                lineColor = Color.red;
+                verticalScaling = 1;
+                horizontalScaling = 1;
+            }
+
+            public void InputData(double[] xValues, double[] yValues)
+            {
+                rawDataX = xValues.replaceNaNs(0, "xValues");
+                rawDataY = yValues.replaceNaNs(0, "yValues");
+                ConvertRawToPixels(false);
+            }
+
+            private void ConvertRawToPixels(bool update = true)
+            {
+                double xScaling = lineDisplay.width / (bounds.y - bounds.x);
+                double yScaling = lineDisplay.height / (bounds.w - bounds.z);
+                pixelDataX = rawDataX.toPixelsF(bounds.x, horizontalScaling, xScaling);
+                pixelDataY = rawDataY.toPixelsF(bounds.z, verticalScaling, yScaling);
+                if (update)
+                    Update();
+            }
+
+            public void SetBoundaries(Vector4 boundaries)
+            {
+                bounds = boundaries;
+                if (rawDataX.Length > 0)
+                    ConvertRawToPixels();
+            }
+
+            public void Update()
+            {
+                ClearLine();
+                if (lineThickness < 1)
+                    lineThickness = 1;
+                int prev = 0;
+
+                for (int k = 1; k < pixelDataX.Length; k++)
+                {
+                    lineDisplay.DrawLineAAF(pixelDataX[prev],
+                                            pixelDataY[prev],
+                                            pixelDataX[k],
+                                            pixelDataY[k],
+                                            lineColor,
+                                            lineThickness);
+                    prev = k;
+                }
+
+                lineDisplay.Apply();
+                UpdateLineLegend();
+            }
+
+            private void UpdateLineLegend()
+            {
+                lineLegend = new Texture2D(25, 15, TextureFormat.ARGB32, false);
+                for (int i = 0; i < lineLegend.width; i++)
+                    for (int j = 0; j < lineLegend.height; j++)
+                        lineLegend.SetPixel(i,
+                                            j,
+                                            Mathf.Abs((int)(j - lineLegend.height / 2f)) < lineThickness
+                                                ? lineColor
+                                                : backgroundColor);
+                lineLegend.Apply();
+            }
+
+            private void ClearLine()
+            {
+                lineDisplay.Clear(ferramDrawingExtensions.EmptyColor);
+                lineDisplay.Apply();
+            }
+
+            /// <summary>
+            ///     XMin, XMax, YMin, YMax
+            /// </summary>
+            public Vector4d GetExtremeData()
+            {
+                Vector4d extremes = Vector4d.zero;
+                extremes.x = rawDataX.Min();
+                extremes.y = rawDataX.Max();
+                extremes.z = rawDataY.Min();
+                extremes.w = rawDataY.Max();
+
+                return extremes;
+            }
+
+            public Texture2D Line()
+            {
+                return lineDisplay;
+            }
+
+            public Texture2D LegendImage()
+            {
+                return lineLegend;
+            }
+
+            public void UpdateVerticalScaling(double scaling)
+            {
+                verticalScaling = scaling;
+                ConvertRawToPixels();
+            }
+
+            public void UpdateHorizontalScaling(double scaling)
+            {
+                horizontalScaling = scaling;
+                ConvertRawToPixels();
+            }
+
+            public void ClearTextures()
+            {
+                Object.Destroy(lineLegend);
+                Object.Destroy(lineDisplay);
+                lineDisplay = null;
+                lineLegend = null;
+            }
         }
     }
 }

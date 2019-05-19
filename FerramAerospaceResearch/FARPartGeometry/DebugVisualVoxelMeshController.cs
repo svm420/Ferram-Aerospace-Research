@@ -79,6 +79,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public Transform Parent { get; }
 
+        public void Dispose()
+        {
+            QueueMainThreadTask(DisposeSafe);
+        }
+
         private void UpdateActive()
         {
             foreach (DebugVisualVoxelSubmesh submesh in submeshes)
@@ -122,11 +127,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             for (int i = submeshes.Count; i < meshes; i++)
                 submeshes.Add(DebugVisualVoxelSubmesh.Create(Parent, active));
-        }
-
-        public void Dispose()
-        {
-            QueueMainThreadTask(DisposeSafe);
         }
 
         private void DisposeSafe()

@@ -52,9 +52,21 @@ namespace FerramAerospaceResearch
         public const double rad2deg = 180d / Math.PI;
         public const double deg2rad = Math.PI / 180d;
 
-        // ReSharper disable CompareOfFloatsByEqualityOperator
+        private const double rightedge = 30d;
+        private const double leftedge = -rightedge;
+        private const double xstepinitial = 5d;
+        private const double xstepsize = 10d;
+        private const double minpart = 1d / 8d;
+        private const double maxpart = 7d / 8d;
+        private const double tol_triangle = 1E-3;
+        private const double tol_linear = 3E-4;
+        private const double tol_brent = 1E-3;
+        private const double machswitchvalue = 0.30;
+        private const int iterlim = 500;
+
         public static bool NearlyEqual(this double a, double b, double epsilon = 1e-14)
         {
+            // ReSharper disable CompareOfFloatsByEqualityOperator
             // shortcut, handles infinities
             if (a.Equals(b))
                 return true;
@@ -67,10 +79,12 @@ namespace FerramAerospaceResearch
 
             // use relative error
             return diff / (Math.Abs(a) + Math.Abs(b)) < epsilon;
+            // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
         public static bool NearlyEqual(this float a, float b, float epsilon = 1e-6f)
         {
+            // ReSharper disable CompareOfFloatsByEqualityOperator
             // shortcut, handles infinities
             if (a.Equals(b))
                 return true;
@@ -83,8 +97,8 @@ namespace FerramAerospaceResearch
 
             // use relative error
             return diff / (Math.Abs(a) + Math.Abs(b)) < epsilon;
+            // ReSharper restore CompareOfFloatsByEqualityOperator
         }
-        // ReSharper restore CompareOfFloatsByEqualityOperator
 
         // ReSharper disable once UnusedMember.Global
         public static double Lerp(double x1, double x2, double y1, double y2, double x)
@@ -284,18 +298,6 @@ namespace FerramAerospaceResearch
 
             return s;
         }
-
-        private const double rightedge = 30d;
-        private const double leftedge = -rightedge;
-        private const double xstepinitial = 5d;
-        private const double xstepsize = 10d;
-        private const double minpart = 1d / 8d;
-        private const double maxpart = 7d / 8d;
-        private const double tol_triangle = 1E-3;
-        private const double tol_linear = 3E-4;
-        private const double tol_brent = 1E-3;
-        private const double machswitchvalue = 0.30;
-        private const int iterlim = 500;
 
         public static double SelectedSearchMethod(double machNumber, Func<double, double> function)
         {

@@ -45,6 +45,9 @@ namespace FerramAerospaceResearch
     {
         public const int KSP_MAJOR_MAX = 1, KSP_MAJOR_MIN = 1, KSP_MINOR_MAX = 7, KSP_MINOR_MIN = 4;
 
+        //Version of the compatibility checker itself.
+        private static int _version = 6;
+
         public static bool IsCompatible()
         {
             /*-----------------------------------------------*\
@@ -84,9 +87,6 @@ namespace FerramAerospaceResearch
             | IMPLEMENTERS SHOULD NOT EDIT BEYOND THIS POINT! |
             \*-----------------------------------------------*/
         }
-
-        //Version of the compatibility checker itself.
-        private static int _version = 6;
 
         public void Start()
         {

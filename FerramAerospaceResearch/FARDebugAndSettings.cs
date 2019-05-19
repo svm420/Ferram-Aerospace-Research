@@ -67,19 +67,6 @@ namespace FerramAerospaceResearch
         public static Callback Toggle = delegate { };
         private static bool debugMenu;
         private static bool inputLocked;
-        private Rect debugWinPos = new Rect(50, 50, 700, 250);
-        private Texture2D cLTexture;
-        private Texture2D cDTexture;
-        private Texture2D cMTexture;
-        private Texture2D l_DTexture;
-
-        // ReSharper disable once UnusedMember.Local -> AtmComposition
-        private enum MenuTab
-        {
-            DebugAndData,
-            AeroStress,
-            AtmComposition
-        }
 
         private static readonly string[] MenuTab_str =
         {
@@ -90,6 +77,12 @@ namespace FerramAerospaceResearch
         {
             "NO_FLOW", "ALL_VESSEL", "STAGE_PRIORITY_FLOW", "STACK_PRIORITY_SEARCH"
         };
+
+        private Rect debugWinPos = new Rect(50, 50, 700, 250);
+        private Texture2D cLTexture;
+        private Texture2D cDTexture;
+        private Texture2D cMTexture;
+        private Texture2D l_DTexture;
 
         private MenuTab activeTab = MenuTab.DebugAndData;
 
@@ -131,7 +124,7 @@ namespace FerramAerospaceResearch
             hasScenarioChanged = false;
         }
 
-        // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void OnSceneChange(GameEvents.FromToAction<GameScenes, GameScenes> fromToScenes)
         {
             FARLogger.Info("check scene");
@@ -152,6 +145,7 @@ namespace FerramAerospaceResearch
             }
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void OnAppLauncherReadySetup()
         {
             OnGUIAppLauncherReady();
@@ -160,7 +154,6 @@ namespace FerramAerospaceResearch
             Toggle += EditorGUI.onAppLaunchToggle;
             Toggle += FlightGUI.onAppLaunchToggle;
         }
-        // ReSharper restore MemberCanBeMadeStatic.Local
 
         private static void ToggleGUI()
         {
@@ -634,6 +627,14 @@ namespace FerramAerospaceResearch
             GameEvents.onGameSceneSwitchRequested.Remove(OnSceneChange);
 
             FARDebugButtonBlizzy?.Destroy();
+        }
+
+        // ReSharper disable once UnusedMember.Local -> AtmComposition
+        private enum MenuTab
+        {
+            DebugAndData,
+            AeroStress,
+            AtmComposition
         }
     }
 

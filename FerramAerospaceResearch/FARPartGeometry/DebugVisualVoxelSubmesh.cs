@@ -52,16 +52,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
     {
         private MeshFilter meshFilter;
 
-        public static DebugVisualVoxelSubmesh Create(Transform parent = null, bool active = true)
-        {
-            var go = new GameObject();
-            if (parent != null)
-                go.transform.SetParent(parent);
-            var component = go.AddComponent<DebugVisualVoxelSubmesh>();
-            go.SetActive(active);
-            return component;
-        }
-
         public bool Active
         {
             // ReSharper disable once UnusedMember.Global
@@ -78,6 +68,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public List<Vector2> Uvs { get; } = new List<Vector2>();
 
         public List<int> Triangles { get; } = new List<int>();
+
+        public static DebugVisualVoxelSubmesh Create(Transform parent = null, bool active = true)
+        {
+            var go = new GameObject();
+            if (parent != null)
+                go.transform.SetParent(parent);
+            var component = go.AddComponent<DebugVisualVoxelSubmesh>();
+            go.SetActive(active);
+            return component;
+        }
 
         private void Awake()
         {

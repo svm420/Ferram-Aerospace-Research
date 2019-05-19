@@ -70,9 +70,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightDataOption8")
         };
 
-        private VesselFlightInfo infoParameters;
         private readonly StringBuilder dataStringBuilder = new StringBuilder();
         private readonly StringBuilder labelStringBuilder = new StringBuilder();
+
+        private VesselFlightInfo infoParameters;
 
         private GUIStyle buttonStyle;
         private GUIStyle boxStyle;

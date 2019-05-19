@@ -54,24 +54,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 {
     internal class StabilityDerivSimulationGUI : IDisposable
     {
-        private SimMode simMode = 0;
-
-        private EditorSimManager simManager;
-        private readonly InitialConditions lonConditions;
-        private readonly InitialConditions latConditions;
-        private ferramGraph _graph = new ferramGraph(400, 200);
-
-        // ReSharper disable once UnusedMember.Local
-        private enum SimMode
-        {
-            LONG,
-            LAT
-        }
-
         private static readonly string[] SimMode_str =
         {
             Localizer.Format("FAREditorSimModeLong"), Localizer.Format("FAREditorSimModeLat")
         };
+
+        private readonly InitialConditions lonConditions;
+        private readonly InitialConditions latConditions;
+        private SimMode simMode = 0;
+
+        private EditorSimManager simManager;
+        private ferramGraph _graph = new ferramGraph(400, 200);
 
         public StabilityDerivSimulationGUI(EditorSimManager simManager)
         {
@@ -450,6 +443,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _graph.horizontalLabel = horizontalLabel;
             _graph.verticalLabel = verticalLabel;
             _graph.Update();
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private enum SimMode
+        {
+            LONG,
+            LAT
         }
 
         private class InitialConditions

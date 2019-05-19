@@ -97,8 +97,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             offset = iOffset + 8 * jOffset + 64 * kOffset;
             this.lowerCorner = lowerCorner;
             this.overridingParts = overridingParts;
+            // ReSharper restore ParameterHidesMember
         }
-        // ReSharper restore ParameterHidesMember
 
         public void ClearChunk()
         {

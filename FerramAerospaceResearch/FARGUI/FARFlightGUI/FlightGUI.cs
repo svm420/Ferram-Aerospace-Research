@@ -56,9 +56,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class FlightGUI : VesselModule
     {
-        private Vessel _vessel;
-        private FARVesselAero _vesselAero;
-
         private static bool showGUI;
         public static bool showAllGUI = true;
         public static bool savedShowGUI = true;
@@ -70,25 +67,27 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private static int frameCountForSaving;
         public static Dictionary<Vessel, FlightGUI> vesselFlightGUI;
 
+        internal static GUIStyle boxStyle;
+        internal static GUIStyle buttonStyle;
+
         private readonly StringBuilder _strBuilder = new StringBuilder();
+        private Vessel _vessel;
+        private FARVesselAero _vesselAero;
 
         private PhysicsCalcs _physicsCalcs;
-        public VesselFlightInfo InfoParameters { get; private set; }
 
         private FlightStatusGUI _flightStatusGUI;
         private StabilityAugmentation _stabilityAugmentation;
         private FlightDataGUI _flightDataGUI;
-        public AeroVisualizationGUI AeroVizGUI { get; private set; }
-
-        public AirspeedSettingsGUI airSpeedGUI { get; private set; }
 
         private bool showFlightDataWindow;
         private bool showSettingsWindow;
 
-        internal static GUIStyle boxStyle;
-        internal static GUIStyle buttonStyle;
-
         private GUIDropDown<int> settingsWindow;
+        public VesselFlightInfo InfoParameters { get; private set; }
+        public AeroVisualizationGUI AeroVizGUI { get; private set; }
+
+        public AirspeedSettingsGUI airSpeedGUI { get; private set; }
 
         protected override void OnAwake()
         {
@@ -403,17 +402,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             showGUI = !showGUI;
         }
 
-        // ReSharper disable MemberCanBeMadeStatic.Local -> static does not work with GameEvents
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void HideUI()
         {
             showAllGUI = false;
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void ShowUI()
         {
             showAllGUI = true;
         }
-        // ReSharper restore MemberCanBeMadeStatic.Local
 
         private static void SaveConfigs()
         {

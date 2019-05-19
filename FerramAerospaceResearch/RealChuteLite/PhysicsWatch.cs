@@ -34,6 +34,22 @@ namespace FerramAerospaceResearch.RealChuteLite
         private double totalSeconds;
 
         /// <summary>
+        ///     Creates a new PhysicsWatch
+        /// </summary>
+        public PhysicsWatch()
+        {
+        }
+
+        /// <summary>
+        ///     Creates a new PhysicsWatch starting at a certain amount of time
+        /// </summary>
+        /// <param name="seconds">Time to start at, in seconds</param>
+        public PhysicsWatch(double seconds)
+        {
+            totalSeconds = seconds;
+        }
+
+        /// <summary>
         ///     If the watch is currently counting down time
         /// </summary>
         public bool IsRunning { get; private set; }
@@ -70,22 +86,6 @@ namespace FerramAerospaceResearch.RealChuteLite
                     UpdateWatch();
                 return (long)Math.Round(totalSeconds * ticksPerSecond);
             }
-        }
-
-        /// <summary>
-        ///     Creates a new PhysicsWatch
-        /// </summary>
-        public PhysicsWatch()
-        {
-        }
-
-        /// <summary>
-        ///     Creates a new PhysicsWatch starting at a certain amount of time
-        /// </summary>
-        /// <param name="seconds">Time to start at, in seconds</param>
-        public PhysicsWatch(double seconds)
-        {
-            totalSeconds = seconds;
         }
 
         /// <summary>

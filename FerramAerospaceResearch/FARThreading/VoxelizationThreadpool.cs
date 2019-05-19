@@ -52,38 +52,22 @@ namespace FerramAerospaceResearch.FARThreading
     //This class only exists to ensure that the ThreadPool is not choked with requests to start running voxels, which will deadlock the entire voxelization process when the MaxThread limit is reached because they will be unable to start up their various worker threads
     internal class VoxelizationThreadpool
     {
-        // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit
-        static VoxelizationThreadpool()
-        {
-        }
+        private const int THREAD_COUNT = 8;
 
         public static readonly VoxelizationThreadpool Instance = new VoxelizationThreadpool();
 
-        public class Task
-        {
-            public readonly Action Action;
-            public bool Executed;
-
-            public Task(Action action)
-            {
-                Action = action;
-                Executed = false;
-            }
-        }
+        public static bool RunInMainThread = false;
 
         private readonly Queue<Task> queuedMainThreadTasks;
 
         private readonly Thread[] _threads;
         private readonly Queue<Action> queuedVoxelizations;
-        private const int THREAD_COUNT = 8;
-
-        public static bool RunInMainThread = false;
 
         private Thread _mainThread;
 
-        public bool inMainThread
+        // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit
+        static VoxelizationThreadpool()
         {
-            get { return _mainThread == Thread.CurrentThread; }
         }
 
         private VoxelizationThreadpool()
@@ -99,6 +83,11 @@ namespace FerramAerospaceResearch.FARThreading
 
             // make sure we get main thread while in main thread, ctor is not guaranteed to be run in main thread
             queuedMainThreadTasks.Enqueue(new Task(SetupMainThread));
+        }
+
+        public bool inMainThread
+        {
+            get { return _mainThread == Thread.CurrentThread; }
         }
 
         ~VoxelizationThreadpool()
@@ -178,6 +167,18 @@ namespace FerramAerospaceResearch.FARThreading
                     task.Executed = true;
                     Monitor.Pulse(task);
                 }
+            }
+        }
+
+        public class Task
+        {
+            public readonly Action Action;
+            public bool Executed;
+
+            public Task(Action action)
+            {
+                Action = action;
+                Executed = false;
             }
         }
     }

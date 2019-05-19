@@ -57,43 +57,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
     {
         private static double[] indexSqrt = new double[1];
         private static readonly object _commonLocker = new object();
-
-        private VehicleVoxel _voxel;
-        private VoxelCrossSection[] _vehicleCrossSection = new VoxelCrossSection[1];
-        private double[] _ductedAreaAdjustment = new double[1];
-
-        private int _voxelCount;
-
-        public double Length { get; private set; }
-
-        private double _maxCrossSectionArea;
-
-        public double MaxCrossSectionArea
-        {
-            get { return _maxCrossSectionArea; }
-        }
-
-        public bool CalculationCompleted { get; private set; }
-
-        public double SonicDragArea { get; private set; }
-
-        public double CriticalMach { get; private set; }
-
-        private Matrix4x4 _worldToLocalMatrix, _localToWorldMatrix;
-
-        private Vector3d _voxelLowerRightCorner;
-        private double _voxelElementSize;
-        private double _sectionThickness;
-
-        public double SectionThickness
-        {
-            get { return _sectionThickness; }
-        }
-
-        private Vector3 _vehicleMainAxis;
-        private List<Part> _vehiclePartList;
-
-        private List<GeometryPartModule> _currentGeoModules;
+        private static Stack<FARAeroSection> currentlyUnusedSections;
 
         private readonly Dictionary<Part, PartTransformInfo> _partWorldToLocalMatrixDict =
             new Dictionary<Part, PartTransformInfo>(ObjectReferenceEqualityComparer<Part>.Default);
@@ -101,6 +65,28 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private readonly Dictionary<FARAeroPartModule, FARAeroPartModule.ProjectedArea> _moduleAndAreasDict =
             new Dictionary<FARAeroPartModule, FARAeroPartModule.ProjectedArea>(ObjectReferenceEqualityComparer<
                                                                                    FARAeroPartModule>.Default);
+
+        private readonly List<FARAeroPartModule> includedModules = new List<FARAeroPartModule>();
+        private readonly List<float> weighting = new List<float>();
+
+        private VehicleVoxel _voxel;
+        private VoxelCrossSection[] _vehicleCrossSection = new VoxelCrossSection[1];
+        private double[] _ductedAreaAdjustment = new double[1];
+
+        private int _voxelCount;
+
+        private double _maxCrossSectionArea;
+
+        private Matrix4x4 _worldToLocalMatrix, _localToWorldMatrix;
+
+        private Vector3d _voxelLowerRightCorner;
+        private double _voxelElementSize;
+        private double _sectionThickness;
+
+        private Vector3 _vehicleMainAxis;
+        private List<Part> _vehiclePartList;
+
+        private List<GeometryPartModule> _currentGeoModules;
 
         private List<FARAeroPartModule> _currentAeroModules = new List<FARAeroPartModule>();
         private List<FARAeroPartModule> _newAeroModules = new List<FARAeroPartModule>();
@@ -115,10 +101,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private List<ICrossSectionAdjuster> activeAdjusters = new List<ICrossSectionAdjuster>();
 
-        private readonly List<FARAeroPartModule> includedModules = new List<FARAeroPartModule>();
-        private readonly List<float> weighting = new List<float>();
-        private static Stack<FARAeroSection> currentlyUnusedSections;
-
         private int validSectionCount;
         private int firstSection;
 
@@ -129,6 +111,24 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             if (currentlyUnusedSections == null)
                 currentlyUnusedSections = new Stack<FARAeroSection>();
+        }
+
+        public double Length { get; private set; }
+
+        public double MaxCrossSectionArea
+        {
+            get { return _maxCrossSectionArea; }
+        }
+
+        public bool CalculationCompleted { get; private set; }
+
+        public double SonicDragArea { get; private set; }
+
+        public double CriticalMach { get; private set; }
+
+        public double SectionThickness
+        {
+            get { return _sectionThickness; }
         }
 
         public void ForceCleanup()

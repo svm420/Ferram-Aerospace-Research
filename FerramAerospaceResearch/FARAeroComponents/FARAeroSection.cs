@@ -72,13 +72,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private List<PartData> partData;
         private Dictionary<FARAeroPartModule, int> handledAeroModulesIndexDict;
 
-        public struct PartData
+        private FARAeroSection()
         {
-            public FARAeroPartModule aeroModule;
-            public Vector3 centroidPartSpace;
-            public Vector3 xRefVectorPartSpace;
-            public Vector3 nRefVectorPartSpace;
-            public float dragFactor; //sum of these should add up to 1
         }
 
         public static FARAeroSection CreateNewAeroSection()
@@ -99,8 +94,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return section;
         }
 
-        private FARAeroSection()
+        public struct PartData
         {
+            public FARAeroPartModule aeroModule;
+            public Vector3 centroidPartSpace;
+            public Vector3 xRefVectorPartSpace;
+            public Vector3 nRefVectorPartSpace;
+            public float dragFactor; //sum of these should add up to 1
         }
 
         // ReSharper disable ParameterHidesMember -> updating member values
@@ -187,8 +187,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             xForceSkinFriction.BakeCurve();
 
             worldNormalVector = nRefVectorWorldSpace;
+            // ReSharper restore ParameterHidesMember
         }
-        // ReSharper restore ParameterHidesMember
 
         public bool CanMerge(FARAeroSection otherSection)
         {

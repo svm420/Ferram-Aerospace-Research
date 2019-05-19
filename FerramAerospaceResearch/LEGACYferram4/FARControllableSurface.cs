@@ -51,27 +51,10 @@ namespace ferram4
 {
     public class FARControllableSurface : FARWingAerodynamicModel, ITorqueProvider
     {
+        public static double timeConstant = 0.25;
+        public static double timeConstantFlap = 10;
+        public static double timeConstantSpoiler = 0.75;
         protected Transform movableSection;
-
-        protected Transform MovableSection
-        {
-            get
-            {
-                if (movableSection != null)
-                    return movableSection;
-                movableSection = part.FindModelTransform(transformName); //And the transform
-                if (!MovableOrigReady)
-                {
-                    // In parts copied by symmetry, these fields should already be set,
-                    // while the transform may not be in the original orientation anymore.
-                    MovableOrig = movableSection.localRotation; //Its original orientation
-                    MovableOrigReady = true;
-                }
-
-                flipAxis = Vector3.Dot(movableSection.right, part.partTransform.right) <= 0;
-                return movableSection;
-            }
-        }
 
         private bool flipAxis;
 
@@ -140,8 +123,8 @@ namespace ferram4
              stepIncrement = 0.5f)]
         public float maxdeflect = 15;
 
-        // ReSharper disable ConvertToConstant.Local
-        // ReSharper disable FieldCanBeMadeReadOnly.Local
+        // ReSharper disable once ConvertToConstant.Local
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
         [KSPField(guiName = "FARCtrlSurfFlapSpoiler", guiActiveEditor = true, guiActive = true),
          UI_Toggle(affectSymCounterparts = UI_Scene.All,
              scene = UI_Scene.All,
@@ -149,14 +132,14 @@ namespace ferram4
              enabledText = "FARCtrlSurfStdText")]
         private bool showFlpCtrl = false;
 
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
+        // ReSharper disable once ConvertToConstant.Local
         [KSPField(guiName = "FARCtrlSurfStdTitle", guiActiveEditor = true, guiActive = true),
          UI_Toggle(affectSymCounterparts = UI_Scene.All,
              scene = UI_Scene.All,
              disabledText = "FARCtrlSurfStdText",
              enabledText = "FARCtrlSurfStdText")]
         private bool showStdCtrl = false;
-        // ReSharper restore FieldCanBeMadeReadOnly.Local
-        // ReSharper restore ConvertToConstant.Local
 
         private bool prevFlpCtrl = true;
 
@@ -208,14 +191,53 @@ namespace ferram4
 
         private double lastAoAoffset;
         private Vector3d deflectedNormal = Vector3d.forward;
-
-        public static double timeConstant = 0.25;
-        public static double timeConstantFlap = 10;
-        public static double timeConstantSpoiler = 0.75;
         public bool brake;
         private bool justStarted;
 
         private Transform lastReferenceTransform;
+
+        protected Transform MovableSection
+        {
+            get
+            {
+                if (movableSection != null)
+                    return movableSection;
+                movableSection = part.FindModelTransform(transformName); //And the transform
+                if (!MovableOrigReady)
+                {
+                    // In parts copied by symmetry, these fields should already be set,
+                    // while the transform may not be in the original orientation anymore.
+                    MovableOrig = movableSection.localRotation; //Its original orientation
+                    MovableOrigReady = true;
+                }
+
+                flipAxis = Vector3.Dot(movableSection.right, part.partTransform.right) <= 0;
+                return movableSection;
+            }
+        }
+
+        // TODO 1.2: ITorqueProvider now reports two Vector3s, positive torque(that produced by control actuation 1,1,1) and negative torque(that produced by -1,-1,-1).
+        public void GetPotentialTorque(out Vector3 pos, out Vector3 neg)
+        {
+            //get max lift coeff
+            Vector3 maxLiftVec = FinalLiftSlope * GetLiftDirection() * maxdeflect * Math.PI / 180;
+            //get an actual lift vector out of it
+            maxLiftVec *= (float)(vessel.dynamicPressurekPa * S);
+
+            Vector3 relPosVector = AerodynamicCenter - vessel.CoM;
+
+            Vector3 maxMomentVector = Vector3.Cross(relPosVector, maxLiftVec);
+
+            Vector3 vesselRelMaxMoment = vessel.ReferenceTransform.worldToLocalMatrix.MultiplyVector(maxMomentVector);
+
+            Vector3 resultVector = Vector3.zero;
+            resultVector.x = (float)Math.Abs(vesselRelMaxMoment.x * pitchaxis * PitchLocation * 0.01);
+            resultVector.z = (float)Math.Abs(vesselRelMaxMoment.z * yawaxis * YawLocation * 0.01);
+            resultVector.y = (float)Math.Abs(vesselRelMaxMoment.y * rollaxis * RollLocation * 0.01);
+
+            pos = resultVector;
+            neg = -resultVector;
+        }
 
 
         [FARAction("FARCtrlActionSpoiler", FARActionGroupConfiguration.ID_SPOILER)]
@@ -772,29 +794,6 @@ namespace ferram4
             var tmpUI = (UI_FloatRange)Fields[field].uiControlEditor;
             tmpUI.maxValue = upperRange;
             tmpUI.minValue = lowerRange;
-        }
-
-        // TODO 1.2: ITorqueProvider now reports two Vector3s, positive torque(that produced by control actuation 1,1,1) and negative torque(that produced by -1,-1,-1).
-        public void GetPotentialTorque(out Vector3 pos, out Vector3 neg)
-        {
-            //get max lift coeff
-            Vector3 maxLiftVec = FinalLiftSlope * GetLiftDirection() * maxdeflect * Math.PI / 180;
-            //get an actual lift vector out of it
-            maxLiftVec *= (float)(vessel.dynamicPressurekPa * S);
-
-            Vector3 relPosVector = AerodynamicCenter - vessel.CoM;
-
-            Vector3 maxMomentVector = Vector3.Cross(relPosVector, maxLiftVec);
-
-            Vector3 vesselRelMaxMoment = vessel.ReferenceTransform.worldToLocalMatrix.MultiplyVector(maxMomentVector);
-
-            Vector3 resultVector = Vector3.zero;
-            resultVector.x = (float)Math.Abs(vesselRelMaxMoment.x * pitchaxis * PitchLocation * 0.01);
-            resultVector.z = (float)Math.Abs(vesselRelMaxMoment.z * yawaxis * YawLocation * 0.01);
-            resultVector.y = (float)Math.Abs(vesselRelMaxMoment.y * rollaxis * RollLocation * 0.01);
-
-            pos = resultVector;
-            neg = -resultVector;
         }
     }
 }

@@ -45,30 +45,23 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
+// ReSharper disable StaticMemberInGenericType
+
 namespace FerramAerospaceResearch.FARGUI
 {
     public class GUIDropDown<T>
     {
-        private int selectedOption;
-        private bool isActive;
-        private bool toggleBtnState;
-        private Vector2 scrollPos;
-
-        private readonly string[] stringOptions;
-        private readonly T[] typeOptions;
-
-        public T ActiveSelection
-        {
-            get { return typeOptions[selectedOption]; }
-        }
-
-        // ReSharper disable StaticMemberInGenericType
         private static GUIStyle listStyle;
         private static GUIStyle toggleBtnStyle;
         private static GUIStyle dropdownItemStyle;
 
         private static GUIStyle selectedItemStyle;
-        // ReSharper restore StaticMemberInGenericType
+        private readonly string[] stringOptions;
+        private readonly T[] typeOptions;
+        private int selectedOption;
+        private bool isActive;
+        private bool toggleBtnState;
+        private Vector2 scrollPos;
 
         public GUIDropDown(string[] stringOptions, T[] typeOptions, int defaultOption = 0)
         {
@@ -76,6 +69,11 @@ namespace FerramAerospaceResearch.FARGUI
             this.typeOptions = typeOptions;
 
             selectedOption = defaultOption;
+        }
+
+        public T ActiveSelection
+        {
+            get { return typeOptions[selectedOption]; }
         }
 
         public void GUIDropDownDisplay(params GUILayoutOption[] guiOptions)
@@ -194,13 +192,12 @@ namespace FerramAerospaceResearch.FARGUI
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class FARGUIDropDownDisplay : MonoBehaviour
     {
-        public static FARGUIDropDownDisplay Instance { get; private set; }
-
         private Rect btnRect;
         private Rect displayRect;
         private int windowId;
         private GUI.WindowFunction windowFunction;
         private GUIStyle listStyle;
+        public static FARGUIDropDownDisplay Instance { get; private set; }
 
         private void Awake()
         {

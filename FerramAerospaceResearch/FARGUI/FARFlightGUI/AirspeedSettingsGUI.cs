@@ -54,18 +54,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class AirspeedSettingsGUI
     {
-        public static bool allEnabled = true;
-        private readonly Vessel _vessel;
-        private GUIStyle buttonStyle;
-        public bool enabled { get; set; }
-
-        public AirspeedSettingsGUI(Vessel vessel, bool enabled = true)
-        {
-            _vessel = vessel;
-            this.enabled = enabled;
-            LoadSettings();
-        }
-
         // ReSharper disable once UnusedMember.Global -> MACH
         public enum SurfaceVelMode
         {
@@ -75,14 +63,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             MACH
         }
 
-        private readonly string[] surfModel_str =
-        {
-            Localizer.Format("FARFlightAirspeedGroundspeed"),
-            Localizer.Format("FARFlightAirspeedIndicated"),
-            Localizer.Format("FARFlightAirspeedEquivalent"),
-            Localizer.Format("FARAbbrevMach")
-        };
-
         public enum SurfaceVelUnit
         {
             M_S,
@@ -90,6 +70,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             MPH,
             KM_H
         }
+
+        public static bool allEnabled = true;
+        private readonly Vessel _vessel;
+
+        private readonly string[] surfModel_str =
+        {
+            Localizer.Format("FARFlightAirspeedGroundspeed"),
+            Localizer.Format("FARFlightAirspeedIndicated"),
+            Localizer.Format("FARFlightAirspeedEquivalent"),
+            Localizer.Format("FARAbbrevMach")
+        };
 
         private readonly string[] surfUnit_str =
         {
@@ -99,6 +90,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightAirspeedKMH")
         };
 
+        private GUIStyle buttonStyle;
+
         private SurfaceVelMode velMode = SurfaceVelMode.TAS;
 
         private SurfaceVelUnit unitMode = SurfaceVelUnit.M_S;
@@ -106,6 +99,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         // DaMichel: cache the velocity display string for retrieval in GetVelocityDisplayString
         private string velString;
         private bool active; // Have we actually generated the string?
+
+        public AirspeedSettingsGUI(Vessel vessel, bool enabled = true)
+        {
+            _vessel = vessel;
+            this.enabled = enabled;
+            LoadSettings();
+        }
+
+        public bool enabled { get; set; }
 
         public void AirSpeedSettings()
         {

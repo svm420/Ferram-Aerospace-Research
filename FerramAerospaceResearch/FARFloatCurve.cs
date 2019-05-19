@@ -5,78 +5,6 @@ namespace FerramAerospaceResearch
     //recyclable float curve
     internal class FARFloatCurve
     {
-        private struct CubicSection
-        {
-            public double a, b, c, d;
-            public double upperLim, lowerLim;
-            public int nextIndex, prevIndex;
-
-            public void BuildSection(Vector3d lowerInputs, Vector3d upperInputs)
-            {
-                //Creates cubic from x,y,dy/dx data
-
-                double recipXDiff = 1 / (lowerInputs.x - upperInputs.x);
-                double recipXDiffSq = recipXDiff * recipXDiff;
-
-                a = 2 * (upperInputs.y - lowerInputs.y) * recipXDiff;
-                a += upperInputs.z + lowerInputs.z;
-                a *= recipXDiffSq;
-
-                b = 3 * (upperInputs.x + lowerInputs.x) * (lowerInputs.y - upperInputs.y) * recipXDiff;
-                b -= (lowerInputs.x + 2 * upperInputs.x) * lowerInputs.z;
-                b -= (2 * lowerInputs.x + upperInputs.x) * upperInputs.z;
-                b *= recipXDiffSq;
-
-                c = 6 * upperInputs.x * lowerInputs.x * (upperInputs.y - lowerInputs.y) * recipXDiff;
-                c += (2 * lowerInputs.x * upperInputs.x + upperInputs.x * upperInputs.x) * lowerInputs.z;
-                c += (2 * lowerInputs.x * upperInputs.x + lowerInputs.x * lowerInputs.x) * upperInputs.z;
-                c *= recipXDiffSq;
-
-                d = (3 * lowerInputs.x - upperInputs.x) * upperInputs.x * upperInputs.x * lowerInputs.y;
-                d += (lowerInputs.x - 3 * upperInputs.x) * lowerInputs.x * lowerInputs.x * upperInputs.y;
-                d *= recipXDiff;
-
-                d -= lowerInputs.x * upperInputs.x * upperInputs.x * lowerInputs.z;
-                d -= lowerInputs.x * lowerInputs.x * upperInputs.x * upperInputs.z;
-                d *= recipXDiffSq;
-
-                upperLim = upperInputs.x;
-                lowerLim = lowerInputs.x;
-            }
-
-            public double Evaluate(double x)
-            {
-                double y = a * x;
-                y += b;
-                y *= x;
-                y += c;
-                y *= x;
-                y += d;
-
-                return y;
-            }
-
-            public double EvalUpperLim()
-            {
-                return Evaluate(upperLim);
-            }
-
-            public double EvalLowerLim()
-            {
-                return Evaluate(lowerLim);
-            }
-
-            public int CheckRange(double x)
-            {
-                if (x > upperLim)
-                    return 1;
-                if (x < lowerLim)
-                    return -1;
-
-                return 0;
-            }
-        }
-
         private readonly Vector3d[] controlPoints;
         private readonly CubicSection[] sections;
         private readonly int centerIndex;
@@ -195,6 +123,78 @@ namespace FerramAerospaceResearch
                 tmpSection.d += addSection.d;
 
                 sections[i] = tmpSection;
+            }
+        }
+
+        private struct CubicSection
+        {
+            public double a, b, c, d;
+            public double upperLim, lowerLim;
+            public int nextIndex, prevIndex;
+
+            public void BuildSection(Vector3d lowerInputs, Vector3d upperInputs)
+            {
+                //Creates cubic from x,y,dy/dx data
+
+                double recipXDiff = 1 / (lowerInputs.x - upperInputs.x);
+                double recipXDiffSq = recipXDiff * recipXDiff;
+
+                a = 2 * (upperInputs.y - lowerInputs.y) * recipXDiff;
+                a += upperInputs.z + lowerInputs.z;
+                a *= recipXDiffSq;
+
+                b = 3 * (upperInputs.x + lowerInputs.x) * (lowerInputs.y - upperInputs.y) * recipXDiff;
+                b -= (lowerInputs.x + 2 * upperInputs.x) * lowerInputs.z;
+                b -= (2 * lowerInputs.x + upperInputs.x) * upperInputs.z;
+                b *= recipXDiffSq;
+
+                c = 6 * upperInputs.x * lowerInputs.x * (upperInputs.y - lowerInputs.y) * recipXDiff;
+                c += (2 * lowerInputs.x * upperInputs.x + upperInputs.x * upperInputs.x) * lowerInputs.z;
+                c += (2 * lowerInputs.x * upperInputs.x + lowerInputs.x * lowerInputs.x) * upperInputs.z;
+                c *= recipXDiffSq;
+
+                d = (3 * lowerInputs.x - upperInputs.x) * upperInputs.x * upperInputs.x * lowerInputs.y;
+                d += (lowerInputs.x - 3 * upperInputs.x) * lowerInputs.x * lowerInputs.x * upperInputs.y;
+                d *= recipXDiff;
+
+                d -= lowerInputs.x * upperInputs.x * upperInputs.x * lowerInputs.z;
+                d -= lowerInputs.x * lowerInputs.x * upperInputs.x * upperInputs.z;
+                d *= recipXDiffSq;
+
+                upperLim = upperInputs.x;
+                lowerLim = lowerInputs.x;
+            }
+
+            public double Evaluate(double x)
+            {
+                double y = a * x;
+                y += b;
+                y *= x;
+                y += c;
+                y *= x;
+                y += d;
+
+                return y;
+            }
+
+            public double EvalUpperLim()
+            {
+                return Evaluate(upperLim);
+            }
+
+            public double EvalLowerLim()
+            {
+                return Evaluate(lowerLim);
+            }
+
+            public int CheckRange(double x)
+            {
+                if (x > upperLim)
+                    return 1;
+                if (x < lowerLim)
+                    return -1;
+
+                return 0;
             }
         }
     }

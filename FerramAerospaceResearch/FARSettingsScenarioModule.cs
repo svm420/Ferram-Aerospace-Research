@@ -55,37 +55,42 @@ namespace FerramAerospaceResearch
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT)]
     public class FARSettingsScenarioModule : ScenarioModule
     {
+        private static List<string> presetNames;
         public bool newGame;
         public FARDifficultyAndExactnessSettings settings;
+
+        public FARDifficultyAndExactnessSettings customSettings;
+        public List<FARDifficultyAndExactnessSettings> presets;
+        public FARVoxelSettings voxelSettings;
+
+        public List<ConfigNode> flightGUISettings;
+
+        public int currentIndex;
+
+        private GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
+
+
+        private FARSettingsScenarioModule()
+        {
+            Instance = this;
+        }
 
         public static FARDifficultyAndExactnessSettings Settings
         {
             get { return Instance.settings; }
         }
 
-        public FARDifficultyAndExactnessSettings customSettings;
-        public List<FARDifficultyAndExactnessSettings> presets;
-        public FARVoxelSettings voxelSettings;
-
         public static FARVoxelSettings VoxelSettings
         {
             get { return Instance.voxelSettings; }
         }
-
-        public List<ConfigNode> flightGUISettings;
 
         public static List<ConfigNode> FlightGUISettings
         {
             get { return Instance.flightGUISettings; }
         }
 
-        private static List<string> presetNames;
-
-        public int currentIndex;
-
         public static FARSettingsScenarioModule Instance { get; private set; }
-
-        private GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
 
         public static void MainMenuBuildDefaultScenarioModule()
         {
@@ -95,12 +100,6 @@ namespace FerramAerospaceResearch
             FARLogger.Info("Creating new setting module for tutorial/scenario");
             Instance.OnLoad(new ConfigNode());
             Instance.Start();
-        }
-
-
-        private FARSettingsScenarioModule()
-        {
-            Instance = this;
         }
 
         private void Start()
@@ -319,14 +318,13 @@ namespace FerramAerospaceResearch
 
     public class FARDifficultyAndExactnessSettings
     {
+        // TODO: index should be the index in the list, allow multiple custom settings
+        public readonly int index;
         public double fractionTransonicDrag = 0.7;
         public double gaussianVehicleLengthFractionForSmoothing = 0.015;
         public int numAreaSmoothingPasses = 2;
 
         public int numDerivSmoothingPasses = 1;
-
-        // TODO: index should be the index in the list, allow multiple custom settings
-        public readonly int index;
 
 
         public FARDifficultyAndExactnessSettings(int index)
