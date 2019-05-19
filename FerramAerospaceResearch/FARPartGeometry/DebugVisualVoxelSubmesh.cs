@@ -66,10 +66,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             // ReSharper disable once UnusedMember.Global
             get { return gameObject.activeSelf; }
-            set
-            {
-                gameObject.SetActive(value);
-            }
+            set { gameObject.SetActive(value); }
         }
 
         public Mesh Mesh { get; private set; }

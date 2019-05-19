@@ -84,13 +84,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
                 currentState = NextState(currentState);
 
-                for(int k = 0; k < currentState.Length; k++)
+                for (int k = 0; k < currentState.Length; k++)
                     if (double.IsNaN(currentState[k]) || double.IsInfinity(currentState[k]))
                     {
                         currentState[k] = 0;
                         j = time.Length;
                         t = endTime;
                     }
+
                 j++;
                 t += dt;
             }
@@ -122,39 +123,29 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f1[j] += currentState[i] * stateEquations.Value(i, j);
-                }
             }
 
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f2[j] += (currentState[i] + 0.5f * dt * f1[i]) * stateEquations.Value(i, j);
-                }
             }
 
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f3[j] += (currentState[i] + 0.5f * dt * f2[i]) * stateEquations.Value(i, j);
-                }
             }
 
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f4[j] += (currentState[i] + dt * f3[i]) * stateEquations.Value(i, j);
-                }
             }
 
             for (int i = 0; i < next.Length; i++)
-            {
                 next[i] = currentState[i] + dt * (c[0] * f1[i] + c[1] * f2[i] + c[2] * f3[i] + c[3] * f4[i]);
-            }
 
             return next;
         }

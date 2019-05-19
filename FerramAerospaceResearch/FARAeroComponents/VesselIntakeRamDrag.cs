@@ -54,7 +54,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
     {
         //assume value approximately for turbojets
         private const float AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM = 0.25f;
-        private const float AVG_NOZZLE_VEL_FACTOR = AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM * (1 - AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM);
+
+        private const float AVG_NOZZLE_VEL_FACTOR =
+            AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM * (1 - AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM);
 
         private static readonly int AJE_JET_CLASS_ID = "ModuleEnginesAJEJet".GetHashCode();
         private static readonly int AJE_PROP_CLASS_ID = "ModuleEnginesAJEPropeller".GetHashCode();
@@ -136,12 +138,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             float currentThrottle = 0;
 
             foreach (ModuleEngines engine in _airBreathingEngines)
-            {
                 if (engine.manuallyOverridden)
                     currentThrottle++;
                 else
                     currentThrottle += engine.currentThrottle;
-            }
             currentThrottle /= Math.Max((float)_airBreathingEngines.Count, 1);
 
             if (currentThrottle > 0.5)
@@ -190,10 +190,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             float drag = machNumber * machNumber;
             ++drag;
             drag = 2f / drag;
-            drag *= AVG_NOZZLE_VEL_FACTOR;  //drag based on the nozzle
+            drag *= AVG_NOZZLE_VEL_FACTOR; //drag based on the nozzle
 
-            drag += 0.1f;           //drag based on inlet
-                                    //assuming inlet and nozzle area are equal
+            drag += 0.1f; //drag based on inlet
+            //assuming inlet and nozzle area are equal
 
             return drag;
         }

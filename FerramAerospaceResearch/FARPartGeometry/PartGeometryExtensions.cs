@@ -79,7 +79,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 if (mc != null)
                 {
                     m = mc.sharedMesh;
-                    if(m != null)
+                    if (m != null)
                         EncapsulateBounds(ref lower, ref upper, matrix, m);
                 }
 
@@ -105,18 +105,26 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     continue;
 
                 EncapsulateBounds(ref lower, ref upper, matrix, m);
-
             }
+
             var bounds = new Bounds((lower + upper) * 0.5f, upper - lower);
             return bounds;
         }
 
-        private static void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
+        private static void TransformedPointBounds(
+            Matrix4x4 matrix,
+            Vector3 center,
+            float extX,
+            float extY,
+            float extZ,
+            ref Vector3 lower,
+            ref Vector3 upper
+        )
         {
-            var boundPt = new Vector3 (center.x + extX, center.y + extY, center.z + extZ);
+            var boundPt = new Vector3(center.x + extX, center.y + extY, center.z + extZ);
             boundPt = matrix.MultiplyPoint3x4(boundPt);
-            lower = Vector3.Min (lower, boundPt);
-            upper = Vector3.Max (upper, boundPt);
+            lower = Vector3.Min(lower, boundPt);
+            upper = Vector3.Max(upper, boundPt);
         }
 
         private static void EncapsulateBounds(ref Vector3 lower, ref Vector3 upper, Matrix4x4 matrix, Mesh mesh)
@@ -153,6 +161,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         bounds.Encapsulate(matrix.MultiplyPoint3x4(bc.bounds.min));
                         bounds.Encapsulate(matrix.MultiplyPoint3x4(bc.bounds.max));
                     }
+
                     continue;
                 }
 
@@ -163,8 +172,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 bounds.Encapsulate(matrix.MultiplyPoint3x4(m.bounds.min));
                 bounds.Encapsulate(matrix.MultiplyPoint3x4(m.bounds.max));
-
             }
+
             return bounds;
         }
 
@@ -201,12 +210,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 for (int j = 1; j < currentPartModuleTransforms.Count; ++j)
                 {
-                    string transformString = (string)module.GetType().GetField(currentPartModuleTransforms[j]).GetValue(module);
+                    string transformString =
+                        (string)module.GetType().GetField(currentPartModuleTransforms[j]).GetValue(module);
                     Transform.AddRange(string.IsNullOrEmpty(transformString)
                                            ? p.FindModelComponents<Transform>(transformString)
                                            : p.FindModelComponents<Transform>(currentPartModuleTransforms[j]));
                 }
             }
+
             foreach (Transform t in p.FindModelComponents<Transform>())
             {
                 if (Transform.Contains(t))
@@ -239,27 +250,24 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (parent == null)
                 return;
             transformList.Add(parent);
-            for(int i = 0; i < parent.childCount; ++i)
-            {
+            for (int i = 0; i < parent.childCount; ++i)
                 GetChildTransforms(transformList, parent.GetChild(i));
-            }
         }
 
         private static void LoadPartModuleTransformStrings()
         {
             ignorePartModuleTransforms = new List<List<string>>();
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARPartModuleTransformExceptions"))
-                if(node != null)
-                    foreach(ConfigNode template in node.GetNodes("FARPartModuleException"))
+                if (node != null)
+                    foreach (ConfigNode template in node.GetNodes("FARPartModuleException"))
                     {
-                        if(!template.HasValue("PartModuleName"))
+                        if (!template.HasValue("PartModuleName"))
                             continue;
                         var transformExceptions = new List<string> {template.GetValue("PartModuleName")};
                         transformExceptions.AddRange(template.GetValues("TransformException"));
 
                         ignorePartModuleTransforms.Add(transformExceptions);
                     }
-
         }
     }
 }

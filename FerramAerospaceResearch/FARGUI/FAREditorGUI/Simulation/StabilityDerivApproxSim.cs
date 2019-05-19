@@ -49,7 +49,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
     internal static class StabilityDerivLinearSim
     {
-        public static GraphData RunTransientSimLateral(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
+        public static GraphData RunTransientSimLateral(
+            StabilityDerivOutput vehicleData,
+            double endTime,
+            double initDt,
+            double[] InitCond
+        )
         {
             var A = new SimMatrix(4, 4);
 
@@ -98,18 +103,25 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     A.Add(f, i, j);
 
                 if (j < 2)
+                {
                     j++;
+                }
                 else
                 {
                     j = 0;
                     i++;
                 }
             }
-            A.Add(InstantConditionSim.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude) * Math.Cos(vehicleData.stableAoA * Math.PI / 180) / vehicleData.nominalVelocity, 3, 0);
+
+            A.Add(InstantConditionSim.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude) *
+                  Math.Cos(vehicleData.stableAoA * Math.PI / 180) /
+                  vehicleData.nominalVelocity,
+                  3,
+                  0);
             A.Add(1, 1, 3);
 
 
-            A.PrintToConsole();                //We should have an array that looks like this:
+            A.PrintToConsole(); //We should have an array that looks like this:
 
             /*             i --------------->
              *       j  [ Yb / u0 , Yp / u0 , -(1 - Yr/ u0) ,  g Cos(θ0) / u0 ]
@@ -149,7 +161,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             return lines;
         }
 
-        public static GraphData RunTransientSimLongitudinal(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
+        public static GraphData RunTransientSimLongitudinal(
+            StabilityDerivOutput vehicleData,
+            double endTime,
+            double initDt,
+            double[] InitCond
+        )
         {
             var A = new SimMatrix(4, 4);
             var B = new SimMatrix(1, 4);
@@ -178,18 +195,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 else
                     B.Add(f, 0, j);
                 if (j < 2)
+                {
                     j++;
+                }
                 else
                 {
                     j = 0;
                     i++;
                 }
             }
+
             A.Add(-InstantConditionSim.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude), 3, 1);
             A.Add(1, 2, 3);
 
 
-            A.PrintToConsole();                //We should have an array that looks like this:
+            A.PrintToConsole(); //We should have an array that looks like this:
 
             /*             i --------------->
              *       j  [ Z w , Z u , Z q  + u,  0 ]

@@ -89,23 +89,33 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             GUILayout.BeginVertical(FlightGUI.boxStyle);
             TintForCl = GUILayout.Toggle(TintForCl, Localizer.Format("FARFlightAeroVizTintCl"));
-            FullySaturatedCl = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatWing"), 125, FullySaturatedCl);
-            FullySaturatedClBody = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatBody"), 125, FullySaturatedClBody);
+            FullySaturatedCl =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatWing"), 125, FullySaturatedCl);
+            FullySaturatedClBody =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatBody"),
+                                            125,
+                                            FullySaturatedClBody);
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(FlightGUI.boxStyle);
             TintForCd = GUILayout.Toggle(TintForCd, Localizer.Format("FARFlightAeroVizTintCd"));
-            FullySaturatedCd = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatWing"), 125, FullySaturatedCd);
-            FullySaturatedCdBody = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatBody"), 125, FullySaturatedCdBody);
+            FullySaturatedCd =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatWing"), 125, FullySaturatedCd);
+            FullySaturatedCdBody =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatBody"),
+                                            125,
+                                            FullySaturatedCdBody);
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(FlightGUI.boxStyle);
             TintForStall = GUILayout.Toggle(TintForStall, Localizer.Format("FARFlightAeroVizTintStall"));
-            FullySaturatedStall = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintStallSat"), 125, FullySaturatedStall);
+            FullySaturatedStall =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintStallSat"), 125, FullySaturatedStall);
             GUILayout.EndVertical();
 
             // Allowing toggling arrows here because why not...
-            PhysicsGlobals.AeroForceDisplay = GUILayout.Toggle(PhysicsGlobals.AeroForceDisplay, Localizer.Format("FARFlightAeroVizToggleArrows"));
+            PhysicsGlobals.AeroForceDisplay =
+                GUILayout.Toggle(PhysicsGlobals.AeroForceDisplay, Localizer.Format("FARFlightAeroVizToggleArrows"));
         }
 
         public void SaveSettings()
@@ -116,6 +126,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 FARLogger.Error("Could not save Aero Visualization Settings because settings config list was null");
                 return;
             }
+
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "AeroVizSettings");
 
             if (node == null)
@@ -123,6 +134,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 node = new ConfigNode("AeroVizSettings");
                 flightGUISettings.Add(node);
             }
+
             node.ClearData();
 
             node.AddValue("fullySaturatedCl", FullySaturatedCl);

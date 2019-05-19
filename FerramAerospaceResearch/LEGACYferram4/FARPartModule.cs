@@ -57,7 +57,15 @@ namespace ferram4
         public List<Part> VesselPartList;
         private Collider[] partColliders;
 
-        public Collider[] PartColliders { get { if(partColliders == null) TriggerPartColliderUpdate(); return partColliders; } }
+        public Collider[] PartColliders
+        {
+            get
+            {
+                if (partColliders == null)
+                    TriggerPartColliderUpdate();
+                return partColliders;
+            }
+        }
 
         public void ForceOnVesselPartsChange()
         {
@@ -103,10 +111,13 @@ namespace ferram4
             }
             catch (NullReferenceException)
             {
-                FARLogger.Info("NullReferenceException trying to get part colliders from " + part + ", defaulting to no colliders");
+                FARLogger.Info("NullReferenceException trying to get part colliders from " +
+                               part +
+                               ", defaulting to no colliders");
                 partColliders = new Collider[0];
             }
         }
+
         protected void UpdateShipPartsList()
         {
             VesselPartList = GetShipPartList();
@@ -116,9 +127,13 @@ namespace ferram4
         {
             List<Part> list;
             if (HighLogic.LoadedSceneIsEditor)
+            {
                 list = FARAeroUtil.AllEditorParts;
+            }
             else if (vessel)
+            {
                 list = vessel.parts;
+            }
             else
             {
                 list = new List<Part>();
@@ -134,7 +149,7 @@ namespace ferram4
             base.OnLoad(node);
             if (!HighLogic.LoadedSceneIsFlight && !HighLogic.LoadedSceneIsEditor)
                 return;
-            if(!(part is CompoundPart))
+            if (!(part is CompoundPart))
                 TriggerPartColliderUpdate();
         }
 

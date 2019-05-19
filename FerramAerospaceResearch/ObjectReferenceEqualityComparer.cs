@@ -3,8 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace FerramAerospaceResearch
 {
-    public class ObjectReferenceEqualityComparer<T> : EqualityComparer<T>
-    where T : class
+    public class ObjectReferenceEqualityComparer<T> : EqualityComparer<T> where T : class
     {
         private static IEqualityComparer<T> _defaultComparer;
 

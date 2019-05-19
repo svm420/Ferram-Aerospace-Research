@@ -78,17 +78,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
             public Vector3 centroidPartSpace;
             public Vector3 xRefVectorPartSpace;
             public Vector3 nRefVectorPartSpace;
-            public float dragFactor;    //sum of these should add up to 1
+            public float dragFactor; //sum of these should add up to 1
         }
 
         public static FARAeroSection CreateNewAeroSection()
         {
             var section = new FARAeroSection
             {
-                xForcePressureAoA0   = new FARFloatCurve(6),
+                xForcePressureAoA0 = new FARFloatCurve(6),
                 xForcePressureAoA180 = new FARFloatCurve(6),
-                xForceSkinFriction   = new FARFloatCurve(3),
-                partData             = new List<PartData>(),
+                xForceSkinFriction = new FARFloatCurve(3),
+                partData = new List<PartData>(),
                 handledAeroModulesIndexDict =
                     new Dictionary<FARAeroPartModule, int>(ObjectReferenceEqualityComparer<FARAeroPartModule>.Default)
             };
@@ -99,16 +99,31 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return section;
         }
 
-        private FARAeroSection() { }
+        private FARAeroSection()
+        {
+        }
 
         // ReSharper disable ParameterHidesMember -> updating member values
-        public void UpdateAeroSection(float potentialFlowNormalForce, float viscCrossflowDrag, float diameter, float flatnessRatio, float hypersonicMomentForward, float hypersonicMomentBackward,
-                                      Vector3 centroidWorldSpace, Vector3 xRefVectorWorldSpace, Vector3 nRefVectorWorldSpace, Matrix4x4 vesselToWorldMatrix, Vector3 vehicleMainAxis, List<FARAeroPartModule> moduleList,
-            List<float> dragFactor, Dictionary<Part, PartTransformInfo> partWorldToLocalMatrixDict)
+        public void UpdateAeroSection(
+            float potentialFlowNormalForce,
+            float viscCrossflowDrag,
+            float diameter,
+            float flatnessRatio,
+            float hypersonicMomentForward,
+            float hypersonicMomentBackward,
+            Vector3 centroidWorldSpace,
+            Vector3 xRefVectorWorldSpace,
+            Vector3 nRefVectorWorldSpace,
+            Matrix4x4 vesselToWorldMatrix,
+            Vector3 vehicleMainAxis,
+            List<FARAeroPartModule> moduleList,
+            List<float> dragFactor,
+            Dictionary<Part, PartTransformInfo> partWorldToLocalMatrixDict
+        )
         {
             mergeFactor = 0;
 
-            this.potentialFlowNormalForce = potentialFlowNormalForce;                   //copy lifting body info over
+            this.potentialFlowNormalForce = potentialFlowNormalForce; //copy lifting body info over
             this.viscCrossflowDrag = viscCrossflowDrag;
             this.flatnessRatio = flatnessRatio;
             invFlatnessRatio = 1 / flatnessRatio;
@@ -134,7 +149,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (!partWorldToLocalMatrixDict.ContainsKey(p))
                     continue;
                 worldSpaceAvgPos += partWorldToLocalMatrixDict[p].worldPosition * dragFactor[i];
-                totalDragFactor  += dragFactor[i];
+                totalDragFactor += dragFactor[i];
             }
 
             worldSpaceAvgPos /= totalDragFactor;
@@ -148,7 +163,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 var data = new PartData {aeroModule = moduleList[i]};
                 Matrix4x4 transformMatrix = partWorldToLocalMatrixDict[data.aeroModule.part].worldToLocalMatrix;
 
-                Vector3 forceCenterWorldSpace = centroidLocationAlongxRef + Vector3.ProjectOnPlane(partWorldToLocalMatrixDict[data.aeroModule.part].worldPosition, worldVehicleAxis) + avgPosDiffFromCentroid;
+                Vector3 forceCenterWorldSpace = centroidLocationAlongxRef +
+                                                Vector3.ProjectOnPlane(partWorldToLocalMatrixDict[data.aeroModule.part]
+                                                                           .worldPosition,
+                                                                       worldVehicleAxis) +
+                                                avgPosDiffFromCentroid;
 
                 data.centroidPartSpace = transformMatrix.MultiplyPoint3x4(forceCenterWorldSpace);
                 data.xRefVectorPartSpace = transformMatrix.MultiplyVector(xRefVectorWorldSpace);
@@ -174,16 +193,16 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public bool CanMerge(FARAeroSection otherSection)
         {
             if (mergeFactor >= 10)
-                return false;       //only merge up to 10 sections
+                return false; //only merge up to 10 sections
 
             float flatnessRelDiff = flatnessRatio - otherSection.flatnessRatio;
             flatnessRelDiff *= invFlatnessRatio;
 
-            if (flatnessRelDiff < 0.05)  //allow for 5% rel difference for merging
-                if (flatnessRatio >= 1.05)  //if it's within 5% of 1, it's good
+            if (flatnessRelDiff < 0.05)    //allow for 5% rel difference for merging
+                if (flatnessRatio >= 1.05) //if it's within 5% of 1, it's good
                     //allow 5 degrees error for flatnessRatio
                     if (Math.Abs(Vector3.Dot(worldNormalVector, otherSection.worldNormalVector)) <= 0.999)
-                        return false;         //too different in out-of-roundness, don't merge
+                        return false; //too different in out-of-roundness, don't merge
 
             float diameterRelDiff = diameter - otherSection.diameter;
             diameterRelDiff /= diameter;
@@ -217,7 +236,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             for (int i = 0; i < partData.Count; ++i)
             {
                 PartData oldData = partData[i];
-                oldData.dragFactor *= mergeFactor;      //scale all of these up for the incoming data
+                oldData.dragFactor *= mergeFactor; //scale all of these up for the incoming data
                 oldData.centroidPartSpace *= mergeFactor;
                 oldData.xRefVectorPartSpace *= mergeFactor;
                 oldData.nRefVectorPartSpace *= mergeFactor;
@@ -232,7 +251,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (handledAeroModulesIndexDict.TryGetValue(tmpOtherData.aeroModule, out int index))
                 {
                     PartData tmpData = partData[index];
-                    tmpData.centroidPartSpace += tmpOtherData.centroidPartSpace;         //prep'd for averaging
+                    tmpData.centroidPartSpace += tmpOtherData.centroidPartSpace; //prep'd for averaging
                     tmpData.xRefVectorPartSpace += tmpOtherData.xRefVectorPartSpace;
                     tmpData.nRefVectorPartSpace += tmpOtherData.nRefVectorPartSpace;
                     tmpData.dragFactor += tmpOtherData.dragFactor;
@@ -252,13 +271,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
             for (int i = 0; i < partData.Count; ++i)
             {
                 PartData newData = partData[i];
-                newData.dragFactor *= invMergeFactorP1;      //now scale everything back down to sane levels
+                newData.dragFactor *= invMergeFactorP1; //now scale everything back down to sane levels
                 newData.centroidPartSpace *= invMergeFactorP1;
                 newData.xRefVectorPartSpace.Normalize();
                 newData.nRefVectorPartSpace.Normalize();
                 partData[i] = newData;
             }
-
         }
 
         public void ClearAeroSection()
@@ -270,12 +288,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
         internal interface IForceContext
         {
             /// <summary>
-            /// The part-relative velocity of the part whose force is being computed
+            ///     The part-relative velocity of the part whose force is being computed
             /// </summary>
             /// <param name="pd">The part data for which to compute the local velocity</param>
             Vector3 LocalVelocity(PartData pd);
+
             /// <summary>
-            /// Apply a calculated force to a part.
+            ///     Apply a calculated force to a part.
             /// </summary>
             /// <param name="pd">The part data of the part that the force should be applied to</param>
             /// <param name="localVel">The local velocity of the part</param>
@@ -285,8 +304,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
 
         private void CalculateAeroForces(
-            float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag,
-            IForceContext forceContext)
+            float machNumber,
+            float reynoldsPerUnitLength,
+            float pseudoKnudsenNumber,
+            float skinFrictionDrag,
+            IForceContext forceContext
+        )
         {
             //this will be the same for each part, so why recalc it multiple times?
             double skinFrictionForce = skinFrictionDrag * xForceSkinFriction.Evaluate(machNumber);
@@ -297,9 +320,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 FARAeroPartModule aeroModule = data.aeroModule;
                 if (aeroModule is null)
-                {
                     continue;
-                }
 
                 Vector3 xRefVector = data.xRefVectorPartSpace;
                 Vector3 nRefVector = data.nRefVectorPartSpace;
@@ -307,9 +328,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 velLocal = forceContext.LocalVelocity(data);
                 // Rejects both negligible speed and invalid simulation cases
                 if (velLocal.sqrMagnitude.NearlyEqual(0.0f))
-                {
                     continue;
-                }
 
                 Vector3 angVelLocal = aeroModule.partLocalAngVel;
 
@@ -319,11 +338,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 localNormalForceVec = Vector3.ProjectOnPlane(-velLocalNorm, xRefVector).normalized;
 
-                double cosAoA     = Vector3.Dot(xRefVector, velLocalNorm);
-                double cosSqrAoA  = cosAoA * cosAoA;
-                double sinSqrAoA  = Math.Max(1 - cosSqrAoA, 0);
-                double sinAoA     = Math.Sqrt(sinSqrAoA);
-                double sin2AoA    = 2 * sinAoA * Math.Abs(cosAoA);
+                double cosAoA = Vector3.Dot(xRefVector, velLocalNorm);
+                double cosSqrAoA = cosAoA * cosAoA;
+                double sinSqrAoA = Math.Max(1 - cosSqrAoA, 0);
+                double sinAoA = Math.Sqrt(sinSqrAoA);
+                double sin2AoA = 2 * sinAoA * Math.Abs(cosAoA);
                 double cosHalfAoA = Math.Sqrt(0.5 + 0.5 * Math.Abs(cosAoA));
 
 
@@ -348,13 +367,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 nForce *= normalForceFactor;
 
-                double xForce        = -skinFrictionForce * Math.Sign(cosAoA) * cosSqrAoA;
+                double xForce = -skinFrictionForce * Math.Sign(cosAoA) * cosSqrAoA;
                 double localVelForce = xForce * pseudoKnudsenNumber;
                 xForce -= localVelForce;
 
                 localVelForce = Math.Abs(localVelForce);
 
-                float moment        = (float)(cosAoA * sinAoA);
+                float moment = (float)(cosAoA * sinAoA);
                 float dampingMoment = 4f * moment;
 
                 if (cosAoA > 0)
@@ -362,16 +381,20 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     xForce += cosSqrAoA * xForceAoA0;
                     float momentFactor;
                     if (machNumber > 6)
+                    {
                         momentFactor = hypersonicMomentForward;
+                    }
                     else if (machNumber < 0.6)
+                    {
                         momentFactor = 0.6f * hypersonicMomentBackward;
+                    }
                     else
                     {
                         float tmp = -0.185185185f * machNumber + 1.11111111111f;
                         momentFactor = tmp * hypersonicMomentBackward * 0.6f + (1 - tmp) * hypersonicMomentForward;
                     }
 
-                    moment        *= momentFactor;
+                    moment *= momentFactor;
                     dampingMoment *= momentFactor;
                 }
                 else
@@ -380,20 +403,25 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     //negative to deal with the ref vector facing the opposite direction, causing the moment vector to point in the opposite direction
                     float momentFactor;
                     if (machNumber > 6)
+                    {
                         momentFactor = hypersonicMomentBackward;
+                    }
                     else if (machNumber < 0.6)
+                    {
                         momentFactor = 0.6f * hypersonicMomentForward;
+                    }
                     else
                     {
                         float tmp = -0.185185185f * machNumber + 1.11111111111f;
                         momentFactor = tmp * hypersonicMomentForward * 0.6f + (1 - tmp) * hypersonicMomentBackward;
                     }
 
-                    moment        *= momentFactor;
+                    moment *= momentFactor;
                     dampingMoment *= momentFactor;
                 }
-                moment        /= normalForceFactor;
-                dampingMoment =  Math.Abs(dampingMoment) * 0.1f;
+
+                moment /= normalForceFactor;
+                dampingMoment = Math.Abs(dampingMoment) * 0.1f;
                 //skin friction force times avg moment arm for vehicle
                 float rollDampingMoment = (float)(skinFrictionForce * 0.5 * diameter);
                 //this is just an approximation for now
@@ -404,33 +432,57 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 Vector3 torqueVector = Vector3.Cross(xRefVector, localNormalForceVec) * moment;
 
-                Vector3 axialAngLocalVel    = Vector3.Dot(xRefVector, angVelLocal) * xRefVector;
+                Vector3 axialAngLocalVel = Vector3.Dot(xRefVector, angVelLocal) * xRefVector;
                 Vector3 nonAxialAngLocalVel = angVelLocal - axialAngLocalVel;
 
                 if (velLocal.sqrMagnitude > 0.001f)
-                    torqueVector -= dampingMoment * nonAxialAngLocalVel + rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / velLocal.sqrMagnitude;
+                    torqueVector -= dampingMoment * nonAxialAngLocalVel +
+                                    rollDampingMoment *
+                                    axialAngLocalVel *
+                                    axialAngLocalVel.magnitude /
+                                    velLocal.sqrMagnitude;
                 else
-                    torqueVector -= dampingMoment * nonAxialAngLocalVel + rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / 0.001f;
+                    torqueVector -= dampingMoment * nonAxialAngLocalVel +
+                                    rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / 0.001f;
 
-                forceVector  *= data.dragFactor;
+                forceVector *= data.dragFactor;
                 torqueVector *= data.dragFactor;
 
                 forceContext.ApplyForce(data, velLocal, forceVector, torqueVector);
             }
         }
 
-        private readonly SimulatedForceContext simContext = new SimulatedForceContext(Vector3.zero, new FARCenterQuery(), 0.0f);
-        public void PredictionCalculateAeroForces(float atmDensity, float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag, Vector3 vel, FARCenterQuery center)
+        private readonly SimulatedForceContext simContext =
+            new SimulatedForceContext(Vector3.zero, new FARCenterQuery(), 0.0f);
+
+        public void PredictionCalculateAeroForces(
+            float atmDensity,
+            float machNumber,
+            float reynoldsPerUnitLength,
+            float pseudoKnudsenNumber,
+            float skinFrictionDrag,
+            Vector3 vel,
+            FARCenterQuery center
+        )
         {
             simContext.UpdateSimulationContext(vel, center, atmDensity);
             CalculateAeroForces(machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, simContext);
         }
 
         private readonly FlightForceContext flightContext = new FlightForceContext();
-        public void FlightCalculateAeroForces(float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag)
-        {
-            CalculateAeroForces(machNumber, reynoldsPerUnitLength, pseudoKnudsenNumber, skinFrictionDrag, flightContext);
 
+        public void FlightCalculateAeroForces(
+            float machNumber,
+            float reynoldsPerUnitLength,
+            float pseudoKnudsenNumber,
+            float skinFrictionDrag
+        )
+        {
+            CalculateAeroForces(machNumber,
+                                reynoldsPerUnitLength,
+                                pseudoKnudsenNumber,
+                                skinFrictionDrag,
+                                flightContext);
         }
 
         public static void GenerateCrossFlowDragCurve()

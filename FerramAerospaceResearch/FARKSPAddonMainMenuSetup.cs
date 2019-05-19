@@ -49,7 +49,7 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     internal class FARKSPAddonMainMenuSetup : MonoBehaviour
     {
-	    private void Start()
+        private void Start()
         {
             FARSettingsScenarioModule.MainMenuBuildDefaultScenarioModule();
             enabled = false;

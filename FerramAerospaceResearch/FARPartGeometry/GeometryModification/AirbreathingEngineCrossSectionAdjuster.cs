@@ -60,6 +60,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         public ModuleEngines EngineModule { get; }
 
         private readonly Part part;
+
         public Part GetPart()
         {
             return part;
@@ -90,7 +91,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             exitArea *= exitArea;
             exitArea *= Math.PI;
 
-            exitArea *= -1;     //make this negative to note that it is a removal of area
+            exitArea *= -1; //make this negative to note that it is a removal of area
         }
 
         public double AreaRemovedFromCrossSection(Vector3 vehicleAxis)
@@ -116,7 +117,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             sign = direction;
         }
 
-        public int GetForwardBackwardNoFlowSign() { return sign; }
+        public int GetForwardBackwardNoFlowSign()
+        {
+            return sign;
+        }
 
         public void TransformBasis(Matrix4x4 matrix)
         {
@@ -135,6 +139,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             meshLocalToWorld = EngineModule.thrustTransforms[0].localToWorldMatrix;
         }
 
-        public void UpdateArea() { }
+        public void UpdateArea()
+        {
+        }
     }
 }

@@ -54,7 +54,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public DebugVisualVoxel(Vector3 pos, double elementScale)
         {
-            Scale = (float) elementScale;
+            Scale = (float)elementScale;
             Position = pos;
         }
 
@@ -121,6 +121,5 @@ namespace FerramAerospaceResearch.FARPartGeometry
             triangles.Add(counter + 2);
             triangles.Add(counter + 3);
         }
-
     }
 }

@@ -96,7 +96,12 @@ namespace ferram4
 
         public double ClInterferenceFactor { get; private set; } = 1;
 
-        public FARWingInteraction(FARWingAerodynamicModel parentModule, Part parentPart, Vector3 rootChordMid, short srfAttachNegative)
+        public FARWingInteraction(
+            FARWingAerodynamicModel parentModule,
+            Part parentPart,
+            Vector3 rootChordMid,
+            short srfAttachNegative
+        )
         {
             parentWingModule = parentModule;
             parentWingPart = parentPart;
@@ -119,6 +124,7 @@ namespace ferram4
 
                     wingCamberFactor.Add((float)i, (float)tmp);
                 }
+
                 wingCamberFactor.Add(1, 1);
             }
 
@@ -139,14 +145,17 @@ namespace ferram4
 
         public void Destroy()
         {
-            nearbyWingModulesForwardList = nearbyWingModulesBackwardList = nearbyWingModulesLeftwardList = nearbyWingModulesRightwardList = null;
-            nearbyWingModulesForwardInfluence = nearbyWingModulesBackwardInfluence = nearbyWingModulesLeftwardInfluence = nearbyWingModulesRightwardInfluence = null;
+            nearbyWingModulesForwardList = nearbyWingModulesBackwardList =
+                                               nearbyWingModulesLeftwardList = nearbyWingModulesRightwardList = null;
+            nearbyWingModulesForwardInfluence = nearbyWingModulesBackwardInfluence =
+                                                    nearbyWingModulesLeftwardInfluence =
+                                                        nearbyWingModulesRightwardInfluence = null;
             parentWingModule = null;
             parentWingPart = null;
         }
 
         /// <summary>
-        /// Called when plane is stopped to get rid of old wing interaction data
+        ///     Called when plane is stopped to get rid of old wing interaction data
         /// </summary>
         public void ResetWingInteractions()
         {
@@ -160,10 +169,13 @@ namespace ferram4
         }
 
         /// <summary>
-        /// Recalculates all nearby wings; call when vessel has changed shape
+        ///     Recalculates all nearby wings; call when vessel has changed shape
         /// </summary>
         /// <param name="VesselPartList">A list of all parts on this vessel</param>
-        /// <param name="isSmallSrf">If a part should be considered a small attachable surface, like an aileron, elevator, etc; used to calculate nearby wings properly</param>
+        /// <param name="isSmallSrf">
+        ///     If a part should be considered a small attachable surface, like an aileron, elevator, etc;
+        ///     used to calculate nearby wings properly
+        /// </param>
         public void UpdateWingInteraction(List<Part> VesselPartList, bool isSmallSrf)
         {
             float flt_MAC = (float)parentWingModule.MAC_actual;
@@ -179,7 +191,8 @@ namespace ferram4
             if (parentWingPart == null)
                 return;
 
-            rootChordMidPt = parentWingPart.partTransform.position + parentWingPart.partTransform.TransformDirection(rootChordMidLocal);
+            rootChordMidPt = parentWingPart.partTransform.position +
+                             parentWingPart.partTransform.TransformDirection(rootChordMidLocal);
 
             Vector3 up = parentWingPart.partTransform.up;
             Vector3 right = parentWingPart.partTransform.right;
@@ -187,27 +200,60 @@ namespace ferram4
             {
                 forwardExposure = ExposureSmallSrf(out nearbyWingModulesForward, up, VesselPartList, flt_MAC, flt_MAC);
 
-                backwardExposure = ExposureSmallSrf(out nearbyWingModulesBackward, -up, VesselPartList, flt_MAC, flt_MAC);
+                backwardExposure =
+                    ExposureSmallSrf(out nearbyWingModulesBackward, -up, VesselPartList, flt_MAC, flt_MAC);
 
-                leftwardExposure = ExposureSmallSrf(out nearbyWingModulesLeftward, -right, VesselPartList, flt_b_2, flt_MAC);
+                leftwardExposure =
+                    ExposureSmallSrf(out nearbyWingModulesLeftward, -right, VesselPartList, flt_b_2, flt_MAC);
 
-                rightwardExposure = ExposureSmallSrf(out nearbyWingModulesRightward, right, VesselPartList, flt_b_2, flt_MAC);
+                rightwardExposure =
+                    ExposureSmallSrf(out nearbyWingModulesRightward, right, VesselPartList, flt_b_2, flt_MAC);
             }
             else
             {
-                forwardExposure = ExposureInChordDirection(out nearbyWingModulesForward, up, VesselPartList, flt_b_2, flt_MAC, flt_MidChordSweep);
+                forwardExposure = ExposureInChordDirection(out nearbyWingModulesForward,
+                                                           up,
+                                                           VesselPartList,
+                                                           flt_b_2,
+                                                           flt_MAC,
+                                                           flt_MidChordSweep);
 
-                backwardExposure = ExposureInChordDirection(out nearbyWingModulesBackward, -up, VesselPartList, flt_b_2, flt_MAC, flt_MidChordSweep);
+                backwardExposure = ExposureInChordDirection(out nearbyWingModulesBackward,
+                                                            -up,
+                                                            VesselPartList,
+                                                            flt_b_2,
+                                                            flt_MAC,
+                                                            flt_MidChordSweep);
 
-                leftwardExposure = ExposureInSpanDirection(out nearbyWingModulesLeftward, -right, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
+                leftwardExposure = ExposureInSpanDirection(out nearbyWingModulesLeftward,
+                                                           -right,
+                                                           VesselPartList,
+                                                           flt_b_2,
+                                                           flt_MAC,
+                                                           flt_TaperRatio,
+                                                           flt_MidChordSweep);
 
-                rightwardExposure = ExposureInSpanDirection(out nearbyWingModulesRightward, right, VesselPartList, flt_b_2, flt_MAC, flt_TaperRatio, flt_MidChordSweep);
+                rightwardExposure = ExposureInSpanDirection(out nearbyWingModulesRightward,
+                                                            right,
+                                                            VesselPartList,
+                                                            flt_b_2,
+                                                            flt_MAC,
+                                                            flt_TaperRatio,
+                                                            flt_MidChordSweep);
             }
 
-            CompressArrayToList(nearbyWingModulesForward, ref nearbyWingModulesForwardList, ref nearbyWingModulesForwardInfluence);
-            CompressArrayToList(nearbyWingModulesBackward, ref nearbyWingModulesBackwardList, ref nearbyWingModulesBackwardInfluence);
-            CompressArrayToList(nearbyWingModulesLeftward, ref nearbyWingModulesLeftwardList, ref nearbyWingModulesLeftwardInfluence);
-            CompressArrayToList(nearbyWingModulesRightward, ref nearbyWingModulesRightwardList, ref nearbyWingModulesRightwardInfluence);
+            CompressArrayToList(nearbyWingModulesForward,
+                                ref nearbyWingModulesForwardList,
+                                ref nearbyWingModulesForwardInfluence);
+            CompressArrayToList(nearbyWingModulesBackward,
+                                ref nearbyWingModulesBackwardList,
+                                ref nearbyWingModulesBackwardInfluence);
+            CompressArrayToList(nearbyWingModulesLeftward,
+                                ref nearbyWingModulesLeftwardList,
+                                ref nearbyWingModulesLeftwardInfluence);
+            CompressArrayToList(nearbyWingModulesRightward,
+                                ref nearbyWingModulesRightwardList,
+                                ref nearbyWingModulesRightwardInfluence);
 
             //This part handles effects of biplanes, triplanes, etc.
             double ClCdInterference = 0;
@@ -220,7 +266,9 @@ namespace ferram4
 
         //This updates the interactions of all wings near this one; call this one when something changes rather than all of them at once
         // ReSharper disable once UnusedMember.Global
-        public HashSet<FARWingAerodynamicModel> UpdateNearbyWingInteractions(HashSet<FARWingAerodynamicModel> wingsHandled)
+        public HashSet<FARWingAerodynamicModel> UpdateNearbyWingInteractions(
+            HashSet<FARWingAerodynamicModel> wingsHandled
+        )
         {
             //Hashset to avoid repeating the same one affected
 
@@ -231,6 +279,7 @@ namespace ferram4
                 w.UpdateThisWingInteractions();
                 wingsHandled.Add(w);
             }
+
             foreach (FARWingAerodynamicModel w in nearbyWingModulesBackwardList)
             {
                 if (wingsHandled.Contains(w))
@@ -238,6 +287,7 @@ namespace ferram4
                 w.UpdateThisWingInteractions();
                 wingsHandled.Add(w);
             }
+
             foreach (FARWingAerodynamicModel w in nearbyWingModulesRightwardList)
             {
                 if (wingsHandled.Contains(w))
@@ -245,6 +295,7 @@ namespace ferram4
                 w.UpdateThisWingInteractions();
                 wingsHandled.Add(w);
             }
+
             foreach (FARWingAerodynamicModel w in nearbyWingModulesLeftwardList)
             {
                 if (wingsHandled.Contains(w))
@@ -252,10 +303,15 @@ namespace ferram4
                 w.UpdateThisWingInteractions();
                 wingsHandled.Add(w);
             }
+
             return wingsHandled;
         }
 
-        private void CompressArrayToList(FARWingAerodynamicModel[] arrayIn, ref List<FARWingAerodynamicModel> moduleList, ref List<double> associatedInfluences)
+        private void CompressArrayToList(
+            FARWingAerodynamicModel[] arrayIn,
+            ref List<FARWingAerodynamicModel> moduleList,
+            ref List<double> associatedInfluences
+        )
         {
             moduleList.Clear();
             associatedInfluences.Clear();
@@ -264,16 +320,19 @@ namespace ferram4
             Vector3 forward = parentWingPart.partTransform.forward;
             foreach (FARWingAerodynamicModel w in arrayIn)
             {
-                if (w is null) continue;
+                if (w is null)
+                    continue;
                 bool foundModule = false;
                 double influence = influencePerIndex * Math.Abs(Vector3.Dot(forward, w.part.partTransform.forward));
                 for (int j = 0; j < moduleList.Count; j++)
                 {
-                    if (moduleList[j] != w) continue;
+                    if (moduleList[j] != w)
+                        continue;
                     associatedInfluences[j] += influence;
-                    foundModule             =  true;
+                    foundModule = true;
                     break;
                 }
+
                 if (foundModule)
                     continue;
 
@@ -288,7 +347,7 @@ namespace ferram4
 
             var ray = new Ray
             {
-                origin    = parentWingModule.WingCentroid(),
+                origin = parentWingModule.WingCentroid(),
                 direction = rayDirection
             };
 
@@ -321,26 +380,37 @@ namespace ferram4
                         foreach (Collider collider in colliders)
                             if (h.collider == collider && h.distance > 0)
                             {
-
                                 double tmp = h.distance / dist;
                                 tmp = tmp.Clamp(0, 1);
-                                double tmp2 = Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward, w.part.partTransform.forward));
-                                tmp               = 1 - (1 - tmp) * tmp2;
+                                double tmp2 =
+                                    Math.Abs(Vector3.Dot(parentWingPart.partTransform.forward,
+                                                         w.part.partTransform.forward));
+                                tmp = 1 - (1 - tmp) * tmp2;
                                 interferenceValue = Math.Min(tmp, interferenceValue);
-                                gotSomething      = true;
+                                gotSomething = true;
 
                                 break;
                             }
                     }
+
                     if (gotSomething)
                         break;
                 }
             }
+
             return interferenceValue;
         }
 
         #region StandardWingExposureDetection
-        private double ExposureInChordDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float MidChordSweep)
+
+        private double ExposureInChordDirection(
+            out FARWingAerodynamicModel[] nearbyWings,
+            Vector3 rayDirection,
+            List<Part> vesselPartList,
+            float b_2,
+            float MAC,
+            float MidChordSweep
+        )
         {
             var ray = new Ray {direction = rayDirection};
 
@@ -352,16 +422,29 @@ namespace ferram4
             for (int i = 0; i < 5; i++)
             {
                 //shift the raycast origin along the midchord line
-                ray.origin = rootChordMidPt + (float)(i * 0.2 + 0.1) * -b_2 * (partTransformRight * srfAttachFlipped + partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
+                ray.origin = rootChordMidPt +
+                             (float)(i * 0.2 + 0.1) *
+                             -b_2 *
+                             (partTransformRight * srfAttachFlipped +
+                              partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
 
                 RaycastHit[] hits = Physics.RaycastAll(ray, MAC, FARAeroUtil.RaycastMask);
 
                 nearbyWings[i] = ExposureHitDetectionAndWingDetection(hits, vesselPartList, ref exposure, 0.2);
             }
+
             return exposure;
         }
 
-        private double ExposureInSpanDirection(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float b_2, float MAC, float TaperRatio, float MidChordSweep)
+        private double ExposureInSpanDirection(
+            out FARWingAerodynamicModel[] nearbyWings,
+            Vector3 rayDirection,
+            List<Part> vesselPartList,
+            float b_2,
+            float MAC,
+            float TaperRatio,
+            float MidChordSweep
+        )
         {
             var ray = new Ray {direction = rayDirection};
 
@@ -374,9 +457,13 @@ namespace ferram4
             for (int i = 0; i < 5; i++)
             {
                 //shift the origin along the midchord line
-                ray.origin = rootChordMidPt + 0.5f * -b_2 * (partTransformRight * srfAttachFlipped + partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
+                ray.origin = rootChordMidPt +
+                             0.5f *
+                             -b_2 *
+                             (partTransformRight * srfAttachFlipped +
+                              partTransformUp * (float)Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
 
-                float chord_length = 2 * MAC / (1 + TaperRatio);    //first, calculate the root chord
+                float chord_length = 2 * MAC / (1 + TaperRatio); //first, calculate the root chord
 
                 //determine the chord length based on how far down the span it is
                 chord_length = chord_length * (1 - 0.5f) + TaperRatio * chord_length * 0.5f;
@@ -387,13 +474,21 @@ namespace ferram4
 
                 nearbyWings[i] = ExposureHitDetectionAndWingDetection(hits, vesselPartList, ref exposure, 0.2);
             }
+
             return exposure;
         }
+
         #endregion
 
         #region SmallSrfExposureDetection
 
-        private double ExposureSmallSrf(out FARWingAerodynamicModel[] nearbyWings, Vector3 rayDirection, List<Part> vesselPartList, float rayCastDist, float MAC)
+        private double ExposureSmallSrf(
+            out FARWingAerodynamicModel[] nearbyWings,
+            Vector3 rayDirection,
+            List<Part> vesselPartList,
+            float rayCastDist,
+            float MAC
+        )
         {
             var ray = new Ray {direction = rayDirection};
 
@@ -408,9 +503,15 @@ namespace ferram4
 
             return exposure;
         }
+
         #endregion
 
-        private FARWingAerodynamicModel ExposureHitDetectionAndWingDetection(RaycastHit[] hits, List<Part> vesselPartList, ref double exposure, double exposureDecreasePerHit)
+        private FARWingAerodynamicModel ExposureHitDetectionAndWingDetection(
+            RaycastHit[] hits,
+            List<Part> vesselPartList,
+            ref double exposure,
+            double exposureDecreasePerHit
+        )
         {
             bool firstHit = true;
             double wingInteractionFactor = 0;
@@ -442,7 +543,9 @@ namespace ferram4
                         }
                     }
                     else
-                        colliders = new[] { p.collider };
+                    {
+                        colliders = new[] {p.collider};
+                    }
 
                     // ReSharper disable once LoopCanBeConvertedToQuery -> closure
                     foreach (Collider collider in colliders)
@@ -451,19 +554,21 @@ namespace ferram4
                             if (firstHit)
                             {
                                 exposure -= exposureDecreasePerHit;
-                                firstHit =  false;
+                                firstHit = false;
                             }
 
                             var hitModule = p.GetComponent<FARWingAerodynamicModel>();
                             if (hitModule != null)
                             {
-                                double tmp = Math.Abs(Vector3.Dot(p.transform.forward, parentWingPart.partTransform.forward));
+                                double tmp =
+                                    Math.Abs(Vector3.Dot(p.transform.forward, parentWingPart.partTransform.forward));
                                 if (tmp > wingInteractionFactor + 0.01)
                                 {
                                     wingInteractionFactor = tmp;
-                                    wingHit               = hitModule;
+                                    wingHit = hitModule;
                                 }
                             }
+
                             gotSomething = true;
                             break;
                         }
@@ -472,6 +577,7 @@ namespace ferram4
                         break;
                 }
             }
+
             return wingHit;
         }
 
@@ -503,7 +609,6 @@ namespace ferram4
             {
                 if (nearbyWingModulesBackwardList.Count > 0)
                     return true;
-
             }
 
             if (wingRightwardDir > 0)
@@ -515,14 +620,15 @@ namespace ferram4
             {
                 if (nearbyWingModulesLeftwardList.Count > 0)
                     return true;
-
             }
+
             return false;
         }
 
 
         /// <summary>
-        /// Accounts for increments in lift due to camber changes from upstream wings, and returns changes for this wing part; returns true if there are wings in front of it
+        ///     Accounts for increments in lift due to camber changes from upstream wings, and returns changes for this wing part;
+        ///     returns true if there are wings in front of it
         /// </summary>
         /// <param name="thisWingAoA">AoA of this wing in rad</param>
         /// <param name="thisWingMachNumber">Mach Number of this wing in rad</param>
@@ -531,8 +637,14 @@ namespace ferram4
         /// <param name="ACshift">Value used to shift the wing AC due to interactive effects</param>
         /// <param name="ClIncrementFromRear">Increase in Cl due to this</param>
         /// <returns></returns>
-        public void CalculateEffectsOfUpstreamWing(double thisWingAoA, double thisWingMachNumber, Vector3d parallelInPlaneLocal,
-            ref double ACweight, ref double ACshift, ref double ClIncrementFromRear)
+        public void CalculateEffectsOfUpstreamWing(
+            double thisWingAoA,
+            double thisWingMachNumber,
+            Vector3d parallelInPlaneLocal,
+            ref double ACweight,
+            ref double ACshift,
+            ref double ClIncrementFromRear
+        )
         {
             double thisWingMAC = parentWingModule.GetMAC();
             double thisWingb_2 = parentWingModule.Getb_2();
@@ -555,35 +667,47 @@ namespace ferram4
             if (wingForwardDir > 0)
             {
                 wingForwardDir *= wingForwardDir;
-                UpdateUpstreamValuesFromWingModules(nearbyWingModulesForwardList, nearbyWingModulesForwardInfluence, wingForwardDir, thisWingAoA);
+                UpdateUpstreamValuesFromWingModules(nearbyWingModulesForwardList,
+                                                    nearbyWingModulesForwardInfluence,
+                                                    wingForwardDir,
+                                                    thisWingAoA);
             }
             else
             {
                 wingForwardDir *= wingForwardDir;
-                UpdateUpstreamValuesFromWingModules(nearbyWingModulesBackwardList, nearbyWingModulesBackwardInfluence, wingForwardDir, thisWingAoA);
+                UpdateUpstreamValuesFromWingModules(nearbyWingModulesBackwardList,
+                                                    nearbyWingModulesBackwardInfluence,
+                                                    wingForwardDir,
+                                                    thisWingAoA);
             }
 
             if (wingRightwardDir > 0)
             {
                 wingRightwardDir *= wingRightwardDir;
-                UpdateUpstreamValuesFromWingModules(nearbyWingModulesRightwardList, nearbyWingModulesRightwardInfluence, wingRightwardDir, thisWingAoA);
+                UpdateUpstreamValuesFromWingModules(nearbyWingModulesRightwardList,
+                                                    nearbyWingModulesRightwardInfluence,
+                                                    wingRightwardDir,
+                                                    thisWingAoA);
             }
             else
             {
                 wingRightwardDir *= wingRightwardDir;
-                UpdateUpstreamValuesFromWingModules(nearbyWingModulesLeftwardList, nearbyWingModulesLeftwardInfluence, wingRightwardDir, thisWingAoA);
+                UpdateUpstreamValuesFromWingModules(nearbyWingModulesLeftwardList,
+                                                    nearbyWingModulesLeftwardInfluence,
+                                                    wingRightwardDir,
+                                                    thisWingAoA);
             }
 
             double MachCoeff = (1 - thisWingMachNumber * thisWingMachNumber).Clamp(0, 1);
 
             if (MachCoeff.NearlyEqual(0))
                 return;
-            double flapRatio     = (thisWingMAC / (thisWingMAC + EffectiveUpstreamMAC)).Clamp(0, 1);
-            float  flt_flapRatio = (float)flapRatio;
+            double flapRatio = (thisWingMAC / (thisWingMAC + EffectiveUpstreamMAC)).Clamp(0, 1);
+            float flt_flapRatio = (float)flapRatio;
             //Flap Effectiveness Factor
-            double flapFactor    = wingCamberFactor.Evaluate(flt_flapRatio);
+            double flapFactor = wingCamberFactor.Evaluate(flt_flapRatio);
             //Change in moment due to change in lift from flap
-            double dCm_dCl       = wingCamberMoment.Evaluate(flt_flapRatio);
+            double dCm_dCl = wingCamberMoment.Evaluate(flt_flapRatio);
 
             //This accounts for the wing possibly having a longer span than the flap
             double WingFraction = (thisWingb_2 / EffectiveUpstreamb_2).Clamp(0, 1);
@@ -593,7 +717,8 @@ namespace ferram4
             //Lift created by the flap interaction
             double ClIncrement = flapFactor * EffectiveUpstreamLiftSlope * EffectiveUpstreamAoA;
             //Increase the Cl so that even though we're working with the flap's area, it accounts for the added lift across the entire object
-            ClIncrement *= (parentWingModule.S * FlapFraction + EffectiveUpstreamArea * WingFraction) / parentWingModule.S;
+            ClIncrement *= (parentWingModule.S * FlapFraction + EffectiveUpstreamArea * WingFraction) /
+                           parentWingModule.S;
 
             // Total flap Cl for the purpose of applying ACshift, including the bit subtracted below
             ACweight = ClIncrement * MachCoeff;
@@ -608,7 +733,7 @@ namespace ferram4
         }
 
         /// <summary>
-        /// Updates all FARWingInteraction orientation-based variables using the in-wing-plane velocity vector
+        ///     Updates all FARWingInteraction orientation-based variables using the in-wing-plane velocity vector
         /// </summary>
         /// <param name="parallelInPlaneLocal">Normalized local velocity vector projected onto wing surface</param>
         public void UpdateOrientationForInteraction(Vector3d parallelInPlaneLocal)
@@ -620,7 +745,12 @@ namespace ferram4
             HasWingsUpstream = DetermineWingsUpstream(wingForwardDir, wingRightwardDir);
         }
 
-        private void UpdateUpstreamValuesFromWingModules(List<FARWingAerodynamicModel> wingModules, List<double> associatedInfluences, double directionalInfluence, double thisWingAoA)
+        private void UpdateUpstreamValuesFromWingModules(
+            List<FARWingAerodynamicModel> wingModules,
+            List<double> associatedInfluences,
+            double directionalInfluence,
+            double thisWingAoA
+        )
         {
             directionalInfluence = Math.Abs(directionalInfluence);
             for (int i = 0; i < wingModules.Count; i++)
@@ -634,6 +764,7 @@ namespace ferram4
                     i--;
                     continue;
                 }
+
                 if (wingModule.isShielded)
                     continue;
 
@@ -658,7 +789,11 @@ namespace ferram4
             }
         }
 
-        private static void HandleNullPart(List<FARWingAerodynamicModel> wingModules, List<double> associatedInfluences, int index)
+        private static void HandleNullPart(
+            List<FARWingAerodynamicModel> wingModules,
+            List<double> associatedInfluences,
+            int index
+        )
         {
             wingModules.RemoveAt(index);
             associatedInfluences.RemoveAt(index);
@@ -667,14 +802,11 @@ namespace ferram4
             influenceSum = 1 / influenceSum;
 
             for (int j = 0; j < associatedInfluences.Count; j++)
-            {
                 associatedInfluences[j] *= influenceSum;
-            }
-
         }
 
         /// <summary>
-        /// Calculates effect of nearby wings on the effective aspect ratio multiplier of this wing
+        ///     Calculates effect of nearby wings on the effective aspect ratio multiplier of this wing
         /// </summary>
         /// <param name="wingForwardDir">Local velocity vector forward component</param>
         /// <param name="wingRightwardDir">Local velocity vector leftward component</param>

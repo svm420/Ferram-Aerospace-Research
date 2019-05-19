@@ -55,8 +55,10 @@ namespace ferram4
         // ReSharper disable NotAccessedField.Global
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCl")]
         public double Cl;
+
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCd")]
         public double Cd;
+
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCm")]
         public double Cm;
         // ReSharper restore NotAccessedField.Global
@@ -80,15 +82,16 @@ namespace ferram4
 
             if (part.partTransform == null && part == part.vessel.rootPart)
                 part_transform = vessel.vesselTransform;
-            if(HighLogic.LoadedSceneIsEditor)
+            if (HighLogic.LoadedSceneIsEditor)
                 part_transform = part.partTransform;
         }
 
         public Vector3d GetVelocity()
         {
             if (HighLogic.LoadedSceneIsFlight)
-                return part.Rigidbody.velocity + Krakensbane.GetFrameVelocityV3f()
-                    - FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
+                return part.Rigidbody.velocity +
+                       Krakensbane.GetFrameVelocityV3f() -
+                       FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
             return velocityEditor;
         }
 
@@ -105,7 +108,6 @@ namespace ferram4
             velocity -= FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
 
             return velocity;
-
         }
 
         protected virtual void ResetCenterOfLift()
@@ -113,7 +115,12 @@ namespace ferram4
             // Clear state when preparing CoL computation
         }
 
-        public virtual Vector3d PrecomputeCenterOfLift(Vector3d velocity, double MachNumber, double density, FARCenterQuery center)
+        public virtual Vector3d PrecomputeCenterOfLift(
+            Vector3d velocity,
+            double MachNumber,
+            double density,
+            FARCenterQuery center
+        )
         {
             return Vector3d.zero;
         }
@@ -130,7 +137,12 @@ namespace ferram4
             return parts;
         }
 
-        public static void PrecomputeGlobalCenterOfLift(FARCenterQuery lift, FARCenterQuery dummy, Vector3 vel, double density)
+        public static void PrecomputeGlobalCenterOfLift(
+            FARCenterQuery lift,
+            FARCenterQuery dummy,
+            Vector3 vel,
+            double density
+        )
         {
             /* Center of lift is the location where the derivative of
                the total torque provided by aerodynamic forces relative to
@@ -147,31 +159,23 @@ namespace ferram4
 
             // run computations twice to let things like flap interactions settle
             foreach (FARBaseAerodynamics ba in parts)
-            {
                 ba.PrecomputeCenterOfLift(vel, 0.5, density, dummy);
-            }
             foreach (FARBaseAerodynamics ba in parts)
-            {
                 ba.PrecomputeCenterOfLift(vel, 0.5, density, lift);
-            }
         }
 
         // TODO 1.2: provide actual implementation of these new methods
+
         #region ILiftProvider
+
         public bool DisableBodyLift
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
         }
 
         public bool IsLifting
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
@@ -184,6 +188,7 @@ namespace ferram4
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;
         }
+
         #endregion ILiftProvider
 
         public override void OnLoad(ConfigNode node)

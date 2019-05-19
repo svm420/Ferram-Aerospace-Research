@@ -54,6 +54,7 @@ namespace FerramAerospaceResearch.FARGUI
         private List<Color> colors;
 
         private static GUIColors _instance;
+
         public static GUIColors Instance
         {
             get { return _instance ?? (_instance = new GUIColors()); }
@@ -118,12 +119,13 @@ namespace FerramAerospaceResearch.FARGUI
 
             var saveNode = new ConfigNode();
             saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARGUIColors.cfg");
+            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
+                          "GameData/FerramAerospaceResearch/CustomFARGUIColors.cfg");
         }
 
         private static Color ReadColor(string input)
         {
-            char[] separators = { ',', ' ', ';' };
+            char[] separators = {',', ' ', ';'};
             string[] splitValues = input.Split(separators);
 
             int curIndex = 0;

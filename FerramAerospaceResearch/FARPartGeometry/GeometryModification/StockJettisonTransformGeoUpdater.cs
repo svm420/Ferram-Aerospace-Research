@@ -54,12 +54,12 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public StockJettisonTransformGeoUpdater(ModuleJettison engineFairing, GeometryPartModule geoModule)
         {
-                this.engineFairing = engineFairing;
-                this.geoModule = geoModule;
-                if (ObjectsNotNull())
-                    fairingVisible = engineFairing.jettisonTransform.gameObject.activeSelf && !engineFairing.isJettisoned;
-                else
-                    fairingVisible = false;
+            this.engineFairing = engineFairing;
+            this.geoModule = geoModule;
+            if (ObjectsNotNull())
+                fairingVisible = engineFairing.jettisonTransform.gameObject.activeSelf && !engineFairing.isJettisoned;
+            else
+                fairingVisible = false;
         }
 
         public void EditorGeometryUpdate()
@@ -92,6 +92,5 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             GameObject o = t.gameObject;
             return o != null;
         }
-
     }
 }

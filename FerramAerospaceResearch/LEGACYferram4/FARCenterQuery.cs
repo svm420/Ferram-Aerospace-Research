@@ -52,6 +52,7 @@ namespace ferram4
     {
         // Total force.
         public Vector3d force = Vector3d.zero;
+
         // Torque needed to compensate if force were applied at origin.
         public Vector3d torque = Vector3d.zero;
 
@@ -120,7 +121,8 @@ namespace ferram4
         public Vector3d GetMinTorquePos(Vector3d origin)
         {
             double fmag = force.sqrMagnitude;
-            if (fmag <= 0) return origin;
+            if (fmag <= 0)
+                return origin;
 
             return origin + Vector3d.Cross(force, TorqueAt(origin)) / fmag;
         }

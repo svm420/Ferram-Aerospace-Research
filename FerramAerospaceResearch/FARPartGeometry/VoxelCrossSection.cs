@@ -49,12 +49,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
     public struct VoxelCrossSection
     {
         public double area;
+
         public Vector3d centroid;
+
         //second derivative of area, used in calculating slender body wave drag
         public double secondAreaDeriv;
 
         //ratio of the longest distance to shortest distance of the cross-section.  Used in calculating body lift and drag
         public double flatnessRatio;
+
         //unit vector indicating the direction perpendicular to the longest distance on the cross-section
         public Vector3d flatNormalVector;
 

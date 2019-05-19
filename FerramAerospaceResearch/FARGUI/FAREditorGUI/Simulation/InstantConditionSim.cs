@@ -64,7 +64,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             get { return _currentAeroSections != null && _currentAeroModules != null && _wingAerodynamicModel != null; }
         }
 
-        public void UpdateAeroData(List<FARAeroPartModule> aeroModules, List<FARAeroSection> aeroSections, VehicleAerodynamics vehicleAero, List<FARWingAerodynamicModel> wingAerodynamicModel)
+        public void UpdateAeroData(
+            List<FARAeroPartModule> aeroModules,
+            List<FARAeroSection> aeroSections,
+            VehicleAerodynamics vehicleAero,
+            List<FARWingAerodynamicModel> wingAerodynamicModel
+        )
         {
             _currentAeroModules = aeroModules;
             _currentAeroSections = aeroSections;
@@ -83,7 +88,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             return accel;
         }
 
-        public void GetClCdCmSteady(InstantConditionSimInput input, out InstantConditionSimOutput output, bool clear, bool reset_stall = false)
+        public void GetClCdCmSteady(
+            InstantConditionSimInput input,
+            out InstantConditionSimOutput output,
+            bool clear,
+            bool reset_stall = false
+        )
         {
             output = new InstantConditionSimOutput();
 
@@ -115,9 +125,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     partMass += p.GetResourceMass();
 
                 // If you want to use GetModuleMass, you need to start from p.partInfo.mass, not p.mass
-                CoM  += partMass * (Vector3d)p.transform.TransformPoint(p.CoMOffset);
+                CoM += partMass * (Vector3d)p.transform.TransformPoint(p.CoMOffset);
                 mass += partMass;
             }
+
             CoM /= mass;
 
             // Rodhern: The original reference directions (velocity, liftVector, sideways) did not form an orthonormal
@@ -174,7 +185,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 Vector3d vel = velocity + Vector3d.Cross(angVel, relPos);
 
                 if (w is FARControllableSurface controllableSurface)
-                    controllableSurface.SetControlStateEditor(CoM, vel, (float)input.pitchValue, 0, 0, input.flaps, input.spoilers);
+                    controllableSurface.SetControlStateEditor(CoM,
+                                                              vel,
+                                                              (float)input.pitchValue,
+                                                              0,
+                                                              0,
+                                                              input.flaps,
+                                                              input.spoilers);
                 else if (w.isShielded)
                     continue;
 
@@ -186,20 +203,24 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
                 Vector3d moment = -Vector3d.Cross(relPos, force);
 
-                output.Cm     += Vector3d.Dot(moment, sideways);
-                output.Cn     += Vector3d.Dot(moment, liftDown);
+                output.Cm += Vector3d.Dot(moment, sideways);
+                output.Cn += Vector3d.Dot(moment, liftDown);
                 output.C_roll += Vector3d.Dot(moment, velocity);
 
                 area += w.S;
-                MAC  += w.GetMAC() * w.S;
-                b_2  += w.Getb_2() * w.S;
+                MAC += w.GetMAC() * w.S;
+                b_2 += w.Getb_2() * w.S;
             }
 
             var center = new FARCenterQuery();
             foreach (FARAeroSection aeroSection in _currentAeroSections)
-            {
-                aeroSection.PredictionCalculateAeroForces(2, (float)input.machNumber, 10000, 0, 0.005f, velocity.normalized, center);
-            }
+                aeroSection.PredictionCalculateAeroForces(2,
+                                                          (float)input.machNumber,
+                                                          10000,
+                                                          0,
+                                                          0.005f,
+                                                          velocity.normalized,
+                                                          center);
 
             Vector3d centerForce = center.force * 1000;
 
@@ -257,7 +278,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     continue;
 
                 if (w is FARControllableSurface controllableSurface)
-                    controllableSurface.SetControlStateEditor(CoM, Vector3.up, (float)pitch, 0, 0, flapSetting, spoilers);
+                    controllableSurface.SetControlStateEditor(CoM,
+                                                              Vector3.up,
+                                                              (float)pitch,
+                                                              0,
+                                                              0,
+                                                              flapSetting,
+                                                              spoilers);
             }
         }
 
@@ -267,6 +294,5 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             GetClCdCmSteady(iterationInput, out iterationOutput, true, true);
             return iterationOutput.Cl - neededCl;
         }
-
     }
 }

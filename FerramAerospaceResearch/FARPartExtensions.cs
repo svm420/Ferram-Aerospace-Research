@@ -89,12 +89,15 @@ namespace FerramAerospaceResearch
                         colliders = partColliders.ToArray();
                     }
                     else
+                    {
                         colliders = part.GetComponentsInChildren<Collider>();
+                    }
                 }
                 catch
-                {   //FIXME
+                {
+                    //FIXME
                     //Fail silently because it's the only way to avoid issues with pWings
-                    colliders = new[] { part.collider };
+                    colliders = new[] {part.collider};
                 }
 
                 return colliders;
@@ -106,7 +109,7 @@ namespace FerramAerospaceResearch
                 List<Transform> transforms = part.FindModelComponents<Transform>();
                 var bounds = new Bounds[transforms.Count];
                 Matrix4x4 partMatrix = part.partTransform.worldToLocalMatrix;
-                for(int i = 0; i < transforms.Count; i++)
+                for (int i = 0; i < transforms.Count; i++)
                 {
                     var newBounds = new Bounds();
                     Transform t = transforms[i];
@@ -122,30 +125,30 @@ namespace FerramAerospaceResearch
 
                     if (m.vertices.Length < excessiveVerts)
                         foreach (Vector3 vertex in m.vertices)
-                        {
                             newBounds.Encapsulate(matrix.MultiplyPoint(vertex));
-                        }
                     else
-                    {
                         newBounds.SetMinMax(matrix.MultiplyPoint(m.bounds.min), matrix.MultiplyPoint(m.bounds.max));
-                    }
 
                     bounds[i] = newBounds;
                 }
+
                 return bounds;
             }
 
             #region RealChuteLite
+
             /// <summary>
-            /// Returns the total mass of the part
+            ///     Returns the total mass of the part
             /// </summary>
             public static float TotalMass(this Part part)
             {
-                return part.physicalSignificance != Part.PhysicalSignificance.NONE ? part.mass + part.GetResourceMass() : 0;
+                return part.physicalSignificance != Part.PhysicalSignificance.NONE
+                           ? part.mass + part.GetResourceMass()
+                           : 0;
             }
 
             /// <summary>
-            /// Initiates an animation for later use
+            ///     Initiates an animation for later use
             /// </summary>
             /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation</param>
@@ -163,7 +166,7 @@ namespace FerramAerospaceResearch
             }
 
             /// <summary>
-            /// Plays an animation at a given speed
+            ///     Plays an animation at a given speed
             /// </summary>
             /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation</param>
@@ -181,13 +184,18 @@ namespace FerramAerospaceResearch
             }
 
             /// <summary>
-            /// Skips directly to the given time of the animation
+            ///     Skips directly to the given time of the animation
             /// </summary>
             /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation to skip to</param>
             /// <param name="animationSpeed">Speed of the animation after the skip</param>
             /// <param name="animationTime">Normalized time skip</param>
-            public static void SkipToAnimationTime(this Part part, string animationName, float animationSpeed, float animationTime)
+            public static void SkipToAnimationTime(
+                this Part part,
+                string animationName,
+                float animationSpeed,
+                float animationTime
+            )
             {
                 foreach (Animation animation in part.FindModelAnimators(animationName))
                 {
@@ -198,6 +206,7 @@ namespace FerramAerospaceResearch
                     animation.Play(animationName);
                 }
             }
+
             #endregion
         }
     }

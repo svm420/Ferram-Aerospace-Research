@@ -59,23 +59,22 @@ namespace FerramAerospaceResearch
         #region CurrentFlightInfo
 
         /// <summary>
-        /// Toggle or enable/disable FAR speed display.
+        ///     Toggle or enable/disable FAR speed display.
         /// </summary>
         /// <param name="enabled">Enable/disable the speed display, null value toggles the speed display</param>
-        /// <param name="v">Vessel to toggle or enable/disable speed display for, null to apply <paramref name="enabled"/> globally</param>
+        /// <param name="v">
+        ///     Vessel to toggle or enable/disable speed display for, null to apply <paramref name="enabled" />
+        ///     globally
+        /// </param>
         /// <returns>Success/failure of toggling or enabling/disabling the speed display</returns>
         public static bool ToggleAirspeedDisplay(bool? enabled = null, Vessel v = null)
         {
             if (v == null)
             {
                 if (enabled == null)
-                {
                     AirspeedSettingsGUI.allEnabled = !AirspeedSettingsGUI.allEnabled;
-                }
                 else
-                {
-                    AirspeedSettingsGUI.allEnabled = (bool) enabled;
-                }
+                    AirspeedSettingsGUI.allEnabled = (bool)enabled;
                 return true;
             }
 
@@ -86,13 +85,9 @@ namespace FerramAerospaceResearch
             if (airspeedSettingsGUI == null)
                 return false;
             if (enabled == null)
-            {
                 airspeedSettingsGUI.enabled = !airspeedSettingsGUI.enabled;
-            }
             else
-            {
-                airspeedSettingsGUI.enabled = (bool) enabled;
-            }
+                airspeedSettingsGUI.enabled = (bool)enabled;
             return true;
         }
 
@@ -223,7 +218,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Increases flap deflection level for all control surfaces on this vessel, up to max setting of 3
+        ///     Increases flap deflection level for all control surfaces on this vessel, up to max setting of 3
         /// </summary>
         public static void VesselIncreaseFlapDeflection(Vessel v)
         {
@@ -237,7 +232,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Decreases flap deflection level for all control surfaces on this vessel, down to min setting of 0
+        ///     Decreases flap deflection level for all control surfaces on this vessel, down to min setting of 0
         /// </summary>
         public static void VesselDecreaseFlapDeflection(Vessel v)
         {
@@ -251,7 +246,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Returns flap setting for this vessel
+        ///     Returns flap setting for this vessel
         /// </summary>
         /// <param name="v"></param>
         /// <returns>Flap setting; 0 - 3 indicates no to full flap deflections; -1 indicates lack of any control surface parts</returns>
@@ -270,7 +265,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Sets spoilers to a certain value on this vessel
+        ///     Sets spoilers to a certain value on this vessel
         /// </summary>
         public static void VesselSetSpoilers(Vessel v, bool spoilerActive)
         {
@@ -284,7 +279,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Returns spoiler setting for this vessel
+        ///     Returns spoiler setting for this vessel
         /// </summary>
         /// <param name="v"></param>
         /// <returns>Spoiler setting; true indicates active spoilers, false indicates inactive or no spoilers in existence</returns>
@@ -303,7 +298,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Returns the current aerodynamic force being experienced by the vehicle in world space
+        ///     Returns the current aerodynamic force being experienced by the vehicle in world space
         /// </summary>
         /// <param name="v">The vessel that force is being queried</param>
         /// <returns>The force on the vessel in world space</returns>
@@ -313,7 +308,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Returns the current aerodynamic torque being experienced by the vehicle in world space
+        ///     Returns the current aerodynamic torque being experienced by the vehicle in world space
         /// </summary>
         /// <param name="v">The vessel that force is being queried</param>
         /// <returns>The torque on the vessel in world space</returns>
@@ -323,7 +318,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Returns the current aerodynamic force being experienced by the active vehicle in world space
+        ///     Returns the current aerodynamic force being experienced by the active vehicle in world space
         /// </summary>
         /// <returns>The force on the vessel in world space</returns>
         public static Vector3 ActiveVesselAerodynamicForce()
@@ -332,26 +327,36 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// Returns the current aerodynamic torque being experienced by the active vehicle in world space
+        ///     Returns the current aerodynamic torque being experienced by the active vehicle in world space
         /// </summary>
         /// <returns>The torque on the vessel in world space</returns>
         public static Vector3 ActiveVesselAerodynamicTorque()
         {
             return VesselAerodynamicTorque(FlightGlobals.ActiveVessel);
         }
+
         #endregion
 
         #region AeroPredictions
 
         /// <summary>
-        /// Calculates the forces and torque on a vessel at a given condition at the CoM
+        ///     Calculates the forces and torque on a vessel at a given condition at the CoM
         /// </summary>
         /// <param name="vessel">Vessel in question</param>
         /// <param name="aeroForce">Total aerodynamic force at CoM, in kN</param>
         /// <param name="aeroTorque">Total aerodynamic torque at CoM, in kN * m</param>
-        /// <param name="velocityWorldVector">Velocity vector in world space relative to the atmosphere for CURRENT vessel orientation, m/s</param>
+        /// <param name="velocityWorldVector">
+        ///     Velocity vector in world space relative to the atmosphere for CURRENT vessel
+        ///     orientation, m/s
+        /// </param>
         /// <param name="altitude">Vessel altitude, in m</param>
-        public static void CalculateVesselAeroForces(Vessel vessel, out Vector3 aeroForce, out Vector3 aeroTorque, Vector3 velocityWorldVector, double altitude)
+        public static void CalculateVesselAeroForces(
+            Vessel vessel,
+            out Vector3 aeroForce,
+            out Vector3 aeroTorque,
+            Vector3 velocityWorldVector,
+            double altitude
+        )
         {
             aeroForce = aeroTorque = Vector3.zero;
             if (vessel == null)
@@ -370,14 +375,19 @@ namespace FerramAerospaceResearch
 
             vesselAero.SimulateAeroProperties(out aeroForce, out aeroTorque, velocityWorldVector, altitude);
         }
+
         #endregion
 
         #region Misc State
+
         /// <summary>
-        /// Method to determine if the given vessel has been successfully voxelized at any time after being loaded
+        ///     Method to determine if the given vessel has been successfully voxelized at any time after being loaded
         /// </summary>
         /// <param name="vessel"></param>
-        /// <returns>True if vessel has ever been successfully voxelized, returns false if not or if the vessel is null and/or destroyed</returns>
+        /// <returns>
+        ///     True if vessel has ever been successfully voxelized, returns false if not or if the vessel is null and/or
+        ///     destroyed
+        /// </returns>
         public static bool VesselVoxelizationCompletedEver(Vessel vessel)
         {
             if (vessel == null)
@@ -397,10 +407,13 @@ namespace FerramAerospaceResearch
 
 
         /// <summary>
-        /// Method to determine if the given vessel has been successfully voxelized nd currently has valid voxelization
+        ///     Method to determine if the given vessel has been successfully voxelized nd currently has valid voxelization
         /// </summary>
         /// <param name="vessel"></param>
-        /// <returns>True if vessel has valid voxelization currently, returns false if not or if the vessel is null and/or destroyed</returns>
+        /// <returns>
+        ///     True if vessel has valid voxelization currently, returns false if not or if the vessel is null and/or
+        ///     destroyed
+        /// </returns>
         public static bool VesselVoxelizationCompletedAndValid(Vessel vessel)
         {
             if (vessel == null)
@@ -417,6 +430,7 @@ namespace FerramAerospaceResearch
 
             return !(vesselAeroModule is null) && vesselAeroModule.HasValidVoxelizationCurrently();
         }
+
         #endregion
     }
 }

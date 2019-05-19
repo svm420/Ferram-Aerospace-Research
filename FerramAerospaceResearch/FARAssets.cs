@@ -14,7 +14,9 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     internal class FARAssets : MonoBehaviour
     {
-        private static readonly string assetBundleRootPath = Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
+        private static readonly string assetBundleRootPath =
+            Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
+
         private const string AssetBundleExtension = ".far";
 
         public class FARAssetDictionary<T> : Dictionary<string, T> where T : Object
@@ -33,8 +35,8 @@ namespace FerramAerospaceResearch
                 }
             }
 
-            public string BundlePath   { get; private set; }
-            public bool   AssetsLoaded { get; private set; }
+            public string BundlePath { get; private set; }
+            public bool AssetsLoaded { get; private set; }
 
             public FARAssetDictionary(string bundleName)
             {
@@ -60,7 +62,7 @@ namespace FerramAerospaceResearch
                 foreach (Object asset in loadRequest.allAssets)
                 {
                     FARLogger.Debug($"Adding {asset} to dictionary");
-                    Add(asset.name, (T) asset);
+                    Add(asset.name, (T)asset);
                 }
 
                 FARLogger.Debug($"Finished loading {typeof(T)} assets from {BundlePath}");
@@ -83,7 +85,7 @@ namespace FerramAerospaceResearch
         {
             public class ShaderMaterialPair
             {
-                public Shader   Shader   { get; }
+                public Shader Shader { get; }
                 public Material Material { get; }
 
                 public ShaderMaterialPair(Shader shader) : this(shader, new Material(shader))
@@ -92,7 +94,7 @@ namespace FerramAerospaceResearch
 
                 public ShaderMaterialPair(Shader shader, Material material)
                 {
-                    Shader   = shader;
+                    Shader = shader;
                     Material = material;
                 }
             }
@@ -125,7 +127,8 @@ namespace FerramAerospaceResearch
                 switch (Application.platform)
                 {
                     case RuntimePlatform.LinuxPlayer:
-                    case RuntimePlatform.WindowsPlayer when SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL", StringComparison.Ordinal):
+                    case RuntimePlatform.WindowsPlayer
+                        when SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL", StringComparison.Ordinal):
                         FARLogger.Info("Loading shaders from Linux bundle");
                         name += "_linux"; //For OpenGL users on Windows we load the Linux shaders to fix OpenGL issues
                         break;
@@ -155,9 +158,12 @@ namespace FerramAerospaceResearch
 
             public void Initialize()
             {
-                Add("icon_button_stock", GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_stock", false));
-                Add("icon_button_blizzy", GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_blizzy", false));
-                Add("sprite_debug_voxel", GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/sprite_debug_voxel", false));
+                Add("icon_button_stock",
+                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_stock", false));
+                Add("icon_button_blizzy",
+                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_blizzy", false));
+                Add("sprite_debug_voxel",
+                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/sprite_debug_voxel", false));
                 IconLarge = this["icon_button_stock"];
                 IconSmall = this["icon_button_blizzy"];
                 VoxelTexture = this["sprite_debug_voxel"];

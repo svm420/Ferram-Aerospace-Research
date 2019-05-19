@@ -66,7 +66,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
         {
             if (EditorLogic.SortedShipList.Count <= 0 || !_instantSim.Ready)
                 return true;
-            _simInput.alpha      = -1;
+            _simInput.alpha = -1;
             _simInput.machNumber = 0.5;
             _instantSim.GetClCdCmSteady(_simInput, out InstantConditionSimOutput output, true, true);
 
@@ -81,6 +81,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
         {
             return Localizer.Format("FARDesignConcernStabTitle");
         }
+
         public override string GetConcernDescription()
         {
             return Localizer.Format("FARDesignConcernDesc");

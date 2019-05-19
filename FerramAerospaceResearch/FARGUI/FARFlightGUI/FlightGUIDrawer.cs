@@ -60,28 +60,26 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (CompatibilityChecker.IsAllCompatible() && Instance == null)
                 Instance = this;
             else
-            {
                 Destroy(this);
-            }
         }
 
         public static void SetGUIActive(FlightGUI Gui, bool state)
         {
-            if(state)
+            if (state)
             {
-                if(!activeGUIs.Contains(Gui))
+                if (!activeGUIs.Contains(Gui))
                     activeGUIs.Add(Gui);
             }
             else
+            {
                 activeGUIs.Remove(Gui);
+            }
         }
 
         private void OnGUI()
         {
             foreach (FlightGUI activeGui in activeGUIs)
-            {
                 activeGui.DrawGUI();
-            }
         }
     }
 }

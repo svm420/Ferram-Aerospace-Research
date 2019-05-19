@@ -99,17 +99,18 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                     p.SetOpacity(1);
                     p.SetTgtExplodedView(0);
                     p.SetTgtOpacity(1);
-                    if(p.ColliderContainer)
+                    if (p.ColliderContainer)
                         p.ColliderContainer.SetActive(true);
 
                     panelBounds = p.GetBounds();
                 }
-                if(i >= prevPanelBounds.Count)      //set new panel bounds
+
+                if (i >= prevPanelBounds.Count) //set new panel bounds
                 {
                     rebuildMesh = true;
                     prevPanelBounds.Add(panelBounds);
                 }
-                else if(panelBounds != prevPanelBounds[i])
+                else if (panelBounds != prevPanelBounds[i])
                 {
                     rebuildMesh = true;
                     prevPanelBounds[i] = panelBounds;
@@ -118,10 +119,11 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
             if (rebuildMesh)
                 geoModule.RebuildAllMeshData();
-
         }
 
-        public void FlightGeometryUpdate() { }  //use the fairing events instead
+        public void FlightGeometryUpdate()
+        {
+        } //use the fairing events instead
 
         private static void FairingDeployGeometryUpdate(Part p)
         {

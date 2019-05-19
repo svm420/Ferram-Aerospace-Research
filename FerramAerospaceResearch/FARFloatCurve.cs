@@ -107,7 +107,7 @@ namespace FerramAerospaceResearch
 
                 SetNextPrevIndices(curIndex - 1, lowerIndex, prevIndex);
                 lowerIndex = curIndex + 1;
-                curIndex   = nextIndex;
+                curIndex = nextIndex;
             }
         }
 
@@ -119,17 +119,15 @@ namespace FerramAerospaceResearch
 
         public void BakeCurve()
         {
-            for(int i = 0; i < sections.Length; i++)
-            {
+            for (int i = 0; i < sections.Length; i++)
                 sections[i].BuildSection(controlPoints[i], controlPoints[i + 1]);
-            }
         }
 
         public double Evaluate(double x)
         {
             int curIndex = centerIndex;
             int count = 0;
-            while(true)
+            while (true)
             {
                 if (count > sections.Length)
                     throw new Exception();
@@ -140,7 +138,9 @@ namespace FerramAerospaceResearch
                 if (check > 0)
                     if (curIndex >= sections.Length - 1)
                         //at upper end of curve, just return max val of last cubic
+                    {
                         return sections[curIndex].EvalUpperLim();
+                    }
                     else
                     {
                         //otherwise, find next cubic to check and continue
@@ -163,7 +163,7 @@ namespace FerramAerospaceResearch
         // ReSharper disable once UnusedMember.Global
         public void Scale(double scalar)
         {
-            for(int i = 0; i < sections.Length; ++i)
+            for (int i = 0; i < sections.Length; ++i)
             {
                 CubicSection tmpSection = sections[i];
                 tmpSection.a *= scalar;
@@ -176,7 +176,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <summary>
-        /// If num curve sections are identical, adds the curve coefficients together, keeping the limits of this curve
+        ///     If num curve sections are identical, adds the curve coefficients together, keeping the limits of this curve
         /// </summary>
         /// <param name="otherCurve"></param>
         public void AddCurve(FARFloatCurve otherCurve)
@@ -184,7 +184,7 @@ namespace FerramAerospaceResearch
             if (sections.Length != otherCurve.sections.Length)
                 throw new ArgumentException("Section array lengths do not match");
 
-            for(int i = 0; i < sections.Length; ++i)
+            for (int i = 0; i < sections.Length; ++i)
             {
                 CubicSection tmpSection = sections[i];
                 CubicSection addSection = otherCurve.sections[i];

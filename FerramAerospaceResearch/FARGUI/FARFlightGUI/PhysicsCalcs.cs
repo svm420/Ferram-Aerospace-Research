@@ -78,11 +78,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             PartResourceDefinition r = resLibrary.resourceDefinitions["IntakeAir"];
             if (r == null)
                 return;
-            intakeAirId      = r.id;
+            intakeAirId = r.id;
             intakeAirDensity = r.density;
         }
 
-        public void UpdateAeroModules(List<FARAeroPartModule> newAeroModules, List<FARWingAerodynamicModel> legacyWingModels)
+        public void UpdateAeroModules(
+            List<FARAeroPartModule> newAeroModules,
+            List<FARWingAerodynamicModel> legacyWingModels
+        )
         {
             _currentAeroModules = newAeroModules;
             _LEGACY_currentWingAeroModel = legacyWingModels;
@@ -92,8 +95,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             {
                 if (w is null)
                     continue;
-                useWingArea =  true;
-                wingArea    += w.S;
+                useWingArea = true;
+                wingArea += w.S;
             }
         }
 
@@ -103,8 +106,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (_vessel == null)
                 return vesselInfo;
 
-            Vector3d velVector = _vessel.srf_velocity
-                - FARWind.GetWind(_vessel.mainBody, _vessel.rootPart, _vessel.ReferenceTransform.position);
+            Vector3d velVector = _vessel.srf_velocity -
+                                 FARWind.GetWind(_vessel.mainBody,
+                                                 _vessel.rootPart,
+                                                 _vessel.ReferenceTransform.position);
             Vector3d velVectorNorm = velVector.normalized;
             double vesselSpeed = velVector.magnitude;
 
@@ -217,8 +222,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Quaternion vesselRot = Quaternion.Inverse(_navball.relativeGymbal);
 
             vesselInfo.headingAngle = vesselRot.eulerAngles.y;
-            vesselInfo.pitchAngle = vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
-            vesselInfo.rollAngle  = vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
+            vesselInfo.pitchAngle =
+                vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
+            vesselInfo.rollAngle =
+                vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
         }
 
         private void CalculateEngineAndIntakeBasedParameters(double vesselSpeed)
@@ -240,37 +247,42 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 if (rb != null)
                 {
                     vesselInfo.fullMass += rb.mass;
-                    vesselInfo.dryMass  += p.mass;
+                    vesselInfo.dryMass += p.mass;
                 }
 
                 foreach (PartModule m in p.Modules)
-                {
                     switch (m)
                     {
                         case ModuleEngines e:
-                            FuelConsumptionFromEngineModule(e, ref totalThrust, ref totalThrust_Isp, ref fuelConsumptionVol, ref airDemandVol, invDeltaTime);
+                            FuelConsumptionFromEngineModule(e,
+                                                            ref totalThrust,
+                                                            ref totalThrust_Isp,
+                                                            ref fuelConsumptionVol,
+                                                            ref airDemandVol,
+                                                            invDeltaTime);
                             break;
                         case ModuleResourceIntake intake:
                         {
                             if (intake.intakeEnabled)
                             {
-                                airAvailableVol     += intake.airFlow * intakeAirDensity / invDeltaTime;
+                                airAvailableVol += intake.airFlow * intakeAirDensity / invDeltaTime;
                                 vesselInfo.fullMass -= p.Resources[intake.resourceName].amount * intakeAirDensity;
                             }
 
                             break;
                         }
                     }
-                }
             }
 
             if (totalThrust > 0)
             {
-                vesselInfo.tSFC = totalThrust / totalThrust_Isp;    //first, calculate inv Isp
-                vesselInfo.tSFC *= 3600;   //then, convert from 1/s to 1/hr
+                vesselInfo.tSFC = totalThrust / totalThrust_Isp; //first, calculate inv Isp
+                vesselInfo.tSFC *= 3600;                         //then, convert from 1/s to 1/hr
             }
             else
+            {
                 vesselInfo.tSFC = 0;
+            }
 
             if (!airDemandVol.NearlyEqual(0))
                 vesselInfo.intakeAirFrac = airAvailableVol / airDemandVol;
@@ -295,18 +307,25 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             vesselInfo.range *= VL_D_TSFC * 0.001;
         }
 
-        private void FuelConsumptionFromEngineModule(ModuleEngines e, ref double totalThrust, ref double totalThrust_Isp, ref double fuelConsumptionVol, ref double airDemandVol, double invDeltaTime)
+        private void FuelConsumptionFromEngineModule(
+            ModuleEngines e,
+            ref double totalThrust,
+            ref double totalThrust_Isp,
+            ref double fuelConsumptionVol,
+            ref double airDemandVol,
+            double invDeltaTime
+        )
         {
             if (!e.EngineIgnited || e.engineShutdown)
                 return;
-            totalThrust     += e.finalThrust;
+            totalThrust += e.finalThrust;
             totalThrust_Isp += e.finalThrust * e.realIsp;
             foreach (Propellant v in e.propellants)
             {
                 if (v.id == intakeAirId)
                     airDemandVol += v.currentRequirement;
 
-                if(!v.ignoreForIsp)
+                if (!v.ignoreForIsp)
                     fuelConsumptionVol += v.currentRequirement * invDeltaTime;
             }
         }
@@ -332,9 +351,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private void CalculateStallFraction()
         {
             foreach (FARWingAerodynamicModel w in _LEGACY_currentWingAeroModel)
-            {
                 vesselInfo.stallFraction += w.GetStall() * w.S;
-            }
 
             vesselInfo.stallFraction /= wingArea;
         }

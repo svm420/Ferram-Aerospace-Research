@@ -55,7 +55,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
     {
         private readonly Vessel _vessel;
 
-        private static readonly string[] systemLabel = {
+        private static readonly string[] systemLabel =
+        {
             Localizer.Format("FARFlightStabAugLabel0"),
             Localizer.Format("FARFlightStabAugLabel1"),
             Localizer.Format("FARFlightStabAugLabel2"),
@@ -64,7 +65,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         };
 
         // ReSharper disable once UnusedMember.Local
-        private static string[] systemLabelLong = {
+        private static string[] systemLabelLong =
+        {
             Localizer.Format("FARFlightStabAugLabelLong0"),
             Localizer.Format("FARFlightStabAugLabelLong1"),
             Localizer.Format("FARFlightStabAugLabelLong2"),
@@ -86,14 +88,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public StabilityAugmentation(Vessel vessel)
         {
             _vessel = vessel;
-            systemDropdown = new GUIDropDown<int>(systemLabel, new[] { 0, 1, 2, 3, 4, 5 });
+            systemDropdown = new GUIDropDown<int>(systemLabel, new[] {0, 1, 2, 3, 4, 5});
             LoadSettings();
             systemInstances = new ControlSystem[systemTemplates.Length];
 
             for (int i = 0; i < systemInstances.Length; i++)
-            {
                 systemInstances[i] = new ControlSystem(systemTemplates[i]);
-            }
             _vessel.OnAutopilotUpdate += OnAutoPilotUpdate;
         }
 
@@ -112,16 +112,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public void Display()
         {
-            if(buttonStyle == null)
-            {
+            if (buttonStyle == null)
                 buttonStyle = FlightGUI.buttonStyle;
-
-            }
             GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
             for (int i = 0; i < systemInstances.Length; i++)
-            {
-                systemInstances[i].active = GUILayout.Toggle(systemInstances[i].active, systemLabel[i], buttonStyle, GUILayout.MinWidth(30), GUILayout.ExpandWidth(true));
-            }
+                systemInstances[i].active = GUILayout.Toggle(systemInstances[i].active,
+                                                             systemLabel[i],
+                                                             buttonStyle,
+                                                             GUILayout.MinWidth(30),
+                                                             GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
         }
 
@@ -148,13 +147,18 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     aoAHighLim = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightStabAoAHigh"), 120, aoAHighLim);
                 }
                 else
-                    sys.zeroPoint = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightStabOffset"), 120, sys.zeroPoint);
+                {
+                    sys.zeroPoint =
+                        GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightStabOffset"), 120, sys.zeroPoint);
+                }
             }
             else
-                scalingDynPres = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightStabQScaling"), 150, scalingDynPres);
+            {
+                scalingDynPres =
+                    GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightStabQScaling"), 150, scalingDynPres);
+            }
 
             GUILayout.EndVertical();
-
         }
 
         private void OnAutoPilotUpdate(FlightCtrlState state)
@@ -162,7 +166,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (_vessel.srfSpeed < 5)
                 return;
 
-            ControlSystem sys = systemInstances[0];     //wing leveler
+            ControlSystem sys = systemInstances[0]; //wing leveler
             if (sys.active)
             {
                 double phi = info.rollAngle - sys.zeroPoint;
@@ -173,7 +177,9 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                         phi -= 360;
                 }
                 else
+                {
                     phi = -phi;
+                }
 
                 phi *= -FARMathUtil.deg2rad;
 
@@ -190,7 +196,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 }
             }
             else
+            {
                 sys.errorIntegral = 0;
+            }
+
             sys = systemInstances[1];
             if (sys.active)
             {
@@ -207,10 +216,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
                     state.yaw = (float)output + state.yawTrim;
                 }
-
             }
             else
+            {
                 sys.errorIntegral = 0;
+            }
+
             sys = systemInstances[2];
             if (sys.active)
             {
@@ -227,24 +238,25 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
                     state.pitch = (float)output + state.pitchTrim;
                 }
-
             }
             else
+            {
                 sys.errorIntegral = 0;
+            }
+
             sys = systemInstances[3];
             if (sys.active)
             {
                 if (info.aoA > aoAHighLim)
-                {
                     state.pitch = (float)ControlStateChange(sys, info.aoA - aoAHighLim).Clamp(-1, 1) + state.pitchTrim;
-                }
                 else if (info.aoA < aoALowLim)
-                {
                     state.pitch = (float)ControlStateChange(sys, info.aoA - aoALowLim).Clamp(-1, 1) + state.pitchTrim;
-                }
             }
             else
+            {
                 sys.errorIntegral = 0;
+            }
+
             sys = systemInstances[4];
             if (!sys.active)
                 return;
@@ -254,8 +266,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 scalingFactor = 1;
 
             state.pitch = state.pitchTrim + (state.pitch - state.pitchTrim) * (float)scalingFactor;
-            state.yaw   = state.yawTrim + (state.yaw - state.yawTrim) * (float)scalingFactor;
-            state.roll  = state.rollTrim + (state.roll - state.rollTrim) * (float)scalingFactor;
+            state.yaw = state.yawTrim + (state.yaw - state.yawTrim) * (float)scalingFactor;
+            state.roll = state.rollTrim + (state.roll - state.rollTrim) * (float)scalingFactor;
         }
 
         private static double ControlStateChange(ControlSystem system, double error)
@@ -295,6 +307,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     if (node.HasNode(nodeName))
                         TryLoadSystem(node.GetNode(nodeName), i);
                 }
+
                 if (node.HasValue("aoALowLim"))
                     double.TryParse(node.GetValue("aoALowLim"), out aoALowLim);
                 if (node.HasValue("aoAHighLim"))
@@ -390,6 +403,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 FARLogger.Error("Could not save Stability Augmentation Settings because settings config list was null");
                 return;
             }
+
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "StabilityAugmentationSettings");
 
             Vessel active_vessel;
@@ -414,12 +428,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 flightGUISettings.Add(node);
             }
             else
+            {
                 node.ClearData();
+            }
 
             for (int i = 0; i < systemTemplates.Length; i++)
-            {
                 node.AddNode(BuildSystemNode(i));
-            }
             node.AddValue("aoALowLim", aoALowLim);
             node.AddValue("aoAHighLim", aoAHighLim);
             node.AddValue("scalingDynPres", scalingDynPres);
@@ -465,7 +479,9 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 errorIntegral = 0;
             }
 
-            public ControlSystem() { }
+            public ControlSystem()
+            {
+            }
         }
     }
 }

@@ -55,13 +55,13 @@ namespace FerramAerospaceResearch.FARUtils
 {
     public static class FARLogger
     {
-
         public static readonly string defaultTag = $"[FAR {FARVersion.String}] ";
         private static readonly string[] separators = {"\r\n", "\r", "\n"};
 
         public static string Tag { get; } = defaultTag;
 
         #region Info
+
         [Conditional("DEBUG"), Conditional("INFO")]
         public static void Info(object message)
         {
@@ -113,6 +113,7 @@ namespace FerramAerospaceResearch.FARUtils
         #endregion // Info
 
         #region Debug
+
         [Conditional("DEBUG")]
         public static void Debug(object message)
         {
@@ -164,6 +165,7 @@ namespace FerramAerospaceResearch.FARUtils
         #endregion // Debug
 
         #region Warning
+
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING")]
         public static void Warning(object message)
         {
@@ -215,6 +217,7 @@ namespace FerramAerospaceResearch.FARUtils
         #endregion // Warning
 
         #region Error
+
         [Conditional("DEBUG"), Conditional("INFO"), Conditional("WARNING"), Conditional("ERROR")]
         public static void Error(object message)
         {
@@ -266,6 +269,7 @@ namespace FerramAerospaceResearch.FARUtils
         #endregion // Error
 
         #region Assertion
+
         [Conditional("UNITY_ASSERTIONS")]
         public static void Assertion(object message)
         {
@@ -317,6 +321,7 @@ namespace FerramAerospaceResearch.FARUtils
         #endregion // Assertion
 
         #region Exception
+
         public static void Exception(Exception exception)
         {
             Error("Logged exception:");
@@ -340,6 +345,7 @@ namespace FerramAerospaceResearch.FARUtils
             Error(GetCallerInfo() + " - Logged exception:");
             UnityEngine.Debug.LogException(exception, context);
         }
+
         #endregion // Exception
 
         //http://geekswithblogs.net/BlackRabbitCoder/archive/2013/07/25/c.net-little-wonders-getting-caller-information.aspx
@@ -361,9 +367,7 @@ namespace FerramAerospaceResearch.FARUtils
             // #endif
             string trace = Environment.StackTrace;
             if (string.IsNullOrEmpty(trace))
-            {
                 return "";
-            }
             string[] lines = trace.Split(separators, StringSplitOptions.None);
             string caller = lines[3].Trim();
             return caller.Substring(0, caller.IndexOf("(", StringComparison.Ordinal));

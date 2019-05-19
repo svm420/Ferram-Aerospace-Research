@@ -69,10 +69,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
         {
             return Localizer.Format("FARDesignConcernAreaRuleTitle");
         }
+
         public override string GetConcernDescription()
         {
             return Localizer.Format("FARDesignConcernAreaRuleDesc");
         }
+
         public override DesignConcernSeverity GetSeverity()
         {
             return DesignConcernSeverity.WARNING;

@@ -63,6 +63,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         // ReSharper disable NotAccessedField.Global -> unity
         public Transform partTransform;
+
         public Rigidbody partRigidBody;
         // ReSharper restore NotAccessedField.Global
 
@@ -71,6 +72,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public List<GeometryMesh> meshDataList;
         private List<IGeometryUpdater> geometryUpdaters;
         private List<ICrossSectionAdjuster> crossSectionAdjusters;
+
         public bool HasCrossSectionAdjusters
         {
             get
@@ -108,10 +110,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private bool _started;
         private bool _ready;
         private bool _sceneSetup;
+
         public bool Ready
         {
             get { return _ready && _started && _sceneSetup; }
         }
+
         private int _sendUpdateTick;
         private int _meshesToUpdate = -1;
 
@@ -122,8 +126,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         [SerializeField] private bool forceUseColliders;
         [SerializeField] private bool forceUseMeshes;
         [SerializeField] private bool ignoreForMainAxis;
-        [SerializeField] private List<string> ignoredTransforms,
-        unignoredTransforms;
+        [SerializeField] private List<string> ignoredTransforms, unignoredTransforms;
         [SerializeField] private bool ignoreIfNoRenderer;
         [SerializeField] private bool rebuildOnAnimation;
 
@@ -157,16 +160,19 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     sb.Append("\n     Meshes: ");
                     sb.Append(string.Join(", ", meshes.ToArray()));
                 }
+
                 if (colliders.Count > 0)
                 {
                     sb.Append("\n     Colliders: ");
                     sb.Append(string.Join(", ", colliders.ToArray()));
                 }
+
                 if (noRenderer.Count > 0)
                 {
                     sb.Append("\n     No renderer found: ");
                     sb.Append(string.Join(", ", noRenderer.ToArray()));
                 }
+
                 FARLogger.Debug(sb.ToStringAndRelease());
             }
         }
@@ -236,6 +242,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 enabled = false;
                 return;
             }
+
             //RebuildAllMeshData();
             SetupIGeometryUpdaters();
             SetupICrossSectionAdjusters();
@@ -255,8 +262,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public override void OnStart(StartState state)
         {
             base.OnStart(state);
-            _sceneSetup = true;     //this exists only to ensure that OnStart has occurred first
-            if(ignoreLayer0 < 0)
+            _sceneSetup = true; //this exists only to ensure that OnStart has occurred first
+            if (ignoreLayer0 < 0)
                 ignoreLayer0 = LayerMask.NameToLayer("TransparentFX");
         }
 
@@ -264,14 +271,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             //waiting prevents changes in physics in flight or in predictions because the voxel switches to colliders rather than meshes
             if (ReadyToBuildMesh())
-            {
                 RebuildAllMeshData();
-            }
             if (!_ready && _meshesToUpdate == 0)
             {
                 overallMeshBounds = SetBoundsFromMeshes();
                 _ready = true;
             }
+
             if (animStates != null && animStates.Count > 0)
                 CheckAnimations();
         }
@@ -280,9 +286,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             bool returnVal = !_started && _sceneSetup;
 
-            returnVal &= HighLogic.LoadedSceneIsFlight && FlightGlobals.ready || HighLogic.LoadedSceneIsEditor && ApplicationLauncher.Ready;
+            returnVal &= HighLogic.LoadedSceneIsFlight && FlightGlobals.ready ||
+                         HighLogic.LoadedSceneIsEditor && ApplicationLauncher.Ready;
 
-            returnVal &= part.collider != null || part.Modules.Contains<ModuleWheelBase>() || part.Modules.Contains<KerbalEVA>() || part.Modules.Contains<FlagSite>();
+            returnVal &= part.collider != null ||
+                         part.Modules.Contains<ModuleWheelBase>() ||
+                         part.Modules.Contains<KerbalEVA>() ||
+                         part.Modules.Contains<FlagSite>();
 
             return returnVal;
         }
@@ -301,7 +311,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         internal void RebuildAllMeshData()
         {
-            if(!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor))
+            if (!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor))
                 return;
 
             _ready = false;
@@ -318,7 +328,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             meshDataList = new List<GeometryMesh>();
 
-            Matrix4x4 worldToVesselMatrix = HighLogic.LoadedSceneIsFlight ? vessel.vesselTransform.worldToLocalMatrix : EditorLogic.RootPart.partTransform.worldToLocalMatrix;
+            Matrix4x4 worldToVesselMatrix = HighLogic.LoadedSceneIsFlight
+                                                ? vessel.vesselTransform.worldToLocalMatrix
+                                                : EditorLogic.RootPart.partTransform.worldToLocalMatrix;
             for (int i = 0; i < meshTransforms.Count; ++i)
             {
                 MeshData m = geometryMeshes[i];
@@ -329,6 +341,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     --i;
                     continue;
                 }
+
                 var geoMesh = new GeometryMesh(m, meshTransforms[i], worldToVesselMatrix, this);
                 meshDataList.Add(geoMesh);
             }
@@ -353,20 +366,26 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 upper = Vector3.Max(upper, geoMesh.bounds.max);
                 lower = Vector3.Min(lower, geoMesh.bounds.min);
             }
+
             var overallBounds = new Bounds((upper + lower) * 0.5f, upper - lower);
 
-            float tmpTestBounds = overallBounds.center.x + overallBounds.center.y + overallBounds.center.z +
-                overallBounds.extents.x + overallBounds.extents.y + overallBounds.extents.z;
+            float tmpTestBounds = overallBounds.center.x +
+                                  overallBounds.center.y +
+                                  overallBounds.center.z +
+                                  overallBounds.extents.x +
+                                  overallBounds.extents.y +
+                                  overallBounds.extents.z;
             if (float.IsNaN(tmpTestBounds) || float.IsInfinity(tmpTestBounds))
             {
                 FARLogger.Info("Overall bounds error in " + part.partInfo.title + " " + meshDataList.Count + " meshes");
                 Valid = false;
             }
             else
+            {
                 Valid = true;
+            }
 
             return overallBounds;
-
         }
 
         private void GetAnimations()
@@ -381,7 +400,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             foreach (PartModule m in part.Modules)
             {
-
                 FindAnimStatesInModule(animations, m, "animationName");
                 FindAnimStatesInModule(animations, m, "animationStateName");
                 FindAnimStatesInModule(animations, m, "animName");
@@ -413,12 +431,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void SetupIGeometryUpdaters()
         {
             geometryUpdaters = new List<IGeometryUpdater>();
-            if(part is CompoundPart compoundPart)
+            if (part is CompoundPart compoundPart)
             {
                 var compoundUpdate = new CompoundPartGeoUpdater(compoundPart, this);
                 geometryUpdaters.Add(compoundUpdate);
             }
-            if(part.Modules.Contains<ModuleProceduralFairing>())
+
+            if (part.Modules.Contains<ModuleProceduralFairing>())
             {
                 List<ModuleProceduralFairing> fairings = part.Modules.GetModules<ModuleProceduralFairing>();
                 foreach (ModuleProceduralFairing fairing in fairings)
@@ -427,7 +446,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     geometryUpdaters.Add(fairingUpdater);
                 }
             }
-            if(part.Modules.Contains<ModuleJettison>())
+
+            if (part.Modules.Contains<ModuleJettison>())
 
             {
                 List<ModuleJettison> engineFairings = part.Modules.GetModules<ModuleJettison>();
@@ -446,7 +466,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void SetupICrossSectionAdjusters()
         {
-            Matrix4x4 worldToVesselMatrix = HighLogic.LoadedSceneIsFlight ? vessel.vesselTransform.worldToLocalMatrix : EditorLogic.RootPart.partTransform.worldToLocalMatrix;
+            Matrix4x4 worldToVesselMatrix = HighLogic.LoadedSceneIsFlight
+                                                ? vessel.vesselTransform.worldToLocalMatrix
+                                                : EditorLogic.RootPart.partTransform.worldToLocalMatrix;
             crossSectionAdjusters = new List<ICrossSectionAdjuster>();
 
             string intakeType = "", engineType = "";
@@ -471,45 +493,49 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (module is ModuleResourceIntake intake)
                 {
-                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster = IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
+                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster =
+                        IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
                 else
                 {
-                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster = IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
+                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster =
+                        IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
+
                 return;
             }
-            if(intakeType != "")
+
+            if (intakeType != "")
             {
                 PartModule module = part.Modules[intakeType];
 
                 if (module is ModuleResourceIntake intake)
                 {
-                    IntakeCrossSectionAdjuster intakeAdjuster = IntakeCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
+                    IntakeCrossSectionAdjuster intakeAdjuster =
+                        IntakeCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
                 else
                 {
-                    IntakeCrossSectionAdjuster intakeAdjuster = IntakeCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
+                    IntakeCrossSectionAdjuster intakeAdjuster =
+                        IntakeCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
+
                 return;
             }
 
             if (engineType == "")
                 return;
-            var  engines     = (ModuleEngines)part.Modules[engineType];
+            var engines = (ModuleEngines)part.Modules[engineType];
             bool airBreather = false;
 
             if (engineType == "ModuleEnginesAJEJet")
                 airBreather = true;
-            else
-            if (engines.propellants.Any(p => p.name == "IntakeAir"))
-            {
+            else if (engines.propellants.Any(p => p.name == "IntakeAir"))
                 airBreather = true;
-            }
 
             if (!airBreather)
                 return;
@@ -527,13 +553,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     geoUpdater.FlightGeometryUpdate();
         }
 
-        public void GetICrossSectionAdjusters(List<ICrossSectionAdjuster> activeAdjusters, Matrix4x4 basis, Vector3 vehicleMainAxis)
+        public void GetICrossSectionAdjusters(
+            List<ICrossSectionAdjuster> activeAdjusters,
+            Matrix4x4 basis,
+            Vector3 vehicleMainAxis
+        )
         {
             if (crossSectionAdjusters == null)
                 return;
 
             foreach (ICrossSectionAdjuster adjuster in crossSectionAdjusters)
-            {
                 if (!adjuster.AreaRemovedFromCrossSection(vehicleMainAxis).NearlyEqual(0))
                 {
                     adjuster.SetForwardBackwardNoFlowDirection(1);
@@ -545,11 +574,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     activeAdjusters.Add(adjuster);
                 }
                 else
+                {
                     adjuster.SetForwardBackwardNoFlowDirection(0);
-            }
+                }
         }
 
         #region voxelUpdates
+
         private void CheckAnimations()
         {
             bool updateShape = false;
@@ -559,24 +590,27 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 for (int i = 0; i < animStates.Count; ++i)
                 {
                     AnimationState state = animStates[i];
-                    if(state == null)
+                    if (state == null)
                     {
                         animStates.RemoveAt(i);
                         animStateTime.RemoveAt(i);
                         --i;
                         continue;
                     }
+
                     float prevNormTime = animStateTime[i];
 
                     //if the anim is not playing, but it was, also send the event to be sure that we closed
                     if (Math.Abs(prevNormTime - state.time) <= 10E-5)
                         continue;
                     animStateTime[i] = state.time;
-                    updateShape      = true;
+                    updateShape = true;
                 }
             }
             else
+            {
                 ++_sendUpdateTick;
+            }
 
             if (!updateShape)
                 return;
@@ -590,7 +624,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private void UpdateShapeWithAnims()
         {
-            Matrix4x4 transformMatrix = HighLogic.LoadedSceneIsFlight ? vessel.vesselTransform.worldToLocalMatrix : EditorLogic.RootPart.partTransform.worldToLocalMatrix;
+            Matrix4x4 transformMatrix = HighLogic.LoadedSceneIsFlight
+                                            ? vessel.vesselTransform.worldToLocalMatrix
+                                            : EditorLogic.RootPart.partTransform.worldToLocalMatrix;
 
             UpdateTransformMatrixList(transformMatrix);
         }
@@ -634,7 +670,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         meshDataList.RemoveAt(i);
                         --i;
                         lock (this)
+                        {
                             --_meshesToUpdate;
+                        }
                     }
                 }
             }
@@ -690,10 +728,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 var bc = t.GetComponent<BoxCollider>();
                 if (bc != null)
-                {
                     return CreateBoxMeshFromBoxCollider(bc.size, bc.center);
-                }
             }
+
             return null;
         }
 
@@ -732,9 +769,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     return new MeshData(m.vertices, m.triangles, m.bounds);
                 Transform prefabTransform = part.partInfo.partPrefab.FindModelTransform(t.gameObject.name);
                 if (!(prefabTransform is null) && prefabTransform.gameObject.layer == ignoreLayer0)
-                {
                     return null;
-                }
 
                 return new MeshData(m.vertices, m.triangles, m.bounds);
             }
@@ -770,12 +805,19 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Bounds colliderBounds = part.GetPartColliderBoundsInBasis(worldToLocalMatrix);
 
             bool cantUseColliders = true;
-            bool isFairing = part.Modules.Contains<ModuleProceduralFairing>() || part.Modules.Contains("ProceduralFairingSide");
-            bool isDrill = part.Modules.Contains<ModuleAsteroidDrill>() || part.Modules.Contains<ModuleResourceHarvester>();
+            bool isFairing = part.Modules.Contains<ModuleProceduralFairing>() ||
+                             part.Modules.Contains("ProceduralFairingSide");
+            bool isDrill = part.Modules.Contains<ModuleAsteroidDrill>() ||
+                           part.Modules.Contains<ModuleResourceHarvester>();
 
             //Voxelize colliders
-            if ((forceUseColliders || isFairing || isDrill || rendererBounds.size.x * rendererBounds.size.z < colliderBounds.size.x * colliderBounds.size.z * 1.6f && rendererBounds.size.y < colliderBounds.size.y * 1.2f && (rendererBounds.center - colliderBounds.center).magnitude < 0.3f) && !forceUseMeshes)
-            {
+            if ((forceUseColliders ||
+                 isFairing ||
+                 isDrill ||
+                 rendererBounds.size.x * rendererBounds.size.z < colliderBounds.size.x * colliderBounds.size.z * 1.6f &&
+                 rendererBounds.size.y < colliderBounds.size.y * 1.2f &&
+                 (rendererBounds.center - colliderBounds.center).magnitude < 0.3f) &&
+                !forceUseMeshes)
                 foreach (Transform t in meshTransforms)
                 {
                     MeshData md = GetColliderMeshData(t);
@@ -787,7 +829,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     validTransformList.Add(t);
                     cantUseColliders = false;
                 }
-            }
 
 
             if (part.Modules.Contains<ModuleJettison>())
@@ -801,13 +842,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         continue;
 
                     if (variants)
-                    {
                         // with part variants, jettison name is a comma separated list of transform names
                         foreach (string transformName in j.jettisonName.Split(','))
-                        {
                             jettisonTransforms.Add(transformName);
-                        }
-                    }
                     else
                         jettisonTransforms.Add(j.jettisonTransform.name);
                     if (j.isJettisoned)
@@ -828,7 +865,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 //Voxelize Everything
                 if ((cantUseColliders || forceUseMeshes || isFairing) && !isDrill)
-                {
                     foreach (Transform t in meshTransforms)
                     {
                         if (jettisonTransforms.Contains(t.name))
@@ -841,13 +877,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         meshList.Add(md);
                         validTransformList.Add(t);
                     }
-                }
             }
             else
             {
                 //Voxelize Everything
                 if ((cantUseColliders || forceUseMeshes || isFairing) && !isDrill)
-                {
                     foreach (Transform t in meshTransforms)
                     {
                         MeshData md = GetVisibleMeshData(t, ignoreIfNoRenderer, false);
@@ -858,8 +892,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         meshList.Add(md);
                         validTransformList.Add(t);
                     }
-                }
             }
+
             DebugPrint();
             meshTransforms = validTransformList;
             return meshList;
@@ -882,35 +916,77 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Points.Add(new Vector3(center.x - extents.x, center.y - extents.y, center.z + extents.z));
             Points.Add(new Vector3(center.x + extents.x, center.y - extents.y, center.z + extents.z));
             // Front plane
-            Verts.Add(Points[0]); Verts.Add(Points[1]); Verts.Add(Points[2]); Verts.Add(Points[3]);
+            Verts.Add(Points[0]);
+            Verts.Add(Points[1]);
+            Verts.Add(Points[2]);
+            Verts.Add(Points[3]);
             // Back plane
-            Verts.Add(Points[4]); Verts.Add(Points[5]); Verts.Add(Points[6]); Verts.Add(Points[7]);
+            Verts.Add(Points[4]);
+            Verts.Add(Points[5]);
+            Verts.Add(Points[6]);
+            Verts.Add(Points[7]);
             // Left plane
-            Verts.Add(Points[5]); Verts.Add(Points[0]); Verts.Add(Points[3]); Verts.Add(Points[6]);
+            Verts.Add(Points[5]);
+            Verts.Add(Points[0]);
+            Verts.Add(Points[3]);
+            Verts.Add(Points[6]);
             // Right plane
-            Verts.Add(Points[1]); Verts.Add(Points[4]); Verts.Add(Points[7]); Verts.Add(Points[2]);
+            Verts.Add(Points[1]);
+            Verts.Add(Points[4]);
+            Verts.Add(Points[7]);
+            Verts.Add(Points[2]);
             // Top plane
-            Verts.Add(Points[5]); Verts.Add(Points[4]); Verts.Add(Points[1]); Verts.Add(Points[0]);
+            Verts.Add(Points[5]);
+            Verts.Add(Points[4]);
+            Verts.Add(Points[1]);
+            Verts.Add(Points[0]);
             // Bottom plane
-            Verts.Add(Points[3]); Verts.Add(Points[2]); Verts.Add(Points[7]); Verts.Add(Points[6]);
+            Verts.Add(Points[3]);
+            Verts.Add(Points[2]);
+            Verts.Add(Points[7]);
+            Verts.Add(Points[6]);
             // Front Plane
-            Tris.Add(0); Tris.Add(1); Tris.Add(2);
-            Tris.Add(2); Tris.Add(3); Tris.Add(0);
+            Tris.Add(0);
+            Tris.Add(1);
+            Tris.Add(2);
+            Tris.Add(2);
+            Tris.Add(3);
+            Tris.Add(0);
             // Back Plane
-            Tris.Add(4); Tris.Add(5); Tris.Add(6);
-            Tris.Add(6); Tris.Add(7); Tris.Add(4);
+            Tris.Add(4);
+            Tris.Add(5);
+            Tris.Add(6);
+            Tris.Add(6);
+            Tris.Add(7);
+            Tris.Add(4);
             // Left Plane
-            Tris.Add(8); Tris.Add(9); Tris.Add(10);
-            Tris.Add(10); Tris.Add(11); Tris.Add(8);
+            Tris.Add(8);
+            Tris.Add(9);
+            Tris.Add(10);
+            Tris.Add(10);
+            Tris.Add(11);
+            Tris.Add(8);
             // Right Plane
-            Tris.Add(12); Tris.Add(13); Tris.Add(14);
-            Tris.Add(14); Tris.Add(15); Tris.Add(12);
+            Tris.Add(12);
+            Tris.Add(13);
+            Tris.Add(14);
+            Tris.Add(14);
+            Tris.Add(15);
+            Tris.Add(12);
             // Top Plane
-            Tris.Add(16); Tris.Add(17); Tris.Add(18);
-            Tris.Add(18); Tris.Add(19); Tris.Add(16);
+            Tris.Add(16);
+            Tris.Add(17);
+            Tris.Add(18);
+            Tris.Add(18);
+            Tris.Add(19);
+            Tris.Add(16);
             // Bottom Plane
-            Tris.Add(20); Tris.Add(21); Tris.Add(22);
-            Tris.Add(22); Tris.Add(23); Tris.Add(20);
+            Tris.Add(20);
+            Tris.Add(21);
+            Tris.Add(22);
+            Tris.Add(22);
+            Tris.Add(23);
+            Tris.Add(20);
 
             var mesh = new MeshData(Verts.ToArray(), Tris.ToArray(), new Bounds(center, size));
 

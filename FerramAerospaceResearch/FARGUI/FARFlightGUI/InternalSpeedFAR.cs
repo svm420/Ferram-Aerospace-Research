@@ -53,7 +53,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
      */
     public class InternalSpeedFAR : InternalSpeed
     {
-        private readonly string[] shortCaptions = {
+        private readonly string[] shortCaptions =
+        {
             Localizer.Format("FARFlightInternalAirspeedGroundspeed"),
             Localizer.Format("FARFlightInternalAirspeedIndicated"),
             Localizer.Format("FARFlightInternalAirspeedEquivalent"),
@@ -67,14 +68,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             {
                 AirspeedSettingsGUI airspeedSettingsGUI = flightGUI.airSpeedGUI;
                 if (airspeedSettingsGUI != null)
-                {
-                    if (airspeedSettingsGUI.GetVelocityDisplayString(out string value, out AirspeedSettingsGUI.SurfaceVelMode mode))
+                    if (airspeedSettingsGUI.GetVelocityDisplayString(out string value,
+                                                                     out AirspeedSettingsGUI.SurfaceVelMode mode))
                     {
                         textObject.text.SetText(shortCaptions[(int)mode] + value);
                         return; // we are done here
                     }
-                }
             }
+
             // if FAR velocity display is not ready or not used -> fall back to stock behaviour
             base.OnUpdate();
         }

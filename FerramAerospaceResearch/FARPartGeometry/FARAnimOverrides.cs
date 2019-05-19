@@ -13,9 +13,12 @@ namespace FerramAerospaceResearch
             ConfigNode[] nodes = GameDatabase.Instance.GetConfigNodes("FARAnimOverride");
             foreach (ConfigNode node in nodes)
             {
-                string moduleName    = node.GetValue("moduleName");
+                string moduleName = node.GetValue("moduleName");
                 string animNameField = node.GetValue("animNameField");
-                if (moduleName != null && animNameField != null && moduleName != string.Empty && animNameField != string.Empty)
+                if (moduleName != null &&
+                    animNameField != null &&
+                    moduleName != string.Empty &&
+                    animNameField != string.Empty)
                     animOverrides.Add(moduleName, animNameField);
             }
         }

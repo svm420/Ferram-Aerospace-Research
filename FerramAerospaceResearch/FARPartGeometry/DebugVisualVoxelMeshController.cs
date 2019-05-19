@@ -82,10 +82,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void UpdateActive()
         {
             foreach (DebugVisualVoxelSubmesh submesh in submeshes)
-            {
                 if (submesh != null)
                     submesh.Active = active;
-            }
         }
 
         public void Rebuild()
@@ -97,12 +95,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             SetupSubmeshes(meshes);
             for (int i = 0; i < meshes; i++)
             {
-                for (int j = i * MaxVoxelsPerSubmesh; j < Math.Min((i + 1) * MaxVoxelsPerSubmesh, DebugVoxels.Count); j++)
-                {
+                for (int j = i * MaxVoxelsPerSubmesh;
+                     j < Math.Min((i + 1) * MaxVoxelsPerSubmesh, DebugVoxels.Count);
+                     j++)
                     DebugVoxels[j].AddToMesh(submeshes[i].Vertices, submeshes[i].Uvs, submeshes[i].Triangles);
-                }
                 submeshes[i].Rebuild();
             }
+
             FARLogger.Info("Finished rebuilding visual voxel mesh.");
         }
 
@@ -114,21 +113,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public void Clear(bool clearVoxels = false)
         {
             foreach (DebugVisualVoxelSubmesh submesh in submeshes)
-            {
                 submesh.Clear();
-            }
             if (clearVoxels)
-            {
                 DebugVoxels.Clear();
-            }
         }
 
         private void SetupSubmeshes(int meshes)
         {
             for (int i = submeshes.Count; i < meshes; i++)
-            {
                 submeshes.Add(DebugVisualVoxelSubmesh.Create(Parent, active));
-            }
         }
 
         public void Dispose()
@@ -139,9 +132,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void DisposeSafe()
         {
             foreach (DebugVisualVoxelSubmesh submesh in submeshes)
-            {
                 Object.Destroy(submesh);
-            }
         }
 
         private static void QueueMainThreadTask(Action action)
@@ -153,10 +144,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else
             {
-                ThreadSafeDebugLogger.Instance.RegisterDebugMessage("Running " + action.Method.Name + " in main thread");
+                ThreadSafeDebugLogger.Instance.RegisterDebugMessage("Running " +
+                                                                    action.Method.Name +
+                                                                    " in main thread");
                 VoxelizationThreadpool.Instance.RunOnMainThread(action);
             }
         }
-
     }
 }

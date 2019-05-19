@@ -91,10 +91,18 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private bool fieldsVisible;
 
         // ReSharper disable NotAccessedField.Global -> unity
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiFormat = "F3", guiUnits = "FARUnitKN")]
+        [KSPField(isPersistant = false,
+            guiActive = false,
+            guiActiveEditor = false,
+            guiFormat = "F3",
+            guiUnits = "FARUnitKN")]
         public float dragForce;
 
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiFormat = "F3", guiUnits = "FARUnitKN")]
+        [KSPField(isPersistant = false,
+            guiActive = false,
+            guiActiveEditor = false,
+            guiFormat = "F3",
+            guiUnits = "FARUnitKN")]
         public float liftForce;
         // ReSharper restore NotAccessedField.Global
 
@@ -112,9 +120,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public struct ProjectedArea
         {
-            public double iN, iP;  //area in x direction
-            public double jN, jP;  //area in y direction
-            public double kN, kP;  //area in z direction
+            public double iN, iP; //area in x direction
+            public double jN, jP; //area in y direction
+            public double kN, kP; //area in z direction
             public double totalArea;
 
 
@@ -129,7 +137,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 return a;
             }
 
-            public static ProjectedArea operator + (ProjectedArea a, VoxelCrossSection.SideAreaValues b)
+            public static ProjectedArea operator +(ProjectedArea a, VoxelCrossSection.SideAreaValues b)
             {
                 a.iN += b.iN;
                 a.iP += b.iP;
@@ -152,7 +160,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     kP = b.kP
                 };
                 return a;
-
             }
         }
 
@@ -162,21 +169,21 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (!value)
                 return;
             worldSpaceAeroForce = Vector3.zero;
-            worldSpaceTorque    = Vector3.zero;
+            worldSpaceTorque = Vector3.zero;
 
             totalWorldSpaceAeroForce = Vector3.zero;
 
-            partLocalForce  = Vector3.zero;
+            partLocalForce = Vector3.zero;
             partLocalTorque = Vector3.zero;
 
-            partLocalAngVel  = Vector3.zero;
-            partLocalVel     = Vector3.zero;
+            partLocalAngVel = Vector3.zero;
+            partLocalVel = Vector3.zero;
             partLocalVelNorm = Vector3.zero;
 
-            part.dragVectorMag      = 0f;
-            part.dragVectorDir      = Vector3.zero;
+            part.dragVectorMag = 0f;
+            part.dragVectorDir = Vector3.zero;
             part.dragVectorDirLocal = Vector3.zero;
-            part.dragScalar         = 0f;
+            part.dragScalar = 0f;
 
             UpdateAeroDisplay();
         }
@@ -204,7 +211,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
             IncrementAreas(ref transformedArea, (float)areas.kN * -Vector3.forward, transformMatrix);
 
             projectedArea = transformedArea;
-            projectedArea.totalArea = projectedArea.iN + projectedArea.iP + projectedArea.jN + projectedArea.jP + projectedArea.kN + projectedArea.kP;
+            projectedArea.totalArea = projectedArea.iN +
+                                      projectedArea.iP +
+                                      projectedArea.jN +
+                                      projectedArea.jP +
+                                      projectedArea.kN +
+                                      projectedArea.kP;
 
             if (projectedArea.totalArea <= 0)
             {
@@ -215,16 +227,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     Fields["liftForce"].guiActive = false;
                     fieldsVisible = false;
                 }
+
                 if (!(liftArrow is null))
                 {
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
+
                 if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
                     dragArrow = null;
                 }
+
                 if (!(momentArrow is null))
                 {
                     Destroy(momentArrow);
@@ -237,12 +252,16 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
 
             double areaForStress = projectedArea.totalArea / 6;
-            if (!FARDebugValues.allowStructuralFailures || areaForStress <= 0.1 || part.Modules.Contains<RealChuteFAR>() || part.Modules.Contains<ModuleAblator>())
+            if (!FARDebugValues.allowStructuralFailures ||
+                areaForStress <= 0.1 ||
+                part.Modules.Contains<RealChuteFAR>() ||
+                part.Modules.Contains<ModuleAblator>())
             {
                 partForceMaxY = double.MaxValue;
                 partForceMaxXZ = double.MaxValue;
                 return;
             }
+
             partForceMaxY = areaForStress * partStressMaxY;
             partForceMaxXZ = areaForStress * partStressMaxXZ;
         }
@@ -294,6 +313,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 partStressMaxY = template.YmaxStress;
                 partStressMaxXZ = template.XZmaxStress;
             }
+
             partTransform = part.partTransform;
 
             materialColorUpdater = new MaterialColorUpdater(partTransform, PhysicsGlobals.TemperaturePropertyID);
@@ -305,7 +325,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 LegacyWingModel = null;
 
             // For handling airbrakes aero visualization
-            stockAeroSurfaceModule = part.Modules.Contains<ModuleAeroSurface>() ? part.Modules.GetModule<ModuleAeroSurface>() : null;
+            stockAeroSurfaceModule = part.Modules.Contains<ModuleAeroSurface>()
+                                         ? part.Modules.GetModule<ModuleAeroSurface>()
+                                         : null;
         }
 
         public double ProjectedAreaWorld(Vector3 normalizedDirectionVector)
@@ -340,10 +362,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             AeroVisualizationGUI aeroVizGUI = null;
 
-            if (FlightGUI.vesselFlightGUI != null && vessel != null && FlightGUI.vesselFlightGUI.TryGetValue(vessel, out FlightGUI flightGUI))
+            if (FlightGUI.vesselFlightGUI != null &&
+                vessel != null &&
+                FlightGUI.vesselFlightGUI.TryGetValue(vessel, out FlightGUI flightGUI))
                 aeroVizGUI = flightGUI.AeroVizGUI;
 
-            if (aeroVizGUI == null) return;
+            if (aeroVizGUI == null)
+                return;
 
             bool anyActive = aeroVizGUI.AnyVisualizationActive;
             if (!anyActive && !updateVisualization ||
@@ -382,7 +407,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             // Stall tinting overrides Cl / Cd tinting
             if (LegacyWingModel != null && aeroVizGUI.TintForStall)
-                return new Color((float)(LegacyWingModel.GetStall() * 100.0 / aeroVizGUI.FullySaturatedStall), 0f, 0f, 0.5f);
+                return new Color((float)(LegacyWingModel.GetStall() * 100.0 / aeroVizGUI.FullySaturatedStall),
+                                 0f,
+                                 0f,
+                                 0.5f);
 
             if (!aeroVizGUI.TintForCl && !aeroVizGUI.TintForCd)
                 return new Color(0, 0, 0, 0);
@@ -441,7 +469,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             part.dragScalar = 0;
             part.bodyLiftScalar = 0;
 
-            if(!vessel.packed)
+            if (!vessel.packed)
                 CheckAeroStressFailure();
 
             Rigidbody rb = part.Rigidbody;
@@ -465,13 +493,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 waterDragForce, waterLiftForce;
                 if (part.submergedPortion < 1)
                 {
-                    float waterFraction = (float)(part.submergedDynamicPressurekPa * part.submergedPortion + part.dynamicPressurekPa * (1 - part.submergedPortion));
+                    float waterFraction = (float)(part.submergedDynamicPressurekPa * part.submergedPortion +
+                                                  part.dynamicPressurekPa * (1 - part.submergedPortion));
                     waterFraction = (float)(part.submergedDynamicPressurekPa * part.submergedPortion) / waterFraction;
 
-                    waterDragForce = worldSpaceDragForce * waterFraction;        //calculate areaDrag vector
+                    waterDragForce = worldSpaceDragForce * waterFraction; //calculate areaDrag vector
                     waterLiftForce = worldSpaceLiftForce * waterFraction;
 
-                    worldSpaceDragForce -= waterDragForce;      //remove water drag from this
+                    worldSpaceDragForce -= waterDragForce; //remove water drag from this
                     worldSpaceLiftForce -= waterLiftForce;
 
                     waterDragForce *= (float)Math.Min(part.submergedDragScalar, 1);
@@ -483,18 +512,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     waterLiftForce = worldSpaceLiftForce * (float)part.submergedLiftScalar;
                     worldSpaceDragForce = Vector3.zero;
                 }
+
                 hackWaterDragVal += Math.Abs(waterDragForce.magnitude / (rb.mass * rb.velocity.magnitude));
 
-                if(!float.IsNaN(worldSpaceDragForce.x))
+                if (!float.IsNaN(worldSpaceDragForce.x))
                     part.AddForce(worldSpaceDragForce + worldSpaceLiftForce + waterLiftForce);
 
                 worldSpaceAeroForce = worldSpaceDragForce + worldSpaceLiftForce + waterDragForce + waterLiftForce;
             }
+
             part.AddTorque(worldSpaceTorque);
 
             partLocalForce = Vector3.zero;
             partLocalTorque = Vector3.zero;
-
         }
 
         //just to make water drag work in some possibly sane way
@@ -503,7 +533,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (waterSlowDragNew <= 0 || !vessel || part.submergedPortion <= 0)
                 return;
             PhysicsGlobals.BuoyancyWaterDragSlow = Math.Max(hackWaterDragVal, 0f);
-            hackWaterDragVal                     = 0;
+            hackWaterDragVal = 0;
 
             float vel = partLocalVel.magnitude;
 
@@ -524,7 +554,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             partLocalTorque += Vector3.Cross(localRadVector, localForce);
 
             partLocalTorque += localTorque;
-
         }
 
         public void UpdateVelocityAndAngVelocity(Vector3 frameVel)
@@ -553,25 +582,20 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             partLocalAngVel = rb.angularVelocity;
             partLocalAngVel = partTransform.InverseTransformDirection(partLocalAngVel);
-
         }
 
         // TODO 1.2: provide actual implementation of new 1.2 methods
+
         #region ILiftProvider
+
         public bool DisableBodyLift
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
         }
 
         public bool IsLifting
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
@@ -583,11 +607,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
             CoLMarker.dir = Vector3.zero;
             CoLMarker.lift = 1;
         }
+
         #endregion ILiftProvider
 
         private void CheckAeroStressFailure()
         {
-            if (partForceMaxY * (1 + part.submergedPortion * 1000) < partLocalForce.y || Vector3.ProjectOnPlane(partLocalForce, Vector3.up).magnitude > partForceMaxXZ * (1 + part.submergedPortion * 1000))
+            if (partForceMaxY * (1 + part.submergedPortion * 1000) < partLocalForce.y ||
+                Vector3.ProjectOnPlane(partLocalForce, Vector3.up).magnitude >
+                partForceMaxXZ * (1 + part.submergedPortion * 1000))
                 ApplyAeroStressFailure();
         }
 
@@ -612,6 +639,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 failureOccured = true;
             }
+
             if (part.parent)
             {
                 part.decouple(25);
@@ -621,12 +649,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (!failureOccured || !vessel)
                 return;
             vessel.SendMessage("AerodynamicFailureStatus");
-            string msg = Localizer.Format("FARFlightLogAeroFailure", KSPUtil.PrintTimeStamp(FlightLogger.met), part.partInfo.title);
+            string msg = Localizer.Format("FARFlightLogAeroFailure",
+                                          KSPUtil.PrintTimeStamp(FlightLogger.met),
+                                          part.partInfo.title);
             FlightLogger.eventLog.Add(msg);
             if (FARDebugValues.aeroFailureExplosions)
-            {
                 FXMonger.Explode(part, partTransform.position, (float)projectedArea.totalArea * 0.0005f);
-            }
         }
 
         private void UpdateAeroDisplay()
@@ -640,10 +668,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 worldDragArrow = Vector3.Dot(worldSpaceAeroForce, worldVelNorm) * worldVelNorm;
                 worldLiftArrow = worldSpaceAeroForce - worldDragArrow;
             }
+
             if (PhysicsGlobals.AeroForceDisplay && !part.ShieldedFromAirstream)
             {
                 if (liftArrow == null)
-                    liftArrow = ArrowPointer.Create(partTransform, Vector3.zero, worldLiftArrow, worldLiftArrow.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale, GUIColors.GetColor(0), true);
+                {
+                    liftArrow = ArrowPointer.Create(partTransform,
+                                                    Vector3.zero,
+                                                    worldLiftArrow,
+                                                    worldLiftArrow.magnitude *
+                                                    FARKSPAddonFlightScene.FARAeroForceDisplayScale,
+                                                    GUIColors.GetColor(0),
+                                                    true);
+                }
                 else
                 {
                     liftArrow.Direction = worldLiftArrow;
@@ -651,7 +688,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
 
                 if (dragArrow == null)
-                    dragArrow = ArrowPointer.Create(partTransform, Vector3.zero, worldDragArrow, worldDragArrow.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale, GUIColors.GetColor(1), true);
+                {
+                    dragArrow = ArrowPointer.Create(partTransform,
+                                                    Vector3.zero,
+                                                    worldDragArrow,
+                                                    worldDragArrow.magnitude *
+                                                    FARKSPAddonFlightScene.FARAeroForceDisplayScale,
+                                                    GUIColors.GetColor(1),
+                                                    true);
+                }
                 else
                 {
                     dragArrow.Direction = worldDragArrow;
@@ -661,11 +706,20 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (FARDebugValues.showMomentArrows)
                 {
                     if (momentArrow == null)
-                        momentArrow = ArrowPointer.Create(partTransform, Vector3.zero, worldSpaceTorque, worldSpaceTorque.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale, GUIColors.GetColor(2), true);
+                    {
+                        momentArrow = ArrowPointer.Create(partTransform,
+                                                          Vector3.zero,
+                                                          worldSpaceTorque,
+                                                          worldSpaceTorque.magnitude *
+                                                          FARKSPAddonFlightScene.FARAeroForceDisplayScale,
+                                                          GUIColors.GetColor(2),
+                                                          true);
+                    }
                     else
                     {
                         momentArrow.Direction = -worldSpaceTorque;
-                        momentArrow.Length = worldSpaceTorque.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale;
+                        momentArrow.Length =
+                            worldSpaceTorque.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale;
                     }
                 }
             }
@@ -676,11 +730,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
+
                 if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
                     dragArrow = null;
                 }
+
                 if (!(momentArrow is null))
                 {
                     Destroy(momentArrow);
@@ -699,7 +755,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 dragForce = worldDragArrow.magnitude;
                 liftForce = worldLiftArrow.magnitude;
-
             }
             else if (fieldsVisible)
             {
@@ -707,7 +762,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Fields["liftForce"].guiActive = false;
                 fieldsVisible = false;
             }
-
         }
 
         public override void OnLoad(ConfigNode node)
@@ -716,19 +770,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             if (!FARDebugValues.allowStructuralFailures || !node.HasNode("FARPartStressTemplate"))
                 return;
-            ConfigNode            stressTemplate  = node.GetNode("FARPartStressTemplate");
+            ConfigNode stressTemplate = node.GetNode("FARPartStressTemplate");
             FARPartStressTemplate defaultTemplate = FARAeroStress.DetermineStressTemplate(part);
-            if(stressTemplate.HasValue("YmaxStress"))
-            {
+            if (stressTemplate.HasValue("YmaxStress"))
                 if (!double.TryParse(stressTemplate.GetValue("YmaxStress"), out partStressMaxY))
                     partStressMaxY = defaultTemplate.YmaxStress;
-            }
             // ReSharper disable once InvertIf
             if (stressTemplate.HasValue("XZmaxStress"))
-            {
                 if (!double.TryParse(stressTemplate.GetValue("XZmaxStress"), out partStressMaxXZ))
                     partStressMaxXZ = defaultTemplate.XZmaxStress;
-            }
         }
 
         private void OnDestroy()
@@ -738,16 +788,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Destroy(liftArrow);
                 liftArrow = null;
             }
+
             if (dragArrow != null)
             {
                 Destroy(dragArrow);
                 dragArrow = null;
             }
+
             if (momentArrow != null)
             {
                 Destroy(momentArrow);
                 momentArrow = null;
             }
+
             LegacyWingModel = null;
             stockAeroSurfaceModule = null;
         }

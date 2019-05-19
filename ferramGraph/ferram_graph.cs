@@ -50,6 +50,7 @@ namespace ferram4
             private double horizontalScaling;
 
             #region Constructor
+
             public ferramGraphLine(int width, int height)
             {
                 lineDisplay = new Texture2D(width, height, TextureFormat.ARGB32, false);
@@ -60,10 +61,9 @@ namespace ferram4
                 horizontalScaling = 1;
             }
 
-
             #endregion
-            #region InputData
 
+            #region InputData
 
             public void InputData(double[] xValues, double[] yValues)
             {
@@ -71,6 +71,7 @@ namespace ferram4
                 rawDataY = yValues.replaceNaNs(0, "yValues");
                 ConvertRawToPixels(false);
             }
+
             #endregion
 
             #region ConvertRawToPixels
@@ -81,18 +82,17 @@ namespace ferram4
                 double yScaling = lineDisplay.height / (bounds.w - bounds.z);
                 pixelDataX = rawDataX.toPixelsF(bounds.x, horizontalScaling, xScaling);
                 pixelDataY = rawDataY.toPixelsF(bounds.z, verticalScaling, yScaling);
-                if(update)
+                if (update)
                     Update();
             }
+
             #endregion
 
             public void SetBoundaries(Vector4 boundaries)
             {
                 bounds = boundaries;
                 if (rawDataX.Length > 0)
-                {
                     ConvertRawToPixels();
-                }
             }
 
             public void Update()
@@ -102,14 +102,19 @@ namespace ferram4
                     lineThickness = 1;
                 int prev = 0;
 
-                for(int k = 1; k < pixelDataX.Length; k++)
+                for (int k = 1; k < pixelDataX.Length; k++)
                 {
-                    lineDisplay.DrawLineAAF(pixelDataX[prev], pixelDataY[prev], pixelDataX[k], pixelDataY[k], lineColor, lineThickness);
+                    lineDisplay.DrawLineAAF(pixelDataX[prev],
+                                            pixelDataY[prev],
+                                            pixelDataX[k],
+                                            pixelDataY[k],
+                                            lineColor,
+                                            lineThickness);
                     prev = k;
                 }
+
                 lineDisplay.Apply();
                 UpdateLineLegend();
-
             }
 
             private void UpdateLineLegend()
@@ -117,13 +122,11 @@ namespace ferram4
                 lineLegend = new Texture2D(25, 15, TextureFormat.ARGB32, false);
                 for (int i = 0; i < lineLegend.width; i++)
                     for (int j = 0; j < lineLegend.height; j++)
-                    {
                         lineLegend.SetPixel(i,
                                             j,
-                                            Mathf.Abs((int) (j - lineLegend.height / 2f)) < lineThickness
+                                            Mathf.Abs((int)(j - lineLegend.height / 2f)) < lineThickness
                                                 ? lineColor
                                                 : backgroundColor);
-                    }
                 lineLegend.Apply();
             }
 
@@ -134,7 +137,7 @@ namespace ferram4
             }
 
             /// <summary>
-            /// XMin, XMax, YMin, YMax
+            ///     XMin, XMax, YMin, YMax
             /// </summary>
             public Vector4d GetExtremeData()
             {
@@ -162,6 +165,7 @@ namespace ferram4
                 verticalScaling = scaling;
                 ConvertRawToPixels();
             }
+
             public void UpdateHorizontalScaling(double scaling)
             {
                 horizontalScaling = scaling;
@@ -199,7 +203,15 @@ namespace ferram4
 
         #region Constructors
 
-        public ferramGraph(int width, int height, double minx = 0, double maxx = 1, double miny = 0, double maxy = 1, bool autoscale = false)
+        public ferramGraph(
+            int width,
+            int height,
+            double minx = 0,
+            double maxx = 1,
+            double miny = 0,
+            double maxy = 1,
+            bool autoscale = false
+        )
         {
             graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
             this.autoscale = autoscale;
@@ -207,9 +219,11 @@ namespace ferram4
             displayRect = new Rect(1, 1, graph.width, graph.height);
             GridInit();
         }
+
         #endregion
 
         #region Scaling Functions
+
         public void SetBoundaries(double minx, double maxx, double miny, double maxy)
         {
             bounds.x = minx;
@@ -247,6 +261,7 @@ namespace ferram4
                 pixelWidth = 5;
                 Debug.Log("[FAR] [ferramGraph] Warning! Grid width scale too fine for scaling; picking safe alternative");
             }
+
             if (pixelHeight <= 1)
             {
                 pixelHeight = 5;
@@ -265,7 +280,8 @@ namespace ferram4
                 return;
             }
 
-            if (!allLines.TryGetValue(lineName, out ferramGraphLine line)) return;
+            if (!allLines.TryGetValue(lineName, out ferramGraphLine line))
+                return;
             line.UpdateVerticalScaling(scaling);
         }
 
@@ -279,11 +295,13 @@ namespace ferram4
                 return;
             }
 
-            if (!allLines.TryGetValue(lineName, out ferramGraphLine line)) return;
+            if (!allLines.TryGetValue(lineName, out ferramGraphLine line))
+                return;
             line.UpdateHorizontalScaling(scaling);
         }
 
         #endregion
+
         #region GridInit
 
         private void GridInit()
@@ -301,18 +319,17 @@ namespace ferram4
             for (int i = 0; i < graph.width; i++)
             {
                 for (int j = 0; j < graph.height; j++)
-                {
                     if (i - horizontalAxis == 0 || j - verticalAxis == 0)
                         graph.SetPixel(i, j, axisColor);
                     else if ((i - horizontalAxis) % widthSize == 0 || (j - verticalAxis) % heightSize == 0)
                         graph.SetPixel(i, j, gridColor);
                     else
                         graph.SetPixel(i, j, backgroundColor);
-                }
             }
 
             graph.Apply();
         }
+
         #endregion
 
         #region Add / Remove Line Functions
@@ -325,6 +342,7 @@ namespace ferram4
                 MonoBehaviour.print("[FAR] [ferramGraph] Error: A Line with that name already exists");
                 return;
             }
+
             var newLine = new ferramGraphLine((int)displayRect.width, (int)displayRect.height);
             newLine.SetBoundaries(bounds);
             allLines.Add(lineName, newLine);
@@ -351,13 +369,21 @@ namespace ferram4
             AddLine(lineName, xValues, yValues, lineColor, lineThickness);
         }
 
-        public void AddLine(string lineName, double[] xValues, double[] yValues, Color lineColor, int lineThickness, bool display = true)
+        public void AddLine(
+            string lineName,
+            double[] xValues,
+            double[] yValues,
+            Color lineColor,
+            int lineThickness,
+            bool display = true
+        )
         {
             if (allLines.ContainsKey(lineName))
             {
                 MonoBehaviour.print("[FAR] [ferramGraph] Error: A Line with that name already exists");
                 return;
             }
+
             if (xValues.Length != yValues.Length)
             {
                 MonoBehaviour.print("[FAR] [ferramGraph] Error: X and Y value arrays are different lengths");
@@ -390,15 +416,12 @@ namespace ferram4
 
             line.ClearTextures();
             Update();
-
         }
 
         public void Clear()
         {
-            foreach (KeyValuePair<string,ferramGraphLine> line in allLines)
-            {
+            foreach (KeyValuePair<string, ferramGraphLine> line in allLines)
                 line.Value.ClearTextures();
-            }
             allLines.Clear();
             Update();
         }
@@ -418,7 +441,6 @@ namespace ferram4
 
             if (allLines.TryGetValue(lineName, out ferramGraphLine line))
             {
-
                 line.InputData(xValues, yValues);
 
                 allLines.Remove(lineName);
@@ -426,20 +448,23 @@ namespace ferram4
                 Update();
             }
             else
+            {
                 MonoBehaviour.print("[FAR] [ferramGraph] Error: No line with this name exists");
-
+            }
         }
 
         #endregion
 
 
         #region Update Visual Functions
+
         /// <summary>
-        /// Use this to update the graph display
+        ///     Use this to update the graph display
         /// </summary>
         public void Update()
         {
             #region Autoscaling
+
             if (autoscale)
             {
                 Vector4d extremes = Vector4.zero;
@@ -462,7 +487,6 @@ namespace ferram4
                         extremes.y = Math.Max(extremes.y, tmp.y);
                         extremes.z = Math.Min(extremes.z, tmp.z);
                         extremes.w = Math.Max(extremes.w, tmp.w);
-
                     }
 
                     extremes.x = Math.Floor(extremes.x);
@@ -470,15 +494,17 @@ namespace ferram4
                     extremes.z = Math.Floor(extremes.z);
                     extremes.w = Math.Ceiling(extremes.w);
                 }
+
                 SetBoundaries(extremes);
             }
+
             #endregion
+
             foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
             {
                 pair.Value.backgroundColor = backgroundColor;
                 pair.Value.Update();
             }
-
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -503,13 +529,11 @@ namespace ferram4
             allLines.Add(lineName, line);
         }
 
-
         #endregion
 
 
-
         /// <summary>
-        /// This displays the graph
+        ///     This displays the graph
         /// </summary>
         public void Display(int horizontalBorder, int verticalBorder)
         {
@@ -521,7 +545,10 @@ namespace ferram4
             //Vertical axis and labels
 
             GUILayout.BeginVertical();
-            GUILayout.BeginArea(new Rect(20 + horizontalBorder, 15 + verticalBorder, 30, displayRect.height + 2 * verticalBorder));
+            GUILayout.BeginArea(new Rect(20 + horizontalBorder,
+                                         15 + verticalBorder,
+                                         30,
+                                         displayRect.height + 2 * verticalBorder));
 
             var LabelStyle = new GUIStyle(GUI.skin.label) {alignment = TextAnchor.UpperCenter};
 
@@ -539,7 +566,10 @@ namespace ferram4
             //Graph itself
 
             GUILayout.BeginVertical();
-            var areaRect = new Rect(50 + horizontalBorder, 15 + verticalBorder, displayRect.width + 2 * horizontalBorder, displayRect.height + 2 * verticalBorder);
+            var areaRect = new Rect(50 + horizontalBorder,
+                                    15 + verticalBorder,
+                                    displayRect.width + 2 * horizontalBorder,
+                                    displayRect.height + 2 * verticalBorder);
             GUILayout.BeginArea(areaRect);
 
             GUI.DrawTexture(displayRect, graph);
@@ -549,7 +579,10 @@ namespace ferram4
 
             //Horizontal Axis and Labels
 
-            GUILayout.BeginArea(new Rect(50 + horizontalBorder, displayRect.height + verticalBorder + 15, displayRect.width + 2 * horizontalBorder, 30));
+            GUILayout.BeginArea(new Rect(50 + horizontalBorder,
+                                         displayRect.height + verticalBorder + 15,
+                                         displayRect.width + 2 * horizontalBorder,
+                                         30));
             GUILayout.BeginHorizontal(GUILayout.Width(displayRect.width));
 
 
@@ -568,37 +601,40 @@ namespace ferram4
 
             //Legend Area
 
-            int movementdownwards = ((int)displayRect.height - allLines.Count * 20)/2;
+            int movementdownwards = ((int)displayRect.height - allLines.Count * 20) / 2;
             foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
             {
                 if (!pair.Value.displayInLegend)
                     continue;
 
-                GUILayout.BeginArea(new Rect(60 + displayRect.width + 2 * horizontalBorder, 15 + verticalBorder + movementdownwards, 25, 15));
+                GUILayout.BeginArea(new Rect(60 + displayRect.width + 2 * horizontalBorder,
+                                             15 + verticalBorder + movementdownwards,
+                                             25,
+                                             15));
                 GUI.DrawTexture(new Rect(1, 1, 25, 15), pair.Value.LegendImage());
                 GUILayout.EndArea();
-                GUILayout.BeginArea(new Rect(85 + displayRect.width + 2 * horizontalBorder, 15 + verticalBorder + movementdownwards, 35, 15));
+                GUILayout.BeginArea(new Rect(85 + displayRect.width + 2 * horizontalBorder,
+                                             15 + verticalBorder + movementdownwards,
+                                             35,
+                                             15));
                 GUILayout.Label(pair.Key, LabelStyle);
                 GUILayout.EndArea();
                 movementdownwards += 20;
             }
+
             GUILayout.EndVertical();
 
             int bottomofarea = (int)displayRect.height + 2 * verticalBorder + 30;
 
             GUILayout.Space(bottomofarea);
             GUILayout.EndScrollView();
-
         }
 
         public void Dispose()
         {
             foreach (KeyValuePair<string, ferramGraphLine> pair in allLines)
-            {
                 pair.Value.ClearTextures();
-            }
             allLines = null;
         }
-
     }
 }

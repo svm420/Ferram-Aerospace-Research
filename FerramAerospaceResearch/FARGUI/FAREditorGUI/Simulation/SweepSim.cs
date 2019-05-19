@@ -60,7 +60,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             return _instantCondition.Ready;
         }
 
-        public GraphData MachNumberSweep(double aoAdegrees, double pitch, double lowerBound, double upperBound, int numPoints, int flapSetting, bool spoilers, CelestialBody body)
+        public GraphData MachNumberSweep(
+            double aoAdegrees,
+            double pitch,
+            double lowerBound,
+            double upperBound,
+            int numPoints,
+            int flapSetting,
+            bool spoilers,
+            CelestialBody body
+        )
         {
             FARAeroUtil.UpdateCurrentActiveBody(body);
 
@@ -98,7 +107,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             return data;
         }
 
-        public GraphData AngleOfAttackSweep(double machNumber, double pitch, double lowerBound, double upperBound, int numPoints, int flapSetting, bool spoilers, CelestialBody body)
+        public GraphData AngleOfAttackSweep(
+            double machNumber,
+            double pitch,
+            double lowerBound,
+            double upperBound,
+            int numPoints,
+            int flapSetting,
+            bool spoilers,
+            CelestialBody body
+        )
         {
             if (machNumber.NearlyEqual(0))
                 machNumber = 0.001;
@@ -165,6 +183,5 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             return data;
         }
-
     }
 }

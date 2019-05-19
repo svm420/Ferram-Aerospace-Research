@@ -67,7 +67,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 return;
             geoModule.RebuildAllMeshData();
             lastAttachState = part.attachState;
-            lastTarget      = part.target;
+            lastTarget = part.target;
         }
 
         public void FlightGeometryUpdate()
@@ -78,7 +78,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 return;
             geoModule.RebuildAllMeshData();
             lastAttachState = part.attachState;
-            lastTarget      = part.target;
+            lastTarget = part.target;
         }
     }
 }

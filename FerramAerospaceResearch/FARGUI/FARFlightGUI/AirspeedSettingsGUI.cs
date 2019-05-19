@@ -57,11 +57,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public static bool allEnabled = true;
         private readonly Vessel _vessel;
         private GUIStyle buttonStyle;
-        public bool enabled
-        {
-            get;
-            set;
-        }
+        public bool enabled { get; set; }
 
         public AirspeedSettingsGUI(Vessel vessel, bool enabled = true)
         {
@@ -106,6 +102,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private SurfaceVelMode velMode = SurfaceVelMode.TAS;
 
         private SurfaceVelUnit unitMode = SurfaceVelUnit.M_S;
+
         // DaMichel: cache the velocity display string for retrieval in GetVelocityDisplayString
         private string velString;
         private bool active; // Have we actually generated the string?
@@ -155,9 +152,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             // No need to build the string
             if (!(allEnabled && enabled))
-            {
                 return;
-            }
 
             active = false;
             //DaMichel: Avoid conflict between multiple vessels in physics range. We only want to show the speed of the active vessel.
@@ -177,24 +172,25 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             {
                 case SurfaceVelUnit.KNOTS:
                     unitConversion = 1.943844492440604768413343347219;
-                    unitString     = surfUnit_str[1];
+                    unitString = surfUnit_str[1];
                     break;
                 case SurfaceVelUnit.KM_H:
                     unitConversion = 3.6;
-                    unitString     = surfUnit_str[3];
+                    unitString = surfUnit_str[3];
                     break;
                 case SurfaceVelUnit.MPH:
                     unitConversion = 2.236936;
-                    unitString     = surfUnit_str[2];
+                    unitString = surfUnit_str[2];
                     break;
                 default:
                     unitString = surfUnit_str[0];
                     break;
             }
+
             switch (velMode)
             {
                 case SurfaceVelMode.TAS:
-                    caption   = surfModel_str[0];
+                    caption = surfModel_str[0];
                     velString = (_vessel.srfSpeed * unitConversion).ToString("F1") + unitString;
                     break;
                 case SurfaceVelMode.IAS:
@@ -202,14 +198,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     velString = (CalculateIAS() * unitConversion).ToString("F1") + unitString;
                     break;
                 case SurfaceVelMode.EAS:
-                    caption   = surfModel_str[2];
+                    caption = surfModel_str[2];
                     velString = (CalculateEAS() * unitConversion).ToString("F1") + unitString;
                     break;
                 default:
-                    caption   = surfModel_str[3];
+                    caption = surfModel_str[3];
                     velString = _vessel.mach.ToString("F3");
                     break;
             }
+
             active = true;
 
             SpeedDisplay UI = SpeedDisplay.Instance;
@@ -223,11 +220,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public void SaveSettings()
         {
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
-            if(flightGUISettings == null)
+            if (flightGUISettings == null)
             {
                 FARLogger.Error("Could not save Airspeed Settings because settings config list was null");
                 return;
             }
+
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "AirSpeedSettings");
 
             if (node == null)
@@ -235,6 +233,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 node = new ConfigNode("AirSpeedSettings");
                 flightGUISettings.Add(node);
             }
+
             node.ClearData();
 
             node.AddValue("unitTypeIndex", (int)unitMode);

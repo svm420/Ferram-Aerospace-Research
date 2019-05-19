@@ -50,7 +50,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
     internal class VoxelChunk
     {
         private readonly PartSizePair[] voxelPoints;
-        private DebugVisualVoxel[, ,] visualVoxels;
+        private DebugVisualVoxel[,,] visualVoxels;
         private HashSet<Part> overridingParts;
 
         private double _size;
@@ -58,21 +58,25 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private Vector3d lowerCorner;
         private int offset;
 
-        public VoxelChunk(double size, Vector3d lowerCorner, int iOffset, int jOffset, int kOffset, HashSet<Part> overridingParts, bool usePartSize256)
+        public VoxelChunk(
+            double size,
+            Vector3d lowerCorner,
+            int iOffset,
+            int jOffset,
+            int kOffset,
+            HashSet<Part> overridingParts,
+            bool usePartSize256
+        )
         {
             _size = size;
             offset = iOffset + 8 * jOffset + 64 * kOffset;
             voxelPoints = new PartSizePair[512];
             if (usePartSize256)
-            {
                 for (int i = 0; i < voxelPoints.Length; i++)
                     voxelPoints[i] = new PartSizePair8Bit();
-            }
             else
-            {
                 for (int i = 0; i < voxelPoints.Length; i++)
                     voxelPoints[i] = new PartSizePair4Bit();
-            }
 
 
             this.lowerCorner = lowerCorner;
@@ -80,7 +84,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         // ReSharper disable ParameterHidesMember -> update member values
-        public void SetChunk(double size, Vector3d lowerCorner, int iOffset, int jOffset, int kOffset, HashSet<Part> overridingParts)
+        public void SetChunk(
+            double size,
+            Vector3d lowerCorner,
+            int iOffset,
+            int jOffset,
+            int kOffset,
+            HashSet<Part> overridingParts
+        )
         {
             _size = size;
             offset = iOffset + 8 * jOffset + 64 * kOffset;
@@ -101,7 +112,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         //Use when locking is unnecessary and only to change size, not part
-        public void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(
+            int zeroBaseIndex,
+            byte location,
+            VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL
+        )
         {
             zeroBaseIndex -= offset;
             voxelPoints[zeroBaseIndex].SetPlaneLocation(plane, location);
@@ -120,21 +135,40 @@ namespace FerramAerospaceResearch.FARPartGeometry
             int index = i + 8 * j + 64 * k - offset;
             SetPart(p, index, VoxelOrientationPlane.NONE, 0);
         }
+
         //Use when certain that locking is unnecessary and need to fill the location
-        public void SetVoxelPointGlobalIndexNoLock(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(
+            int zeroBaseIndex,
+            Part p,
+            byte location,
+            VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL
+        )
         {
             zeroBaseIndex -= offset;
             SetPart(p, zeroBaseIndex, plane, location);
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void SetVoxelPointGlobalIndexNoLock(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndexNoLock(
+            int i,
+            int j,
+            int k,
+            Part p,
+            byte location,
+            VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL
+        )
         {
             int index = i + 8 * j + 64 * k - offset;
             SetPart(p, index, plane, location);
         }
+
         //Sets point and ensures that includedParts includes p
-        public void SetVoxelPointGlobalIndex(int zeroBaseIndex, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndex(
+            int zeroBaseIndex,
+            Part p,
+            byte location,
+            VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL
+        )
         {
             zeroBaseIndex -= offset;
 
@@ -145,7 +179,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void SetVoxelPointGlobalIndex(int i, int j, int k, Part p, byte location, VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL)
+        public void SetVoxelPointGlobalIndex(
+            int i,
+            int j,
+            int k,
+            Part p,
+            byte location,
+            VoxelOrientationPlane plane = VoxelOrientationPlane.FILL_VOXEL
+        )
         {
             int index = i + 8 * j + 64 * k - offset;
 
@@ -162,9 +203,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Part currentPart = pair.part;
             //if we update the plane location with this, then we can consider replacing the part here.  Otherwise, we don't
             bool largerThanLast = pair.SetPlaneLocation(plane, location);
-            if (currentPart is null || overridingParts.Contains(p) || largerThanLast && !overridingParts.Contains(currentPart))
+            if (currentPart is null ||
+                overridingParts.Contains(p) ||
+                largerThanLast && !overridingParts.Contains(currentPart))
                 pair.part = p;
-
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -239,7 +281,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             elementSize = 1;
 
                         elementSize *= _size * 0.5f;
-                        var vx = new DebugVisualVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner + new Vector3d(i, j, k) * _size), elementSize);
+                        var vx =
+                            new DebugVisualVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner +
+                                                                                           new Vector3d(i, j, k) *
+                                                                                           _size),
+                                                 elementSize);
                         voxelMesh.DebugVoxels.Add(vx);
                         visualVoxels[i, j, k] = vx;
                     }
@@ -252,9 +298,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++)
                     for (int k = 0; k < 8; k++)
-                    {
                         visualVoxels[i, j, k] = null;
-                    }
         }
     }
 

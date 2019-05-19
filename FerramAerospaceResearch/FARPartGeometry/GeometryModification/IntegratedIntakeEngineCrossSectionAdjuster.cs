@@ -61,6 +61,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         private Transform intakeTrans;
 
         private Part part;
+
         public Part GetPart()
         {
             return part;
@@ -71,7 +72,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             return intakeModule.node == null || intakeModule.node.attachedPart == null;
         }
 
-        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
+        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(
+            PartModule intake,
+            Matrix4x4 worldToVesselMatrix
+        )
         {
             var adjuster = new IntegratedIntakeEngineCrossSectionAdjuster();
             adjuster.SetupAdjuster(intake, worldToVesselMatrix);
@@ -79,7 +83,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             return adjuster;
         }
 
-        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
+        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(
+            ModuleResourceIntake intake,
+            Matrix4x4 worldToVesselMatrix
+        )
         {
             var adjuster = new IntegratedIntakeEngineCrossSectionAdjuster();
             adjuster.SetupAdjuster(intake, worldToVesselMatrix);
@@ -87,7 +94,9 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             return adjuster;
         }
 
-        private IntegratedIntakeEngineCrossSectionAdjuster() { }
+        private IntegratedIntakeEngineCrossSectionAdjuster()
+        {
+        }
 
         public void SetupAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
         {
@@ -139,7 +148,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             sign = direction;
         }
 
-        public int GetForwardBackwardNoFlowSign() { return sign; }
+        public int GetForwardBackwardNoFlowSign()
+        {
+            return sign;
+        }
 
         public void TransformBasis(Matrix4x4 matrix)
         {
@@ -149,7 +161,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             tempMatrix = thisToVesselMatrix * tempMatrix;
 
             vehicleBasisForwardVector = tempMatrix.MultiplyVector(vehicleBasisForwardVector);
-
         }
 
         public void SetThisToVesselMatrixForTransform()
@@ -157,6 +168,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             meshLocalToWorld = intakeTrans.localToWorldMatrix;
         }
 
-        public void UpdateArea() { }
+        public void UpdateArea()
+        {
+        }
     }
 }

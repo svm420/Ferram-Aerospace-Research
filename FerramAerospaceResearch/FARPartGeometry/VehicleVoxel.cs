@@ -70,7 +70,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public double ElementSize { get; private set; }
 
         private double invElementSize;
-        private VoxelChunk[, , ] voxelChunks;
+        private VoxelChunk[,,] voxelChunks;
         private readonly DebugVisualVoxelMeshController voxelMesh;
         private HashSet<Part> overridingParts;
         private int xLength, yLength, zLength;
@@ -88,9 +88,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 var array = new VoxelCrossSection[MaxArrayLength];
                 for (int i = 0; i < array.Length; i++)
-                {
-                    array[i].partSideAreaValues = new Dictionary<Part, VoxelCrossSection.SideAreaValues>(ObjectReferenceEqualityComparer<Part>.Default);
-                }
+                    array[i].partSideAreaValues =
+                        new Dictionary<Part, VoxelCrossSection.SideAreaValues>(ObjectReferenceEqualityComparer<Part>
+                                                                                   .Default);
                 return array;
             }
         }
@@ -118,16 +118,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         clearedPlanes.Push(new SweepPlanePoint[1, 1]);
 
                     clearedPlanes.TrimExcess();
-
                 }
+
                 //2.2 / 64
-                int chunksForQueue = (int)Math.Ceiling(FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel * 0.034375);
+                int chunksForQueue =
+                    (int)Math.Ceiling(FARSettingsScenarioModule.VoxelSettings.numVoxelsControllableVessel * 0.034375);
 
                 if (MAX_CHUNKS_IN_QUEUE == chunksForQueue)
                     return;
                 clearedChunks.Clear();
                 MAX_CHUNKS_IN_QUEUE = chunksForQueue;
-                MAX_CHUNKS_ALLOWED  = (int)Math.Ceiling(1.5 * MAX_CHUNKS_IN_QUEUE);
+                MAX_CHUNKS_ALLOWED = (int)Math.Ceiling(1.5 * MAX_CHUNKS_IN_QUEUE);
 
                 FARLogger.Info("" + MAX_CHUNKS_IN_QUEUE + " " + MAX_CHUNKS_ALLOWED);
                 for (int i = 0; i < MAX_CHUNKS_IN_QUEUE; i++)
@@ -137,7 +138,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        public static VehicleVoxel CreateNewVoxel(List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded = true, bool solidify = true)
+        public static VehicleVoxel CreateNewVoxel(
+            List<GeometryPartModule> geoModules,
+            int elementCount,
+            bool multiThreaded = true,
+            bool solidify = true
+        )
         {
             var newVoxel = new VehicleVoxel();
 
@@ -146,7 +152,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return newVoxel;
         }
 
-        private void CreateVoxel(List<GeometryPartModule> geoModules, int elementCount, bool multiThreaded, bool solidify)
+        private void CreateVoxel(
+            List<GeometryPartModule> geoModules,
+            int elementCount,
+            bool multiThreaded,
+            bool solidify
+        )
         {
             var min = new Vector3d(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity);
             var max = new Vector3d(double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity);
@@ -173,6 +184,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     cont = false;
                     break;
                 }
+
                 if (!cont || !m.Valid)
                     continue;
 
@@ -188,13 +200,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             Vector3d size = max - min;
 
-            Volume = size.x * size.y * size.z;  //from bounds, get voxel volume
+            Volume = size.x * size.y * size.z; //from bounds, get voxel volume
 
-            if (double.IsInfinity(Volume))     //...if something broke, get out of here
+            if (double.IsInfinity(Volume)) //...if something broke, get out of here
             {
                 FARLogger.Error("Voxel Volume was infinity; ending voxelization");
                 return;
             }
+
             double elementVol = Volume / elementCount;
             ElementSize = Math.Pow(elementVol, 1d / 3d);
             invElementSize = 1 / ElementSize;
@@ -205,7 +218,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             yLength = (int)Math.Ceiling(size.y * tmp) + 2;
             zLength = (int)Math.Ceiling(size.z * tmp) + 2;
 
-            lock (clearedChunks)        //make sure that we can actually voxelize without breaking the memory limits
+            lock (clearedChunks) //make sure that we can actually voxelize without breaking the memory limits
             {
                 while (chunksInUse >= MAX_CHUNKS_ALLOWED)
                 {
@@ -228,7 +241,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 z = zLength * 4 * ElementSize
             };
 
-            Vector3d center = (max + min) * 0.5f;    //Center of the vessel
+            Vector3d center = (max + min) * 0.5f; //Center of the vessel
 
             //This places the center of the voxel at the center of the vehicle to achieve maximum symmetry
             LocalLowerRightCorner = center - extents;
@@ -243,7 +256,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 ThreadSafeDebugLogger.Instance.RegisterException(e);
             }
-
         }
 
         private VehicleVoxel()
@@ -265,9 +277,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                              modules.Contains("ProceduralFairingSide");
 
             if (g.HasCrossSectionAdjusters)
-            {
                 returnVal |= g.MaxCrossSectionAdjusterArea > 0;
-            }
 
             return returnVal;
         }
@@ -278,29 +288,33 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (!multiThreaded)
                 //Go through it backwards; this ensures that children (and so interior to cargo bay parts) are handled first
+            {
                 foreach (GeometryPartModule m in geoModules)
                 {
                     if (!m.Valid)
                         continue;
                     foreach (GeometryMesh mesh in m.meshDataList)
-                    {
-                        if(mesh.valid && mesh.gameObjectActiveInHierarchy)
+                        if (mesh.valid && mesh.gameObjectActiveInHierarchy)
                             UpdateFromMesh(mesh, m.part);
-                    }
                 }
+            }
             else
             {
                 int count = threadsQueued;
                 for (int i = 0; i < count; i++)
                 {
-                    var meshParams = new VoxelShellMeshParams(geoModules.Count * i / count, (i + 1) * geoModules.Count / count, geoModules);
+                    var meshParams = new VoxelShellMeshParams(geoModules.Count * i / count,
+                                                              (i + 1) * geoModules.Count / count,
+                                                              geoModules);
 
                     ThreadPool.QueueUserWorkItem(UpdateFromMesh, meshParams);
                 }
 
                 lock (_locker)
+                {
                     while (threadsQueued > 0)
                         Monitor.Wait(_locker);
+                }
             }
 
             if (!solidify)
@@ -322,8 +336,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (!multiThreaded)
                 return;
             lock (_locker)
+            {
                 while (threadsQueued > 0)
                     Monitor.Wait(_locker);
+            }
         }
 
         public void CleanupVoxel()
@@ -363,7 +379,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         #region CrossSection Calcs
-        public void CrossSectionData(VoxelCrossSection[] crossSections, Vector3 orientationVector, out int frontIndex, out int backIndex, out double sectionThickness, out double maxCrossSectionArea)
+
+        public void CrossSectionData(
+            VoxelCrossSection[] crossSections,
+            Vector3 orientationVector,
+            out int frontIndex,
+            out int backIndex,
+            out double sectionThickness,
+            out double maxCrossSectionArea
+        )
         {
             //TODO: Look into setting better limits for iterating over sweep plane to improve off-axis performance
 
@@ -381,7 +405,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             sectionThickness = ElementSize;
 
-            Matrix4x4 sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(new Vector3(0, 0, 1), orientationVector), Vector3.one);
+            Matrix4x4 sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero,
+                                                                  Quaternion.FromToRotation(new Vector3(0, 0, 1),
+                                                                                            orientationVector),
+                                                                  Vector3.one);
             Matrix4x4 vesselToSectionNormal = sectionNormalToVesselCoords.inverse;
 
             //Code has multiple optimizations to take advantage of the limited range of values that are included.  They are listed below
@@ -423,14 +450,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     double centz = 0;
 
                     double i_xx = 0, i_xy = 0, i_yy = 0;
-                    Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas = crossSections[m].partSideAreaValues;
+                    Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas =
+                        crossSections[m].partSideAreaValues;
                     partSideAreas.Clear();
 
                     //Overall ones iterate over the actual voxel indices (to make use of the equation of the plane) but are used to get chunk indices
                     for (int iOverall = 0; iOverall < xCellLength; iOverall += 8)
                         for (int kOverall = 0; kOverall < zCellLength; kOverall += 8)
                         {
-
                             int jSect1, jSect3;
 
                             //Determine high and low points on this quad of the plane
@@ -445,7 +472,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 jSect1 = (int)-(plane.x * (iOverall + 7) + plane.z * kOverall + plane.w);
                                 jSect3 = (int)-(plane.x * iOverall + plane.z * (kOverall + 7) + plane.w);
                             }
-                            int jSect2 = (int)((jSect1 + jSect3) * 0.5);     //Central point
+
+                            int jSect2 = (int)((jSect1 + jSect3) * 0.5); //Central point
 
                             int jMin = Math.Min(jSect1, jSect3);
                             int jMax = Math.Max(jSect1, jSect3) + 1;
@@ -454,10 +482,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             jSect2 >>= 3;
                             jSect3 = (jMax - 1) >> 3;
 
-                            if (jSect1 >= yLength)  //if the smallest sect is above the limit, they all are
+                            if (jSect1 >= yLength) //if the smallest sect is above the limit, they all are
                                 continue;
 
-                            if (jSect3 < 0)         //if the largest sect is below the limit, they all are
+                            if (jSect3 < 0) //if the largest sect is below the limit, they all are
                                 continue;
 
                             //If chunk indices are identical, only get that one and it's very simple; only need to check 1 and 3, because if any are different, it must be those
@@ -495,9 +523,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                             size = 1.0;
 
                                         areaCount += size;
-                                        centx     += i * size;
-                                        centy     += j * size;
-                                        centz     += k * size;
+                                        centx += i * size;
+                                        centy += j * size;
+                                        centz += k * size;
 
                                         Vector3 location = vesselToSectionNormal.MultiplyVector(new Vector3(i, j, k));
                                         i_xx += location.x * location.x * size;
@@ -506,25 +534,27 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                     }
                                 }
                             }
-                            else                       //Two or three different indices requires separate handling
+                            else //Two or three different indices requires separate handling
                             {
                                 VoxelChunk sect1 = null, sect2 = null, sect3 = null;
 
                                 int iSect = iOverall >> 3;
                                 int kSect = kOverall >> 3;
                                 bool validSects = false;
-                                if (!(jSect1 < 0))      //this block ensures that there are sections here to check
+                                if (!(jSect1 < 0)) //this block ensures that there are sections here to check
                                 {
                                     sect1 = voxelChunks[iSect, jSect1, kSect];
                                     if (sect1 != null)
                                         validSects = true;
                                 }
+
                                 if (!(jSect2 < 0 || jSect2 >= yLength))
                                 {
                                     sect2 = voxelChunks[iSect, jSect2, kSect];
                                     if (sect2 != null && sect2 != sect1)
                                         validSects = true;
                                 }
+
                                 if (!(jSect3 >= yLength))
                                 {
                                     sect3 = voxelChunks[iSect, jSect3, kSect];
@@ -568,9 +598,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                             size = 1.0;
 
                                         areaCount += size;
-                                        centx     += i * size;
-                                        centy     += j * size;
-                                        centz     += k * size;
+                                        centx += i * size;
+                                        centy += j * size;
+                                        centz += k * size;
 
                                         Vector3 location = vesselToSectionNormal.MultiplyVector(new Vector3(i, j, k));
                                         i_xx += location.x * location.x * size;
@@ -580,18 +610,23 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 }
                             }
                         }
+
                     var centroid = new Vector3d(centx, centy, centz);
                     if (areaCount > 0)
                     {
                         if (frontIndexFound)
+                        {
                             backIndex = m;
+                        }
                         else
                         {
                             frontIndexFound = true;
                             frontIndex = m;
                         }
+
                         centroid /= areaCount;
                     }
+
                     Vector3 localCentroid = vesselToSectionNormal.MultiplyVector(centroid);
                     i_xx -= areaCount * localCentroid.x * localCentroid.x;
                     i_xy -= areaCount * localCentroid.x * localCentroid.y;
@@ -611,17 +646,21 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         flatnessRatio = (i_xy * tanPrinAngle + i_xx) / flatnessRatio;
                         flatnessRatio = Math.Sqrt(Math.Sqrt(flatnessRatio));
                     }
+
                     if (double.IsNaN(flatnessRatio))
                         flatnessRatio = 1;
 
                     Vector3 principalAxis;
                     if (flatnessRatio > 1)
+                    {
                         principalAxis = axis1;
+                    }
                     else
                     {
                         flatnessRatio = 1 / flatnessRatio;
                         principalAxis = axis2;
                     }
+
                     if (flatnessRatio > 10)
                         flatnessRatio = 10;
 
@@ -630,7 +669,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " + m);
+                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
+                                                                       m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -670,7 +710,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     double centy = 0;
                     double centz = 0;
 
-                    Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas = crossSections[m].partSideAreaValues;
+                    Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas =
+                        crossSections[m].partSideAreaValues;
                     partSideAreas.Clear();
 
                     for (int jOverall = 0; jOverall < yCellLength; jOverall += 8)
@@ -688,6 +729,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 iSect1 = (int)(-(plane.y * (jOverall + 7) + plane.z * kOverall + plane.w) + 0.5);
                                 iSect3 = (int)(-(plane.y * jOverall + plane.z * (kOverall + 7) + plane.w) + 0.5);
                             }
+
                             int iSect2 = (int)((iSect1 + iSect3) * 0.5);
 
                             int iMin = Math.Min(iSect1, iSect3);
@@ -697,10 +739,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             iSect2 >>= 3;
                             iSect3 = (iMax - 1) >> 3;
 
-                            if (iSect1 >= xLength)  //if the smallest sect is above the limit, they all are
+                            if (iSect1 >= xLength) //if the smallest sect is above the limit, they all are
                                 continue;
 
-                            if (iSect3 < 0)         //if the largest sect is below the limit, they all are
+                            if (iSect3 < 0) //if the largest sect is below the limit, they all are
                                 continue;
 
                             if (iSect1 == iSect3)
@@ -736,9 +778,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                             size = 1.0;
 
                                         areaCount += size;
-                                        centx     += i * size;
-                                        centy     += j * size;
-                                        centz     += k * size;
+                                        centx += i * size;
+                                        centy += j * size;
+                                        centz += k * size;
 
                                         Vector3 location = vesselToSectionNormal.MultiplyVector(new Vector3(i, j, k));
                                         i_xx += location.x * location.x * size;
@@ -761,6 +803,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                     if (sect1 != null)
                                         validSects = true;
                                 }
+
                                 if (!(iSect2 < 0 || iSect2 >= xLength))
                                 {
                                     sect2 = voxelChunks[iSect2, jSect, kSect];
@@ -811,9 +854,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                             size = 1.0;
 
                                         areaCount += size;
-                                        centx     += i * size;
-                                        centy     += j * size;
-                                        centz     += k * size;
+                                        centx += i * size;
+                                        centy += j * size;
+                                        centz += k * size;
 
                                         Vector3 location = vesselToSectionNormal.MultiplyVector(new Vector3(i, j, k));
                                         i_xx += location.x * location.x * size;
@@ -823,18 +866,23 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 }
                             }
                         }
+
                     var centroid = new Vector3d(centx, centy, centz);
                     if (areaCount > 0)
                     {
                         if (frontIndexFound)
+                        {
                             backIndex = m;
+                        }
                         else
                         {
                             frontIndexFound = true;
                             frontIndex = m;
                         }
+
                         centroid /= areaCount;
                     }
+
                     Vector3 localCentroid = vesselToSectionNormal.MultiplyVector(centroid);
                     i_xx -= areaCount * localCentroid.x * localCentroid.x;
                     i_xy -= areaCount * localCentroid.x * localCentroid.y;
@@ -854,17 +902,21 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         flatnessRatio = (i_xy * tanPrinAngle + i_xx) / flatnessRatio;
                         flatnessRatio = Math.Sqrt(Math.Sqrt(flatnessRatio));
                     }
+
                     if (double.IsNaN(flatnessRatio))
                         flatnessRatio = 1;
 
                     Vector3 principalAxis;
                     if (flatnessRatio > 1)
+                    {
                         principalAxis = axis1;
+                    }
                     else
                     {
                         flatnessRatio = 1 / flatnessRatio;
                         principalAxis = axis2;
                     }
+
                     if (flatnessRatio > 10)
                         flatnessRatio = 10;
 
@@ -873,7 +925,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " + m);
+                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
+                                                                       m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -910,11 +963,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 for (int m = 0; m < sectionCount; m++)
                 {
                     double areaCount = 0;
-                    double centx =  0;
+                    double centx = 0;
                     double centy = 0;
                     double centz = 0;
 
-                    Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas = crossSections[m].partSideAreaValues;
+                    Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas =
+                        crossSections[m].partSideAreaValues;
                     partSideAreas.Clear();
 
                     //Overall ones iterate over the actual voxel indices (to make use of the equation of the plane) but are used to get chunk indices
@@ -934,6 +988,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 kSect1 = (int)(-(plane.x * (iOverall + 7) + plane.y * jOverall + plane.w) + 0.5);
                                 kSect3 = (int)(-(plane.x * iOverall + plane.y * (jOverall + 7) + plane.w) + 0.5);
                             }
+
                             int kSect2 = (int)((kSect1 + kSect3) * 0.5);
 
                             int kMin = Math.Min(kSect1, kSect3);
@@ -943,10 +998,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             kSect2 >>= 3;
                             kSect3 = (kMax - 1) >> 3;
 
-                            if (kSect1 >= zLength)  //if the smallest sect is above the limit, they all are
+                            if (kSect1 >= zLength) //if the smallest sect is above the limit, they all are
                                 continue;
 
-                            if (kSect3 < 0)         //if the largest sect is below the limit, they all are
+                            if (kSect3 < 0) //if the largest sect is below the limit, they all are
                                 continue;
 
                             //If chunk indices are identical, only get that one and it's very simple
@@ -985,9 +1040,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                             size = 1.0;
 
                                         areaCount += size;
-                                        centx     += i * size;
-                                        centy     += j * size;
-                                        centz     += k * size;
+                                        centx += i * size;
+                                        centy += j * size;
+                                        centz += k * size;
 
                                         Vector3 location = vesselToSectionNormal.MultiplyVector(new Vector3(i, j, k));
                                         i_xx += location.x * location.x * size;
@@ -1011,12 +1066,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                     if (sect1 != null)
                                         validSects = true;
                                 }
+
                                 if (!(kSect2 < 0 || kSect2 >= zLength))
                                 {
                                     sect2 = voxelChunks[iSect, jSect, kSect2];
                                     if (sect2 != null && sect2 != sect1)
                                         validSects = true;
                                 }
+
                                 if (!(kSect3 >= zLength))
                                 {
                                     sect3 = voxelChunks[iSect, jSect, kSect3];
@@ -1059,9 +1116,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                         if (size > 1.0)
                                             size = 1.0;
                                         areaCount += size;
-                                        centx     += i * size;
-                                        centy     += j * size;
-                                        centz     += k * size;
+                                        centx += i * size;
+                                        centy += j * size;
+                                        centz += k * size;
 
                                         Vector3 location = vesselToSectionNormal.MultiplyVector(new Vector3(i, j, k));
                                         i_xx += location.x * location.x * size;
@@ -1076,14 +1133,18 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     if (areaCount > 0)
                     {
                         if (frontIndexFound)
+                        {
                             backIndex = m;
+                        }
                         else
                         {
                             frontIndexFound = true;
                             frontIndex = m;
                         }
+
                         centroid /= areaCount;
                     }
+
                     Vector3 localCentroid = vesselToSectionNormal.MultiplyVector(centroid);
                     i_xx -= areaCount * localCentroid.x * localCentroid.x;
                     i_xy -= areaCount * localCentroid.x * localCentroid.y;
@@ -1103,17 +1164,21 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         flatnessRatio = (i_xy * tanPrinAngle + i_xx) / flatnessRatio;
                         flatnessRatio = Math.Sqrt(Math.Sqrt(flatnessRatio));
                     }
+
                     if (double.IsNaN(flatnessRatio))
                         flatnessRatio = 1;
 
                     Vector3 principalAxis;
                     if (flatnessRatio > 1)
+                    {
                         principalAxis = axis1;
+                    }
                     else
                     {
                         flatnessRatio = 1 / flatnessRatio;
                         principalAxis = axis2;
                     }
+
                     if (flatnessRatio > 10)
                         flatnessRatio = 10;
 
@@ -1122,7 +1187,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " + m);
+                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
+                                                                       m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -1136,11 +1202,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             maxCrossSectionArea = 0;
 
 
-            for (int i = frontIndex; i <= backIndex; i++)       //calculate 2nd derivs, raw
+            for (int i = frontIndex; i <= backIndex; i++) //calculate 2nd derivs, raw
             {
                 double areaM1, area0, areaP1;
 
-                if(i == frontIndex)     //forward difference for frontIndex
+                if (i == frontIndex) //forward difference for frontIndex
                 {
                     areaM1 = crossSections[i].area;
                     area0 = crossSections[i + 1].area;
@@ -1152,7 +1218,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     area0 = crossSections[i - 1].area;
                     areaP1 = crossSections[i].area;
                 }
-                else                     //central difference for all others
+                else //central difference for all others
                 {
                     areaM1 = crossSections[i - 1].area;
                     area0 = crossSections[i].area;
@@ -1169,7 +1235,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private void DetermineIfPartGetsForcesAndAreas(Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas, PartSizePair voxel, int i, int j, int k)
+        private void DetermineIfPartGetsForcesAndAreas(
+            Dictionary<Part, VoxelCrossSection.SideAreaValues> partSideAreas,
+            PartSizePair voxel,
+            int i,
+            int j,
+            int k
+        )
         {
             // ReSharper disable BitwiseOperatorOnEnumWithoutFlags
             var filledPlanes = VoxelOrientationPlane.NONE;
@@ -1182,6 +1254,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 areas = new VoxelCrossSection.SideAreaValues();
                 partGetsForces = false;
             }
+
             if (i + 1 >= xCellLength || !VoxelPointExistsAtPos(i + 1, j, k))
             {
                 areas.iP += ElementSize * ElementSize;
@@ -1189,7 +1262,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 partGetsForces = true;
             }
             else
+            {
                 filledPlanes |= VoxelOrientationPlane.X_UP;
+            }
 
             if (i - 1 < 0 || !VoxelPointExistsAtPos(i - 1, j, k))
             {
@@ -1198,7 +1273,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 partGetsForces = true;
             }
             else
+            {
                 filledPlanes |= VoxelOrientationPlane.X_DOWN;
+            }
 
             if (j + 1 >= yCellLength || !VoxelPointExistsAtPos(i, j + 1, k))
             {
@@ -1207,7 +1284,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 partGetsForces = true;
             }
             else
+            {
                 filledPlanes |= VoxelOrientationPlane.Y_UP;
+            }
 
             if (j - 1 < 0 || !VoxelPointExistsAtPos(i, j - 1, k))
             {
@@ -1216,7 +1295,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 partGetsForces = true;
             }
             else
+            {
                 filledPlanes |= VoxelOrientationPlane.Y_DOWN;
+            }
 
             if (k + 1 >= zCellLength || !VoxelPointExistsAtPos(i, j, k + 1))
             {
@@ -1225,7 +1306,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 partGetsForces = true;
             }
             else
+            {
                 filledPlanes |= VoxelOrientationPlane.Z_UP;
+            }
 
             if (k - 1 < 0 || !VoxelPointExistsAtPos(i, j, k - 1))
             {
@@ -1234,7 +1317,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 partGetsForces = true;
             }
             else
+            {
                 filledPlanes |= VoxelOrientationPlane.Z_DOWN;
+            }
 
             if (partGetsForces)
             {
@@ -1259,6 +1344,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             return tanAngle;
         }
+
         #endregion
 
         #region VoxelViz
@@ -1272,11 +1358,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 for (int j = 0; j < yLength; j++)
                 {
                     for (int k = 0; k < zLength; k++)
-                    {
                         voxelChunks[i, j, k]?.ClearVisualVoxels();
-                    }
                 }
             }
+
             voxelMesh.Clear(true);
         }
 
@@ -1288,14 +1373,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 for (int j = 0; j < yLength; j++)
                 {
                     for (int k = 0; k < zLength; k++)
-                    {
                         voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, voxelMesh);
-                    }
                 }
             }
+
             voxelMesh.RebuildSafe();
             voxelMesh.Active = true;
         }
+
         #endregion
 
         //Only use to change size, not part
@@ -1313,14 +1398,24 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 lock (clearedChunks)
                 {
                     if (clearedChunks.Count > 0)
-                    {
                         section = clearedChunks.Pop();
-                    }
                 }
+
                 if (section == null)
-                    section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                    section = new VoxelChunk(ElementSize,
+                                             LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                             iSec * 8,
+                                             jSec * 8,
+                                             kSec * 8,
+                                             overridingParts,
+                                             useHigherResVoxels);
                 else
-                    section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                    section.SetChunk(ElementSize,
+                                     LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                     iSec * 8,
+                                     jSec * 8,
+                                     kSec * 8,
+                                     overridingParts);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1344,14 +1439,24 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 lock (clearedChunks)
                 {
                     if (clearedChunks.Count > 0)
-                    {
                         section = clearedChunks.Pop();
-                    }
                 }
+
                 if (section == null)
-                    section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                    section = new VoxelChunk(ElementSize,
+                                             LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                             iSec * 8,
+                                             jSec * 8,
+                                             kSec * 8,
+                                             overridingParts,
+                                             useHigherResVoxels);
                 else
-                    section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                    section.SetChunk(ElementSize,
+                                     LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                     iSec * 8,
+                                     jSec * 8,
+                                     kSec * 8,
+                                     overridingParts);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1371,17 +1476,27 @@ namespace FerramAerospaceResearch.FARPartGeometry
             VoxelChunk section = voxelChunks[iSec, jSec, kSec];
             if (section == null)
             {
-                lock(clearedChunks)
+                lock (clearedChunks)
                 {
-                    if(clearedChunks.Count > 0)
-                    {
+                    if (clearedChunks.Count > 0)
                         section = clearedChunks.Pop();
-                    }
                 }
+
                 if (section == null)
-                    section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                    section = new VoxelChunk(ElementSize,
+                                             LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                             iSec * 8,
+                                             jSec * 8,
+                                             kSec * 8,
+                                             overridingParts,
+                                             useHigherResVoxels);
                 else
-                    section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                    section.SetChunk(ElementSize,
+                                     LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                     iSec * 8,
+                                     jSec * 8,
+                                     kSec * 8,
+                                     overridingParts);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1404,17 +1519,28 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 section = voxelChunks[iSec, jSec, kSec];
                 if (section == null)
                 {
-                    lock(clearedChunks)
+                    lock (clearedChunks)
                     {
-                        if(clearedChunks.Count > 0)
-                        {
+                        if (clearedChunks.Count > 0)
                             section = clearedChunks.Pop();
-                        }
                     }
+
                     if (section == null)
-                        section = new VoxelChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts, useHigherResVoxels);
+                        section = new VoxelChunk(ElementSize,
+                                                 LocalLowerRightCorner +
+                                                 new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                                 iSec * 8,
+                                                 jSec * 8,
+                                                 kSec * 8,
+                                                 overridingParts,
+                                                 useHigherResVoxels);
                     else
-                        section.SetChunk(ElementSize, LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8, iSec * 8, jSec * 8, kSec * 8, overridingParts);
+                        section.SetChunk(ElementSize,
+                                         LocalLowerRightCorner + new Vector3d(iSec, jSec, kSec) * ElementSize * 8,
+                                         iSec * 8,
+                                         jSec * 8,
+                                         kSec * 8,
+                                         overridingParts);
 
                     voxelChunks[iSec, jSec, kSec] = section;
                 }
@@ -1482,17 +1608,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 continue;
 
                             foreach (GeometryMesh mesh in module.meshDataList)
-                            {
                                 lock (mesh)
+                                {
                                     if (mesh.meshTransform != null && mesh.gameObjectActiveInHierarchy && mesh.valid)
                                         meshes.Add(mesh);
-                            }
+                                }
                         }
                     });
                     foreach (GeometryMesh mesh in meshes)
-                    {
                         UpdateFromMesh(mesh, mesh.part);
-                    }
                 }
                 else
                 {
@@ -1507,8 +1631,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         {
                             bool updateFromMesh = false;
                             lock (mesh)
+                            {
                                 if (mesh.meshTransform != null && mesh.gameObjectActiveInHierarchy && mesh.valid)
                                     updateFromMesh = true;
+                            }
 
                             if (updateFromMesh)
                                 UpdateFromMesh(mesh, mesh.part);
@@ -1529,6 +1655,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
             }
         }
+
         private void UpdateFromMesh(GeometryMesh mesh, Part part)
         {
             for (int a = 0; a < mesh.triangles.Length; a += 3)
@@ -1566,12 +1693,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
             for (int i = lowerI; i <= upperI; i++)
                 for (int j = lowerJ; j <= upperJ; j++)
                     for (int k = lowerK; k <= upperK; k++)
-                    {
                         SetVoxelPoint(i, j, k, part, VoxelOrientationPlane.FILL_VOXEL, 1);
-                    }
         }
 
-        private void CalculateVoxelShellForTriangle(Vector3 vert1, Vector3 vert2, Vector3 vert3, Part part, int invertXYZ)
+        private void CalculateVoxelShellForTriangle(
+            Vector3 vert1,
+            Vector3 vert2,
+            Vector3 vert3,
+            Part part,
+            int invertXYZ
+        )
         {
             Vector4 indexPlane = CalculateEquationOfPlaneInIndices(vert1, vert2, vert3);
 
@@ -1581,26 +1712,25 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             double testSum = x + y + z;
             if (testSum.NearlyEqual(0) || double.IsNaN(testSum) || double.IsInfinity(testSum))
-            {
                 //after much user confusion, we're just gonna quietly swallow this error; need to change so there's a debug switch
                 return;
-            }
 
             if (z >= y && z >= x * 0.999)
-            {
                 VoxelShellTrianglePerpZ(indexPlane, vert1, vert2, vert3, part, invertXYZ);
-            }
             else if (x > z && x >= y)
-            {
                 VoxelShellTrianglePerpX(indexPlane, vert1, vert2, vert3, part, invertXYZ);
-            }
             else
-            {
                 VoxelShellTrianglePerpY(indexPlane, vert1, vert2, vert3, part, invertXYZ);
-            }
         }
 
-        private void VoxelShellTrianglePerpX(Vector4 indexPlane, Vector3 vert1, Vector3 vert2, Vector3 vert3, Part part, int invertTri)
+        private void VoxelShellTrianglePerpX(
+            Vector4 indexPlane,
+            Vector3 vert1,
+            Vector3 vert2,
+            Vector3 vert3,
+            Part part,
+            int invertTri
+        )
         {
             Vector3 vert1Proj = (vert1 - LocalLowerRightCorner) * invElementSize;
             Vector3 vert2Proj = (vert2 - LocalLowerRightCorner) * invElementSize;
@@ -1678,7 +1808,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         (u < 0.5 || u + v > 0.5) && p2TestPt.magnitude <= RC ||
                         (v < 0.5 || u + v > 0.5) && p3TestPt.magnitude <= RC)
                     {
-
                         floatLoc = (i - iFloat) * signW + 0.5;
                         floatLoc *= maxLocation * 0.25d;
 
@@ -1697,12 +1826,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     bool validDistFromSide = false;
                     double distFromSide = DistanceFromSide(p1p2, p1TestPt);
                     if (distFromSide <= RC)
+                    {
                         validDistFromSide = true;
+                    }
                     else
                     {
                         distFromSide = DistanceFromSide(p1p3, p1TestPt);
                         if (distFromSide <= RC)
+                        {
                             validDistFromSide = true;
+                        }
                         else
                         {
                             distFromSide = DistanceFromSide(vert3Proj - vert2Proj, p2TestPt);
@@ -1728,7 +1861,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
         }
 
-        private void VoxelShellTrianglePerpY(Vector4 indexPlane, Vector3 vert1, Vector3 vert2, Vector3 vert3, Part part, int invertTri)
+        private void VoxelShellTrianglePerpY(
+            Vector4 indexPlane,
+            Vector3 vert1,
+            Vector3 vert2,
+            Vector3 vert3,
+            Part part,
+            int invertTri
+        )
         {
             Vector3 vert1Proj = (vert1 - LocalLowerRightCorner) * invElementSize;
             Vector3 vert2Proj = (vert2 - LocalLowerRightCorner) * invElementSize;
@@ -1827,12 +1967,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     bool validDistFromSide = false;
                     double distFromSide = DistanceFromSide(p1p2, p1TestPt);
                     if (distFromSide <= RC)
+                    {
                         validDistFromSide = true;
+                    }
                     else
                     {
                         distFromSide = DistanceFromSide(p1p3, p1TestPt);
                         if (distFromSide <= RC)
+                        {
                             validDistFromSide = true;
+                        }
                         else
                         {
                             distFromSide = DistanceFromSide(vert3Proj - vert2Proj, p2TestPt);
@@ -1858,7 +2002,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
         }
 
-        private void VoxelShellTrianglePerpZ(Vector4 indexPlane, Vector3 vert1, Vector3 vert2, Vector3 vert3, Part part, int invertTri)
+        private void VoxelShellTrianglePerpZ(
+            Vector4 indexPlane,
+            Vector3 vert1,
+            Vector3 vert2,
+            Vector3 vert3,
+            Part part,
+            int invertTri
+        )
         {
             Vector3 vert1Proj = (vert1 - LocalLowerRightCorner) * invElementSize;
             Vector3 vert2Proj = (vert2 - LocalLowerRightCorner) * invElementSize;
@@ -1956,12 +2107,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     bool validDistFromSide = false;
                     double distFromSide = DistanceFromSide(p1p2, p1TestPt);
                     if (distFromSide <= RC)
+                    {
                         validDistFromSide = true;
+                    }
                     else
                     {
                         distFromSide = DistanceFromSide(p1p3, p1TestPt);
                         if (distFromSide <= RC)
+                        {
                             validDistFromSide = true;
+                        }
                         else
                         {
                             distFromSide = DistanceFromSide(vert3Proj - vert2Proj, p2TestPt);
@@ -2008,7 +2163,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             var result = new Vector4(normalVector.x, normalVector.y, normalVector.z);
 
-            if(result.x > 0)
+            if (result.x > 0)
                 result.w -= result.x * xCellLength;
             if (result.y > 0)
                 result.w -= result.y * yCellLength;
@@ -2038,7 +2193,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             var result = new Vector4d(tmp.x, tmp.y, tmp.z);
 
-            result.w = result.x * (LocalLowerRightCorner.x - pt1.x) + result.y * (LocalLowerRightCorner.y - pt1.y) + result.z * (LocalLowerRightCorner.z - pt1.z);
+            result.w = result.x * (LocalLowerRightCorner.x - pt1.x) +
+                       result.y * (LocalLowerRightCorner.y - pt1.y) +
+                       result.z * (LocalLowerRightCorner.z - pt1.z);
             result.w *= invElementSize;
 
             return result;
@@ -2068,7 +2225,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 x = plane.x * ElementSize,
                 y = plane.y * ElementSize,
                 z = plane.z * ElementSize,
-                w = plane.w + plane.x * LocalLowerRightCorner.x + plane.y * LocalLowerRightCorner.y + plane.z * LocalLowerRightCorner.z
+                w = plane.w +
+                    plane.x * LocalLowerRightCorner.x +
+                    plane.y * LocalLowerRightCorner.y +
+                    plane.z * LocalLowerRightCorner.z
             };
 
             return newPlane;
@@ -2119,14 +2279,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (increasingJ)
                     for (int j = lowJ; j < highJ; j++) //Iterate from back of vehicle to front
-                    {
                         SolidifyLoop(j, j - 1, plane, activePts, inactiveInteriorPts, neighboringSweepPlanePts);
-                    }
                 else
                     for (int j = highJ - 1; j >= lowJ; j--) //Iterate from front of vehicle to back
-                    {
                         SolidifyLoop(j, j + 1, plane, activePts, inactiveInteriorPts, neighboringSweepPlanePts);
-                    }
             }
             catch (Exception e)
             {
@@ -2156,7 +2312,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
         }
 
-        private void SolidifyLoop(int j, int lastJ, SweepPlanePoint[,] sweepPlane, List<SweepPlanePoint> activePts, HashSet<SweepPlanePoint> inactiveInteriorPts, SweepPlanePoint[] neighboringSweepPlanePts)
+        private void SolidifyLoop(
+            int j,
+            int lastJ,
+            SweepPlanePoint[,] sweepPlane,
+            List<SweepPlanePoint> activePts,
+            HashSet<SweepPlanePoint> inactiveInteriorPts,
+            SweepPlanePoint[] neighboringSweepPlanePts
+        )
         {
             //Iterate across the cross-section plane to add voxel shell and mark active interior points
             for (int i = 0; i < xCellLength; i++)
@@ -2170,7 +2333,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         if (p is null)
                             continue;
-                        pt               = new SweepPlanePoint(p, i, k) {jLastInactive = j};
+                        pt = new SweepPlanePoint(p, i, k) {jLastInactive = j};
                         sweepPlane[i, k] = pt;
                     }
                     else
@@ -2195,25 +2358,28 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             //Only other situation is that it is an inactive point, in which case we do nothing here, because it is already taken care of
                         }
                         //only run this if it's not already labeled as part of a voxel shell
-                        else if (pt.mark != SweepPlanePoint.MarkingType.VoxelShell && pt.mark != SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior)
+                        else if (pt.mark != SweepPlanePoint.MarkingType.VoxelShell &&
+                                 pt.mark != SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior)
                         {
                             //Make sure the point is labeled as a voxel shell if there is already a part there
                             inactiveInteriorPts.Remove(pt);
 
-                            pt.mark = pt.mark == SweepPlanePoint.MarkingType.Clear ? SweepPlanePoint.MarkingType.VoxelShell : SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior;
+                            pt.mark = pt.mark == SweepPlanePoint.MarkingType.Clear
+                                          ? SweepPlanePoint.MarkingType.VoxelShell
+                                          : SweepPlanePoint.MarkingType.VoxelShellPreviouslyInterior;
 
 
                             pt.part = p;
                             pt.jLastInactive = j;
-
                         }
                     }
                 }
+
             //Then, iterate through all active points for this section
             for (int i = 0; i < activePts.Count; i++)
             {
                 SweepPlanePoint activeInteriorPt = activePts[i]; //Get active interior pt
-                if (activeInteriorPt.i + 1 < xCellLength) //And all of its 4-neighbors
+                if (activeInteriorPt.i + 1 < xCellLength)        //And all of its 4-neighbors
                     neighboringSweepPlanePts[0] = sweepPlane[activeInteriorPt.i + 1, activeInteriorPt.k];
                 else
                     neighboringSweepPlanePts[0] = null;
@@ -2231,7 +2397,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     neighboringSweepPlanePts[3] = null;
 
                 //Check if the active point is surrounded by all 4 neighbors
-                bool remove = neighboringSweepPlanePts.Any(neighbor => neighbor == null || neighbor.mark == SweepPlanePoint.MarkingType.Clear);
+                bool remove =
+                    neighboringSweepPlanePts.Any(neighbor => neighbor == null ||
+                                                             neighbor.mark == SweepPlanePoint.MarkingType.Clear);
                 if (remove) //If it is set to be removed...
                 {
                     //Go through all the neighboring points
@@ -2244,6 +2412,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         neighbor.mark = SweepPlanePoint.MarkingType.Active; //...mark them active
                         activePts.Add(neighbor);                            //And add them to the end of activePts
                     }
+
                     SweepPlanePoint pt = sweepPlane[activeInteriorPt.i, activeInteriorPt.k];
                     //Then, set this point to be marked clear in the sweepPlane
                     pt.mark = SweepPlanePoint.MarkingType.Clear;
@@ -2251,7 +2420,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     pt.part = null;
                 }
                 else
-                { //If it's surrounded by other points, it's inactive; add it to that list
+                {
+                    //If it's surrounded by other points, it's inactive; add it to that list
                     if (activeInteriorPt.mark == SweepPlanePoint.MarkingType.ActivePassedThroughInternalShell)
                     {
                         if (activeInteriorPt.ductingParts)
@@ -2259,11 +2429,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (activeInteriorPt.jLastInactive < j)
                                 for (int mJ = activeInteriorPt.jLastInactive; mJ < j; mJ++)
                                     //used to make sure that internal part boundaries for cargo bays don't result in dips in cross-section
-                                    SetVoxelPointNoLock(activeInteriorPt.i, mJ, activeInteriorPt.k, activeInteriorPt.part);
+                                    SetVoxelPointNoLock(activeInteriorPt.i,
+                                                        mJ,
+                                                        activeInteriorPt.k,
+                                                        activeInteriorPt.part);
                             else
                                 for (int mJ = lastJ; mJ <= activeInteriorPt.jLastInactive; mJ++)
                                     //used to make sure that internal part boundaries for cargo bays don't result in dips in cross-section
-                                    SetVoxelPointNoLock(activeInteriorPt.i, mJ, activeInteriorPt.k, activeInteriorPt.part);
+                                    SetVoxelPointNoLock(activeInteriorPt.i,
+                                                        mJ,
+                                                        activeInteriorPt.k,
+                                                        activeInteriorPt.part);
                         }
                         else
                         {
@@ -2275,7 +2451,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                 for (int mJ = lastJ; mJ <= activeInteriorPt.jLastInactive; mJ++)
                                     //used to make sure that internal part boundaries for cargo bays don't result in dips in cross-section
                                     SetVoxelPointNoLock(activeInteriorPt.i, mJ, activeInteriorPt.k);
-
                         }
                     }
 
@@ -2284,14 +2459,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     inactiveInteriorPts.Add(activeInteriorPt);
                 }
             }
+
             activePts.Clear(); //Clear activePts every iteration
 
             //Any remaining inactive interior pts are guaranteed to be on the inside of the vehicle
             foreach (SweepPlanePoint inactivePt in inactiveInteriorPts)
-            {
                 //Get each and update the voxel accordingly
                 SetVoxelPointNoLock(inactivePt.i, j, inactivePt.k, inactivePt.part);
-            }
         }
 
         private class SweepPlanePoint

@@ -73,15 +73,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private Material _rendererMaterial;
 
-        public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(Color axisColor, Color crossSectionColor, Color derivColor, double yScaleMaxDistance, double yAxisGridScale)
+        public static EditorAreaRulingOverlay CreateNewAreaRulingOverlay(
+            Color axisColor,
+            Color crossSectionColor,
+            Color derivColor,
+            double yScaleMaxDistance,
+            double yAxisGridScale
+        )
         {
             var overlay = new EditorAreaRulingOverlay
             {
-                _axisColor         = axisColor,
+                _axisColor = axisColor,
                 _crossSectionColor = crossSectionColor,
-                _derivColor        = derivColor,
+                _derivColor = derivColor,
                 _yScaleMaxDistance = yScaleMaxDistance,
-                _yAxisGridScale    = yAxisGridScale
+                _yAxisGridScale = yAxisGridScale
             };
 
 
@@ -90,7 +96,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             return overlay;
         }
 
-        private EditorAreaRulingOverlay() { }
+        private EditorAreaRulingOverlay()
+        {
+        }
 
         private void Initialize()
         {
@@ -101,14 +109,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
                 _rendererMaterial = new Material(lineMaterial)
                 {
-                    hideFlags   = HideFlags.HideAndDontSave,
-                    shader      = {hideFlags = HideFlags.HideAndDontSave},
+                    hideFlags = HideFlags.HideAndDontSave,
+                    shader = {hideFlags = HideFlags.HideAndDontSave},
                     renderQueue = 4500
                 };
             }
 
             FARLogger.Debug("Creating renderers with material " + _rendererMaterial);
-            FARLogger.Debug("Area color: " + _crossSectionColor + ", Deriv: " + _derivColor + ", Coeff: " + Color.cyan + ", Marking: " + _axisColor);
+            FARLogger.Debug("Area color: " +
+                            _crossSectionColor +
+                            ", Deriv: " +
+                            _derivColor +
+                            ", Coeff: " +
+                            Color.cyan +
+                            ", Marking: " +
+                            _axisColor);
             _areaRenderer = CreateNewRenderer(_crossSectionColor, 0.1f, _rendererMaterial);
             _derivRenderer = CreateNewRenderer(_derivColor, 0.1f, _rendererMaterial);
             _coeffRenderer = CreateNewRenderer(Color.cyan, 0.1f, _rendererMaterial);
@@ -126,10 +141,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 Object.Destroy(_coeffRenderer.gameObject);
             if (_markingRenderers != null)
                 foreach (LineRenderer renderer in _markingRenderers)
-                {
                     if (renderer)
                         Object.Destroy(renderer.gameObject);
-                }
 
             _markingRenderers = null;
 
@@ -155,9 +168,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             renderer.useWorldSpace = false;
             if (material.HasProperty(ShaderPropertyIds.Color))
-            {
                 rendererMaterial.SetColor(ShaderPropertyIds.Color, color);
-            }
             else
                 FARLogger.Warning("Material " + material + " has no _Color property");
             renderer.material = rendererMaterial;
@@ -203,7 +214,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     _derivRenderer.enabled = visible;
                     break;
                 case OverlayType.COEFF:
-                     _coeffRenderer.enabled = visible;
+                    _coeffRenderer.enabled = visible;
                     break;
             }
 
@@ -216,9 +227,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
         }
 
-        public void UpdateAeroData(Matrix4x4 voxelLocalToWorldMatrix, double[] xCoords, double[] yCoordsCrossSection, double[] yCoordsDeriv, double[] yCoordsPressureCoeffs, double maxValue)
+        public void UpdateAeroData(
+            Matrix4x4 voxelLocalToWorldMatrix,
+            double[] xCoords,
+            double[] yCoordsCrossSection,
+            double[] yCoordsDeriv,
+            double[] yCoordsPressureCoeffs,
+            double maxValue
+        )
         {
-            _numGridLines = (int)Math.Ceiling(maxValue / _yAxisGridScale);       //add one to account for the xAxis
+            _numGridLines = (int)Math.Ceiling(maxValue / _yAxisGridScale); //add one to account for the xAxis
             double gridScale = _yScaleMaxDistance / _numGridLines;
             double scalingFactor = _yScaleMaxDistance / (_yAxisGridScale * _numGridLines);
 
@@ -242,12 +260,18 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             for (int i = 0; i < _markingRenderers.Count; i++)
             {
                 double height = i * gridScale;
-                UpdateRenderer(_markingRenderers[i], voxelLocalToWorldMatrix, shortXCoords, new[] { height, height });
+                UpdateRenderer(_markingRenderers[i], voxelLocalToWorldMatrix, shortXCoords, new[] {height, height});
                 _markingRenderers[i].enabled = i <= _numGridLines && _areaRenderer.enabled;
             }
         }
 
-        private static void UpdateRenderer(LineRenderer renderer, Matrix4x4 transformMatrix, double[] xCoords, double[] yCoords, double yScalingFactor = 1)
+        private static void UpdateRenderer(
+            LineRenderer renderer,
+            Matrix4x4 transformMatrix,
+            double[] xCoords,
+            double[] yCoords,
+            double yScalingFactor = 1
+        )
         {
             // getting transform is internal call, cache
             Transform transform = renderer.transform;

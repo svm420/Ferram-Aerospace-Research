@@ -62,7 +62,9 @@ namespace FerramAerospaceResearch.FARGUI
             string valString = prevValue.ToString("F5");
             TextEntryField(label, labelWidth, ref valString);
 
-            return !Regex.IsMatch(valString, @"^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$") ? prevValue : double.Parse(valString);
+            return !Regex.IsMatch(valString, @"^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$")
+                       ? prevValue
+                       : double.Parse(valString);
         }
 
         public static int TextEntryForInt(string label, int labelWidth, int prevValue)

@@ -65,7 +65,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private Vector3 aoAVec;
 
-        public StabilityDerivGUI(EditorSimManager simManager, GUIDropDown<int> flapSettingDropDown, GUIDropDown<CelestialBody> bodySettingDropdown)
+        public StabilityDerivGUI(
+            EditorSimManager simManager,
+            GUIDropDown<int> flapSettingDropDown,
+            GUIDropDown<CelestialBody> bodySettingDropdown
+        )
         {
             this.simManager = simManager;
             _flapSettingDropdown = flapSettingDropDown;
@@ -83,7 +87,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             aoA *= FARMathUtil.deg2rad;
 
-            aoAVec = EditorDriver.editorFacility == EditorFacility.SPH ? new Vector3d(0, -Math.Sin(aoA), Math.Cos(aoA)) : new Vector3d(0, Math.Cos(aoA), Math.Sin(aoA));
+            aoAVec = EditorDriver.editorFacility == EditorFacility.SPH
+                         ? new Vector3d(0, -Math.Sin(aoA), Math.Cos(aoA))
+                         : new Vector3d(0, Math.Cos(aoA), Math.Sin(aoA));
         }
 
         public void Display()
@@ -104,11 +110,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.Label(Localizer.Format("FAREditorStabDerivFlap"));
             _flapSettingDropdown.GUIDropDownDisplay();
             GUILayout.Label(Localizer.Format("FAREditorStabDerivSpoiler"));
-            spoilersDeployed = GUILayout.Toggle(spoilersDeployed, spoilersDeployed ? Localizer.Format("FAREditorStabDerivSDeploy") : Localizer.Format("FAREditorStabDerivSRetract"), GUILayout.Width(100));
+            spoilersDeployed = GUILayout.Toggle(spoilersDeployed,
+                                                spoilersDeployed
+                                                    ? Localizer.Format("FAREditorStabDerivSDeploy")
+                                                    : Localizer.Format("FAREditorStabDerivSRetract"),
+                                                GUILayout.Width(100));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivCalcButton"), GUILayout.Width(250.0F), GUILayout.Height(25.0F)))
+            if (GUILayout.Button(Localizer.Format("FAREditorStabDerivCalcButton"),
+                                 GUILayout.Width(250.0F),
+                                 GUILayout.Height(25.0F)))
                 StabDerivCalcButtonAction();
             GUILayout.EndHorizontal();
 
@@ -121,30 +133,79 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(180));
-            GUILayout.Label(Localizer.Format("FAREditorStabDerivRefArea") + stabDerivOutput.area.ToString("G3") + " " + Localizer.Format("FARUnitMSq"));
-            GUILayout.Label(Localizer.Format("FAREditorStabDerivScaledChord") + stabDerivOutput.MAC.ToString("G3") + " " + Localizer.Format("FARUnitM"));
-            GUILayout.Label(Localizer.Format("FAREditorStabDerivScaledSpan") + stabDerivOutput.b.ToString("G3") + " " + Localizer.Format("FARUnitM"));
+            GUILayout.Label(Localizer.Format("FAREditorStabDerivRefArea") +
+                            stabDerivOutput.area.ToString("G3") +
+                            " " +
+                            Localizer.Format("FARUnitMSq"));
+            GUILayout.Label(Localizer.Format("FAREditorStabDerivScaledChord") +
+                            stabDerivOutput.MAC.ToString("G3") +
+                            " " +
+                            Localizer.Format("FARUnitM"));
+            GUILayout.Label(Localizer.Format("FAREditorStabDerivScaledSpan") +
+                            stabDerivOutput.b.ToString("G3") +
+                            " " +
+                            Localizer.Format("FARUnitM"));
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(GUILayout.Width(W160));
-            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIxx") + stabDerivOutput.stabDerivs[0].ToString("G6") + " " + Localizer.Format("FARUnitKgMSq"), Localizer.Format("FAREditorStabDerivIxxExp")));
-            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIyy") + stabDerivOutput.stabDerivs[1].ToString("G6") + " " + Localizer.Format("FARUnitKgMSq"), Localizer.Format("FAREditorStabDerivIyyExp")));
-            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIzz") + stabDerivOutput.stabDerivs[2].ToString("G6") + " " + Localizer.Format("FARUnitKgMSq"), Localizer.Format("FAREditorStabDerivIzzExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIxx") +
+                                           stabDerivOutput.stabDerivs[0].ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitKgMSq"),
+                                           Localizer.Format("FAREditorStabDerivIxxExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIyy") +
+                                           stabDerivOutput.stabDerivs[1].ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitKgMSq"),
+                                           Localizer.Format("FAREditorStabDerivIyyExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIzz") +
+                                           stabDerivOutput.stabDerivs[2].ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitKgMSq"),
+                                           Localizer.Format("FAREditorStabDerivIzzExp")));
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(GUILayout.Width(W160));
-            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIxy") + stabDerivOutput.stabDerivs[24].ToString("G6") + " " + Localizer.Format("FARUnitKgMSq"), Localizer.Format("FAREditorStabDerivIxyExp")));
-            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIyz") + stabDerivOutput.stabDerivs[25].ToString("G6") + " " + Localizer.Format("FARUnitKgMSq"), Localizer.Format("FAREditorStabDerivIyzExp")));
-            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIxz") + stabDerivOutput.stabDerivs[26].ToString("G6") + " " + Localizer.Format("FARUnitKgMSq"), Localizer.Format("FAREditorStabDerivIxzExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIxy") +
+                                           stabDerivOutput.stabDerivs[24].ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitKgMSq"),
+                                           Localizer.Format("FAREditorStabDerivIxyExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIyz") +
+                                           stabDerivOutput.stabDerivs[25].ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitKgMSq"),
+                                           Localizer.Format("FAREditorStabDerivIyzExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivIxz") +
+                                           stabDerivOutput.stabDerivs[26].ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitKgMSq"),
+                                           Localizer.Format("FAREditorStabDerivIxzExp")));
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(GUILayout.Width(140));
-            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivu0") + stabDerivOutput.nominalVelocity.ToString("G6") + " " + Localizer.Format("FARUnitMPerSec"), Localizer.Format("FAREditorStabDerivu0Exp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FAREditorStabDerivu0") +
+                                           stabDerivOutput.nominalVelocity.ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitMPerSec"),
+                                           Localizer.Format("FAREditorStabDerivu0Exp")));
             GUILayout.BeginHorizontal();
-            GUILayout.Label(new GUIContent(Localizer.Format("FARAbbrevCl") + ": " + stabDerivOutput.stableCl.ToString("G3"), Localizer.Format("FAREditorStabDerivClExp")));
-            GUILayout.Label(new GUIContent(Localizer.Format("FARAbbrevCd") + ": " + stabDerivOutput.stableCd.ToString("G3"), Localizer.Format("FAREditorStabDerivCdExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FARAbbrevCl") +
+                                           ": " +
+                                           stabDerivOutput.stableCl.ToString("G3"),
+                                           Localizer.Format("FAREditorStabDerivClExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FARAbbrevCd") +
+                                           ": " +
+                                           stabDerivOutput.stableCd.ToString("G3"),
+                                           Localizer.Format("FAREditorStabDerivCdExp")));
             GUILayout.EndHorizontal();
-            GUILayout.Label(new GUIContent(Localizer.Format("FARAbbrevAoA") + ": " + stabDerivOutput.stableAoAState + stabDerivOutput.stableAoA.ToString("G6") + " " + Localizer.Format("FARUnitDeg"), Localizer.Format("FAREditorStabDerivAoAExp")));
+            GUILayout.Label(new GUIContent(Localizer.Format("FARAbbrevAoA") +
+                                           ": " +
+                                           stabDerivOutput.stableAoAState +
+                                           stabDerivOutput.stableAoA.ToString("G6") +
+                                           " " +
+                                           Localizer.Format("FARUnitDeg"),
+                                           Localizer.Format("FAREditorStabDerivAoAExp")));
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
 
@@ -162,22 +223,82 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndHorizontal();
             GUILayout.BeginVertical(BackgroundStyle);
             GUILayout.BeginHorizontal();
-            StabilityLabel(Localizer.Format("FAREditorZw"), stabDerivOutput.stabDerivs[3], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorZwExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorZu"), stabDerivOutput.stabDerivs[6], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorZuExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorZq"), stabDerivOutput.stabDerivs[9], " " + Localizer.Format("FARUnitMPerSec"), Localizer.Format("FAREditorZqExp"), W160, 0);
-            StabilityLabel(Localizer.Format("FAREditorZDeltae"), stabDerivOutput.stabDerivs[12], " " + Localizer.Format("FARUnitMPerSecSq"), Localizer.Format("FAREditorZDeltaeExp"), W160, 0);
+            StabilityLabel(Localizer.Format("FAREditorZw"),
+                           stabDerivOutput.stabDerivs[3],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorZwExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorZu"),
+                           stabDerivOutput.stabDerivs[6],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorZuExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorZq"),
+                           stabDerivOutput.stabDerivs[9],
+                           " " + Localizer.Format("FARUnitMPerSec"),
+                           Localizer.Format("FAREditorZqExp"),
+                           W160,
+                           0);
+            StabilityLabel(Localizer.Format("FAREditorZDeltae"),
+                           stabDerivOutput.stabDerivs[12],
+                           " " + Localizer.Format("FARUnitMPerSecSq"),
+                           Localizer.Format("FAREditorZDeltaeExp"),
+                           W160,
+                           0);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            StabilityLabel(Localizer.Format("FAREditorXw"), stabDerivOutput.stabDerivs[4], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorXwExp"), W160, 0);
-            StabilityLabel(Localizer.Format("FAREditorXu"), stabDerivOutput.stabDerivs[7], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorXuExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorXq"), stabDerivOutput.stabDerivs[10], " " + Localizer.Format("FARUnitMPerSec"), Localizer.Format("FAREditorXqExp"), W160, 0);
-            StabilityLabel(Localizer.Format("FAREditorXDeltae"), stabDerivOutput.stabDerivs[13], " " + Localizer.Format("FARUnitMPerSecSq"), Localizer.Format("FAREditorXDeltaeExp"), W160, 0);
+            StabilityLabel(Localizer.Format("FAREditorXw"),
+                           stabDerivOutput.stabDerivs[4],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorXwExp"),
+                           W160,
+                           0);
+            StabilityLabel(Localizer.Format("FAREditorXu"),
+                           stabDerivOutput.stabDerivs[7],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorXuExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorXq"),
+                           stabDerivOutput.stabDerivs[10],
+                           " " + Localizer.Format("FARUnitMPerSec"),
+                           Localizer.Format("FAREditorXqExp"),
+                           W160,
+                           0);
+            StabilityLabel(Localizer.Format("FAREditorXDeltae"),
+                           stabDerivOutput.stabDerivs[13],
+                           " " + Localizer.Format("FARUnitMPerSecSq"),
+                           Localizer.Format("FAREditorXDeltaeExp"),
+                           W160,
+                           0);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            StabilityLabel(Localizer.Format("FAREditorMw"), stabDerivOutput.stabDerivs[5], " " + Localizer.Format("FARUnitInvMSec"), Localizer.Format("FAREditorMwExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorMu"), stabDerivOutput.stabDerivs[8], " " + Localizer.Format("FARUnitInvMSec"), Localizer.Format("FAREditorMuExp"), W160, 0);
-            StabilityLabel(Localizer.Format("FAREditorMq"), stabDerivOutput.stabDerivs[11], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorMqExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorMDeltae"), stabDerivOutput.stabDerivs[14], " " + Localizer.Format("FARUnitInvSecSq"), Localizer.Format("FAREditorMDeltaeExp"), W160, 1);
+            StabilityLabel(Localizer.Format("FAREditorMw"),
+                           stabDerivOutput.stabDerivs[5],
+                           " " + Localizer.Format("FARUnitInvMSec"),
+                           Localizer.Format("FAREditorMwExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorMu"),
+                           stabDerivOutput.stabDerivs[8],
+                           " " + Localizer.Format("FARUnitInvMSec"),
+                           Localizer.Format("FAREditorMuExp"),
+                           W160,
+                           0);
+            StabilityLabel(Localizer.Format("FAREditorMq"),
+                           stabDerivOutput.stabDerivs[11],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorMqExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorMDeltae"),
+                           stabDerivOutput.stabDerivs[14],
+                           " " + Localizer.Format("FARUnitInvSecSq"),
+                           Localizer.Format("FAREditorMDeltaeExp"),
+                           W160,
+                           1);
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
@@ -191,19 +312,64 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.EndHorizontal();
             GUILayout.BeginVertical(BackgroundStyle);
             GUILayout.BeginHorizontal();
-            StabilityLabel(Localizer.Format("FAREditorYβ"), stabDerivOutput.stabDerivs[15], " " + Localizer.Format("FARUnitMPerSecSq"), Localizer.Format("FAREditorYβExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorYp"), stabDerivOutput.stabDerivs[18], " " + Localizer.Format("FARUnitMPerSec"), Localizer.Format("FAREditorYpExp"), W160, 0);
-            StabilityLabel(Localizer.Format("FAREditorYr"), stabDerivOutput.stabDerivs[21], " " + Localizer.Format("FARUnitMPerSec"), Localizer.Format("FAREditorYrExp"), W160, 1);
+            StabilityLabel(Localizer.Format("FAREditorYβ"),
+                           stabDerivOutput.stabDerivs[15],
+                           " " + Localizer.Format("FARUnitMPerSecSq"),
+                           Localizer.Format("FAREditorYβExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorYp"),
+                           stabDerivOutput.stabDerivs[18],
+                           " " + Localizer.Format("FARUnitMPerSec"),
+                           Localizer.Format("FAREditorYpExp"),
+                           W160,
+                           0);
+            StabilityLabel(Localizer.Format("FAREditorYr"),
+                           stabDerivOutput.stabDerivs[21],
+                           " " + Localizer.Format("FARUnitMPerSec"),
+                           Localizer.Format("FAREditorYrExp"),
+                           W160,
+                           1);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            StabilityLabel(Localizer.Format("FAREditorLβ"), stabDerivOutput.stabDerivs[16], " " + Localizer.Format("FARUnitInvSecSq"), Localizer.Format("FAREditorLβExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorLp"), stabDerivOutput.stabDerivs[19], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorLpExp"), W160, -1);
-            StabilityLabel(Localizer.Format("FAREditorLr"), stabDerivOutput.stabDerivs[22], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorLrExp"), W160, 1);
+            StabilityLabel(Localizer.Format("FAREditorLβ"),
+                           stabDerivOutput.stabDerivs[16],
+                           " " + Localizer.Format("FARUnitInvSecSq"),
+                           Localizer.Format("FAREditorLβExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorLp"),
+                           stabDerivOutput.stabDerivs[19],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorLpExp"),
+                           W160,
+                           -1);
+            StabilityLabel(Localizer.Format("FAREditorLr"),
+                           stabDerivOutput.stabDerivs[22],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorLrExp"),
+                           W160,
+                           1);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            StabilityLabel(Localizer.Format("FAREditorNβ"), stabDerivOutput.stabDerivs[17], " " + Localizer.Format("FARUnitInvSecSq"), Localizer.Format("FAREditorNβExp"), W160, 1);
-            StabilityLabel(Localizer.Format("FAREditorNp"), stabDerivOutput.stabDerivs[20], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorNpExp"), W160, 0);
-            StabilityLabel(Localizer.Format("FAREditorNr"), stabDerivOutput.stabDerivs[23], " " + Localizer.Format("FARUnitInvSec"), Localizer.Format("FAREditorNrExp"), W160, -1);
+            StabilityLabel(Localizer.Format("FAREditorNβ"),
+                           stabDerivOutput.stabDerivs[17],
+                           " " + Localizer.Format("FARUnitInvSecSq"),
+                           Localizer.Format("FAREditorNβExp"),
+                           W160,
+                           1);
+            StabilityLabel(Localizer.Format("FAREditorNp"),
+                           stabDerivOutput.stabDerivs[20],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorNpExp"),
+                           W160,
+                           0);
+            StabilityLabel(Localizer.Format("FAREditorNr"),
+                           stabDerivOutput.stabDerivs[23],
+                           " " + Localizer.Format("FARUnitInvSec"),
+                           Localizer.Format("FAREditorNrExp"),
+                           W160,
+                           -1);
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
@@ -223,12 +389,29 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             if (body.GetPressure(altitudeDouble) > 0)
             {
-                stabDerivOutput = simManager.StabDerivCalculator.CalculateStabilityDerivs(body, altitudeDouble, machDouble, flapsettingInt, spoilersDeployedBool, 0, 0, 0);
+                stabDerivOutput =
+                    simManager.StabDerivCalculator.CalculateStabilityDerivs(body,
+                                                                            altitudeDouble,
+                                                                            machDouble,
+                                                                            flapsettingInt,
+                                                                            spoilersDeployedBool,
+                                                                            0,
+                                                                            0,
+                                                                            0);
                 simManager.vehicleData = stabDerivOutput;
                 SetAngleVectors(stabDerivOutput.stableAoA);
             }
             else
-                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "FARStabDerivError", Localizer.Format("FAREditorStabDerivError"), Localizer.Format("FAREditorStabDerivErrorExp"), Localizer.Format("FARGUIOKButton"), true, HighLogic.UISkin);
+            {
+                PopupDialog.SpawnPopupDialog(new Vector2(0, 0),
+                                             new Vector2(0, 0),
+                                             "FARStabDerivError",
+                                             Localizer.Format("FAREditorStabDerivError"),
+                                             Localizer.Format("FAREditorStabDerivErrorExp"),
+                                             Localizer.Format("FARGUIOKButton"),
+                                             true,
+                                             HighLogic.UISkin);
+            }
         }
 
         private static void StabilityLabel(string text1, double val, string text2, string tooltip, int width, int sign)
@@ -254,10 +437,20 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             Vector3 mousePos = GUIUtils.GetMousePos();
             Rect windowRect = EditorGUI.GUIRect;
 
-            var tooltipRect = new Rect(Mathf.Clamp(mousePos.x - windowRect.x, 0, windowRect.width - 300), Mathf.Clamp(mousePos.y - windowRect.y, 0, windowRect.height - 80), 300, 80);
+            var tooltipRect = new Rect(Mathf.Clamp(mousePos.x - windowRect.x, 0, windowRect.width - 300),
+                                       Mathf.Clamp(mousePos.y - windowRect.y, 0, windowRect.height - 80),
+                                       300,
+                                       80);
 
             GUIStyle toolTipStyle = BackgroundStyle;
-            toolTipStyle.normal.textColor = toolTipStyle.active.textColor = toolTipStyle.hover.textColor = toolTipStyle.focused.textColor = toolTipStyle.onNormal.textColor = toolTipStyle.onHover.textColor = toolTipStyle.onActive.textColor = toolTipStyle.onFocused.textColor = new Color(1, 0.75f, 0);
+            toolTipStyle.normal.textColor = toolTipStyle.active.textColor =
+                                                toolTipStyle.hover.textColor =
+                                                    toolTipStyle.focused.textColor =
+                                                        toolTipStyle.onNormal.textColor =
+                                                            toolTipStyle.onHover.textColor =
+                                                                toolTipStyle.onActive.textColor =
+                                                                    toolTipStyle.onFocused.textColor =
+                                                                        new Color(1, 0.75f, 0);
 
             GUI.Box(tooltipRect, GUI.tooltip, toolTipStyle);
         }

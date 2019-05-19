@@ -55,6 +55,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         public static EditorAeroCenter Instance { get; private set; }
 
         private Vector3 vesselRootLocalAeroCenter;
+
         public static Vector3 VesselRootLocalAeroCenter
         {
             get { return Instance.vesselRootLocalAeroCenter; }
@@ -78,7 +79,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             var aeroSection = new FARCenterQuery();
             var dummy = new FARCenterQuery();
 
-            if(EditorLogic.RootPart is null)
+            if (EditorLogic.RootPart is null)
                 return;
 
             Vector3 vel_base, vel_fuzz;
@@ -98,9 +99,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             Vector3 vel = (vel_base - vel_fuzz).normalized;
 
             foreach (FARAeroSection section in _currentAeroSections)
-            {
                 section.PredictionCalculateAeroForces(1, 0.5f, 100000, 0, 0.005f, vel, aeroSection);
-            }
 
             FARBaseAerodynamics.PrecomputeGlobalCenterOfLift(aeroSection, dummy, vel, 1);
 
@@ -110,8 +109,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             {
                 float tmpMass = p.mass + p.GetResourceMass();
                 mass += tmpMass;
-                pos  += p.partTransform.position * tmpMass;
+                pos += p.partTransform.position * tmpMass;
             }
+
             pos /= mass;
 
             Vector3 force0 = aeroSection.force;
@@ -122,9 +122,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             vel = (vel_base + vel_fuzz).normalized;
 
             foreach (FARAeroSection section in _currentAeroSections)
-            {
                 section.PredictionCalculateAeroForces(1, 0.5f, 100000, 0, 0.005f, vel, aeroSection);
-            }
 
             FARBaseAerodynamics.PrecomputeGlobalCenterOfLift(aeroSection, dummy, vel, 1);
 
@@ -141,9 +139,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             Vector3 deltaForcePerpNorm = deltaForcePerp / deltaForcePerpMag;
 
-            Vector3 deltaMomentPerp = deltaMoment - Vector3.Dot(deltaMoment, deltaForcePerpNorm) * deltaForcePerpNorm - Vector3.Project(deltaMoment, vel_base);
+            Vector3 deltaMomentPerp = deltaMoment -
+                                      Vector3.Dot(deltaMoment, deltaForcePerpNorm) * deltaForcePerpNorm -
+                                      Vector3.Project(deltaMoment, vel_base);
 
-            vesselRootLocalAeroCenter = deltaMomentPerp.magnitude / deltaForcePerpMag * Math.Sign(Vector3.Dot(Vector3.Cross(deltaForce, deltaMoment), vel_base)) * vel_base;
+            vesselRootLocalAeroCenter = deltaMomentPerp.magnitude /
+                                        deltaForcePerpMag *
+                                        Math.Sign(Vector3.Dot(Vector3.Cross(deltaForce, deltaMoment), vel_base)) *
+                                        vel_base;
 
             vesselRootLocalAeroCenter += pos;
             vesselRootLocalAeroCenter = rootPartTrans.worldToLocalMatrix.MultiplyPoint3x4(vesselRootLocalAeroCenter);
