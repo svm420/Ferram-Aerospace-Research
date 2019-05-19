@@ -65,7 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompatibilityChecker.cs" />
+    <Compile Include="FARAeroComponents\FlightForceContext.cs" />
     <Compile Include="FARAeroComponents\ModularFlightIntegratorRegisterer.cs" />
+    <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />
     <Compile Include="FARAeroComponents\VesselIntakeRamDrag.cs" />
     <Compile Include="FARAPI.cs" />
     <Compile Include="FARAssets.cs" />

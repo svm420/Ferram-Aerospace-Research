@@ -105,7 +105,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
         public void UpdateAeroSection(float potentialFlowNormalForce, float viscCrossflowDrag, float diameter, float flatnessRatio, float hypersonicMomentForward, float hypersonicMomentBackward,
                                       Vector3 centroidWorldSpace, Vector3 xRefVectorWorldSpace, Vector3 nRefVectorWorldSpace, Matrix4x4 vesselToWorldMatrix, Vector3 vehicleMainAxis, List<FARAeroPartModule> moduleList,
             List<float> dragFactor, Dictionary<Part, PartTransformInfo> partWorldToLocalMatrixDict)
-        // ReSharper restore ParameterHidesMember
         {
             mergeFactor = 0;
 
@@ -170,6 +169,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             worldNormalVector = nRefVectorWorldSpace;
         }
+        // ReSharper restore ParameterHidesMember
 
         public bool CanMerge(FARAeroSection otherSection)
         {
@@ -267,8 +267,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             handledAeroModulesIndexDict.Clear();
         }
 
-        #region Force application contexts
-        private interface IForceContext
+        internal interface IForceContext
         {
             /// <summary>
             /// The part-relative velocity of the part whose force is being computed
@@ -284,80 +283,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             /// <param name="torqueVector">The calculated torque vector to be applied to the part</param>
             void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector);
         }
-
-        private class SimulatedForceContext : IForceContext
-        {
-            /// <summary>
-            /// The world-space velocity of the part whose force is being simulated
-            /// </summary>
-            private Vector3 worldVel;
-
-            /// <summary>
-            /// The center with which force should be accumulated
-            /// </summary>
-            private FARCenterQuery center;
-
-            /// <summary>
-            /// The atmospheric density that the force is being simulated at
-            /// </summary>
-            private float atmDensity;
-
-            public SimulatedForceContext(Vector3 worldVel, FARCenterQuery center, float atmDensity)
-            {
-                this.worldVel = worldVel;
-                this.center = center;
-                this.atmDensity = atmDensity;
-            }
-
-            // ReSharper disable ParameterHidesMember -> updating member values
-            public void UpdateSimulationContext(Vector4 worldVel, FARCenterQuery center, float atmDensity)
-            {
-                this.worldVel = worldVel;
-                this.center = center;
-                this.atmDensity = atmDensity;
-            }
-            // ReSharper restore ParameterHidesMember
-
-            public Vector3 LocalVelocity(PartData pd)
-            {
-                if (pd.aeroModule.part == null || pd.aeroModule.part.partTransform == null)
-                    return Vector3.zero;
-                return pd.aeroModule.part.partTransform.InverseTransformVector(worldVel);
-            }
-
-            public void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector)
-            {
-                double tmp = 0.0005 * Vector3.SqrMagnitude(localVel);
-                double dynamicPressurekPa = tmp * atmDensity;
-                double dragFactor = dynamicPressurekPa * Mathf.Max(PhysicsGlobals.DragCurvePseudoReynolds.Evaluate(atmDensity * Vector3.Magnitude(localVel)), 1.0f);
-                double liftFactor = dynamicPressurekPa;
-
-                Vector3 localVelNorm = Vector3.Normalize(localVel);
-                Vector3 localForceTemp = Vector3.Dot(localVelNorm, forceVector) * localVelNorm;
-                Vector3 partLocalForce = localForceTemp * (float)dragFactor + (forceVector - localForceTemp) * (float)liftFactor;
-                forceVector = pd.aeroModule.part.transform.TransformDirection(partLocalForce);
-                torqueVector = pd.aeroModule.part.transform.TransformDirection(torqueVector * (float)dynamicPressurekPa);
-                if (float.IsNaN(forceVector.x) || float.IsNaN(torqueVector.x))
-                    return;
-                Vector3 centroid = pd.aeroModule.part.transform.TransformPoint(pd.centroidPartSpace - pd.aeroModule.part.CoMOffset);
-                center.AddForce(centroid, forceVector);
-                center.AddTorque(torqueVector);
-            }
-        }
-
-        private class FlightForceContext : IForceContext
-        {
-            public Vector3 LocalVelocity(PartData pd)
-            {
-                return pd.aeroModule.partLocalVel;
-            }
-
-            public void ApplyForce(PartData pd, Vector3 localVel, Vector3 forceVector, Vector3 torqueVector)
-            {
-                pd.aeroModule.AddLocalForceAndTorque(forceVector, torqueVector, pd.centroidPartSpace);
-            }
-        }
-        #endregion
 
         private void CalculateAeroForces(
             float machNumber, float reynoldsPerUnitLength, float pseudoKnudsenNumber, float skinFrictionDrag,
