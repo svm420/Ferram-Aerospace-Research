@@ -2042,20 +2042,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             if (finenessRatio > 10)
                 return 0.925;
-            if (finenessRatio < 1.5)
-                return 0.285;
+            if (finenessRatio > 6)
+                return 0.00625 * finenessRatio + 0.8625;
             if (finenessRatio > 4)
-            {
-                if (finenessRatio > 6)
-                    return 0.00625 * finenessRatio + 0.8625;
-
                 return 0.025 * finenessRatio + 0.75;
-            }
-
-            if (finenessRatio < 3)
+            if (finenessRatio > 3)
+                return 0.07 * finenessRatio + 0.57;
+            if (finenessRatio > 1.5)
                 return 0.33 * finenessRatio - 0.21;
-
-            return 0.07 * finenessRatio + 0.57;
+            return 0.285;
         }
 
         private double CriticalMachFactorForUnsmoothCrossSection(
