@@ -519,7 +519,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 else
                     EdLogInstance.Unlock("FAREdLock");
             }
-            else if (!cursorInGUI)
+            else
             {
                 EdLogInstance.Unlock("FAREdLock");
             }
