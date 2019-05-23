@@ -62,14 +62,14 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         private ModuleResourceIntake intakeModule;
         private AttachNode node;
 
-        private double nodeOffsetArea;      //used to handle intakes being on the side of fuselage parts
+        private double nodeOffsetArea; //used to handle intakes being on the side of fuselage parts
 
-        //ModuleResourceIntake intake;
-        //public ModuleResourceIntake IntakeModule
-        //{
-        //    get { return intake; }
-        //}
         private Part part;
+
+        private IntakeCrossSectionAdjuster()
+        {
+        }
+
         public Part GetPart()
         {
             return part;
@@ -78,69 +78,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         public bool IntegratedCrossSectionIncreaseDecrease()
         {
             return false;
-        }
-
-        public static IntakeCrossSectionAdjuster CreateAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
-        {
-            IntakeCrossSectionAdjuster adjuster = new IntakeCrossSectionAdjuster();
-            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
-
-            return adjuster;
-        }
-
-        public static IntakeCrossSectionAdjuster CreateAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
-        {
-            IntakeCrossSectionAdjuster adjuster = new IntakeCrossSectionAdjuster();
-            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
-
-            return adjuster;
-        }
-
-        private IntakeCrossSectionAdjuster() { }
-
-        public void SetupAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
-        {
-            if (intake is ModuleResourceIntake module)
-                SetupAdjuster(module, worldToVesselMatrix);
-            else
-                FARLogger.Error($"{intake} is not typeof ModuleResourceIntake");
-        }
-
-        public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
-        {
-            part = intake.part;
-            intakeModule = intake;
-            intakeTrans = intakeModule.intakeTransform;
-            if (intakeTrans == null)
-                intakeTrans = intake.part.partTransform;
-
-            if(!string.IsNullOrEmpty(intakeModule.occludeNode))
-                node = intakeModule.node;
-
-            foreach (AttachNode candidateNode in part.attachNodes)
-                if (candidateNode.nodeType == AttachNode.NodeType.Stack && Vector3.Dot(candidateNode.position, (part.transform.worldToLocalMatrix * intakeTrans.localToWorldMatrix).MultiplyVector(Vector3.forward)) > 0)
-                {
-                    if (candidateNode == node)
-                        continue;
-
-                    nodeOffsetArea = candidateNode.size;
-                    if (nodeOffsetArea.NearlyEqual(0))
-                        nodeOffsetArea = 0.5;
-
-                    nodeOffsetArea *= 0.625;     //scale it up as needed
-                    nodeOffsetArea *= nodeOffsetArea;
-                    nodeOffsetArea *= Math.PI;  //calc area;
-
-                    nodeOffsetArea *= -1;        //and the adjustment area
-                    break;
-                }
-
-            thisToVesselMatrix = worldToVesselMatrix * intakeTrans.localToWorldMatrix;
-
-            vehicleBasisForwardVector = Vector3.forward;
-            vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);
-
-            intakeArea = INTAKE_AREA_SCALAR * intake.area;
         }
 
         public double AreaRemovedFromCrossSection(Vector3 vehicleAxis)
@@ -161,7 +98,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public double AreaThreshold()
         {
-             return nodeOffsetArea;
+            return nodeOffsetArea;
         }
 
         public void SetForwardBackwardNoFlowDirection(int direction)
@@ -169,7 +106,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             sign = direction;
         }
 
-        public int GetForwardBackwardNoFlowSign() { return sign; }
+        public int GetForwardBackwardNoFlowSign()
+        {
+            return sign;
+        }
 
         public void TransformBasis(Matrix4x4 matrix)
         {
@@ -179,9 +119,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             tempMatrix = thisToVesselMatrix * tempMatrix;
 
             vehicleBasisForwardVector = tempMatrix.MultiplyVector(vehicleBasisForwardVector);
-
         }
-
 
         public void SetThisToVesselMatrixForTransform()
         {
@@ -190,7 +128,74 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void UpdateArea()
         {
+        }
 
+        public static IntakeCrossSectionAdjuster CreateAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
+        {
+            var adjuster = new IntakeCrossSectionAdjuster();
+            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
+
+            return adjuster;
+        }
+
+        public static IntakeCrossSectionAdjuster CreateAdjuster(
+            ModuleResourceIntake intake,
+            Matrix4x4 worldToVesselMatrix
+        )
+        {
+            var adjuster = new IntakeCrossSectionAdjuster();
+            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
+
+            return adjuster;
+        }
+
+        public void SetupAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
+        {
+            if (intake is ModuleResourceIntake module)
+                SetupAdjuster(module, worldToVesselMatrix);
+            else
+                FARLogger.Error($"{intake} is not typeof ModuleResourceIntake");
+        }
+
+        public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
+        {
+            part = intake.part;
+            intakeModule = intake;
+            intakeTrans = intakeModule.intakeTransform;
+            if (intakeTrans == null)
+                intakeTrans = intake.part.partTransform;
+
+            if (!string.IsNullOrEmpty(intakeModule.occludeNode))
+                node = intakeModule.node;
+
+            foreach (AttachNode candidateNode in part.attachNodes)
+                if (candidateNode.nodeType == AttachNode.NodeType.Stack &&
+                    Vector3.Dot(candidateNode.position,
+                                (part.transform.worldToLocalMatrix * intakeTrans.localToWorldMatrix)
+                                .MultiplyVector(Vector3.forward)) >
+                    0)
+                {
+                    if (candidateNode == node)
+                        continue;
+
+                    nodeOffsetArea = candidateNode.size;
+                    if (nodeOffsetArea.NearlyEqual(0))
+                        nodeOffsetArea = 0.5;
+
+                    nodeOffsetArea *= 0.625; //scale it up as needed
+                    nodeOffsetArea *= nodeOffsetArea;
+                    nodeOffsetArea *= Math.PI; //calc area;
+
+                    nodeOffsetArea *= -1; //and the adjustment area
+                    break;
+                }
+
+            thisToVesselMatrix = worldToVesselMatrix * intakeTrans.localToWorldMatrix;
+
+            vehicleBasisForwardVector = Vector3.forward;
+            vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);
+
+            intakeArea = INTAKE_AREA_SCALAR * intake.area;
         }
     }
 }

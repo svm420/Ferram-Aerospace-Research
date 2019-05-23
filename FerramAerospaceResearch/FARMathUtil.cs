@@ -52,69 +52,73 @@ namespace FerramAerospaceResearch
         public const double rad2deg = 180d / Math.PI;
         public const double deg2rad = Math.PI / 180d;
 
-        // ReSharper disable CompareOfFloatsByEqualityOperator
+        private const double rightedge = 30d;
+        private const double leftedge = -rightedge;
+        private const double xstepinitial = 5d;
+        private const double xstepsize = 10d;
+        private const double minpart = 1d / 8d;
+        private const double maxpart = 7d / 8d;
+        private const double tol_triangle = 1E-3;
+        private const double tol_linear = 3E-4;
+        private const double tol_brent = 1E-3;
+        private const double machswitchvalue = 0.30;
+        private const int iterlim = 500;
+
         public static bool NearlyEqual(this double a, double b, double epsilon = 1e-14)
         {
+            // ReSharper disable CompareOfFloatsByEqualityOperator
+            // shortcut, handles infinities
             if (a.Equals(b))
-            {
-                // shortcut, handles infinities
                 return true;
-            }
 
+            // a or b is zero or both are extremely close to it
+            // relative error is less meaningful here
             double diff = Math.Abs(a - b);
             if (a == 0 || b == 0 || diff < double.Epsilon)
-            {
-                // a or b is zero or both are extremely close to it
-                // relative error is less meaningful here
                 return diff < epsilon * double.Epsilon;
-            }
 
             // use relative error
             return diff / (Math.Abs(a) + Math.Abs(b)) < epsilon;
+            // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
         public static bool NearlyEqual(this float a, float b, float epsilon = 1e-6f)
         {
+            // ReSharper disable CompareOfFloatsByEqualityOperator
+            // shortcut, handles infinities
             if (a.Equals(b))
-            {
-                // shortcut, handles infinities
                 return true;
-            }
 
+            // a or b is zero or both are extremely close to it
+            // relative error is less meaningful here
             float diff = Math.Abs(a - b);
             if (a == 0 || b == 0 || diff < float.Epsilon)
-            {
-                // a or b is zero or both are extremely close to it
-                // relative error is less meaningful here
                 return diff < epsilon * float.Epsilon;
-            }
 
             // use relative error
             return diff / (Math.Abs(a) + Math.Abs(b)) < epsilon;
+            // ReSharper restore CompareOfFloatsByEqualityOperator
         }
-        // ReSharper restore CompareOfFloatsByEqualityOperator
 
         // ReSharper disable once UnusedMember.Global
         public static double Lerp(double x1, double x2, double y1, double y2, double x)
         {
             double y = (y2 - y1) / (x2 - x1);
-            y *= (x - x1);
+            y *= x - x1;
             y += y1;
             return y;
         }
 
         public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
         {
-            if (val.CompareTo(min) < 0) return min;
-            if (val.CompareTo(max) > 0) return max;
-            return val;
+            if (val.CompareTo(min) < 0)
+                return min;
+            return val.CompareTo(max) > 0 ? max : val;
         }
 
         public static bool Approximately(double p, double q, double error = double.Epsilon)
         {
-            if (Math.Abs(p - q) < error)
-                return true;
-            return false;
+            return Math.Abs(p - q) < error;
         }
 
         public static double ArithmeticGeometricMean(double a, double b, double error)
@@ -125,6 +129,7 @@ namespace FerramAerospaceResearch
                 b = Math.Sqrt(a * b);
                 a = tmpA;
             }
+
             return (a + b) * 0.5;
         }
 
@@ -136,9 +141,10 @@ namespace FerramAerospaceResearch
                 double tmpA = 0.5 * (a + b);
                 double tmpSqrt = Math.Sqrt((a - c) * (b - c));
                 b = c + tmpSqrt;
-                c = c - tmpSqrt;
+                c -= tmpSqrt;
                 a = tmpA;
             }
+
             return (a + b) * 0.5;
         }
 
@@ -156,10 +162,16 @@ namespace FerramAerospaceResearch
         {
             int tmp = (int)(BitConverter.DoubleToInt64Bits(a) >> 32);
             int tmp2 = (int)(b * (tmp - 1072632447) + 1072632447);
-            return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
+            return BitConverter.Int64BitsToDouble((long)tmp2 << 32);
         }
 
-        public static double BrentsMethod(Func<double, double> function, double a, double b, double epsilon = 0.001, int maxIter = int.MaxValue)
+        public static double BrentsMethod(
+            Func<double, double> function,
+            double a,
+            double b,
+            double epsilon = 0.001,
+            int maxIter = int.MaxValue
+        )
         {
             double delta = epsilon * 100;
             double fa = function(a);
@@ -187,7 +199,7 @@ namespace FerramAerospaceResearch
             int iter = 0;
             while (!fs.NearlyEqual(0) && Math.Abs(a - b) > epsilon && iter < maxIter)
             {
-                if ((fa - fc) > double.Epsilon && (fb - fc) > double.Epsilon)    //inverse quadratic interpolation
+                if (fa - fc > double.Epsilon && fb - fc > double.Epsilon) //inverse quadratic interpolation
                 {
                     s = a * fc * fb / ((fa - fb) * (fa - fc));
                     s += b * fc * fa / ((fb - fa) * (fb - fc));
@@ -195,7 +207,7 @@ namespace FerramAerospaceResearch
                 }
                 else
                 {
-                    s = (b - a) / (fb - fa);    //secant method
+                    s = (b - a) / (fb - fa); //secant method
                     s *= fb;
                     s = b - s;
                 }
@@ -211,11 +223,10 @@ namespace FerramAerospaceResearch
                         condition1 = false;
                     else
                         condition1 = true;
+                else if (s > a3pb_over4 && s < b)
+                    condition1 = false;
                 else
-                    if (s > a3pb_over4 && s < b)
-                        condition1 = false;
-                    else
-                        condition1 = true;
+                    condition1 = true;
 
                 bool condition2;
 
@@ -252,7 +263,9 @@ namespace FerramAerospaceResearch
                     flag = true;
                 }
                 else
+                {
                     flag = false;
+                }
 
                 fs = function(s);
                 d = c;
@@ -279,53 +292,46 @@ namespace FerramAerospaceResearch
                     a = b;
                     b = tmp;
                 }
+
                 iter++;
             }
+
             return s;
         }
-
-        private const double rightedge = 30d;
-        private const double leftedge = -rightedge;
-        private const double xstepinitial = 5d;
-        private const double xstepsize = 10d;
-        private const double minpart = 1d / 8d;
-        private const double maxpart = 7d / 8d;
-        private const double tol_triangle = 1E-3;
-        private const double tol_linear = 3E-4;
-        private const double tol_brent = 1E-3;
-        private const double machswitchvalue = 0.30;
-        private const int iterlim = 500;
 
         public static double SelectedSearchMethod(double machNumber, Func<double, double> function)
         {
             // Rodhern: In dkavolis branch BrentsMethod is the favoured root-finding algorithm.
             //          At slower speeds however SegmentSearchMethod is used as ad hoc root-finder.
-            if (machNumber >= machswitchvalue)
-                return BrentsMethod(function, leftedge, rightedge, tol_brent, iterlim);
-            return SegmentSearchMethod(function);
+            return machNumber >= machswitchvalue
+                       ? BrentsMethod(function, leftedge, rightedge, tol_brent, iterlim)
+                       : SegmentSearchMethod(function);
         }
 
         public static double SegmentSearchMethod(Func<double, double> function)
         {
             double x0 = 0d;
             double f0 = function(x0);
-            MirroredFunction mfobj = new MirroredFunction(function, f0 > 0d);
-            if (mfobj.IsMirrored) f0 = -f0;
+            var mfobj = new MirroredFunction(function, f0 > 0d);
+            if (mfobj.IsMirrored)
+                f0 = -f0;
             Func<double, double> f = mfobj.Delegate;
             double x1 = xstepinitial;
             double f1 = f(x1);
             if (f1 < f0)
                 return mfobj.BrentSolve("Negative initial gradient.");
 
-        LblSkipRight:
+            LblSkipRight:
             if (f1 > 0)
                 return mfobj.LinearSolution(x0, f0, x1, f1);
             double x2 = Clamp(x1 + xstepsize, 0d, rightedge);
             if (Math.Abs(x2 - x1) < tol_brent)
-                return mfobj.BrentSolve("Reached far right edge."); // Rodhern: Strict equality replaced with approximate equality for readability in dkavolis branch.
+                // Rodhern: Strict equality replaced with approximate equality for readability in dkavolis branch.
+                return mfobj.BrentSolve("Reached far right edge.");
             double f2 = f(x2);
             if (f2 > f1)
-            { // skip right
+            {
+                // skip right
                 x0 = x1;
                 f0 = f1;
                 x1 = x2;
@@ -333,7 +339,7 @@ namespace FerramAerospaceResearch
                 goto LblSkipRight;
             }
 
-        LblTriangle:
+            LblTriangle:
             if (f1 > 0)
                 return mfobj.LinearSolution(x0, f0, x1, f1);
             if (x2 - x0 < tol_triangle)
@@ -343,7 +349,8 @@ namespace FerramAerospaceResearch
             double f01 = f(x01);
             double f12 = f(x12);
             if (f01 >= f1 && f01 >= f12)
-            { // maximum at x01
+            {
+                // maximum at x01
                 x1 = x01;
                 f1 = f01;
                 x2 = x1;
@@ -352,9 +359,10 @@ namespace FerramAerospaceResearch
             }
 
             if (f12 > f1 && f12 > f01)
-            { // maximum at x12
+            {
+                // maximum at x12
                 x0 = x1;
-                f0  = f1;
+                f0 = f1;
                 x1 = x12;
                 f1 = f12;
                 goto LblTriangle;
@@ -371,25 +379,19 @@ namespace FerramAerospaceResearch
         public class MirroredFunction
         {
             private readonly Func<double, double> F;
-            private readonly bool mirror;
 
             public MirroredFunction(Func<double, double> original, bool mirrored)
             {
                 F = original;
-                mirror = mirrored;
+                IsMirrored = mirrored;
             }
 
             public Func<double, double> Delegate
             {
-                get
-                {
-                    if (mirror)
-                        return InvokeMirrored;
-                    return F;
-                }
+                get { return IsMirrored ? InvokeMirrored : F; }
             }
 
-            public bool IsMirrored { get { return mirror; } }
+            public bool IsMirrored { get; }
 
             private double InvokeMirrored(double x)
             {
@@ -402,11 +404,13 @@ namespace FerramAerospaceResearch
                 {
                     double oldx0 = x0;
                     double oldf0 = f0;
-                    x0 = -x1; f0 = -f1;
-                    x1 = -oldx0; f1 = -oldf0;
+                    x0 = -x1;
+                    f0 = -f1;
+                    x1 = -oldx0;
+                    f1 = -oldf0;
                 }
 
-            LblLoop:
+                LblLoop:
                 double x = x0 + (x0 - x1) * f0 / (f1 - f0);
                 if (x1 - x0 < tol_linear)
                     return x;
@@ -414,22 +418,21 @@ namespace FerramAerospaceResearch
                 double fx = F(x);
                 if (fx < 0d)
                 {
-                    x0 = x; f0 = fx;
+                    x0 = x;
+                    f0 = fx;
                     goto LblLoop;
                 }
 
-                if (fx > 0d)
-                {
-                    x1 = x; f1 = fx;
-                    goto LblLoop;
-                }
-
-                return x;
+                if (fx <= 0d)
+                    return x;
+                x1 = x;
+                f1 = fx;
+                goto LblLoop;
             }
 
             public double BrentSolve(string dbgmsg)
             {
-                FARLogger.Info("MirroredFunction (mirrored= " + mirror + ") reverting to BrentsMethod: " + dbgmsg);
+                FARLogger.Info("MirroredFunction (mirrored= " + IsMirrored + ") reverting to BrentsMethod: " + dbgmsg);
                 return BrentsMethod(F, leftedge, rightedge, tol_brent, iterlim);
             }
         }

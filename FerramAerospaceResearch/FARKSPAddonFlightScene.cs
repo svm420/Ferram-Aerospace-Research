@@ -51,7 +51,6 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class FARKSPAddonFlightScene : MonoBehaviour
     {
-
         public static float FARAeroForceDisplayScale;
 
         private void Awake()
@@ -70,7 +69,6 @@ namespace FerramAerospaceResearch
         private void Update()
         {
             VoxelizationThreadpool.Instance.ExecuteMainThreadTasks();
-
         }
 
         private void OnDestroy()

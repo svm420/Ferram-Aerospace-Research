@@ -44,7 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-	internal class InstantConditionSimInput
+    internal class InstantConditionSimInput
     {
         public double alpha;
         public double beta;
@@ -57,9 +57,22 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
         public int flaps;
         public bool spoilers;
 
-        public InstantConditionSimInput() { }
+        public InstantConditionSimInput()
+        {
+        }
 
-        public InstantConditionSimInput(double alpha, double beta, double phi, double alphaDot, double betaDot, double phiDot, double machNumber, double pitchValue, int flaps = 0, bool spoilers = false)
+        public InstantConditionSimInput(
+            double alpha,
+            double beta,
+            double phi,
+            double alphaDot,
+            double betaDot,
+            double phiDot,
+            double machNumber,
+            double pitchValue,
+            int flaps = 0,
+            bool spoilers = false
+        )
         {
             this.alpha = alpha;
             this.beta = beta;

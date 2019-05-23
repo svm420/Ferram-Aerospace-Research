@@ -54,22 +54,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class AirspeedSettingsGUI
     {
-        public static bool allEnabled = true;
-        private readonly Vessel _vessel;
-        private GUIStyle buttonStyle;
-        public bool enabled
-        {
-            get;
-            set;
-        }
-
-        public AirspeedSettingsGUI(Vessel vessel, bool enabled = true)
-        {
-            _vessel = vessel;
-            this.enabled = enabled;
-            LoadSettings();
-        }
-
         // ReSharper disable once UnusedMember.Global -> MACH
         public enum SurfaceVelMode
         {
@@ -79,14 +63,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             MACH
         }
 
-        private readonly string[] surfModel_str =
-        {
-            Localizer.Format("FARFlightAirspeedGroundspeed"),
-            Localizer.Format("FARFlightAirspeedIndicated"),
-            Localizer.Format("FARFlightAirspeedEquivalent"),
-            Localizer.Format("FARAbbrevMach")
-        };
-
         public enum SurfaceVelUnit
         {
             M_S,
@@ -94,6 +70,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             MPH,
             KM_H
         }
+
+        public static bool allEnabled = true;
+        private readonly Vessel _vessel;
+
+        private readonly string[] surfModel_str =
+        {
+            Localizer.Format("FARFlightAirspeedGroundspeed"),
+            Localizer.Format("FARFlightAirspeedIndicated"),
+            Localizer.Format("FARFlightAirspeedEquivalent"),
+            Localizer.Format("FARAbbrevMach")
+        };
 
         private readonly string[] surfUnit_str =
         {
@@ -103,12 +90,24 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             Localizer.Format("FARFlightAirspeedKMH")
         };
 
+        private GUIStyle buttonStyle;
+
         private SurfaceVelMode velMode = SurfaceVelMode.TAS;
 
         private SurfaceVelUnit unitMode = SurfaceVelUnit.M_S;
+
         // DaMichel: cache the velocity display string for retrieval in GetVelocityDisplayString
         private string velString;
         private bool active; // Have we actually generated the string?
+
+        public AirspeedSettingsGUI(Vessel vessel, bool enabled = true)
+        {
+            _vessel = vessel;
+            this.enabled = enabled;
+            LoadSettings();
+        }
+
+        public bool enabled { get; set; }
 
         public void AirSpeedSettings()
         {
@@ -123,8 +122,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             velMode = (SurfaceVelMode)GUILayout.SelectionGrid((int)velMode, surfModel_str, 1, buttonStyle);
             unitMode = (SurfaceVelUnit)GUILayout.SelectionGrid((int)unitMode, surfUnit_str, 1, buttonStyle);
             GUILayout.EndHorizontal();
-            //            SaveAirSpeedPos.x = AirSpeedPos.x;
-            //            SaveAirSpeedPos.y = AirSpeedPos.y;
         }
 
         public bool GetVelocityDisplayString(out string value_out, out SurfaceVelMode mode_out)
@@ -136,7 +133,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public double CalculateIAS()
         {
-            double pressureRatio = FARAeroUtil.RayleighPitotTubeStagPressure(_vessel.mach); //stag pressure at pitot tube face / ambient pressure
+            //stag pressure at pitot tube face / ambient pressure
+            double pressureRatio = FARAeroUtil.RayleighPitotTubeStagPressure(_vessel.mach);
 
             double velocity = pressureRatio - 1;
             velocity *= _vessel.staticPressurekPa * 1000 * 2;
@@ -148,7 +146,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public double CalculateEAS()
         {
-            double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
+            double densityRatio = FARAeroUtil.GetCurrentDensity(_vessel) / 1.225;
             return _vessel.srfSpeed * Math.Sqrt(densityRatio);
         }
 
@@ -156,9 +154,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             // No need to build the string
             if (!(allEnabled && enabled))
-            {
                 return;
-            }
 
             active = false;
             //DaMichel: Avoid conflict between multiple vessels in physics range. We only want to show the speed of the active vessel.
@@ -172,52 +168,47 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
 
             double unitConversion = 1;
-            string unitString; // = "m/s";
+            string unitString;
             string caption;
-            if (unitMode == SurfaceVelUnit.KNOTS)
+            switch (unitMode)
             {
-                unitConversion = 1.943844492440604768413343347219;
-                unitString = surfUnit_str[1];
+                case SurfaceVelUnit.KNOTS:
+                    unitConversion = 1.943844492440604768413343347219;
+                    unitString = surfUnit_str[1];
+                    break;
+                case SurfaceVelUnit.KM_H:
+                    unitConversion = 3.6;
+                    unitString = surfUnit_str[3];
+                    break;
+                case SurfaceVelUnit.MPH:
+                    unitConversion = 2.236936;
+                    unitString = surfUnit_str[2];
+                    break;
+                default:
+                    unitString = surfUnit_str[0];
+                    break;
             }
-            else if (unitMode == SurfaceVelUnit.KM_H)
-            {
-                unitConversion = 3.6;
-                unitString = surfUnit_str[3];
-            }
-            else if (unitMode == SurfaceVelUnit.MPH)
-            {
-                unitConversion = 2.236936;
-                unitString = surfUnit_str[2];
-            }
-            else
-            {
-                unitString = surfUnit_str[0];
-            }
-            if (velMode == SurfaceVelMode.TAS)
-            {
-                caption = surfModel_str[0];
-                velString = (_vessel.srfSpeed * unitConversion).ToString("F1") + unitString;
-            }
-            else
-            {
-                if (velMode == SurfaceVelMode.IAS)
-                {
-                    caption = surfModel_str[1];
-                    //double densityRatio = (FARAeroUtil.GetCurrentDensity(_vessel) / 1.225);
 
+            switch (velMode)
+            {
+                case SurfaceVelMode.TAS:
+                    caption = surfModel_str[0];
+                    velString = (_vessel.srfSpeed * unitConversion).ToString("F1") + unitString;
+                    break;
+                case SurfaceVelMode.IAS:
+                    caption = surfModel_str[1];
                     velString = (CalculateIAS() * unitConversion).ToString("F1") + unitString;
-                }
-                else if (velMode == SurfaceVelMode.EAS)
-                {
+                    break;
+                case SurfaceVelMode.EAS:
                     caption = surfModel_str[2];
                     velString = (CalculateEAS() * unitConversion).ToString("F1") + unitString;
-                }
-                else // if (velMode == SurfaceVelMode.MACH)
-                {
+                    break;
+                default:
                     caption = surfModel_str[3];
                     velString = _vessel.mach.ToString("F3");
-                }
+                    break;
             }
+
             active = true;
 
             SpeedDisplay UI = SpeedDisplay.Instance;
@@ -231,11 +222,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         public void SaveSettings()
         {
             List<ConfigNode> flightGUISettings = FARSettingsScenarioModule.FlightGUISettings;
-            if(flightGUISettings == null)
+            if (flightGUISettings == null)
             {
                 FARLogger.Error("Could not save Airspeed Settings because settings config list was null");
                 return;
             }
+
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "AirSpeedSettings");
 
             if (node == null)
@@ -243,6 +235,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 node = new ConfigNode("AirSpeedSettings");
                 flightGUISettings.Add(node);
             }
+
             node.ClearData();
 
             node.AddValue("unitTypeIndex", (int)unitMode);
@@ -262,7 +255,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
             else
             {
-                //unitMode = (SurfaceVelUnit)int.Parse(node.GetValue("unitTypeIndex"));
                 if (int.TryParse(node.GetValue("unitTypeIndex"), out int tmp))
                     unitMode = (SurfaceVelUnit)tmp;
                 else

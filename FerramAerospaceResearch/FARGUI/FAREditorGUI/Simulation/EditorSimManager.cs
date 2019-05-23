@@ -52,12 +52,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
     {
         private readonly InstantConditionSim _instantCondition;
 
-        public StabilityDerivCalculator StabDerivCalculator { get; }
-
-        public StabilityDerivLinearSim StabDerivLinearSim { get; }
-
-        public SweepSim SweepSim { get; }
-
         private readonly EditorAeroCenter _aeroCenter;
 
         public StabilityDerivOutput vehicleData;
@@ -66,17 +60,20 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
         {
             _instantCondition = _instantSim;
             StabDerivCalculator = new StabilityDerivCalculator(_instantCondition);
-            StabDerivLinearSim = new StabilityDerivLinearSim(_instantCondition);
             SweepSim = new SweepSim(_instantCondition);
             _aeroCenter = new EditorAeroCenter();
             vehicleData = new StabilityDerivOutput();
         }
 
+        public StabilityDerivCalculator StabDerivCalculator { get; }
+
+        public SweepSim SweepSim { get; }
+
         public void UpdateAeroData(VehicleAerodynamics vehicleAero, List<FARWingAerodynamicModel> wingAerodynamicModel)
         {
-	        vehicleAero.GetNewAeroData(out List<FARAeroPartModule> aeroModules, out List<FARAeroSection> aeroSections);
-             _instantCondition.UpdateAeroData(aeroModules, aeroSections, vehicleAero, wingAerodynamicModel);
-             _aeroCenter.UpdateAeroData(aeroSections);
+            vehicleAero.GetNewAeroData(out List<FARAeroPartModule> aeroModules, out List<FARAeroSection> aeroSections);
+            _instantCondition.UpdateAeroData(aeroModules, aeroSections, vehicleAero, wingAerodynamicModel);
+            _aeroCenter.UpdateAeroData(aeroSections);
         }
     }
 }

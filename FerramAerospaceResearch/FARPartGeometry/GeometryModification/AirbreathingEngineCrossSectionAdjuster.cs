@@ -49,33 +49,18 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
     internal class AirbreathingEngineCrossSectionAdjuster : ICrossSectionAdjuster
     {
-        private Vector3 vehicleBasisForwardVector;
-
         private readonly double exitArea;
+
+        private readonly Part part;
+        private Vector3 vehicleBasisForwardVector;
         private int sign = 1;
 
         private Matrix4x4 thisToVesselMatrix;
         private Matrix4x4 meshLocalToWorld;
 
-        public ModuleEngines EngineModule { get; }
-
-        private readonly Part part;
-        public Part GetPart()
-        {
-            return part;
-        }
-
-        public bool IntegratedCrossSectionIncreaseDecrease()
-        {
-            return false;
-        }
-
         public AirbreathingEngineCrossSectionAdjuster(ModuleEngines engine, Matrix4x4 worldToVesselMatrix)
         {
             vehicleBasisForwardVector = Vector3.forward;
-            //for (int i = 0; i < engine.thrustTransforms.Count; i++)
-            //    vehicleBasisForwardVector += engine.thrustTransforms[i].forward;
-
             thisToVesselMatrix = worldToVesselMatrix * engine.thrustTransforms[0].localToWorldMatrix;
 
             vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);
@@ -93,7 +78,19 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             exitArea *= exitArea;
             exitArea *= Math.PI;
 
-            exitArea *= -1;     //make this negative to note that it is a removal of area
+            exitArea *= -1; //make this negative to note that it is a removal of area
+        }
+
+        public ModuleEngines EngineModule { get; }
+
+        public Part GetPart()
+        {
+            return part;
+        }
+
+        public bool IntegratedCrossSectionIncreaseDecrease()
+        {
+            return false;
         }
 
         public double AreaRemovedFromCrossSection(Vector3 vehicleAxis)
@@ -119,7 +116,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             sign = direction;
         }
 
-        public int GetForwardBackwardNoFlowSign() { return sign; }
+        public int GetForwardBackwardNoFlowSign()
+        {
+            return sign;
+        }
 
         public void TransformBasis(Matrix4x4 matrix)
         {
@@ -138,6 +138,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             meshLocalToWorld = EngineModule.thrustTransforms[0].localToWorldMatrix;
         }
 
-        public void UpdateArea() { }
+        public void UpdateArea()
+        {
+        }
     }
 }

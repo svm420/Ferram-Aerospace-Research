@@ -11,42 +11,46 @@ namespace FerramAerospaceResearch.RealChuteLite
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class ChuteCalculator : MonoBehaviour
     {
-        #region Initialization
         private void Start()
         {
             FARLogger.Info("Initiating RealChuteLite Chute Property Calculation");
             foreach (AvailablePart part in PartLoader.Instance.loadedParts)
             {
                 Part prefab = part.partPrefab;
-                if (prefab != null && prefab.Modules.Contains<RealChuteFAR>())
-                {
-                    //Updates the part's GetInfo.
-                    RealChuteFAR module = prefab.Modules.GetModule<RealChuteFAR>();
-                    DragCubeSystem.Instance.LoadDragCubes(prefab);
-                    DragCube semi = prefab.DragCubes.Cubes.Find(c => c.Name == "SEMIDEPLOYED"), deployed = prefab.DragCubes.Cubes.Find(c => c.Name == "DEPLOYED");
-                    if (semi == null || deployed == null) { FARLogger.Info("" + part.title + " cannot find drag cube for RealChuteLite"); }
-                    module.preDeployedDiameter = GetApparentDiameter(semi);
-                    module.deployedDiameter = GetApparentDiameter(deployed);
-                    part.moduleInfos.Find(m => m.moduleName == "RealChute").info = module.GetInfo();
-                }
+                if (prefab == null || !prefab.Modules.Contains<RealChuteFAR>())
+                    continue;
+                //Updates the part's GetInfo.
+                var module = prefab.Modules.GetModule<RealChuteFAR>();
+                DragCubeSystem.Instance.LoadDragCubes(prefab);
+                DragCube semi = prefab.DragCubes.Cubes.Find(c => c.Name == "SEMIDEPLOYED"),
+                         deployed = prefab.DragCubes.Cubes.Find(c => c.Name == "DEPLOYED");
+                if (semi == null || deployed == null)
+                    FARLogger.Info("" + part.title + " cannot find drag cube for RealChuteLite");
+                module.preDeployedDiameter = GetApparentDiameter(semi);
+                module.deployedDiameter = GetApparentDiameter(deployed);
+                part.moduleInfos.Find(m => m.moduleName == "RealChute").info = module.GetInfo();
             }
         }
-        #endregion
 
-        #region Methods
         //Retrieves an "apparent" diameter from a DragCube
         private static float GetApparentDiameter(DragCube cube)
         {
             float area = 0;
             for (int i = 0; i < 6; i++)
-            {
                 // TODO 1.2: according to API docs this method should have only 2 arguments but it has 3
-                area += cube.Area[i] * cube.Drag[i]
-                        * PhysicsGlobals.DragCurveValue(PhysicsGlobals.SurfaceCurves, (Vector3.Dot(Vector3.up, DragCubeList.GetFaceDirection((DragCube.DragFace)i)) + 1) * 0.5f, 0);
-
-            }
-            return (float)Math.Max(Math.Round(Math.Sqrt((area * 0.1f * PhysicsGlobals.DragMultiplier) / Math.PI) * 2, 1, MidpointRounding.AwayFromZero), 0.1);
+                area += cube.Area[i] *
+                        cube.Drag[i] *
+                        PhysicsGlobals.DragCurveValue(PhysicsGlobals.SurfaceCurves,
+                                                      (Vector3.Dot(Vector3.up,
+                                                                   DragCubeList
+                                                                       .GetFaceDirection((DragCube.DragFace)i)) +
+                                                       1) *
+                                                      0.5f,
+                                                      0);
+            return (float)Math.Max(Math.Round(Math.Sqrt(area * 0.1f * PhysicsGlobals.DragMultiplier / Math.PI) * 2,
+                                              1,
+                                              MidpointRounding.AwayFromZero),
+                                   0.1);
         }
-        #endregion
     }
 }

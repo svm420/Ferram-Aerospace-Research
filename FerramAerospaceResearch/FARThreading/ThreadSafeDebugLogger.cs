@@ -54,22 +54,14 @@ namespace FerramAerospaceResearch.FARThreading
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class ThreadSafeDebugLogger : MonoBehaviour
     {
-        private static ThreadSafeDebugLogger _instance;
-        public static ThreadSafeDebugLogger Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
-
         private List<Exception> _exceptionsThrown;
         private List<string> _infoMessages;
         private List<string> _debugMessages;
+        public static ThreadSafeDebugLogger Instance { get; private set; }
 
         private void Awake()
         {
-            _instance = this;
+            Instance = this;
             _exceptionsThrown = new List<Exception>();
             _infoMessages = new List<string>();
             _debugMessages = new List<string>();
@@ -93,31 +85,29 @@ namespace FerramAerospaceResearch.FARThreading
         [Conditional("DEBUG"), Conditional("INFO")]
         private void UpdateInfo()
         {
-            if (_infoMessages.Count > 0)
-            {
-                StringBuilder sB = new StringBuilder();
-                foreach (string message in _infoMessages)
-                    sB.AppendLine(message);
+            if (_infoMessages.Count <= 0)
+                return;
+            var sB = new StringBuilder();
+            foreach (string message in _infoMessages)
+                sB.AppendLine(message);
 
-                _infoMessages.Clear();
+            _infoMessages.Clear();
 
-                FARLogger.Info("" + sB);
-            }
+            FARLogger.Info("" + sB);
         }
 
         [Conditional("DEBUG")]
         private void UpdateDebug()
         {
-            if (_debugMessages.Count > 0)
-            {
-                StringBuilder sB = new StringBuilder();
-                foreach (string message in _debugMessages)
-                    sB.AppendLine(message);
+            if (_debugMessages.Count <= 0)
+                return;
+            var sB = new StringBuilder();
+            foreach (string message in _debugMessages)
+                sB.AppendLine(message);
 
-                _debugMessages.Clear();
+            _debugMessages.Clear();
 
-                FARLogger.Debug("" + sB);
-            }
+            FARLogger.Debug("" + sB);
         }
 
         [Conditional("DEBUG"), Conditional("INFO")]

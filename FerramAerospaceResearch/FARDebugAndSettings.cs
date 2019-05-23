@@ -67,39 +67,27 @@ namespace FerramAerospaceResearch
         public static Callback Toggle = delegate { };
         private static bool debugMenu;
         private static bool inputLocked;
+
+        private static readonly string[] MenuTab_str =
+        {
+            "Difficulty and Debug", "Aerodynamic Failure", "Atm Composition"
+        };
+
+        public static readonly string[] FlowMode_str =
+        {
+            "NO_FLOW", "ALL_VESSEL", "STAGE_PRIORITY_FLOW", "STACK_PRIORITY_SEARCH"
+        };
+
         private Rect debugWinPos = new Rect(50, 50, 700, 250);
         private Texture2D cLTexture;
         private Texture2D cDTexture;
         private Texture2D cMTexture;
         private Texture2D l_DTexture;
 
-        // ReSharper disable once UnusedMember.Local -> AtmComposition
-        private enum MenuTab
-        {
-            DebugAndData,
-            AeroStress,
-            AtmComposition
-        }
-
-        private static readonly string[] MenuTab_str = {
-            "Difficulty and Debug",
-            "Aerodynamic Failure",
-            "Atm Composition"
-        };
-
-        public static readonly string[] FlowMode_str = {
-            "NO_FLOW",
-            "ALL_VESSEL",
-            "STAGE_PRIORITY_FLOW",
-            "STACK_PRIORITY_SEARCH"
-        };
-
         private MenuTab activeTab = MenuTab.DebugAndData;
 
         private int aeroStressIndex;
         private int atmBodyIndex = 1;
-
-        #region Unity MonoBehaviour messages
 
         private void Awake()
         {
@@ -130,29 +118,26 @@ namespace FerramAerospaceResearch
 
         private void Update()
         {
-            if (hasScenarioChanged)
-            {
-                OnScenarioChanged();
-                hasScenarioChanged = false;
-            }
+            if (!hasScenarioChanged)
+                return;
+            OnScenarioChanged();
+            hasScenarioChanged = false;
         }
-        #endregion Unity MonoBehaviour messages
 
-        private void OnSceneChange(GameEvents.FromToAction<GameScenes,GameScenes> fromToScenes)
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
+        private void OnSceneChange(GameEvents.FromToAction<GameScenes, GameScenes> fromToScenes)
         {
             FARLogger.Info("check scene");
-            if(fromToScenes.to == GameScenes.SPACECENTER)
+            if (fromToScenes.to == GameScenes.SPACECENTER)
             {
-                if (FARDebugValues.useBlizzyToolbar)
-                {
-                    if (FARDebugButtonBlizzy == null)
-                    {
-                        FARDebugButtonBlizzy = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARDebugButtonBlizzy");
-                        FARDebugButtonBlizzy.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
-                        FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
-                        FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
-                    }
-                }
+                if (!FARDebugValues.useBlizzyToolbar)
+                    return;
+                if (FARDebugButtonBlizzy != null)
+                    return;
+                FARDebugButtonBlizzy = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARDebugButtonBlizzy");
+                FARDebugButtonBlizzy.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
+                FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
+                FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
             }
             else
             {
@@ -160,6 +145,7 @@ namespace FerramAerospaceResearch
             }
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void OnAppLauncherReadySetup()
         {
             OnGUIAppLauncherReady();
@@ -169,26 +155,29 @@ namespace FerramAerospaceResearch
             Toggle += FlightGUI.onAppLaunchToggle;
         }
 
-        private void ToggleGUI()
+        private static void ToggleGUI()
         {
             Toggle();
         }
 
-        private void OnGUIAppLauncherReady()
+        private static void OnGUIAppLauncherReady()
         {
             FARLogger.Info("Adding Debug Button");
-            FARDebugButtonStock = ApplicationLauncher.Instance.AddModApplication(
-                ToggleGUI,
-                ToggleGUI,
-                null,
-                null,
-                null,
-                null,
-                ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.FLIGHT,
-                FARAssets.TextureCache.IconLarge);
+            FARDebugButtonStock = ApplicationLauncher.Instance.AddModApplication(ToggleGUI,
+                                                                                 ToggleGUI,
+                                                                                 null,
+                                                                                 null,
+                                                                                 null,
+                                                                                 null,
+                                                                                 ApplicationLauncher
+                                                                                     .AppScenes.SPACECENTER |
+                                                                                 ApplicationLauncher.AppScenes.VAB |
+                                                                                 ApplicationLauncher.AppScenes.SPH |
+                                                                                 ApplicationLauncher.AppScenes.FLIGHT,
+                                                                                 FARAssets.TextureCache.IconLarge);
         }
 
-        private void onAppLaunchToggle()
+        private static void onAppLaunchToggle()
         {
             debugMenu = !debugMenu;
         }
@@ -196,9 +185,7 @@ namespace FerramAerospaceResearch
         public static void ForceCloseDebugWindow()
         {
             if (FARDebugButtonStock)
-            {
                 FARDebugButtonStock.SetFalse(false);
-            }
             debugMenu = false;
         }
 
@@ -207,19 +194,22 @@ namespace FerramAerospaceResearch
             if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
             {
                 debugMenu = false;
-                if (inputLocked)
-                {
-                    InputLockManager.RemoveControlLock("FARDebugLock");
-                    inputLocked = false;
-                }
+                if (!inputLocked)
+                    return;
+                InputLockManager.RemoveControlLock("FARDebugLock");
+                inputLocked = false;
                 return;
             }
 
             GUI.skin = HighLogic.Skin;
             if (debugMenu)
             {
-
-                debugWinPos = GUILayout.Window("FARDebug".GetHashCode(), debugWinPos, debugWindow, "FAR Debug Options, " + FARVersion.VersionString, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                debugWinPos = GUILayout.Window("FARDebug".GetHashCode(),
+                                               debugWinPos,
+                                               debugWindow,
+                                               "FAR Debug Options, " + FARVersion.VersionString,
+                                               GUILayout.ExpandWidth(true),
+                                               GUILayout.ExpandHeight(true));
                 if (!inputLocked && debugWinPos.Contains(GUIUtils.GetMousePos()))
                 {
                     InputLockManager.SetControlLock(ControlTypes.KSC_ALL, "FARDebugLock");
@@ -240,42 +230,44 @@ namespace FerramAerospaceResearch
 
         private void debugWindow(int windowID)
         {
-
-            GUIStyle thisStyle = new GUIStyle(GUI.skin.toggle)
+            var thisStyle = new GUIStyle(GUI.skin.toggle)
             {
                 stretchHeight = true,
-                stretchWidth  = true,
-                padding       = new RectOffset(4, 4, 4, 4),
-                margin        = new RectOffset(4, 4, 4, 4)
+                stretchWidth = true,
+                padding = new RectOffset(4, 4, 4, 4),
+                margin = new RectOffset(4, 4, 4, 4)
             };
 
-            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
+            var buttonStyle = new GUIStyle(GUI.skin.button)
             {
                 stretchHeight = true,
-                stretchWidth  = true,
-                padding       = new RectOffset(4, 4, 4, 4),
-                margin        = new RectOffset(4, 4, 4, 4)
+                stretchWidth = true,
+                padding = new RectOffset(4, 4, 4, 4),
+                margin = new RectOffset(4, 4, 4, 4)
             };
 
-            GUIStyle boxStyle = new GUIStyle(GUI.skin.box)
+            var boxStyle = new GUIStyle(GUI.skin.box)
             {
                 stretchHeight = true,
-                stretchWidth  = true,
-                padding       = new RectOffset(4, 4, 4, 4),
-                margin        = new RectOffset(4, 4, 4, 4)
+                stretchWidth = true,
+                padding = new RectOffset(4, 4, 4, 4),
+                margin = new RectOffset(4, 4, 4, 4)
             };
 
             activeTab = (MenuTab)GUILayout.SelectionGrid((int)activeTab, MenuTab_str, 3);
 
-            if (activeTab == MenuTab.DebugAndData)
-                DebugAndDataTab(thisStyle);
-            else if (activeTab == MenuTab.AeroStress)
-                AeroStressTab(buttonStyle, boxStyle);
-            else
-                AeroDataTab(buttonStyle, boxStyle);
-
-            //            SaveWindowPos.x = windowPos.x;3
-            //            SaveWindowPos.y = windowPos.y;
+            switch (activeTab)
+            {
+                case MenuTab.DebugAndData:
+                    DebugAndDataTab(thisStyle);
+                    break;
+                case MenuTab.AeroStress:
+                    AeroStressTab(buttonStyle, boxStyle);
+                    break;
+                default:
+                    AeroDataTab(buttonStyle, boxStyle);
+                    break;
+            }
 
             GUI.DragWindow();
             debugWinPos = GUIUtils.ClampToScreen(debugWinPos);
@@ -283,12 +275,14 @@ namespace FerramAerospaceResearch
 
         private void AeroDataTab(GUIStyle buttonStyle, GUIStyle boxStyle)
         {
-            int i = 0;
             GUILayout.BeginVertical(boxStyle);
 
-            FARControllableSurface.timeConstant = GUIUtils.TextEntryForDouble("Ctrl Surf Time Constant:", 160, FARControllableSurface.timeConstant);
-            FARControllableSurface.timeConstantFlap = GUIUtils.TextEntryForDouble("Flap Time Constant:", 160, FARControllableSurface.timeConstantFlap);
-            FARControllableSurface.timeConstantSpoiler = GUIUtils.TextEntryForDouble("Spoiler Time Constant:", 160, FARControllableSurface.timeConstantSpoiler);
+            FARControllableSurface.timeConstant =
+                GUIUtils.TextEntryForDouble("Ctrl Surf Time Constant:", 160, FARControllableSurface.timeConstant);
+            FARControllableSurface.timeConstantFlap =
+                GUIUtils.TextEntryForDouble("Flap Time Constant:", 160, FARControllableSurface.timeConstantFlap);
+            FARControllableSurface.timeConstantSpoiler =
+                GUIUtils.TextEntryForDouble("Spoiler Time Constant:", 160, FARControllableSurface.timeConstantSpoiler);
 
 
             GUILayout.EndVertical();
@@ -301,14 +295,18 @@ namespace FerramAerospaceResearch
 
             GUILayout.BeginHorizontal();
             int j = 0;
-            for (i = 0; i < FlightGlobals.Bodies.Count; i++)
+            for (int i = 0; i < FlightGlobals.Bodies.Count; i++)
             {
                 CelestialBody body = FlightGlobals.Bodies[i];
 
                 if (!body.atmosphere)
                     continue;
 
-                bool active = GUILayout.Toggle(i == atmBodyIndex, body.GetName(), buttonStyle, GUILayout.Width(150), GUILayout.Height(40));
+                bool active = GUILayout.Toggle(i == atmBodyIndex,
+                                               body.GetName(),
+                                               buttonStyle,
+                                               GUILayout.Width(150),
+                                               GUILayout.Height(40));
                 if (active)
                     atmBodyIndex = i;
                 if ((j + 1) % 4 == 0)
@@ -316,8 +314,10 @@ namespace FerramAerospaceResearch
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
                 }
+
                 j++;
             }
+
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -339,44 +339,46 @@ namespace FerramAerospaceResearch
 
         private void AeroStressTab(GUIStyle buttonStyle, GUIStyle boxStyle)
         {
-            int i = 0;
             int removeIndex = -1;
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(boxStyle);
 
-            for (i = 0; i < FARAeroStress.StressTemplates.Count; i++)
+            for (int i = 0; i < FARAeroStress.StressTemplates.Count; i++)
             {
                 GUILayout.BeginHorizontal();
-                bool active = GUILayout.Toggle(i == aeroStressIndex, FARAeroStress.StressTemplates[i].name, buttonStyle, GUILayout.Width(150));
+                bool active = GUILayout.Toggle(i == aeroStressIndex,
+                                               FARAeroStress.StressTemplates[i].name,
+                                               buttonStyle,
+                                               GUILayout.Width(150));
                 if (GUILayout.Button("-", buttonStyle, GUILayout.Width(30), GUILayout.Height(30)))
                     removeIndex = i;
                 GUILayout.EndHorizontal();
                 if (active)
                     aeroStressIndex = i;
             }
+
             if (removeIndex >= 0)
             {
                 FARAeroStress.StressTemplates.RemoveAt(removeIndex);
                 if (aeroStressIndex == removeIndex && removeIndex > 0)
                     aeroStressIndex--;
-
-                removeIndex = -1;
             }
+
             if (GUILayout.Button("+", buttonStyle, GUILayout.Width(30), GUILayout.Height(30)))
             {
-                FARPartStressTemplate newTemplate = new FARPartStressTemplate
+                var newTemplate = new FARPartStressTemplate
                 {
-                    XZmaxStress             = 500,
-                    YmaxStress              = 500,
-                    name                    = "default",
-                    isSpecialTemplate       = false,
-                    minNumResources         = 0,
-                    resources               = new List<string>(),
-                    excludeResources        = new List<string>(),
+                    XZmaxStress = 500,
+                    YmaxStress = 500,
+                    name = "default",
+                    isSpecialTemplate = false,
+                    minNumResources = 0,
+                    resources = new List<string>(),
+                    excludeResources = new List<string>(),
                     rejectUnlistedResources = false,
-                    crewed                  = false,
-                    flowModeNeeded          = false,
-                    flowMode                = ResourceFlowMode.NO_FLOW
+                    crewed = false,
+                    flowModeNeeded = false,
+                    flowMode = ResourceFlowMode.NO_FLOW
                 };
 
                 FARAeroStress.StressTemplates.Add(newTemplate);
@@ -389,14 +391,16 @@ namespace FerramAerospaceResearch
 
             GUIUtils.TextEntryField("Name:", 80, ref activeTemplate.name);
 
-            activeTemplate.YmaxStress = GUIUtils.TextEntryForDouble("Axial (Y-axis) Max Stress:", 240, activeTemplate.YmaxStress);
-            activeTemplate.XZmaxStress = GUIUtils.TextEntryForDouble("Lateral (X,Z-axis) Max Stress:", 240, activeTemplate.XZmaxStress);
+            activeTemplate.YmaxStress =
+                GUIUtils.TextEntryForDouble("Axial (Y-axis) Max Stress:", 240, activeTemplate.YmaxStress);
+            activeTemplate.XZmaxStress =
+                GUIUtils.TextEntryForDouble("Lateral (X,Z-axis) Max Stress:", 240, activeTemplate.XZmaxStress);
 
             activeTemplate.crewed = GUILayout.Toggle(activeTemplate.crewed, "Requires Crew Compartment");
 
             string tmp = activeTemplate.minNumResources.ToString();
             GUIUtils.TextEntryField("Min Num Resources:", 80, ref tmp);
-                        tmp = Regex.Replace(tmp, @"[^\d]", "");
+            tmp = Regex.Replace(tmp, @"[^\d]", "");
             activeTemplate.minNumResources = Convert.ToInt32(tmp);
 
             GUILayout.Label("Req Resources:");
@@ -405,15 +409,17 @@ namespace FerramAerospaceResearch
             GUILayout.Label("Exclude Resources:");
             StringListUpdateGUI(activeTemplate.excludeResources, buttonStyle, boxStyle);
 
-            activeTemplate.rejectUnlistedResources = GUILayout.Toggle(activeTemplate.rejectUnlistedResources, "Reject Unlisted Res");
+            activeTemplate.rejectUnlistedResources =
+                GUILayout.Toggle(activeTemplate.rejectUnlistedResources, "Reject Unlisted Res");
 
-            activeTemplate.flowModeNeeded = GUILayout.Toggle(activeTemplate.flowModeNeeded, "Requires Specific Flow Mode");
+            activeTemplate.flowModeNeeded =
+                GUILayout.Toggle(activeTemplate.flowModeNeeded, "Requires Specific Flow Mode");
             if (activeTemplate.flowModeNeeded)
-            {
-                activeTemplate.flowMode = (ResourceFlowMode)GUILayout.SelectionGrid((int)activeTemplate.flowMode, FlowMode_str, 1);
-            }
+                activeTemplate.flowMode =
+                    (ResourceFlowMode)GUILayout.SelectionGrid((int)activeTemplate.flowMode, FlowMode_str, 1);
 
-            activeTemplate.isSpecialTemplate = GUILayout.Toggle(activeTemplate.isSpecialTemplate, "Special Hardcoded Usage");
+            activeTemplate.isSpecialTemplate =
+                GUILayout.Toggle(activeTemplate.isSpecialTemplate, "Special Hardcoded Usage");
 
             FARAeroStress.StressTemplates[aeroStressIndex] = activeTemplate;
 
@@ -422,7 +428,7 @@ namespace FerramAerospaceResearch
             GUILayout.EndHorizontal();
         }
 
-        private void StringListUpdateGUI(List<string> stringList, GUIStyle thisStyle, GUIStyle boxStyle)
+        private static void StringListUpdateGUI(List<string> stringList, GUIStyle thisStyle, GUIStyle boxStyle)
         {
             int removeIndex = -1;
             GUILayout.BeginVertical(boxStyle);
@@ -439,11 +445,9 @@ namespace FerramAerospaceResearch
 
                 stringList[i] = tmp;
             }
+
             if (removeIndex >= 0)
-            {
                 stringList.RemoveAt(removeIndex);
-                removeIndex = -1;
-            }
             if (GUILayout.Button("+", thisStyle, GUILayout.Width(30), GUILayout.Height(30)))
                 stringList.Add("");
 
@@ -455,7 +459,8 @@ namespace FerramAerospaceResearch
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(250));
             GUILayout.Label("Debug / Cheat Options");
-            FARDebugValues.allowStructuralFailures = GUILayout.Toggle(FARDebugValues.allowStructuralFailures, "Allow Aero-structural Failures", thisStyle);
+            FARDebugValues.allowStructuralFailures =
+                GUILayout.Toggle(FARDebugValues.allowStructuralFailures, "Allow Aero-structural Failures", thisStyle);
 
             GUILayout.Label("Editor GUI Graph Colors");
 
@@ -478,12 +483,16 @@ namespace FerramAerospaceResearch
 
             FARActionGroupConfiguration.DrawGUI();
             GUILayout.Label("Other Options"); // DaMichel: put it above the toolbar toggle
-            FARDebugValues.aeroFailureExplosions = GUILayout.Toggle(FARDebugValues.aeroFailureExplosions, "Aero Failures Create Explosions", thisStyle);
-            FARDebugValues.showMomentArrows = GUILayout.Toggle(FARDebugValues.showMomentArrows, "Show Torque Arrows in Aero Overlay", thisStyle);
+            FARDebugValues.aeroFailureExplosions =
+                GUILayout.Toggle(FARDebugValues.aeroFailureExplosions, "Aero Failures Create Explosions", thisStyle);
+            FARDebugValues.showMomentArrows =
+                GUILayout.Toggle(FARDebugValues.showMomentArrows, "Show Torque Arrows in Aero Overlay", thisStyle);
             if (ToolbarManager.ToolbarAvailable)
             {
                 bool tmp = FARDebugValues.useBlizzyToolbar;
-                FARDebugValues.useBlizzyToolbar = GUILayout.Toggle(FARDebugValues.useBlizzyToolbar, "Use Blizzy78 Toolbar instead of Stock AppManager", thisStyle);
+                FARDebugValues.useBlizzyToolbar = GUILayout.Toggle(FARDebugValues.useBlizzyToolbar,
+                                                                   "Use Blizzy78 Toolbar instead of Stock AppManager",
+                                                                   thisStyle);
 
                 if (tmp != FARDebugValues.useBlizzyToolbar)
                 {
@@ -498,18 +507,16 @@ namespace FerramAerospaceResearch
                     }
                 }
             }
+
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
             FARSettingsScenarioModule.Instance.DisplaySelection();
 
-
-
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
-
         }
 
-        private void ChangeColor(string colorTitle, ref Color input, ref Texture2D texture)
+        private static void ChangeColor(string colorTitle, ref Color input, ref Texture2D texture)
         {
             GUILayout.BeginHorizontal();
 
@@ -544,7 +551,7 @@ namespace FerramAerospaceResearch
             GUILayout.EndHorizontal();
         }
 
-        private void ReColorTexture(Color color, ref Texture2D texture)
+        private static void ReColorTexture(Color color, ref Texture2D texture)
         {
             for (int i = 0; i < texture.width; i++)
                 for (int j = 0; j < texture.height; j++)
@@ -558,7 +565,8 @@ namespace FerramAerospaceResearch
             config = PluginConfiguration.CreateForType<FARSettingsScenarioModule>();
             config.load();
 
-            if (node.HasValue("allowStructuralFailures") && bool.TryParse(node.GetValue("allowStructuralFailures"), out bool tmp))
+            if (node.HasValue("allowStructuralFailures") &&
+                bool.TryParse(node.GetValue("allowStructuralFailures"), out bool tmp))
                 FARDebugValues.allowStructuralFailures = tmp;
             else
                 FARDebugValues.allowStructuralFailures = true;
@@ -573,7 +581,8 @@ namespace FerramAerospaceResearch
             else
                 FARDebugValues.useBlizzyToolbar = false;
 
-            if (node.HasValue("aeroFailureExplosions") && bool.TryParse(node.GetValue("aeroFailureExplosions"), out tmp))
+            if (node.HasValue("aeroFailureExplosions") &&
+                bool.TryParse(node.GetValue("aeroFailureExplosions"), out tmp))
                 FARDebugValues.aeroFailureExplosions = tmp;
             else
                 FARDebugValues.aeroFailureExplosions = true;
@@ -589,7 +598,7 @@ namespace FerramAerospaceResearch
         /// <summary> Update GUI after a new scenario was loaded. </summary>
         private void OnScenarioChanged()
         {
-            var guiColors = GUIColors.Instance;
+            GUIColors guiColors = GUIColors.Instance;
             ReColorTexture(guiColors[0], ref cLTexture);
             ReColorTexture(guiColors[1], ref cDTexture);
             ReColorTexture(guiColors[2], ref cMTexture);
@@ -615,10 +624,17 @@ namespace FerramAerospaceResearch
             if (!CompatibilityChecker.IsAllCompatible())
                 return;
 
-            //SaveConfigs();
             GameEvents.onGameSceneSwitchRequested.Remove(OnSceneChange);
 
             FARDebugButtonBlizzy?.Destroy();
+        }
+
+        // ReSharper disable once UnusedMember.Local -> AtmComposition
+        private enum MenuTab
+        {
+            DebugAndData,
+            AeroStress,
+            AtmComposition
         }
     }
 
@@ -632,4 +648,3 @@ namespace FerramAerospaceResearch
         public static bool aeroFailureExplosions = true;
     }
 }
-

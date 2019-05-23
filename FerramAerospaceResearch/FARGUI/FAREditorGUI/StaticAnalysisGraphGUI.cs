@@ -69,7 +69,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private Vector3 upperAoAVec, lowerAoAVec;
         private float pingPongAoAFactor;
 
-        public StaticAnalysisGraphGUI(EditorSimManager simManager, GUIDropDown<int> flapSettingDropDown, GUIDropDown<CelestialBody> bodySettingDropdown)
+        public StaticAnalysisGraphGUI(
+            EditorSimManager simManager,
+            GUIDropDown<int> flapSettingDropDown,
+            GUIDropDown<CelestialBody> bodySettingDropdown
+        )
         {
             this.simManager = simManager;
             flapSettingDropdown = flapSettingDropDown;
@@ -78,23 +82,23 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //Set up defaults for AoA Sweep
             aoASweepInputs = new GraphInputs
             {
-                lowerBound   = "0",
-                upperBound   = "25",
-                numPts       = "100",
-                flapSetting  = 0,
+                lowerBound = "0",
+                upperBound = "25",
+                numPts = "100",
+                flapSetting = 0,
                 pitchSetting = "0",
-                otherInput   = "0.2"
+                otherInput = "0.2"
             };
 
             //Set up defaults for Mach Sweep
             machSweepInputs = new GraphInputs
             {
-                lowerBound   = "0",
-                upperBound   = "3",
-                numPts       = "100",
-                flapSetting  = 0,
+                lowerBound = "0",
+                upperBound = "3",
+                numPts = "100",
+                flapSetting = 0,
                 pitchSetting = "0",
-                otherInput   = "2"
+                otherInput = "2"
             };
 
             _graph.SetBoundaries(0, 25, 0, 2);
@@ -115,14 +119,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         public void ArrowAnim(ArrowPointer velArrow)
         {
-            velArrow.Direction = pingPongAoAFactor < 1 ? Vector3.Slerp(lowerAoAVec, upperAoAVec, pingPongAoAFactor) : Vector3.Slerp(lowerAoAVec, upperAoAVec, 2 - pingPongAoAFactor);
+            velArrow.Direction = pingPongAoAFactor < 1
+                                     ? Vector3.Slerp(lowerAoAVec, upperAoAVec, pingPongAoAFactor)
+                                     : Vector3.Slerp(lowerAoAVec, upperAoAVec, 2 - pingPongAoAFactor);
 
             pingPongAoAFactor += TimeWarp.deltaTime * 0.5f;
 
             if (pingPongAoAFactor >= 2)
                 pingPongAoAFactor = 0;
-
-            //FARLogger.Info("" + velArrow.Direction);
         }
 
         private void SetAngleVectors(double lowerAoA, double upperAoA)
@@ -148,8 +152,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GUILayout.BeginVertical();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(isMachMode ? Localizer.Format("FAREditorStaticMachSweep") : Localizer.Format("FAREditorStaticAoASweep"), GUILayout.Width(250));
-            if (GUILayout.Button(isMachMode ? Localizer.Format("FAREditorStaticSwitchAoA") : Localizer.Format("FAREditorStaticSwitchMach")))
+            GUILayout.Label(isMachMode
+                                ? Localizer.Format("FAREditorStaticMachSweep")
+                                : Localizer.Format("FAREditorStaticAoASweep"),
+                            GUILayout.Width(250));
+            if (GUILayout.Button(isMachMode
+                                     ? Localizer.Format("FAREditorStaticSwitchAoA")
+                                     : Localizer.Format("FAREditorStaticSwitchMach")))
                 isMachMode = !isMachMode;
             GUILayout.EndHorizontal();
 
@@ -166,7 +175,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void GraphDisplay()
         {
-            GUIStyle graphBackingStyle = new GUIStyle(GUI.skin.box);
+            var graphBackingStyle = new GUIStyle(GUI.skin.box);
             graphBackingStyle.hover = graphBackingStyle.active = graphBackingStyle.normal;
 
             GUILayout.BeginHorizontal();
@@ -191,7 +200,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             input.pitchSetting = GUILayout.TextField(input.pitchSetting, GUILayout.ExpandWidth(true));
             input.pitchSetting = Regex.Replace(input.pitchSetting, @"[^-?[0-9]*(\.[0-9]*)?]", "");
             GUILayout.Label(Localizer.Format("FAREditorStabDerivSpoiler"));
-            input.spoilers = GUILayout.Toggle(input.spoilers, input.spoilers ? Localizer.Format("FAREditorStabDerivSDeploy") : Localizer.Format("FAREditorStabDerivSRetract"));
+            input.spoilers = GUILayout.Toggle(input.spoilers,
+                                              input.spoilers
+                                                  ? Localizer.Format("FAREditorStabDerivSDeploy")
+                                                  : Localizer.Format("FAREditorStabDerivSRetract"));
 
             GUILayout.EndVertical();
         }
@@ -200,16 +212,28 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label(Localizer.Format("FAREditorStaticGraphLowLim"), GUILayout.Width(50.0F), GUILayout.Height(25.0F));
+            GUILayout.Label(Localizer.Format("FAREditorStaticGraphLowLim"),
+                            GUILayout.Width(50.0F),
+                            GUILayout.Height(25.0F));
             input.lowerBound = GUILayout.TextField(input.lowerBound, GUILayout.ExpandWidth(true));
-            GUILayout.Label(Localizer.Format("FAREditorStaticGraphUpLim"), GUILayout.Width(50.0F), GUILayout.Height(25.0F));
+            GUILayout.Label(Localizer.Format("FAREditorStaticGraphUpLim"),
+                            GUILayout.Width(50.0F),
+                            GUILayout.Height(25.0F));
             input.upperBound = GUILayout.TextField(input.upperBound, GUILayout.ExpandWidth(true));
-            GUILayout.Label(Localizer.Format("FAREditorStaticGraphPtCount"), GUILayout.Width(70.0F), GUILayout.Height(25.0F));
+            GUILayout.Label(Localizer.Format("FAREditorStaticGraphPtCount"),
+                            GUILayout.Width(70.0F),
+                            GUILayout.Height(25.0F));
             input.numPts = GUILayout.TextField(input.numPts, GUILayout.ExpandWidth(true));
-            GUILayout.Label(isMachMode ? Localizer.Format("FARAbbrevAoA") : Localizer.Format("FARAbbrevMach"), GUILayout.Width(50.0F), GUILayout.Height(25.0F));
+            GUILayout.Label(isMachMode ? Localizer.Format("FARAbbrevAoA") : Localizer.Format("FARAbbrevMach"),
+                            GUILayout.Width(50.0F),
+                            GUILayout.Height(25.0F));
             input.otherInput = GUILayout.TextField(input.otherInput, GUILayout.ExpandWidth(true));
 
-            if (GUILayout.Button(isMachMode ? Localizer.Format("FAREditorStaticSweepMach") : Localizer.Format("FAREditorStaticSweepAoA"), GUILayout.Width(100.0F), GUILayout.Height(25.0F)))
+            if (GUILayout.Button(isMachMode
+                                     ? Localizer.Format("FAREditorStaticSweepMach")
+                                     : Localizer.Format("FAREditorStaticSweepAoA"),
+                                 GUILayout.Width(100.0F),
+                                 GUILayout.Height(25.0F)))
             {
                 input.lowerBound = Regex.Replace(input.lowerBound, @"[^-?[0-9]*(\.[0-9]*)?]", "");
                 input.upperBound = Regex.Replace(input.upperBound, @"[^-?[0-9]*(\.[0-9]*)?]", "");
@@ -235,28 +259,55 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
                 double otherInput = double.Parse(input.otherInput);
 
-                var sim = simManager.SweepSim;
+                SweepSim sim = simManager.SweepSim;
                 if (sim.IsReady())
                 {
                     GraphData data;
                     if (isMachMode)
                     {
-                        data = sim.MachNumberSweep(otherInput, pitchSetting, lowerBound, upperBound, (int)numPts, input.flapSetting, input.spoilers, bodySettingDropdown.ActiveSelection);
+                        data = sim.MachNumberSweep(otherInput,
+                                                   pitchSetting,
+                                                   lowerBound,
+                                                   upperBound,
+                                                   (int)numPts,
+                                                   input.flapSetting,
+                                                   input.spoilers,
+                                                   bodySettingDropdown.ActiveSelection);
                         SetAngleVectors(pitchSetting, pitchSetting);
                     }
                     else
                     {
-                        data = sim.AngleOfAttackSweep(otherInput, pitchSetting, lowerBound, upperBound, (int)numPts, input.flapSetting, input.spoilers, bodySettingDropdown.ActiveSelection);
+                        data = sim.AngleOfAttackSweep(otherInput,
+                                                      pitchSetting,
+                                                      lowerBound,
+                                                      upperBound,
+                                                      (int)numPts,
+                                                      input.flapSetting,
+                                                      input.spoilers,
+                                                      bodySettingDropdown.ActiveSelection);
                         SetAngleVectors(lowerBound, upperBound);
                     }
 
-                    UpdateGraph(data, isMachMode ? Localizer.Format("FAREditorStaticGraphMach") : Localizer.Format("FAREditorStaticGraphAoA"), Localizer.Format("FAREditorStaticGraphCoeff"), lowerBound, upperBound);
+                    UpdateGraph(data,
+                                isMachMode
+                                    ? Localizer.Format("FAREditorStaticGraphMach")
+                                    : Localizer.Format("FAREditorStaticGraphAoA"),
+                                Localizer.Format("FAREditorStaticGraphCoeff"),
+                                lowerBound,
+                                upperBound);
                 }
             }
+
             GUILayout.EndHorizontal();
         }
 
-        private void UpdateGraph(GraphData data, string horizontalLabel, string verticalLabel, double lowerBound, double upperBound)
+        private void UpdateGraph(
+            GraphData data,
+            string horizontalLabel,
+            string verticalLabel,
+            double lowerBound,
+            double upperBound
+        )
         {
             double newMinBounds = double.PositiveInfinity;
             double newMaxBounds = double.NegativeInfinity;
@@ -282,24 +333,25 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _graph.SetGridScaleUsingValues(5, 0.5);
 
             for (int i = 0; i < data.yValues.Count; i++)
-            {
-                _graph.AddLine(data.lineNames[i], data.xValues, data.yValues[i], data.lineColors[i], 1, data.lineNameVisible[i]);
-            }
+                _graph.AddLine(data.lineNames[i],
+                               data.xValues,
+                               data.yValues[i],
+                               data.lineColors[i],
+                               1,
+                               data.lineNameVisible[i]);
             for (int i = 0; i < data.yValues.Count; i++)
-            {
                 AddZeroMarks(data.lineNames[i], data.xValues, data.yValues[i], realMax - realMin, data.lineColors[i]);
-            }
 
             _graph.horizontalLabel = horizontalLabel;
-            _graph.verticalLabel = verticalLabel;// "Cl\nCd\nCm\nL/D / 10";
+            _graph.verticalLabel = verticalLabel;
             _graph.Update();
         }
 
-        private void AddZeroMarks(String key, double[] x, double[] y, double ysize, Color color)
+        private void AddZeroMarks(string key, double[] x, double[] y, double ysize, Color color)
         {
             int j = 0;
 
-            List<double> xv_yvPairs = new List<double>();
+            var xv_yvPairs = new List<double>();
 
             for (int i = 0; i < y.Length - 1; i++)
             {
@@ -311,11 +363,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 xv_yvPairs.Add(xv);
                 xv_yvPairs.Add(yv);
             }
-            if(xv_yvPairs.Count < 5)
-                for(int i = 0; i < xv_yvPairs.Count; i += 2)
-                {
-                    _graph.AddLine(key + (j++), new[] { xv_yvPairs[i], xv_yvPairs[i] }, new[] { -xv_yvPairs[i + 1], xv_yvPairs[i + 1] }, color, 1, false);
-                }
+
+            if (xv_yvPairs.Count >= 5)
+                return;
+            for (int i = 0; i < xv_yvPairs.Count; i += 2)
+                _graph.AddLine(key + j++,
+                               new[] {xv_yvPairs[i], xv_yvPairs[i]},
+                               new[] {-xv_yvPairs[i + 1], xv_yvPairs[i + 1]},
+                               color,
+                               1,
+                               false);
         }
 
         private class GraphInputs
@@ -328,6 +385,5 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             public string otherInput;
             public bool spoilers;
         }
-
     }
 }

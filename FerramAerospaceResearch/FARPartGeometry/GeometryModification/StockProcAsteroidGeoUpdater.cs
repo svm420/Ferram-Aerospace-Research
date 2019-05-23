@@ -46,15 +46,14 @@ using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 {
-	internal class StockProcAsteroidGeoUpdater : IGeometryUpdater
+    internal class StockProcAsteroidGeoUpdater : IGeometryUpdater
     {
-	    private readonly GeometryPartModule geoModule;
-	    private bool hasLoaded;
+        private readonly GeometryPartModule geoModule;
+        private bool hasLoaded;
 
         public StockProcAsteroidGeoUpdater(GeometryPartModule geoModule)
         {
-	        this.geoModule = geoModule;
-
+            this.geoModule = geoModule;
         }
 
         public void EditorGeometryUpdate()
@@ -63,13 +62,11 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public void FlightGeometryUpdate()
         {
-            if (!hasLoaded)
-            {
-                FARLogger.Info("Asteroid Geometry Update");
-                hasLoaded = true;
-                geoModule.GeometryPartModuleRebuildMeshData();
-
-            }
+            if (hasLoaded)
+                return;
+            FARLogger.Info("Asteroid Geometry Update");
+            hasLoaded = true;
+            geoModule.GeometryPartModuleRebuildMeshData();
         }
     }
 }

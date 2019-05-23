@@ -55,12 +55,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private readonly Vector3[] meshLocalVerts;
         public readonly int[] triangles;
         public readonly Transform meshTransform;
-        public Matrix4x4 thisToVesselMatrix;
-        public Matrix4x4 meshLocalToWorld;
-        public Bounds bounds;
         public readonly Part part;
         private readonly GeometryPartModule module;
-        public bool valid;
         public readonly bool isSkinned;
 
         public readonly int invertXYZ;
@@ -68,7 +64,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
         /// <summary> cache activity state of gameobject locally as we cannot access it from other threads </summary>
         public readonly bool gameObjectActiveInHierarchy;
 
-        public GeometryMesh(MeshData meshData, Transform meshTransform, Matrix4x4 worldToVesselMatrix, GeometryPartModule module)
+        public Matrix4x4 thisToVesselMatrix;
+        public Matrix4x4 meshLocalToWorld;
+        public Bounds bounds;
+        public bool valid;
+
+        public GeometryMesh(
+            MeshData meshData,
+            Transform meshTransform,
+            Matrix4x4 worldToVesselMatrix,
+            GeometryPartModule module
+        )
         {
             meshLocalVerts = meshData.vertices;
             triangles = meshData.triangles;
@@ -82,12 +88,20 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             for (int i = 0; i < vertices.Length; i++)
             {
-                //vertices[i] = thisToVesselMatrix.MultiplyPoint3x4(untransformedVerts[i]);
                 Vector3 v = meshLocalVerts[i];
                 Vector3 vert = Vector3.zero;
-                vert.x = thisToVesselMatrix.m00 * v.x + thisToVesselMatrix.m01 * v.y + thisToVesselMatrix.m02 * v.z + thisToVesselMatrix.m03;
-                vert.y = thisToVesselMatrix.m10 * v.x + thisToVesselMatrix.m11 * v.y + thisToVesselMatrix.m12 * v.z + thisToVesselMatrix.m13;
-                vert.z = thisToVesselMatrix.m20 * v.x + thisToVesselMatrix.m21 * v.y + thisToVesselMatrix.m22 * v.z + thisToVesselMatrix.m23;
+                vert.x = thisToVesselMatrix.m00 * v.x +
+                         thisToVesselMatrix.m01 * v.y +
+                         thisToVesselMatrix.m02 * v.z +
+                         thisToVesselMatrix.m03;
+                vert.y = thisToVesselMatrix.m10 * v.x +
+                         thisToVesselMatrix.m11 * v.y +
+                         thisToVesselMatrix.m12 * v.z +
+                         thisToVesselMatrix.m13;
+                vert.z = thisToVesselMatrix.m20 * v.x +
+                         thisToVesselMatrix.m21 * v.y +
+                         thisToVesselMatrix.m22 * v.z +
+                         thisToVesselMatrix.m23;
 
                 float tmpTestVert = vert.x + vert.y + vert.z;
                 if (float.IsNaN(tmpTestVert) || float.IsInfinity(tmpTestVert))
@@ -99,15 +113,21 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             bounds = TransformBounds(meshBounds, thisToVesselMatrix);
 
-            float tmpTestBounds = bounds.center.x + bounds.center.y + bounds.center.z
-                + bounds.extents.x + bounds.extents.y + bounds.extents.z;
+            float tmpTestBounds = bounds.center.x +
+                                  bounds.center.y +
+                                  bounds.center.z +
+                                  bounds.extents.x +
+                                  bounds.extents.y +
+                                  bounds.extents.z;
             if (float.IsNaN(tmpTestBounds) || float.IsInfinity(tmpTestBounds))
             {
                 ThreadSafeDebugLogger.Instance.RegisterMessage("Bounds error in " + module.part.partInfo.title);
                 valid = false;
             }
             else
+            {
                 valid = true;
+            }
 
             this.module = module;
             part = module.part;
@@ -122,14 +142,19 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             if (meshTransform == null)
                 return false;
-            lock(this)
+            lock (this)
+            {
                 UpdateLocalToWorldMatrix();
+            }
+
             return true;
         }
 
         private void UpdateLocalToWorldMatrix()
         {
-            meshLocalToWorld = !isSkinned ? meshTransform.localToWorldMatrix : Matrix4x4.TRS(meshTransform.position, meshTransform.rotation, Vector3.one);
+            meshLocalToWorld = !isSkinned
+                                   ? meshTransform.localToWorldMatrix
+                                   : Matrix4x4.TRS(meshTransform.position, meshTransform.rotation, Vector3.one);
         }
 
         public void TransformBasis(Matrix4x4 newThisToVesselMatrix)
@@ -138,28 +163,25 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 // ReSharper disable once InconsistentlySynchronizedField
                 Matrix4x4 tempMatrix = newThisToVesselMatrix * meshLocalToWorld;
-                //Matrix4x4 tempMatrix = thisToVesselMatrix.inverse;
-                //thisToVesselMatrix = newThisToVesselMatrix * meshLocalToWorld;
-
-                //tempMatrix = thisToVesselMatrix * tempMatrix;
-
-                //bounds = TransformBounds(bounds, tempMatrix);
 
                 Vector3 low = Vector3.one * float.PositiveInfinity;
                 Vector3 high = Vector3.one * float.NegativeInfinity;
 
                 for (int i = 0; i < vertices.Length; i++)
                 {
-                    Vector3 vert = tempMatrix.MultiplyPoint3x4(meshLocalVerts[i]); // = Vector3.zero;
+                    Vector3 vert = tempMatrix.MultiplyPoint3x4(meshLocalVerts[i]);
 
                     float tmpTestVert = vert.x + vert.y + vert.z;
                     if (float.IsNaN(tmpTestVert) || float.IsInfinity(tmpTestVert))
                     {
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("Transform error in " + module.part.partInfo.title);
+                        ThreadSafeDebugLogger.Instance.RegisterMessage("Transform error in " +
+                                                                       module.part.partInfo.title);
                         valid = false;
                     }
                     else
+                    {
                         valid = true;
+                    }
 
                     vertices[i] = vert;
                     low = Vector3.Min(low, vert);
@@ -181,13 +203,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
         // ReSharper disable once UnusedMember.Global
         public void MultithreadTransformBasis(object newThisToVesselMatrixObj)
         {
-            lock(this)
+            lock (this)
             {
-                TransformBasis((Matrix4x4) newThisToVesselMatrixObj);
+                TransformBasis((Matrix4x4)newThisToVesselMatrixObj);
             }
         }
 
-        private Bounds TransformBounds(Bounds oldBounds, Matrix4x4 matrix)
+        private static Bounds TransformBounds(Bounds oldBounds, Matrix4x4 matrix)
         {
             Vector3 center = oldBounds.center;
             Vector3 extents = oldBounds.extents;
@@ -207,9 +229,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return new Bounds((lower + upper) * 0.5f, upper - lower);
         }
 
-        private void TransformedPointBounds(Matrix4x4 matrix, Vector3 center, float extX, float extY, float extZ, ref Vector3 lower, ref Vector3 upper)
+        private static void TransformedPointBounds(
+            Matrix4x4 matrix,
+            Vector3 center,
+            float extX,
+            float extY,
+            float extZ,
+            ref Vector3 lower,
+            ref Vector3 upper
+        )
         {
-            Vector3 boundPt = new Vector3(center.x + extX, center.y + extY, center.z + extZ);
+            var boundPt = new Vector3(center.x + extX, center.y + extY, center.z + extZ);
             boundPt = matrix.MultiplyPoint3x4(boundPt);
             lower = Vector3.Min(lower, boundPt);
             upper = Vector3.Max(upper, boundPt);

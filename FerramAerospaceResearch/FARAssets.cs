@@ -14,13 +14,37 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     internal class FARAssets : MonoBehaviour
     {
-        private static readonly string assetBundleRootPath = Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
         private const string AssetBundleExtension = ".far";
+
+        private static readonly string assetBundleRootPath =
+            Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
+
+        public static FARShaderCache ShaderCache { get; private set; }
+        public static FARTextureCache TextureCache { get; private set; }
+
+        private void Start()
+        {
+            ShaderCache = new FARShaderCache("farshaders");
+            TextureCache = new FARTextureCache();
+            TextureCache.Initialize();
+            StartCoroutine(LoadAssetsAsync());
+        }
+
+        private static IEnumerator LoadAssetsAsync()
+        {
+            // using a separate method to chain asset loading in the future
+            yield return ShaderCache.LoadAsync();
+        }
 
         public class FARAssetDictionary<T> : Dictionary<string, T> where T : Object
         {
             private AssetBundle assetBundle;
             private string bundleName;
+
+            public FARAssetDictionary(string bundleName)
+            {
+                BundleName = bundleName;
+            }
 
             public string BundleName
             {
@@ -33,18 +57,13 @@ namespace FerramAerospaceResearch
                 }
             }
 
-            public string BundlePath   { get; private set; }
-            public bool   AssetsLoaded { get; private set; }
-
-            public FARAssetDictionary(string bundleName)
-            {
-                BundleName = bundleName;
-            }
+            public string BundlePath { get; private set; }
+            public bool AssetsLoaded { get; private set; }
 
             public IEnumerator LoadAsync()
             {
                 FARLogger.Debug($"Loading asset bundle {BundlePath}");
-                var createRequest = AssetBundle.LoadFromFileAsync(BundlePath);
+                AssetBundleCreateRequest createRequest = AssetBundle.LoadFromFileAsync(BundlePath);
                 yield return createRequest;
 
                 assetBundle = createRequest.assetBundle;
@@ -54,13 +73,13 @@ namespace FerramAerospaceResearch
                     yield break;
                 }
 
-                var loadRequest = assetBundle.LoadAllAssetsAsync(typeof(T));
+                AssetBundleRequest loadRequest = assetBundle.LoadAllAssetsAsync(typeof(T));
                 yield return loadRequest;
 
-                foreach (var asset in loadRequest.allAssets)
+                foreach (Object asset in loadRequest.allAssets)
                 {
                     FARLogger.Debug($"Adding {asset} to dictionary");
-                    Add(asset.name, (T) asset);
+                    Add(asset.name, (T)asset);
                 }
 
                 FARLogger.Debug($"Finished loading {typeof(T)} assets from {BundlePath}");
@@ -81,33 +100,17 @@ namespace FerramAerospaceResearch
 
         public class FARShaderCache : FARAssetDictionary<Shader>
         {
-            public class ShaderMaterialPair
+            public FARShaderCache(string bundleName) : base(bundleName)
             {
-                public Shader   Shader   { get; }
-                public Material Material { get; }
-
-                public ShaderMaterialPair(Shader shader) : this(shader, new Material(shader))
-                {
-                }
-
-                public ShaderMaterialPair(Shader shader, Material material)
-                {
-                    Shader   = shader;
-                    Material = material;
-                }
             }
 
             public ShaderMaterialPair LineRenderer { get; private set; }
             public ShaderMaterialPair DebugVoxels { get; private set; }
 
-            public FARShaderCache(string bundleName) : base(bundleName)
-            {
-            }
-
             protected override void OnLoad()
             {
                 LineRenderer = new ShaderMaterialPair(Shader.Find("Hidden/Internal-Colored"));
-                if (TryGetValue("FerramAerospaceResearch/Debug Voxel Mesh", out var voxelShader))
+                if (TryGetValue("FerramAerospaceResearch/Debug Voxel Mesh", out Shader voxelShader))
                 {
                     DebugVoxels = new ShaderMaterialPair(voxelShader);
                     DebugVoxels.Material.SetFloat(ShaderPropertyIds.Cutoff, 0.45f);
@@ -125,7 +128,8 @@ namespace FerramAerospaceResearch
                 switch (Application.platform)
                 {
                     case RuntimePlatform.LinuxPlayer:
-                    case RuntimePlatform.WindowsPlayer when SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL", StringComparison.Ordinal):
+                    case RuntimePlatform.WindowsPlayer
+                        when SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL", StringComparison.Ordinal):
                         FARLogger.Info("Loading shaders from Linux bundle");
                         name += "_linux"; //For OpenGL users on Windows we load the Linux shaders to fix OpenGL issues
                         break;
@@ -145,6 +149,22 @@ namespace FerramAerospaceResearch
 
                 base.SetBundlePath(name);
             }
+
+            public class ShaderMaterialPair
+            {
+                public ShaderMaterialPair(Shader shader) : this(shader, new Material(shader))
+                {
+                }
+
+                public ShaderMaterialPair(Shader shader, Material material)
+                {
+                    Shader = shader;
+                    Material = material;
+                }
+
+                public Shader Shader { get; }
+                public Material Material { get; }
+            }
         }
 
         public class FARTextureCache : Dictionary<string, Texture2D>
@@ -155,30 +175,16 @@ namespace FerramAerospaceResearch
 
             public void Initialize()
             {
-                Add("icon_button_stock", GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_stock", false));
-                Add("icon_button_blizzy", GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_blizzy", false));
-                Add("sprite_debug_voxel", GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/sprite_debug_voxel", false));
+                Add("icon_button_stock",
+                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_stock", false));
+                Add("icon_button_blizzy",
+                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_blizzy", false));
+                Add("sprite_debug_voxel",
+                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/sprite_debug_voxel", false));
                 IconLarge = this["icon_button_stock"];
                 IconSmall = this["icon_button_blizzy"];
                 VoxelTexture = this["sprite_debug_voxel"];
             }
-        }
-
-        public static FARShaderCache ShaderCache { get; private set; }
-        public static FARTextureCache TextureCache { get; private set; }
-
-        private void Start()
-        {
-            ShaderCache = new FARShaderCache("farshaders");
-            TextureCache = new FARTextureCache();
-            TextureCache.Initialize();
-            StartCoroutine(LoadAssetsAsync());
-        }
-
-        private static IEnumerator LoadAssetsAsync()
-        {
-            // using a separate method to chain asset loading in the future
-            yield return ShaderCache.LoadAsync();
         }
     }
 }

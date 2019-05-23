@@ -50,7 +50,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class FlightGUIDrawer : MonoBehaviour
     {
-        private static readonly List<FlightGUI> activeGUIs = new List<FlightGUI>(); //this could be a HashSet as well, but iterating over those causes garbage.
+        //this could be a HashSet as well, but iterating over those causes garbage.
+        private static readonly List<FlightGUI> activeGUIs = new List<FlightGUI>();
 
         public static FlightGUIDrawer Instance { get; private set; }
 
@@ -59,28 +60,26 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (CompatibilityChecker.IsAllCompatible() && Instance == null)
                 Instance = this;
             else
-            {
                 Destroy(this);
-            }
         }
 
         public static void SetGUIActive(FlightGUI Gui, bool state)
         {
-            if(state)
+            if (state)
             {
-                if(!activeGUIs.Contains(Gui))
+                if (!activeGUIs.Contains(Gui))
                     activeGUIs.Add(Gui);
             }
             else
+            {
                 activeGUIs.Remove(Gui);
+            }
         }
 
         private void OnGUI()
         {
             foreach (FlightGUI activeGui in activeGUIs)
-            {
                 activeGui.DrawGUI();
-            }
         }
     }
 }

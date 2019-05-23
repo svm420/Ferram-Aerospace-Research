@@ -44,7 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-	internal class StabilityDerivOutput
+    internal class StabilityDerivOutput
     {
         public readonly double[] stabDerivs = new double[27];
         public double b;

@@ -56,9 +56,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class FlightGUI : VesselModule
     {
-        private Vessel _vessel;
-        private FARVesselAero _vesselAero;
-
         private static bool showGUI;
         public static bool showAllGUI = true;
         public static bool savedShowGUI = true;
@@ -70,44 +67,32 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private static int frameCountForSaving;
         public static Dictionary<Vessel, FlightGUI> vesselFlightGUI;
 
+        internal static GUIStyle boxStyle;
+        internal static GUIStyle buttonStyle;
+
         private readonly StringBuilder _strBuilder = new StringBuilder();
+        private Vessel _vessel;
+        private FARVesselAero _vesselAero;
 
         private PhysicsCalcs _physicsCalcs;
-        private VesselFlightInfo infoParameters;
-        public VesselFlightInfo InfoParameters
-        {
-            get { return infoParameters; }
-        }
 
         private FlightStatusGUI _flightStatusGUI;
         private StabilityAugmentation _stabilityAugmentation;
         private FlightDataGUI _flightDataGUI;
-        private AeroVisualizationGUI _aeroVizGUI;
-        public AeroVisualizationGUI AeroVizGUI
-        {
-            get { return _aeroVizGUI; }
-        }
-
-        private AirspeedSettingsGUI _airSpeedGUI;
-        public AirspeedSettingsGUI airSpeedGUI
-        {
-            get { return _airSpeedGUI; }
-        }
 
         private bool showFlightDataWindow;
         private bool showSettingsWindow;
 
-        internal static GUIStyle boxStyle;
-        internal static GUIStyle buttonStyle;
-
         private GUIDropDown<int> settingsWindow;
+        public VesselFlightInfo InfoParameters { get; private set; }
+        public AeroVisualizationGUI AeroVizGUI { get; private set; }
+
+        public AirspeedSettingsGUI airSpeedGUI { get; private set; }
 
         protected override void OnAwake()
         {
             if (vesselFlightGUI == null)
-            {
                 vesselFlightGUI = new Dictionary<Vessel, FlightGUI>();
-            }
         }
 
         protected override void OnStart()
@@ -135,10 +120,16 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _flightStatusGUI = new FlightStatusGUI();
             _stabilityAugmentation = new StabilityAugmentation(_vessel);
             _flightDataGUI = new FlightDataGUI();
-            _aeroVizGUI = new AeroVisualizationGUI();
+            AeroVizGUI = new AeroVisualizationGUI();
 
-            settingsWindow = new GUIDropDown<int>(new[] { Localizer.Format("FARFlightGUIWindowSelect0"), Localizer.Format("FARFlightGUIWindowSelect1"), Localizer.Format("FARFlightGUIWindowSelect2"), Localizer.Format("FARFlightGUIWindowSelect3") }, new[] { 0, 1, 2, 3 });
-            //boxStyle.padding = new RectOffset(4, 4, 4, 4);
+            settingsWindow = new GUIDropDown<int>(new[]
+                                                  {
+                                                      Localizer.Format("FARFlightGUIWindowSelect0"),
+                                                      Localizer.Format("FARFlightGUIWindowSelect1"),
+                                                      Localizer.Format("FARFlightGUIWindowSelect2"),
+                                                      Localizer.Format("FARFlightGUIWindowSelect3")
+                                                  },
+                                                  new[] {0, 1, 2, 3});
 
             if (vesselFlightGUI.ContainsKey(_vessel))
                 vesselFlightGUI[_vessel] = this;
@@ -147,12 +138,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             enabled = true;
 
-            if(FARDebugValues.useBlizzyToolbar)
+            if (FARDebugValues.useBlizzyToolbar)
                 GenerateBlizzyToolbarButton();
 
             activeFlightGUICount++;
 
-            if(_vessel == FlightGlobals.ActiveVessel || FlightGlobals.ActiveVessel == null)
+            if (_vessel == FlightGlobals.ActiveVessel || FlightGlobals.ActiveVessel == null)
                 LoadConfigs();
 
             GameEvents.onShowUI.Add(ShowUI);
@@ -161,14 +152,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void OnDestroy()
         {
-            FlightGUIDrawer.SetGUIActive(this,false);
+            FlightGUIDrawer.SetGUIActive(this, false);
             GameEvents.onShowUI.Remove(ShowUI);
             GameEvents.onHideUI.Remove(HideUI);
             SaveConfigs();
             if (_vessel)
-            {
                 vesselFlightGUI.Remove(_vessel);
-            }
             _physicsCalcs = null;
 
             _flightDataGUI?.SaveSettings();
@@ -177,10 +166,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _stabilityAugmentation?.SaveAndDestroy();
             _stabilityAugmentation = null;
 
-            _airSpeedGUI?.SaveSettings();
-            _airSpeedGUI = null;
+            airSpeedGUI?.SaveSettings();
+            airSpeedGUI = null;
 
-            _aeroVizGUI?.SaveSettings();
+            AeroVizGUI?.SaveSettings();
 
             _flightStatusGUI = null;
             settingsWindow = null;
@@ -199,112 +188,129 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public void SaveData()
         {
-            if (_vessel == FlightGlobals.ActiveVessel)
-            {
-                SaveConfigs();
-                _airSpeedGUI?.SaveSettings();
-                _stabilityAugmentation?.SaveSettings();
-                _flightDataGUI?.SaveSettings();
-                _aeroVizGUI?.SaveSettings();
-            }
+            if (_vessel != FlightGlobals.ActiveVessel)
+                return;
+            SaveConfigs();
+            airSpeedGUI?.SaveSettings();
+            _stabilityAugmentation?.SaveSettings();
+            _flightDataGUI?.SaveSettings();
+            AeroVizGUI?.SaveSettings();
         }
+
         public static void SaveActiveData()
         {
-            if (FlightGlobals.ready && FlightGlobals.ActiveVessel != null && vesselFlightGUI != null && vesselFlightGUI.TryGetValue(FlightGlobals.ActiveVessel, out FlightGUI gui))
-            {
-                if(gui != null)
-                    gui.SaveData();
-            }
+            if (!FlightGlobals.ready ||
+                FlightGlobals.ActiveVessel == null ||
+                vesselFlightGUI == null ||
+                !vesselFlightGUI.TryGetValue(FlightGlobals.ActiveVessel, out FlightGUI gui))
+                return;
+            if (gui != null)
+                gui.SaveData();
         }
 
         //Receives message from FARVesselAero through _vessel on the recalc being completed
-        public void UpdateAeroModules(List<FARAeroPartModule> newAeroModules, List<FARWingAerodynamicModel> legacyWingModels)
+        public void UpdateAeroModules(
+            List<FARAeroPartModule> newAeroModules,
+            List<FARWingAerodynamicModel> legacyWingModels
+        )
         {
             _physicsCalcs.UpdateAeroModules(newAeroModules, legacyWingModels);
         }
 
-        //Receives a message from any FARWingAerodynamicModel or FARAeroPartModule that has failed to update the GUI
         // ReSharper disable once UnusedMember.Local
+        //Receives a message from any FARWingAerodynamicModel or FARAeroPartModule that has failed to update the GUI
         private void AerodynamicFailureStatus()
         {
             _flightStatusGUI?.AerodynamicFailureStatus();
         }
-
-        #region PhysicsAndOrientationBlock
 
         private void FixedUpdate()
         {
             if (_physicsCalcs == null)
                 return;
 
-            infoParameters = _physicsCalcs.UpdatePhysicsParameters();
+            InfoParameters = _physicsCalcs.UpdatePhysicsParameters();
 
-            _stabilityAugmentation.UpdatePhysicsInfo(infoParameters);
-            _flightStatusGUI.UpdateInfoParameters(infoParameters);
-            _flightDataGUI.UpdateInfoParameters(infoParameters);
+            _stabilityAugmentation.UpdatePhysicsInfo(InfoParameters);
+            _flightStatusGUI.UpdateInfoParameters(InfoParameters);
+            _flightDataGUI.UpdateInfoParameters(InfoParameters);
         }
 
         private void Update()
         {
-            FlightGUIDrawer.SetGUIActive(this,(_vessel == FlightGlobals.ActiveVessel && showGUI && showAllGUI));
+            FlightGUIDrawer.SetGUIActive(this, _vessel == FlightGlobals.ActiveVessel && showGUI && showAllGUI);
             if (frameCountForSaving >= 120)
             {
                 SaveActiveData();
                 frameCountForSaving = 0;
             }
             else
+            {
                 frameCountForSaving++;
+            }
         }
-
-        #endregion
 
         private void LateUpdate()
         {
-            //OnGUIAppLauncherReady();
-            if (_airSpeedGUI != null)
-                _airSpeedGUI.ChangeSurfVelocity();
+            if (airSpeedGUI != null)
+                airSpeedGUI.ChangeSurfVelocity();
             else if (_vessel != null)
-                _airSpeedGUI = new AirspeedSettingsGUI(_vessel);
+                airSpeedGUI = new AirspeedSettingsGUI(_vessel);
         }
-
-        #region GUI Functions
 
         public void DrawGUI()
         {
             GUI.skin = HighLogic.Skin;
-            if(boxStyle == null)
+            if (boxStyle == null)
             {
                 boxStyle = new GUIStyle(GUI.skin.box);
                 boxStyle.normal.textColor = boxStyle.focused.textColor = Color.white;
                 boxStyle.hover.textColor = boxStyle.active.textColor = Color.yellow;
-                boxStyle.onNormal.textColor = boxStyle.onFocused.textColor = boxStyle.onHover.textColor = boxStyle.onActive.textColor = Color.green;
+                boxStyle.onNormal.textColor = boxStyle.onFocused.textColor =
+                                                  boxStyle.onHover.textColor =
+                                                      boxStyle.onActive.textColor = Color.green;
                 boxStyle.padding = new RectOffset(2, 2, 2, 2);
             }
+
             if (buttonStyle == null)
             {
                 buttonStyle = new GUIStyle(GUI.skin.button);
                 buttonStyle.normal.textColor = buttonStyle.focused.textColor = Color.white;
-                buttonStyle.hover.textColor = buttonStyle.active.textColor = buttonStyle.onActive.textColor = Color.yellow;
-                buttonStyle.onNormal.textColor = buttonStyle.onFocused.textColor = buttonStyle.onHover.textColor = Color.green;
+                buttonStyle.hover.textColor =
+                    buttonStyle.active.textColor = buttonStyle.onActive.textColor = Color.yellow;
+                buttonStyle.onNormal.textColor =
+                    buttonStyle.onFocused.textColor = buttonStyle.onHover.textColor = Color.green;
                 buttonStyle.padding = new RectOffset(2, 2, 2, 2);
-
             }
-            if (_vessel == FlightGlobals.ActiveVessel && showGUI && showAllGUI)
+
+            if (_vessel != FlightGlobals.ActiveVessel || !showGUI || !showAllGUI)
+                return;
+            mainGuiRect = GUILayout.Window(GetHashCode(),
+                                           mainGuiRect,
+                                           MainFlightGUIWindow,
+                                           "FAR, " + FARVersion.VersionString,
+                                           GUILayout.MinWidth(230));
+            GUIUtils.ClampToScreen(mainGuiRect);
+
+            if (showFlightDataWindow)
             {
-                mainGuiRect = GUILayout.Window(GetHashCode(), mainGuiRect, MainFlightGUIWindow, "FAR, " + FARVersion.VersionString, GUILayout.MinWidth(230));
-                GUIUtils.ClampToScreen(mainGuiRect);
+                dataGuiRect = GUILayout.Window(GetHashCode() + 1,
+                                               dataGuiRect,
+                                               FlightDataWindow,
+                                               Localizer.Format("FARFlightDataTitle"),
+                                               GUILayout.MinWidth(150));
+                GUIUtils.ClampToScreen(dataGuiRect);
+            }
 
-                if (showFlightDataWindow)
-                {
-                    dataGuiRect = GUILayout.Window(GetHashCode() + 1, dataGuiRect, FlightDataWindow, Localizer.Format("FARFlightDataTitle"), GUILayout.MinWidth(150));
-                    GUIUtils.ClampToScreen(dataGuiRect);
-                }
-
-                if (showSettingsWindow)
-                {
-                    settingsGuiRect = GUILayout.Window(GetHashCode() + 2, settingsGuiRect, SettingsWindow, Localizer.Format("FARFlightSettings"), GUILayout.MinWidth(200));
-                    GUIUtils.ClampToScreen(settingsGuiRect);
-                }
+            // ReSharper disable once InvertIf
+            if (showSettingsWindow)
+            {
+                settingsGuiRect = GUILayout.Window(GetHashCode() + 2,
+                                                   settingsGuiRect,
+                                                   SettingsWindow,
+                                                   Localizer.Format("FARFlightSettings"),
+                                                   GUILayout.MinWidth(200));
+                GUIUtils.ClampToScreen(settingsGuiRect);
             }
         }
 
@@ -315,20 +321,26 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _strBuilder.Length = 0;
             _strBuilder.Append(Localizer.Format("FARAbbrevMach"));
             _strBuilder.Append(": ");
-            _strBuilder.Concat((float)(_vesselAero.MachNumber),3).AppendLine();
-            _strBuilder.AppendFormat(Localizer.Format("FARFlightGUIReynolds"),_vesselAero.ReynoldsNumber);
+            _strBuilder.Concat((float)_vesselAero.MachNumber, 3).AppendLine();
+            _strBuilder.AppendFormat(Localizer.Format("FARFlightGUIReynolds"), _vesselAero.ReynoldsNumber);
             GUILayout.Box(_strBuilder.ToString(), boxStyle, GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
 
             _strBuilder.Length = 0;
             _strBuilder.Append(Localizer.Format("FARFlightGUIAtmDens"));
-            _strBuilder.Concat((float)(vessel.atmDensity),3);
+            _strBuilder.Concat((float)vessel.atmDensity, 3);
 
             GUILayout.Box(_strBuilder.ToString(), boxStyle, GUILayout.ExpandWidth(true));
 
             _flightStatusGUI.Display();
-            showFlightDataWindow = GUILayout.Toggle(showFlightDataWindow, Localizer.Format("FARFlightGUIFltDataBtn"), buttonStyle, GUILayout.ExpandWidth(true));
-            showSettingsWindow = GUILayout.Toggle(showSettingsWindow, Localizer.Format("FARFlightGUIFltSettings"), buttonStyle, GUILayout.ExpandWidth(true));
+            showFlightDataWindow = GUILayout.Toggle(showFlightDataWindow,
+                                                    Localizer.Format("FARFlightGUIFltDataBtn"),
+                                                    buttonStyle,
+                                                    GUILayout.ExpandWidth(true));
+            showSettingsWindow = GUILayout.Toggle(showSettingsWindow,
+                                                  Localizer.Format("FARFlightGUIFltSettings"),
+                                                  buttonStyle,
+                                                  GUILayout.ExpandWidth(true));
 
             GUILayout.Label(Localizer.Format("FARFlightGUIFltAssistance"));
 
@@ -359,17 +371,15 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     _stabilityAugmentation.SettingsDisplay();
                     break;
                 case 2:
-                    _airSpeedGUI.AirSpeedSettings();
+                    airSpeedGUI.AirSpeedSettings();
                     break;
                 case 3:
-                    _aeroVizGUI.SettingsDisplay();
+                    AeroVizGUI.SettingsDisplay();
                     break;
             }
+
             GUI.DragWindow();
         }
-        #endregion
-
-        #region AppLauncher
 
         private static void ClearBlizzyToolbarButton()
         {
@@ -377,15 +387,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             blizzyFlightGUIButton = null;
         }
 
-        private void GenerateBlizzyToolbarButton()
+        private static void GenerateBlizzyToolbarButton()
         {
-            if (blizzyFlightGUIButton == null)
-            {
-                blizzyFlightGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARFlightButtonBlizzy");
-                blizzyFlightGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
-                blizzyFlightGUIButton.ToolTip = "FAR Flight Sys";
-                blizzyFlightGUIButton.OnClick += e => showGUI = !showGUI;
-            }
+            if (blizzyFlightGUIButton != null)
+                return;
+            blizzyFlightGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARFlightButtonBlizzy");
+            blizzyFlightGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
+            blizzyFlightGUIButton.ToolTip = "FAR Flight Sys";
+            blizzyFlightGUIButton.OnClick += e => showGUI = !showGUI;
         }
 
         public static void onAppLaunchToggle()
@@ -393,29 +402,29 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             showGUI = !showGUI;
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void HideUI()
         {
             showAllGUI = false;
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void ShowUI()
         {
             showAllGUI = true;
         }
-        #endregion
 
-        private void SaveConfigs()
+        private static void SaveConfigs()
         {
-            if (FARDebugAndSettings.config != null)
-            {
-                PluginConfiguration config = FARDebugAndSettings.config;
-                config.SetValue("flight_mainGuiRect", mainGuiRect);
-                config.SetValue("flight_dataGuiRect", dataGuiRect);
-                config.SetValue("flight_settingsGuiRect", settingsGuiRect);
-            }
+            if (FARDebugAndSettings.config == null)
+                return;
+            PluginConfiguration config = FARDebugAndSettings.config;
+            config.SetValue("flight_mainGuiRect", mainGuiRect);
+            config.SetValue("flight_dataGuiRect", dataGuiRect);
+            config.SetValue("flight_settingsGuiRect", settingsGuiRect);
         }
 
-        private void LoadConfigs()
+        private static void LoadConfigs()
         {
             PluginConfiguration config = FARDebugAndSettings.config;
             mainGuiRect = config.GetValue("flight_mainGuiRect", new Rect());

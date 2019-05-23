@@ -52,67 +52,35 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
     public class AeroVisualizationGUI
     {
-        private bool _tintForCl;
-        public bool TintForCl
-        {
-            get { return _tintForCl; }
-        }
-
-        private bool _tintForCd;
-        public bool TintForCd
-        {
-            get { return _tintForCd; }
-        }
-
-        private bool _tintForStall;
-        public bool TintForStall
-        {
-            get { return _tintForStall; }
-        }
-
-        // Cl for full tinting (wings)
-        private double _fullySaturatedCl = 0.5;
-        public double FullySaturatedCl
-        {
-            get { return _fullySaturatedCl; }
-        }
-
-        // Cd for full tinting (wings)
-        private double _fullySaturatedCd = 0.1;
-        public double FullySaturatedCd
-        {
-            get { return _fullySaturatedCd; }
-        }
-
-        // Cl for full tinting (non-wing parts)
-        private double _fullySaturatedClBody = 0.05;
-        public double FullySaturatedClBody
-        {
-            get { return _fullySaturatedClBody; }
-        }
-
-        // Cd for full tinting (non-wing parts)
-        private double _fullySaturatedCdBody = 0.01;
-        public double FullySaturatedCdBody
-        {
-            get { return _fullySaturatedCdBody; }
-        }
-
-        // Stalled % for full tinting
-        private double _fullySaturatedStall = 10.0;
-        public double FullySaturatedStall
-        {
-            get { return _fullySaturatedStall; }
-        }
-
-        public bool AnyVisualizationActive
-        {
-            get { return _tintForCl || _tintForCd || _tintForStall; }
-        }
-
         public AeroVisualizationGUI()
         {
             LoadSettings();
+        }
+
+        public bool TintForCl { get; private set; }
+
+        public bool TintForCd { get; private set; }
+
+        public bool TintForStall { get; private set; }
+
+        // Cl for full tinting (wings)
+        public double FullySaturatedCl { get; private set; } = 0.5;
+
+        // Cd for full tinting (wings)
+        public double FullySaturatedCd { get; private set; } = 0.1;
+
+        // Cl for full tinting (non-wing parts)
+        public double FullySaturatedClBody { get; private set; } = 0.05;
+
+        // Cd for full tinting (non-wing parts)
+        public double FullySaturatedCdBody { get; private set; } = 0.01;
+
+        // Stalled % for full tinting
+        public double FullySaturatedStall { get; private set; } = 10.0;
+
+        public bool AnyVisualizationActive
+        {
+            get { return TintForCl || TintForCd || TintForStall; }
         }
 
         public void SettingsDisplay()
@@ -120,24 +88,34 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GUILayout.Label(Localizer.Format("FARFlightAeroVizTitle"));
 
             GUILayout.BeginVertical(FlightGUI.boxStyle);
-            _tintForCl = GUILayout.Toggle(_tintForCl, Localizer.Format("FARFlightAeroVizTintCl"));
-            _fullySaturatedCl = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatWing"), 125, _fullySaturatedCl);
-            _fullySaturatedClBody = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatBody"), 125, _fullySaturatedClBody);
+            TintForCl = GUILayout.Toggle(TintForCl, Localizer.Format("FARFlightAeroVizTintCl"));
+            FullySaturatedCl =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatWing"), 125, FullySaturatedCl);
+            FullySaturatedClBody =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintClSatBody"),
+                                            125,
+                                            FullySaturatedClBody);
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(FlightGUI.boxStyle);
-            _tintForCd = GUILayout.Toggle(_tintForCd, Localizer.Format("FARFlightAeroVizTintCd"));
-            _fullySaturatedCd = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatWing"), 125, _fullySaturatedCd);
-            _fullySaturatedCdBody = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatBody"), 125, _fullySaturatedCdBody);
+            TintForCd = GUILayout.Toggle(TintForCd, Localizer.Format("FARFlightAeroVizTintCd"));
+            FullySaturatedCd =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatWing"), 125, FullySaturatedCd);
+            FullySaturatedCdBody =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintCdSatBody"),
+                                            125,
+                                            FullySaturatedCdBody);
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical(FlightGUI.boxStyle);
-            _tintForStall = GUILayout.Toggle(_tintForStall, Localizer.Format("FARFlightAeroVizTintStall"));
-            _fullySaturatedStall = GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintStallSat"), 125, _fullySaturatedStall);
+            TintForStall = GUILayout.Toggle(TintForStall, Localizer.Format("FARFlightAeroVizTintStall"));
+            FullySaturatedStall =
+                GUIUtils.TextEntryForDouble(Localizer.Format("FARFlightAeroVizTintStallSat"), 125, FullySaturatedStall);
             GUILayout.EndVertical();
 
             // Allowing toggling arrows here because why not...
-            PhysicsGlobals.AeroForceDisplay = GUILayout.Toggle(PhysicsGlobals.AeroForceDisplay, Localizer.Format("FARFlightAeroVizToggleArrows"));
+            PhysicsGlobals.AeroForceDisplay =
+                GUILayout.Toggle(PhysicsGlobals.AeroForceDisplay, Localizer.Format("FARFlightAeroVizToggleArrows"));
         }
 
         public void SaveSettings()
@@ -148,6 +126,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 FARLogger.Error("Could not save Aero Visualization Settings because settings config list was null");
                 return;
             }
+
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "AeroVizSettings");
 
             if (node == null)
@@ -155,13 +134,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 node = new ConfigNode("AeroVizSettings");
                 flightGUISettings.Add(node);
             }
+
             node.ClearData();
 
-            node.AddValue("fullySaturatedCl", _fullySaturatedCl);
-            node.AddValue("fullySaturatedCd", _fullySaturatedCd);
-            node.AddValue("fullySaturatedClBody", _fullySaturatedClBody);
-            node.AddValue("fullySaturatedCdBody", _fullySaturatedCdBody);
-            node.AddValue("fullySaturatedStall", _fullySaturatedStall);
+            node.AddValue("fullySaturatedCl", FullySaturatedCl);
+            node.AddValue("fullySaturatedCd", FullySaturatedCd);
+            node.AddValue("fullySaturatedClBody", FullySaturatedClBody);
+            node.AddValue("fullySaturatedCdBody", FullySaturatedCdBody);
+            node.AddValue("fullySaturatedStall", FullySaturatedStall);
         }
 
         private void LoadSettings()
@@ -170,19 +150,18 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             ConfigNode node = flightGUISettings.FirstOrDefault(t => t.name == "AeroVizSettings");
 
-            if (node != null)
-            {
-                if (double.TryParse(node.GetValue("fullySaturatedCl"), out double tmp))
-                    _fullySaturatedCl = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedCd"), out tmp))
-                    _fullySaturatedCd = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedClBody"), out tmp))
-                    _fullySaturatedClBody = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedCdBody"), out tmp))
-                    _fullySaturatedCdBody = tmp;
-                if (double.TryParse(node.GetValue("fullySaturatedStall"), out tmp))
-                    _fullySaturatedStall = tmp;
-            }
+            if (node == null)
+                return;
+            if (double.TryParse(node.GetValue("fullySaturatedCl"), out double tmp))
+                FullySaturatedCl = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedCd"), out tmp))
+                FullySaturatedCd = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedClBody"), out tmp))
+                FullySaturatedClBody = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedCdBody"), out tmp))
+                FullySaturatedCdBody = tmp;
+            if (double.TryParse(node.GetValue("fullySaturatedStall"), out tmp))
+                FullySaturatedStall = tmp;
         }
     }
 }

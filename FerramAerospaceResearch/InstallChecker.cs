@@ -4,6 +4,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,13 +17,35 @@ namespace FerramAerospaceResearch
     {
         protected void Start()
         {
-            var assemblies = AssemblyLoader.loadedAssemblies.Where(a => a.assembly.GetName().Name == Assembly.GetExecutingAssembly().GetName().Name).Where(a => a.url != "FerramAerospaceResearch/Plugins");
-            if (assemblies.Any())
-            {
-                var badPaths = assemblies.Select(a => a.path).Select(p => Uri.UnescapeDataString(new Uri(Path.GetFullPath(KSPUtil.ApplicationRootPath)).MakeRelativeUri(new Uri(p)).ToString().Replace('/', Path.DirectorySeparatorChar)));
-                PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "IncorrectFARInstall", "Incorrect FAR Installation", "FAR has been installed incorrectly and will not function properly. All FAR files should be located in KSP/GameData/FerramAerospaceResearch. Do not move any files from inside the FAR folder.\n\nIncorrect path(s):\n" + String.Join("\n", badPaths.ToArray()), "OK", true, HighLogic.UISkin);
-            }
+            IEnumerable<AssemblyLoader.LoadedAssembly> assemblies = AssemblyLoader
+                                                                    .loadedAssemblies
+                                                                    .Where(a => a.assembly.GetName().Name ==
+                                                                                Assembly.GetExecutingAssembly()
+                                                                                        .GetName()
+                                                                                        .Name)
+                                                                    .Where(a => a.url !=
+                                                                                "FerramAerospaceResearch/Plugins");
+            if (!assemblies.Any())
+                return;
+            IEnumerable<string> badPaths = assemblies
+                                           .Select(a => a.path)
+                                           .Select(p =>
+                                                       Uri.UnescapeDataString(new Uri(Path.GetFullPath(KSPUtil
+                                                                                                           .ApplicationRootPath))
+                                                                              .MakeRelativeUri(new Uri(p))
+                                                                              .ToString()
+                                                                              .Replace('/',
+                                                                                       Path
+                                                                                           .DirectorySeparatorChar)));
+            PopupDialog.SpawnPopupDialog(new Vector2(0, 0),
+                                         new Vector2(0, 0),
+                                         "IncorrectFARInstall",
+                                         "Incorrect FAR Installation",
+                                         "FAR has been installed incorrectly and will not function properly. All FAR files should be located in KSP/GameData/FerramAerospaceResearch. Do not move any files from inside the FAR folder.\n\nIncorrect path(s):\n" +
+                                         string.Join("\n", badPaths.ToArray()),
+                                         "OK",
+                                         true,
+                                         HighLogic.UISkin);
         }
     }
-
 }

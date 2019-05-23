@@ -51,17 +51,17 @@ namespace FerramAerospaceResearch.FARGUI
 {
     internal class GUIColors
     {
-        private List<Color> colors;
-
         private static GUIColors _instance;
-        public static GUIColors Instance
-        {
-            get { return _instance ?? (_instance = new GUIColors()); }
-        }
+        private List<Color> colors;
 
         private GUIColors()
         {
             LoadColors();
+        }
+
+        public static GUIColors Instance
+        {
+            get { return _instance ?? (_instance = new GUIColors()); }
         }
 
         public Color this[int index]
@@ -110,50 +110,53 @@ namespace FerramAerospaceResearch.FARGUI
 
         public void SaveColors()
         {
-            ConfigNode node = new ConfigNode("@FARGUIColors[default]:FOR[FerramAerospaceResearch]");
+            var node = new ConfigNode("@FARGUIColors[default]:FOR[FerramAerospaceResearch]");
             node.AddValue("%ClColor", SaveColor(colors[0]));
             node.AddValue("%CdColor", SaveColor(colors[1]));
             node.AddValue("%CmColor", SaveColor(colors[2]));
             node.AddValue("%L_DColor", SaveColor(colors[3]));
 
-            ConfigNode saveNode = new ConfigNode();
+            var saveNode = new ConfigNode();
             saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARGUIColors.cfg");
+            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
+                          "GameData/FerramAerospaceResearch/CustomFARGUIColors.cfg");
         }
 
-        private Color ReadColor(string input)
+        private static Color ReadColor(string input)
         {
-            char[] separators = { ',', ' ', ';' };
+            char[] separators = {',', ' ', ';'};
             string[] splitValues = input.Split(separators);
 
             int curIndex = 0;
-            Color color = new Color {a = 1};
+            var color = new Color {a = 1};
             foreach (string s in splitValues)
             {
-                if (s.Length > 0)
+                if (s.Length <= 0)
+                    continue;
+                if (!float.TryParse(s, out float val))
+                    continue;
+                switch (curIndex)
                 {
-                    if (float.TryParse(s, out float val))
-                    {
-                        if (curIndex == 0)
-                            color.r = val;
-                        else if (curIndex == 1)
-                            color.g = val;
-                        else
-                        {
-                            color.b = val;
-                            return color;
-                        }
-                        curIndex++;
-                    }
+                    case 0:
+                        color.r = val;
+                        break;
+                    case 1:
+                        color.g = val;
+                        break;
+                    default:
+                        color.b = val;
+                        return color;
                 }
+
+                curIndex++;
             }
 
             return color;
         }
 
-        private string SaveColor(Color color)
+        private static string SaveColor(Color color)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
 
             //Should return string in format of color.r, color.g, color.b
             builder.Append(color.r);

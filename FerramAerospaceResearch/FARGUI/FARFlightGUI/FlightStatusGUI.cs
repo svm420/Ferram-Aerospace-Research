@@ -81,6 +81,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 statusOverrideTimer -= TimeWarp.deltaTime;
                 return;
             }
+
             if (infoParameters.dynPres < 0.01)
             {
                 statusString = Localizer.Format("FARFlightStatus0");
@@ -99,7 +100,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 statusColor = Color.yellow;
                 statusBlinker = false;
             }
-            else if ((Math.Abs(infoParameters.aoA) > 20 && Math.Abs(infoParameters.aoA) < 160) || (Math.Abs(infoParameters.sideslipAngle) > 20 && Math.Abs(infoParameters.sideslipAngle) < 160))
+            else if (Math.Abs(infoParameters.aoA) > 20 && Math.Abs(infoParameters.aoA) < 160 ||
+                     Math.Abs(infoParameters.sideslipAngle) > 20 && Math.Abs(infoParameters.sideslipAngle) < 160)
             {
                 statusString = Localizer.Format("FARFlightStatus3");
                 statusColor = Color.yellow;
@@ -121,10 +123,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         public void Display()
         {
-            GUIStyle minorTitle = new GUIStyle(GUI.skin.label)
+            var minorTitle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.UpperCenter,
-                padding   = new RectOffset(0, 0, 0, 0)
+                padding = new RectOffset(0, 0, 0, 0)
             };
 
             if (stallStyle == null)
@@ -134,7 +136,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GUILayout.BeginHorizontal();
             if (statusBlinker)
             {
-                stallStyle.normal.textColor = stallStyle.focused.textColor = stallStyle.hover.textColor = stallStyle.active.textColor = stallStyle.onActive.textColor = stallStyle.onNormal.textColor = stallStyle.onFocused.textColor = stallStyle.onHover.textColor = stallStyle.onActive.textColor = statusColor;
+                stallStyle.normal.textColor = stallStyle.focused.textColor =
+                                                  stallStyle.hover.textColor =
+                                                      stallStyle.active.textColor =
+                                                          stallStyle.onActive.textColor =
+                                                              stallStyle.onNormal.textColor =
+                                                                  stallStyle.onFocused.textColor =
+                                                                      stallStyle.onHover.textColor =
+                                                                          stallStyle.onActive.textColor = statusColor;
                 GUILayout.Box(statusBlinkerTimer < 0.5 ? statusString : "", stallStyle, GUILayout.ExpandWidth(true));
 
                 if (statusBlinkerTimer < 1)
@@ -144,9 +153,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
             else
             {
-                stallStyle.normal.textColor = stallStyle.focused.textColor = stallStyle.hover.textColor = stallStyle.active.textColor = stallStyle.onActive.textColor = stallStyle.onNormal.textColor = stallStyle.onFocused.textColor = stallStyle.onHover.textColor = stallStyle.onActive.textColor = statusColor;
+                stallStyle.normal.textColor = stallStyle.focused.textColor =
+                                                  stallStyle.hover.textColor =
+                                                      stallStyle.active.textColor =
+                                                          stallStyle.onActive.textColor =
+                                                              stallStyle.onNormal.textColor =
+                                                                  stallStyle.onFocused.textColor =
+                                                                      stallStyle.onHover.textColor =
+                                                                          stallStyle.onActive.textColor = statusColor;
                 GUILayout.Box(statusString, stallStyle, GUILayout.ExpandWidth(true));
             }
+
             GUILayout.EndHorizontal();
         }
     }

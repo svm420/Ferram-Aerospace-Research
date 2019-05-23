@@ -59,36 +59,45 @@ namespace FerramAerospaceResearch
                 {
                     if (HighLogic.LoadedSceneIsEditor)
                     {
-                        Collider[] tmpColliderArray = part.GetComponentsInChildren<Collider>(); //In the editor, this returns all the colliders of this part AND all the colliders of its children, recursively
+                        //In the editor, this returns all the colliders of this part AND all the colliders of its children, recursively
+                        Collider[] tmpColliderArray = part.GetComponentsInChildren<Collider>();
                         //However, this can also be called on its child parts to get their colliders, so we can exclude the child colliders
                         //Also, fortunately, parent colliders are at the beginning of this; we can take advantage of this to reduce the time iterating through lists
-                        List<Collider> partColliders = new List<Collider>();
-                        HashSet<Collider> excludedCollidersHash = new HashSet<Collider>();      //We'll use a hash to make this fast
+                        var partColliders = new List<Collider>();
+                        //We'll use a hash to make this fast
+                        var excludedCollidersHash = new HashSet<Collider>();
 
                         foreach (Part p in part.children)
                         {
-                            Collider[] excludedColliders = p.GetComponentsInChildren<Collider>(); //All the colliders associated with the immediate child of this part AND their children
+                            //All the colliders associated with the immediate child of this part AND their children
+                            Collider[] excludedColliders = p.GetComponentsInChildren<Collider>();
 
-                            if (!excludedCollidersHash.Contains(excludedColliders[0])) //The first collider _must_ be part of the immediate child; because it is closer to the parent, it will appear earlier in tmpColliderArray
-                                excludedCollidersHash.Add(excludedColliders[0]);       //That means we only ever need the first collider for our purposes
+                            //The first collider _must_ be part of the immediate child; because it is closer to the parent, it will appear earlier in tmpColliderArray
+                            if (!excludedCollidersHash.Contains(excludedColliders[0]))
+                                //That means we only ever need the first collider for our purposes
+                                excludedCollidersHash.Add(excludedColliders[0]);
                         }
 
                         foreach (Collider collider in tmpColliderArray)
-                            if (!excludedCollidersHash.Contains(collider)) //If the collider isn't in the hash, that means that it must belong to _this_ part, because it doesn't belong to any child parts
+                            //If the collider isn't in the hash, that means that it must belong to _this_ part, because it doesn't belong to any child parts
+                            if (!excludedCollidersHash.Contains(collider))
                                 partColliders.Add(collider);
                             else
-                                break; //Once we find something that is in the hash, we're out of the colliders associated with the parent part and can escape
+                                //Once we find something that is in the hash, we're out of the colliders associated with the parent part and can escape
+                                break;
 
                         colliders = partColliders.ToArray();
                     }
                     else
+                    {
                         colliders = part.GetComponentsInChildren<Collider>();
+                    }
                 }
                 catch
-                {   //FIXME
+                {
+                    //FIXME
                     //Fail silently because it's the only way to avoid issues with pWings
-                    //Debug.LogException(e);
-                    colliders = new[] { part.collider };
+                    colliders = new[] {part.collider};
                 }
 
                 return colliders;
@@ -97,15 +106,15 @@ namespace FerramAerospaceResearch
             // ReSharper disable once UnusedMember.Global
             public static Bounds[] GetPartMeshBoundsInPartSpace(this Part part, int excessiveVerts = 2500)
             {
-                var transforms = part.FindModelComponents<Transform>();
-                Bounds[] bounds = new Bounds[transforms.Count];
+                List<Transform> transforms = part.FindModelComponents<Transform>();
+                var bounds = new Bounds[transforms.Count];
                 Matrix4x4 partMatrix = part.partTransform.worldToLocalMatrix;
-                for(int i = 0; i < transforms.Count; i++)
+                for (int i = 0; i < transforms.Count; i++)
                 {
-                    Bounds newBounds = new Bounds();
+                    var newBounds = new Bounds();
                     Transform t = transforms[i];
 
-                    MeshFilter mf = t.GetComponent<MeshFilter>();
+                    var mf = t.GetComponent<MeshFilter>();
                     if (mf == null)
                         continue;
                     Mesh m = mf.sharedMesh;
@@ -116,30 +125,28 @@ namespace FerramAerospaceResearch
 
                     if (m.vertices.Length < excessiveVerts)
                         foreach (Vector3 vertex in m.vertices)
-                        {
                             newBounds.Encapsulate(matrix.MultiplyPoint(vertex));
-                        }
                     else
-                    {
                         newBounds.SetMinMax(matrix.MultiplyPoint(m.bounds.min), matrix.MultiplyPoint(m.bounds.max));
-                    }
 
                     bounds[i] = newBounds;
                 }
+
                 return bounds;
             }
 
-            #region RealChuteLite
             /// <summary>
-            /// Returns the total mass of the part
+            ///     Returns the total mass of the part
             /// </summary>
             public static float TotalMass(this Part part)
             {
-                return part.physicalSignificance != Part.PhysicalSignificance.NONE ? part.mass + part.GetResourceMass() : 0;
+                return part.physicalSignificance != Part.PhysicalSignificance.NONE
+                           ? part.mass + part.GetResourceMass()
+                           : 0;
             }
 
             /// <summary>
-            /// Initiates an animation for later use
+            ///     Initiates an animation for later use
             /// </summary>
             /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation</param>
@@ -157,7 +164,7 @@ namespace FerramAerospaceResearch
             }
 
             /// <summary>
-            /// Plays an animation at a given speed
+            ///     Plays an animation at a given speed
             /// </summary>
             /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation</param>
@@ -175,13 +182,18 @@ namespace FerramAerospaceResearch
             }
 
             /// <summary>
-            /// Skips directly to the given time of the animation
+            ///     Skips directly to the given time of the animation
             /// </summary>
             /// <param name="part">Animated part</param>
             /// <param name="animationName">Name of the animation to skip to</param>
             /// <param name="animationSpeed">Speed of the animation after the skip</param>
             /// <param name="animationTime">Normalized time skip</param>
-            public static void SkipToAnimationTime(this Part part, string animationName, float animationSpeed, float animationTime)
+            public static void SkipToAnimationTime(
+                this Part part,
+                string animationName,
+                float animationSpeed,
+                float animationTime
+            )
             {
                 foreach (Animation animation in part.FindModelAnimators(animationName))
                 {
@@ -192,7 +204,6 @@ namespace FerramAerospaceResearch
                     animation.Play(animationName);
                 }
             }
-            #endregion
         }
     }
 }

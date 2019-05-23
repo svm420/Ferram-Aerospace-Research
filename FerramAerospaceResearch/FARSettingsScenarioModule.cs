@@ -55,64 +55,51 @@ namespace FerramAerospaceResearch
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT)]
     public class FARSettingsScenarioModule : ScenarioModule
     {
+        private static List<string> presetNames;
         public bool newGame;
         public FARDifficultyAndExactnessSettings settings;
-        public static FARDifficultyAndExactnessSettings Settings
-        {
-            get
-            {
-                return Instance.settings;
-            }
-        }
 
         public FARDifficultyAndExactnessSettings customSettings;
         public List<FARDifficultyAndExactnessSettings> presets;
         public FARVoxelSettings voxelSettings;
-        public static FARVoxelSettings VoxelSettings
-        {
-            get
-            {
-                return Instance.voxelSettings;
-            }
-        }
 
         public List<ConfigNode> flightGUISettings;
-        public static List<ConfigNode> FlightGUISettings
-        {
-            get
-            {
-                return Instance.flightGUISettings;
-            }
-        }
-
-        private static List<string> presetNames;
 
         public int currentIndex;
 
-        private static FARSettingsScenarioModule instance;
-        public static FARSettingsScenarioModule Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-
         private GUIDropDown<FARDifficultyAndExactnessSettings> dropdown;
-
-        public static void MainMenuBuildDefaultScenarioModule()
-        {
-            if (instance != null) return;
-            instance = new GameObject().AddComponent<FARSettingsScenarioModule>();
-            FARLogger.Info("Creating new setting module for tutorial/scenario");
-            instance.OnLoad(new ConfigNode());
-            instance.Start();
-        }
 
 
         private FARSettingsScenarioModule()
         {
-            instance = this;
+            Instance = this;
+        }
+
+        public static FARDifficultyAndExactnessSettings Settings
+        {
+            get { return Instance.settings; }
+        }
+
+        public static FARVoxelSettings VoxelSettings
+        {
+            get { return Instance.voxelSettings; }
+        }
+
+        public static List<ConfigNode> FlightGUISettings
+        {
+            get { return Instance.flightGUISettings; }
+        }
+
+        public static FARSettingsScenarioModule Instance { get; private set; }
+
+        public static void MainMenuBuildDefaultScenarioModule()
+        {
+            if (Instance != null)
+                return;
+            Instance = new GameObject().AddComponent<FARSettingsScenarioModule>();
+            FARLogger.Info("Creating new setting module for tutorial/scenario");
+            Instance.OnLoad(new ConfigNode());
+            Instance.Start();
         }
 
         private void Start()
@@ -122,10 +109,8 @@ namespace FerramAerospaceResearch
                 enabled = false;
                 return;
             }
-            instance = this;
 
-            //if (newGame)
-            //    PopupDialog.SpawnPopupDialog("Ferram Aerospace Research", "Welcome to KSP with FAR!\n\r\n\rThings will be much harder from here on out; the FAR button in the top-right corner will bring you to difficulty settings if you ever decide to change them.  Have fun!", "OK", false, HighLogic.Skin);
+            Instance = this;
 
             FARLogger.Info("Vehicle Voxel Setup started");
             FARAeroSection.GenerateCrossFlowDragCurve();
@@ -133,7 +118,6 @@ namespace FerramAerospaceResearch
             PhysicsGlobals.DragCubeMultiplier = 0;
             FARLogger.Info("Vehicle Voxel Setup complete");
 
-            //GameEvents.onGameStateSave.Add(OnSave);
             newGame = false;
         }
 
@@ -142,7 +126,8 @@ namespace FerramAerospaceResearch
             FARLogger.Info("saved");
             node.AddValue("newGame", newGame);
             node.AddValue("fractionTransonicDrag", settings.fractionTransonicDrag);
-            node.AddValue("gaussianVehicleLengthFractionForSmoothing", settings.gaussianVehicleLengthFractionForSmoothing);
+            node.AddValue("gaussianVehicleLengthFractionForSmoothing",
+                          settings.gaussianVehicleLengthFractionForSmoothing);
             node.AddValue("numAreaSmoothingPasses", settings.numAreaSmoothingPasses);
             node.AddValue("numDerivSmoothingPasses", settings.numDerivSmoothingPasses);
             node.AddValue("numVoxelsControllableVessel", voxelSettings.numVoxelsControllableVessel);
@@ -152,12 +137,10 @@ namespace FerramAerospaceResearch
             node.AddValue("index", settings.index);
 
             FlightGUI.SaveActiveData();
-            ConfigNode flightGUINode = new ConfigNode("FlightGUISettings");
+            var flightGUINode = new ConfigNode("FlightGUISettings");
             FARLogger.Info("Saving FAR Data");
             foreach (ConfigNode configNode in flightGUISettings)
-            {
                 flightGUINode.AddNode(configNode);
-            }
             node.AddNode(flightGUINode);
 
             FARDebugAndSettings.SaveConfigs(node);
@@ -165,7 +148,7 @@ namespace FerramAerospaceResearch
 
         public override void OnLoad(ConfigNode node)
         {
-            instance = this;
+            Instance = this;
             GeneratePresets();
             int index = 4;
             if (node.HasValue("newGame"))
@@ -174,7 +157,9 @@ namespace FerramAerospaceResearch
             if (node.HasValue("index"))
                 index = int.Parse(node.GetValue("index"));
 
-            dropdown = new GUIDropDown<FARDifficultyAndExactnessSettings>(presetNames.ToArray(), presets.ToArray(), index < 0 ? 2 : index);
+            dropdown = new GUIDropDown<FARDifficultyAndExactnessSettings>(presetNames.ToArray(),
+                                                                          presets.ToArray(),
+                                                                          index < 0 ? 2 : index);
             voxelSettings = new FARVoxelSettings();
 
             if (node.HasValue("numVoxelsControllableVessel"))
@@ -193,7 +178,8 @@ namespace FerramAerospaceResearch
                 if (node.HasValue("fractionTransonicDrag"))
                     settings.fractionTransonicDrag = double.Parse(node.GetValue("fractionTransonicDrag"));
                 if (node.HasValue("gaussianVehicleLengthFractionForSmoothing"))
-                    settings.gaussianVehicleLengthFractionForSmoothing = double.Parse(node.GetValue("gaussianVehicleLengthFractionForSmoothing"));
+                    settings.gaussianVehicleLengthFractionForSmoothing =
+                        double.Parse(node.GetValue("gaussianVehicleLengthFractionForSmoothing"));
 
                 if (node.HasValue("numAreaSmoothingPasses"))
                     settings.numAreaSmoothingPasses = int.Parse(node.GetValue("numAreaSmoothingPasses"));
@@ -208,16 +194,15 @@ namespace FerramAerospaceResearch
                 settings = presets[index];
                 customSettings = new FARDifficultyAndExactnessSettings(-1);
             }
+
             currentIndex = index;
 
 
             FARLogger.Info("Loading FAR Data");
             flightGUISettings = new List<ConfigNode>();
-            if(node.HasNode("FlightGUISettings"))
-            {
+            if (node.HasNode("FlightGUISettings"))
                 foreach (ConfigNode flightGUINode in node.GetNode("FlightGUISettings").nodes)
                     flightGUISettings.Add(flightGUINode);
-            }
 
             FARDebugAndSettings.LoadConfigs(node);
         }
@@ -227,7 +212,7 @@ namespace FerramAerospaceResearch
             presets = new List<FARDifficultyAndExactnessSettings>();
             presetNames = new List<string>();
 
-            FARDifficultyAndExactnessSettings tmp = new FARDifficultyAndExactnessSettings(0.6, 0.03, 2, 2, 0);
+            var tmp = new FARDifficultyAndExactnessSettings(0.6, 0.03, 2, 2, 0);
             presets.Add(tmp);
             presetNames.Add("Low Drag, Lenient Area Ruling");
 
@@ -269,19 +254,28 @@ namespace FerramAerospaceResearch
             {
                 GUILayout.BeginVertical();
                 settings = customSettings;
-                settings.fractionTransonicDrag = GUIUtils.TextEntryForDouble("Frac Mach 1 Drag: ", 150, settings.fractionTransonicDrag);
+                settings.fractionTransonicDrag =
+                    GUIUtils.TextEntryForDouble("Frac Mach 1 Drag: ", 150, settings.fractionTransonicDrag);
                 GUILayout.Label("The below are used in controlling leniency of design.  Higher values for all will result in more leniency");
-                settings.gaussianVehicleLengthFractionForSmoothing = GUIUtils.TextEntryForDouble("% Vehicle Length for Smoothing", 250, settings.gaussianVehicleLengthFractionForSmoothing);
-                settings.numAreaSmoothingPasses = GUIUtils.TextEntryForInt("Smoothing Passes, Cross-Sectional Area", 250, settings.numAreaSmoothingPasses);
+                settings.gaussianVehicleLengthFractionForSmoothing =
+                    GUIUtils.TextEntryForDouble("% Vehicle Length for Smoothing",
+                                                250,
+                                                settings.gaussianVehicleLengthFractionForSmoothing);
+                settings.numAreaSmoothingPasses =
+                    GUIUtils.TextEntryForInt("Smoothing Passes, Cross-Sectional Area",
+                                             250,
+                                             settings.numAreaSmoothingPasses);
                 if (settings.numAreaSmoothingPasses < 0)
                     settings.numAreaSmoothingPasses = 0;
-                settings.numDerivSmoothingPasses = GUIUtils.TextEntryForInt("Smoothing Passes, area 2nd deriv", 250, settings.numDerivSmoothingPasses);
+                settings.numDerivSmoothingPasses =
+                    GUIUtils.TextEntryForInt("Smoothing Passes, area 2nd deriv", 250, settings.numDerivSmoothingPasses);
                 if (settings.numDerivSmoothingPasses < 0)
                     settings.numDerivSmoothingPasses = 0;
 
                 customSettings = settings;
                 GUILayout.EndVertical();
             }
+
             if (GUILayout.Button(currentIndex < 0 ? "Switch Back To Presets" : "Choose Custom Settings"))
             {
                 if (currentIndex >= 0)
@@ -289,24 +283,33 @@ namespace FerramAerospaceResearch
                 else
                     currentIndex = 4;
             }
+
             GUILayout.EndHorizontal();
             GUILayout.Label("Voxel Detail Settings; increasing these will improve accuracy at the cost of performance");
 
-            voxelSettings.numVoxelsControllableVessel = GUIUtils.TextEntryForInt("Voxels Controllable Vessel: ", 200, voxelSettings.numVoxelsControllableVessel);
+            voxelSettings.numVoxelsControllableVessel =
+                GUIUtils.TextEntryForInt("Voxels Controllable Vessel: ",
+                                         200,
+                                         voxelSettings.numVoxelsControllableVessel);
             if (voxelSettings.numVoxelsControllableVessel < 0)
                 voxelSettings.numVoxelsControllableVessel = 100000;
 
-            voxelSettings.numVoxelsDebrisVessel = GUIUtils.TextEntryForInt("Voxels Debris: ", 200, voxelSettings.numVoxelsDebrisVessel);
+            voxelSettings.numVoxelsDebrisVessel =
+                GUIUtils.TextEntryForInt("Voxels Debris: ", 200, voxelSettings.numVoxelsDebrisVessel);
             if (voxelSettings.numVoxelsDebrisVessel < 0)
                 voxelSettings.numVoxelsDebrisVessel = 5000;
 
-            voxelSettings.minPhysTicksPerUpdate = GUIUtils.TextEntryForInt("Min Phys Ticks per Voxel Update: ", 200, voxelSettings.minPhysTicksPerUpdate);
+            voxelSettings.minPhysTicksPerUpdate =
+                GUIUtils.TextEntryForInt("Min Phys Ticks per Voxel Update: ", 200, voxelSettings.minPhysTicksPerUpdate);
             if (voxelSettings.minPhysTicksPerUpdate < 0)
                 voxelSettings.minPhysTicksPerUpdate = 80;
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Use Higher Res SubVoxels: ");
-            voxelSettings.useHigherResVoxelPoints = GUILayout.Toggle(voxelSettings.useHigherResVoxelPoints, voxelSettings.useHigherResVoxelPoints ? "High Res SubVoxels" : "Low Res SubVoxels");
+            voxelSettings.useHigherResVoxelPoints = GUILayout.Toggle(voxelSettings.useHigherResVoxelPoints,
+                                                                     voxelSettings.useHigherResVoxelPoints
+                                                                         ? "High Res SubVoxels"
+                                                                         : "Low Res SubVoxels");
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -315,12 +318,13 @@ namespace FerramAerospaceResearch
 
     public class FARDifficultyAndExactnessSettings
     {
+        // TODO: index should be the index in the list, allow multiple custom settings
+        public readonly int index;
         public double fractionTransonicDrag = 0.7;
         public double gaussianVehicleLengthFractionForSmoothing = 0.015;
         public int numAreaSmoothingPasses = 2;
+
         public int numDerivSmoothingPasses = 1;
-        // TODO: index should be the index in the list, allow multiple custom settings
-        public readonly int index;
 
 
         public FARDifficultyAndExactnessSettings(int index)
@@ -328,7 +332,13 @@ namespace FerramAerospaceResearch
             this.index = index;
         }
 
-        public FARDifficultyAndExactnessSettings(double transDrag, double gaussianLength, int areaPass, int derivPass, int index)
+        public FARDifficultyAndExactnessSettings(
+            double transDrag,
+            double gaussianLength,
+            int areaPass,
+            int derivPass,
+            int index
+        )
         {
             this.index = index;
             fractionTransonicDrag = transDrag;
@@ -345,7 +355,9 @@ namespace FerramAerospaceResearch
         public int minPhysTicksPerUpdate;
         public bool useHigherResVoxelPoints;
 
-        public FARVoxelSettings() : this(250000, 20000, 80, true) { }
+        public FARVoxelSettings() : this(250000, 20000, 80, true)
+        {
+        }
 
         public FARVoxelSettings(int vesselCount, int debrisCount, int minPhysTicks, bool higherResVoxPoints)
         {
@@ -356,4 +368,3 @@ namespace FerramAerospaceResearch
         }
     }
 }
-

@@ -79,7 +79,9 @@ namespace FerramAerospaceResearch.FARThreading
                         Monitor.PulseAll(_lockerObject);
                     }
                     else
+                    {
                         Monitor.Wait(_lockerObject);
+                    }
                 }
                 else
                 {
@@ -91,7 +93,9 @@ namespace FerramAerospaceResearch.FARThreading
                         Monitor.PulseAll(_lockerObject);
                     }
                     else
+                    {
                         Monitor.Wait(_lockerObject);
+                    }
                 }
             }
         }

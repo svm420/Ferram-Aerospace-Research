@@ -61,6 +61,11 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         private Transform intakeTrans;
 
         private Part part;
+
+        private IntegratedIntakeEngineCrossSectionAdjuster()
+        {
+        }
+
         public Part GetPart()
         {
             return part;
@@ -69,59 +74,6 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         public bool IntegratedCrossSectionIncreaseDecrease()
         {
             return intakeModule.node == null || intakeModule.node.attachedPart == null;
-        }
-
-        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
-        {
-            IntegratedIntakeEngineCrossSectionAdjuster adjuster = new IntegratedIntakeEngineCrossSectionAdjuster();
-            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
-
-            return adjuster;
-        }
-
-        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
-        {
-            IntegratedIntakeEngineCrossSectionAdjuster adjuster = new IntegratedIntakeEngineCrossSectionAdjuster();
-            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
-
-            return adjuster;
-        }
-
-        private IntegratedIntakeEngineCrossSectionAdjuster() { }
-
-        public void SetupAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
-        {
-            if (intake is ModuleResourceIntake module)
-                SetupAdjuster(module, worldToVesselMatrix);
-            else
-                FARLogger.Error($"{intake} is not typeof ModuleResourceIntake");
-        }
-
-        public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
-        {
-            part = intake.part;
-            intakeModule = intake;
-            intakeTrans = intakeModule.intakeTransform;
-            //ModuleResourceIntake intake = intake;
-
-            /*intakeTrans = part.FindModelTransform(intake.intakeTransformName);
-            vehicleBasisForwardVector = Vector3.forward;//intakeTrans.forward;
-
-            foreach (AttachNode node in part.attachNodes)
-                if (node.nodeType == AttachNode.NodeType.Stack && Vector3.Dot(node.position, (part.transform.worldToLocalMatrix * intakeTrans.localToWorldMatrix).MultiplyVector(Vector3.forward)) > 0)
-                {
-                    frontNode = node;
-                    break;
-                }*/
-
-            thisToVesselMatrix = worldToVesselMatrix * intakeTrans.localToWorldMatrix;
-
-            vehicleBasisForwardVector = Vector3.forward;
-            vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);
-
-            intakeArea = INTAKE_AREA_SCALAR * intake.area;
-
-            FARLogger.Info("Integrated cross-section adjuster");
         }
 
         public double AreaRemovedFromCrossSection(Vector3 vehicleAxis)
@@ -136,7 +88,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         {
             if (intakeModule.node == null || intakeModule.node.attachedPart == null)
                 return intakeArea * sign;
-            return -intakeArea * sign; //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
+            //if the intake is covered, switch the math so that it functions like an AirbreathingEngineCrossSectionAdjuster instead
+            return -intakeArea * sign;
         }
 
         public double AreaThreshold()
@@ -149,7 +102,10 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             sign = direction;
         }
 
-        public int GetForwardBackwardNoFlowSign() { return sign; }
+        public int GetForwardBackwardNoFlowSign()
+        {
+            return sign;
+        }
 
         public void TransformBasis(Matrix4x4 matrix)
         {
@@ -159,15 +115,61 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
             tempMatrix = thisToVesselMatrix * tempMatrix;
 
             vehicleBasisForwardVector = tempMatrix.MultiplyVector(vehicleBasisForwardVector);
-
         }
-
 
         public void SetThisToVesselMatrixForTransform()
         {
             meshLocalToWorld = intakeTrans.localToWorldMatrix;
         }
 
-        public void UpdateArea() { }
+        public void UpdateArea()
+        {
+        }
+
+        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(
+            PartModule intake,
+            Matrix4x4 worldToVesselMatrix
+        )
+        {
+            var adjuster = new IntegratedIntakeEngineCrossSectionAdjuster();
+            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
+
+            return adjuster;
+        }
+
+        public static IntegratedIntakeEngineCrossSectionAdjuster CreateAdjuster(
+            ModuleResourceIntake intake,
+            Matrix4x4 worldToVesselMatrix
+        )
+        {
+            var adjuster = new IntegratedIntakeEngineCrossSectionAdjuster();
+            adjuster.SetupAdjuster(intake, worldToVesselMatrix);
+
+            return adjuster;
+        }
+
+        public void SetupAdjuster(PartModule intake, Matrix4x4 worldToVesselMatrix)
+        {
+            if (intake is ModuleResourceIntake module)
+                SetupAdjuster(module, worldToVesselMatrix);
+            else
+                FARLogger.Error($"{intake} is not typeof ModuleResourceIntake");
+        }
+
+        public void SetupAdjuster(ModuleResourceIntake intake, Matrix4x4 worldToVesselMatrix)
+        {
+            part = intake.part;
+            intakeModule = intake;
+            intakeTrans = intakeModule.intakeTransform;
+
+            thisToVesselMatrix = worldToVesselMatrix * intakeTrans.localToWorldMatrix;
+
+            vehicleBasisForwardVector = Vector3.forward;
+            vehicleBasisForwardVector = thisToVesselMatrix.MultiplyVector(vehicleBasisForwardVector);
+
+            intakeArea = INTAKE_AREA_SCALAR * intake.area;
+
+            FARLogger.Info("Integrated cross-section adjuster");
+        }
     }
 }

@@ -47,25 +47,23 @@ using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-    internal class StabilityDerivLinearSim
+    internal static class StabilityDerivLinearSim
     {
-        private readonly InstantConditionSim _instantCondition;
-
-        public StabilityDerivLinearSim(InstantConditionSim instantConditionSim)
+        public static GraphData RunTransientSimLateral(
+            StabilityDerivOutput vehicleData,
+            double endTime,
+            double initDt,
+            double[] InitCond
+        )
         {
-            _instantCondition = instantConditionSim;
-        }
-
-        public GraphData RunTransientSimLateral(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
-        {
-            SimMatrix A = new SimMatrix(4, 4);
+            var A = new SimMatrix(4, 4);
 
             A.PrintToConsole();
 
             int i = 0;
             int j = 0;
             int num = 0;
-            double[] Derivs = new double[27];
+            var Derivs = new double[27];
 
             vehicleData.stabDerivs.CopyTo(Derivs, 0);
 
@@ -105,18 +103,25 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                     A.Add(f, i, j);
 
                 if (j < 2)
+                {
                     j++;
+                }
                 else
                 {
                     j = 0;
                     i++;
                 }
             }
-            A.Add(_instantCondition.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude) * Math.Cos(vehicleData.stableAoA * Math.PI / 180) / vehicleData.nominalVelocity, 3, 0);
+
+            A.Add(InstantConditionSim.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude) *
+                  Math.Cos(vehicleData.stableAoA * Math.PI / 180) /
+                  vehicleData.nominalVelocity,
+                  3,
+                  0);
             A.Add(1, 1, 3);
 
 
-            A.PrintToConsole();                //We should have an array that looks like this:
+            A.PrintToConsole(); //We should have an array that looks like this:
 
             /*             i --------------->
              *       j  [ Yb / u0 , Yp / u0 , -(1 - Yr/ u0) ,  g Cos(θ0) / u0 ]
@@ -132,10 +137,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
              *
              *
              */
-            RungeKutta4 transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
+            var transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
             transSolve.Solve();
 
-            GraphData lines = new GraphData {xValues = transSolve.time};
+            var lines = new GraphData {xValues = transSolve.time};
 
             double[] yVal = transSolve.GetSolution(0);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
@@ -153,19 +158,18 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
             lines.AddData(yVal, GUIColors.GetColor(0), "φ", true);
 
-            /*graph.SetBoundaries(0, endTime, -10, 10);
-            graph.SetGridScaleUsingValues(1, 5);
-            graph.horizontalLabel = "time";
-            graph.verticalLabel = "value";
-            graph.Update();*/
-
             return lines;
         }
 
-        public GraphData RunTransientSimLongitudinal(StabilityDerivOutput vehicleData, double endTime, double initDt, double[] InitCond)
+        public static GraphData RunTransientSimLongitudinal(
+            StabilityDerivOutput vehicleData,
+            double endTime,
+            double initDt,
+            double[] InitCond
+        )
         {
-            SimMatrix A = new SimMatrix(4, 4);
-            SimMatrix B = new SimMatrix(1, 4);
+            var A = new SimMatrix(4, 4);
+            var B = new SimMatrix(1, 4);
 
             A.PrintToConsole();
 
@@ -191,18 +195,21 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 else
                     B.Add(f, 0, j);
                 if (j < 2)
+                {
                     j++;
+                }
                 else
                 {
                     j = 0;
                     i++;
                 }
             }
-            A.Add(-_instantCondition.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude), 3, 1);
+
+            A.Add(-InstantConditionSim.CalculateAccelerationDueToGravity(vehicleData.body, vehicleData.altitude), 3, 1);
             A.Add(1, 2, 3);
 
 
-            A.PrintToConsole();                //We should have an array that looks like this:
+            A.PrintToConsole(); //We should have an array that looks like this:
 
             /*             i --------------->
              *       j  [ Z w , Z u , Z q  + u,  0 ]
@@ -219,10 +226,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
              *
              */
 
-            RungeKutta4 transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
+            var transSolve = new RungeKutta4(endTime, initDt, A, InitCond);
             transSolve.Solve();
 
-            GraphData lines = new GraphData {xValues = transSolve.time};
+            var lines = new GraphData {xValues = transSolve.time};
 
             double[] yVal = transSolve.GetSolution(0);
             ScaleAndClampValues(yVal, 1, 50);
@@ -240,17 +247,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
             lines.AddData(yVal, GUIColors.GetColor(0), "θ", true);
 
-            /*graph.SetBoundaries(0, endTime, -10, 10);
-            graph.SetGridScaleUsingValues(1, 5);
-            graph.horizontalLabel = "time";
-            graph.verticalLabel = "value";
-            graph.Update();*/
-
             return lines;
         }
 
 
-        private void ScaleAndClampValues(double[] yVal, double scalingFactor, double clampValue)
+        private static void ScaleAndClampValues(double[] yVal, double scalingFactor, double clampValue)
         {
             for (int k = 0; k < yVal.Length; k++)
             {

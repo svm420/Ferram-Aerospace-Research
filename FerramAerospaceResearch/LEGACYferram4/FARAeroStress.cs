@@ -52,49 +52,43 @@ namespace FerramAerospaceResearch
         public static bool loaded;
 
 
-
         public static void SaveCustomStressTemplates()
         {
-            ConfigNode node = new ConfigNode("@FARAeroStress[default]:FOR[FerramAerospaceResearch]");
+            var node = new ConfigNode("@FARAeroStress[default]:FOR[FerramAerospaceResearch]");
             node.AddNode(new ConfigNode("!FARPartStressTemplate,*"));
 
             foreach (FARPartStressTemplate template in StressTemplates)
-            {
                 node.AddNode(CreateAeroStressConfigNode(template));
-            }
 
-            ConfigNode saveNode = new ConfigNode();
+            var saveNode = new ConfigNode();
             saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARAeroStress.cfg");
+            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
+                          "GameData/FerramAerospaceResearch/CustomFARAeroStress.cfg");
         }
 
         private static ConfigNode CreateAeroStressConfigNode(FARPartStressTemplate template)
         {
-            ConfigNode node = new ConfigNode("FARPartStressTemplate");
+            var node = new ConfigNode("FARPartStressTemplate");
             node.AddValue("name", template.name);
             node.AddValue("YmaxStress", template.YmaxStress);
             node.AddValue("XZmaxStress", template.XZmaxStress);
             node.AddValue("requiresCrew", template.crewed.ToString());
             node.AddValue("isSpecialTemplate", template.isSpecialTemplate.ToString());
 
-            ConfigNode res = new ConfigNode("Resources");
+            var res = new ConfigNode("Resources");
 
             res.AddValue("numReq", template.minNumResources);
             res.AddValue("rejectUnlistedResources", template.rejectUnlistedResources);
 
             //Make sure to update this whenever MM fixes how it goes through nodes and values
             foreach (string s in template.resources)
-            {
                 res.AddValue("res", s);
-            }
             foreach (string s in template.excludeResources)
-            {
                 res.AddValue("excludeRes", s);
-            }
 
             res.AddValue("flowMode",
                          template.flowModeNeeded
-                             ? FARDebugAndSettings.FlowMode_str[(int) template.flowMode]
+                             ? FARDebugAndSettings.FlowMode_str[(int)template.flowMode]
                              : "unneeded");
 
             node.AddNode(res);
@@ -109,8 +103,8 @@ namespace FerramAerospaceResearch
                 return;
             StressTemplates.Clear();
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARAeroStress"))
-                if(node != null)
-                    foreach(ConfigNode template in node.GetNodes("FARPartStressTemplate"))
+                if (node != null)
+                    foreach (ConfigNode template in node.GetNodes("FARPartStressTemplate"))
                         StressTemplates.Add(CreateFARPartStressTemplate(template));
 
             loaded = true;
@@ -118,19 +112,19 @@ namespace FerramAerospaceResearch
 
         private static FARPartStressTemplate CreateFARPartStressTemplate(ConfigNode template)
         {
-            FARPartStressTemplate parsedTemplate = new FARPartStressTemplate
+            var parsedTemplate = new FARPartStressTemplate
             {
-                XZmaxStress             = 500,
-                YmaxStress              = 500,
-                name                    = "default",
-                isSpecialTemplate       = false,
-                minNumResources         = 0,
-                resources               = new List<string>(),
-                excludeResources        = new List<string>(),
+                XZmaxStress = 500,
+                YmaxStress = 500,
+                name = "default",
+                isSpecialTemplate = false,
+                minNumResources = 0,
+                resources = new List<string>(),
+                excludeResources = new List<string>(),
                 rejectUnlistedResources = false,
-                crewed                  = false,
-                flowModeNeeded          = false,
-                flowMode                = ResourceFlowMode.NO_FLOW
+                crewed = false,
+                flowModeNeeded = false,
+                flowMode = ResourceFlowMode.NO_FLOW
             };
 
             if (template.HasValue("name"))
@@ -144,44 +138,48 @@ namespace FerramAerospaceResearch
             if (template.HasValue("requiresCrew"))
                 bool.TryParse(template.GetValue("requiresCrew"), out parsedTemplate.crewed);
 
-            if (template.HasNode("Resources"))
+            if (!template.HasNode("Resources"))
+                return parsedTemplate;
+            ConfigNode resources = template.GetNode("Resources");
+            if (resources.HasValue("numReq"))
+                int.TryParse(resources.GetValue("numReq"), out parsedTemplate.minNumResources);
+
+            if (resources.HasValue("rejectUnlistedResources"))
+                bool.TryParse(resources.GetValue("rejectUnlistedResources"),
+                              out parsedTemplate.rejectUnlistedResources);
+
+            if (resources.HasValue("flowMode"))
             {
-                ConfigNode resources = template.GetNode("Resources");
-                if(resources.HasValue("numReq"))
-                    int.TryParse(resources.GetValue("numReq"), out parsedTemplate.minNumResources);
+                parsedTemplate.flowModeNeeded = true;
+                string flowString = resources.GetValue("flowMode").ToLowerInvariant();
 
-                if (resources.HasValue("rejectUnlistedResources"))
-                    bool.TryParse(resources.GetValue("rejectUnlistedResources"), out parsedTemplate.rejectUnlistedResources);
-
-                if (resources.HasValue("flowMode"))
+                switch (flowString)
                 {
-                    parsedTemplate.flowModeNeeded = true;
-                    string flowString = resources.GetValue("flowMode").ToLowerInvariant();
-
-                    if (flowString == "all_vessel")
+                    case "all_vessel":
                         parsedTemplate.flowMode = ResourceFlowMode.ALL_VESSEL;
-                    else if (flowString == "stack_priority_search")
+                        break;
+                    case "stack_priority_search":
                         parsedTemplate.flowMode = ResourceFlowMode.STACK_PRIORITY_SEARCH;
-                    else if (flowString == "stage_priority_flow")
+                        break;
+                    case "stage_priority_flow":
                         parsedTemplate.flowMode = ResourceFlowMode.STAGE_PRIORITY_FLOW;
-                    else if (flowString == "no_flow")
+                        break;
+                    case "no_flow":
                         parsedTemplate.flowMode = ResourceFlowMode.NO_FLOW;
-                    else
+                        break;
+                    default:
                         parsedTemplate.flowModeNeeded = false;
-                }
-
-                PartResourceLibrary l = PartResourceLibrary.Instance;
-                foreach (string resString in resources.GetValues("res"))
-                {
-                    if (l.resourceDefinitions.Contains(resString))
-                        parsedTemplate.resources.Add(resString);
-                }
-                foreach (string resString in resources.GetValues("excludeRes"))
-                {
-                    if (l.resourceDefinitions.Contains(resString))
-                        parsedTemplate.excludeResources.Add(resString);
+                        break;
                 }
             }
+
+            PartResourceLibrary l = PartResourceLibrary.Instance;
+            foreach (string resString in resources.GetValues("res"))
+                if (l.resourceDefinitions.Contains(resString))
+                    parsedTemplate.resources.Add(resString);
+            foreach (string resString in resources.GetValues("excludeRes"))
+                if (l.resourceDefinitions.Contains(resString))
+                    parsedTemplate.excludeResources.Add(resString);
 
             return parsedTemplate;
         }
@@ -192,7 +190,7 @@ namespace FerramAerospaceResearch
 
             int resCount = p.Resources.Count;
             bool crewed = p.CrewCapacity > 0;
-            if ( p.Modules.Contains<ModuleAblator>()|| p.Resources.Contains("Ablator"))
+            if (p.Modules.Contains<ModuleAblator>() || p.Resources.Contains("Ablator"))
                 return template;
 
             foreach (FARPartStressTemplate candidate in StressTemplates)
@@ -210,7 +208,6 @@ namespace FerramAerospaceResearch
                     bool cont = true;
                     int numRes = 0;
                     foreach (PartResource res in p.Resources)
-                    {
                         if (candidate.resources.Contains(res.info.name))
                         {
                             numRes++;
@@ -221,7 +218,6 @@ namespace FerramAerospaceResearch
                             cont = true;
                             break;
                         }
-                    }
 
                     if (cont || numRes < candidate.minNumResources)
                         continue;
@@ -231,9 +227,8 @@ namespace FerramAerospaceResearch
                     int numRes = 0;
                     foreach (PartResource res in p.Resources)
                         if (!candidate.excludeResources.Contains(res.info.name))
-                            if(!candidate.flowModeNeeded || res.info.resourceFlowMode == candidate.flowMode)
+                            if (!candidate.flowModeNeeded || res.info.resourceFlowMode == candidate.flowMode)
                                 numRes++;
-
 
 
                     if (numRes < candidate.minNumResources)

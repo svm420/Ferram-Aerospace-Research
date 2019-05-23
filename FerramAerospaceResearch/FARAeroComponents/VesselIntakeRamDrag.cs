@@ -52,8 +52,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
     //This attempts some manner of handling ram drag at various speeds
     internal class VesselIntakeRamDrag
     {
-        private const float AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM = 0.25f;       //assume value approximately for turbojets
-        private const float AVG_NOZZLE_VEL_FACTOR = AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM * (1 - AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM);
+        //assume value approximately for turbojets
+        private const float AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM = 0.25f;
+
+        private const float AVG_NOZZLE_VEL_FACTOR =
+            AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM * (1 - AVG_NOZZLE_VEL_RELATIVE_TO_FREESTREAM);
 
         private static readonly int AJE_JET_CLASS_ID = "ModuleEnginesAJEJet".GetHashCode();
         private static readonly int AJE_PROP_CLASS_ID = "ModuleEnginesAJEPropeller".GetHashCode();
@@ -71,7 +74,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             _intakeTransforms.Clear();
             _airBreathingEngines.Clear();
 
-            HashSet<string> intakeResourceNames = new HashSet<string>();
+            var intakeResourceNames = new HashSet<string>();
 
 
             foreach (FARAeroPartModule aeroModule in allUsedAeroModules)
@@ -82,17 +85,16 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 foreach (PartModule m in p.Modules)
                 {
-                    if (m is ModuleResourceIntake intake)
-                    {
-                        if (intake.node != null && intake.node.attachedPart != null)
-                            continue;
+                    if (!(m is ModuleResourceIntake intake))
+                        continue;
+                    if (intake.node != null && intake.node.attachedPart != null)
+                        continue;
 
-                        _aeroModulesWithIntakes.Add(aeroModule);
-                        _intakeModules.Add(intake);
-                        _intakeTransforms.Add(p.FindModelTransform(intake.intakeTransformName));
-                        if (!intakeResourceNames.Contains(intake.resourceName))
-                            intakeResourceNames.Add(intake.resourceName);
-                    }
+                    _aeroModulesWithIntakes.Add(aeroModule);
+                    _intakeModules.Add(intake);
+                    _intakeTransforms.Add(p.FindModelTransform(intake.intakeTransformName));
+                    if (!intakeResourceNames.Contains(intake.resourceName))
+                        intakeResourceNames.Add(intake.resourceName);
                 }
             }
 
@@ -105,23 +107,21 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 foreach (PartModule m in p.Modules)
                 {
-                    if (m is ModuleEngines e)
-                    {
-                        if (FARAeroUtil.AJELoaded)
-                            if (e.ClassID == AJE_JET_CLASS_ID || e.ClassID == AJE_PROP_CLASS_ID)
-                            {
-                                _airBreathingEngines.Add(e);
-                                continue;
-                            }
-
-                        foreach (Propellant prop in e.propellants)
+                    if (!(m is ModuleEngines e))
+                        continue;
+                    if (FARAeroUtil.AJELoaded)
+                        if (e.ClassID == AJE_JET_CLASS_ID || e.ClassID == AJE_PROP_CLASS_ID)
                         {
-                            if (intakeResourceNames.Contains(prop.name))
-                            {
-                                _airBreathingEngines.Add(e);
-                                break;
-                            }
+                            _airBreathingEngines.Add(e);
+                            continue;
                         }
+
+                    foreach (Propellant prop in e.propellants)
+                    {
+                        if (!intakeResourceNames.Contains(prop.name))
+                            continue;
+                        _airBreathingEngines.Add(e);
+                        break;
                     }
                 }
             }
@@ -138,12 +138,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             float currentThrottle = 0;
 
             foreach (ModuleEngines engine in _airBreathingEngines)
-            {
                 if (engine.manuallyOverridden)
                     currentThrottle++;
                 else
                     currentThrottle += engine.currentThrottle;
-            }
             currentThrottle /= Math.Max((float)_airBreathingEngines.Count, 1);
 
             if (currentThrottle > 0.5)
@@ -169,7 +167,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     _intakeModules.RemoveAt(i);
                     _intakeTransforms.RemoveAt(i);
                     _aeroModulesWithIntakes.RemoveAt(i);
-                    //++i;
                     continue;
                 }
 
@@ -184,21 +181,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
 
                 Vector3 force = cosAoA * currentRamDrag * (float)intake.area * 100f * -aeroModule.partLocalVelNorm;
-                //if(float.IsNaN(force.sqrMagnitude))
-                //    force = Vector3.zero;
                 aeroModule.AddLocalForce(force, Vector3.zero);
             }
         }
 
-        private float RamDragPerArea(float machNumber)
+        private static float RamDragPerArea(float machNumber)
         {
             float drag = machNumber * machNumber;
             ++drag;
             drag = 2f / drag;
-            drag *= AVG_NOZZLE_VEL_FACTOR;  //drag based on the nozzle
+            drag *= AVG_NOZZLE_VEL_FACTOR; //drag based on the nozzle
 
-            drag += 0.1f;           //drag based on inlet
-                                    //assuming inlet and nozzle area are equal
+            drag += 0.1f; //drag based on inlet
+            //assuming inlet and nozzle area are equal
 
             return drag;
         }

@@ -56,12 +56,13 @@ using UnityEngine;
 namespace ferram4
 {
     /// <summary>
-    /// This calculates the lift and drag on a wing in the atmosphere
-    ///
-    /// It uses Prandtl lifting line theory to calculate the basic lift and drag coefficients and includes compressibility corrections for subsonic and supersonic flows; transonic regime has placeholder
+    ///     This calculates the lift and drag on a wing in the atmosphere
+    ///     It uses Prandtl lifting line theory to calculate the basic lift and drag coefficients and includes compressibility
+    ///     corrections for subsonic and supersonic flows; transonic regime has placeholder
     /// </summary>
     public class FARWingAerodynamicModel : FARBaseAerodynamics, IRescalable<FARWingAerodynamicModel>, IPartMassModifier
     {
+        protected const double criticalCl = 1.6;
         public double rawAoAmax = 15;
         private double AoAmax = 15;
 
@@ -70,42 +71,38 @@ namespace ferram4
 
         [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = true)]
         public float curWingMass = 1;
+
         private float desiredMass;
         private float baseMass;
 
-        [KSPField(guiName = "FARWingMassStrength", isPersistant = true, guiActiveEditor = true, guiActive = false), UI_FloatRange(maxValue = 4.0f, minValue = 0.05f, scene = UI_Scene.Editor, stepIncrement = 0.05f)]
+        [KSPField(guiName = "FARWingMassStrength", isPersistant = true, guiActiveEditor = true, guiActive = false),
+         UI_FloatRange(maxValue = 4.0f, minValue = 0.05f, scene = UI_Scene.Editor, stepIncrement = 0.05f)]
         public float massMultiplier = 1.0f;
 
         public float oldMassMultiplier = -1f;
 
-        [KSPField(isPersistant = false)]
-        public double MAC;
+        [KSPField(isPersistant = false)] public double MAC;
 
         public double MAC_actual;
 
-        [KSPField(isPersistant = false)]
-        public double e;
+        [KSPField(isPersistant = false)] public double e;
 
-        [KSPField(isPersistant = false)]
-        public int nonSideAttach;           //This is for ailerons and the small ctrl surf
+        [KSPField(isPersistant = false)] public int nonSideAttach; //This is for ailerons and the small ctrl surf
 
-        [KSPField(isPersistant = false)]
-        public double TaperRatio;
+        [KSPField(isPersistant = false)] public double TaperRatio;
 
         [KSPField(isPersistant = false, guiActive = true, guiName = "FARWingStalled")]
         protected double stall;
 
         private double minStall;
 
-        private double piARe = 1;    //induced drag factor
+        private double piARe = 1; //induced drag factor
 
-        [KSPField(isPersistant = false)]
-        public double b_2;        //span
+        [KSPField(isPersistant = false)] public double b_2; //span
 
-        public double b_2_actual;        //span
+        public double b_2_actual; //span
 
-        [KSPField(isPersistant = false)]
-        public double MidChordSweep;
+        [KSPField(isPersistant = false)] public double MidChordSweep;
         private double MidChordSweepSideways;
 
         private double cosSweepAngle;
@@ -121,24 +118,25 @@ namespace ferram4
 
         private bool fieldsVisible;
 
-        // ReSharper disable NotAccessedField.Global -> unity
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiFormat = "F3", guiUnits = "FARUnitKN")]
+        // ReSharper disable once NotAccessedField.Global -> unity
+        [KSPField(isPersistant = false,
+            guiActive = false,
+            guiActiveEditor = false,
+            guiFormat = "F3",
+            guiUnits = "FARUnitKN")]
         public float dragForceWing;
 
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiFormat = "F3", guiUnits = "FARUnitKN")]
+        // ReSharper disable once NotAccessedField.Global -> unity
+        [KSPField(isPersistant = false,
+            guiActive = false,
+            guiActiveEditor = false,
+            guiFormat = "F3",
+            guiUnits = "FARUnitKN")]
         public float liftForceWing;
-        // ReSharper restore NotAccessedField.Global
 
         private double rawLiftSlope;
         private double liftslope;
-        private double finalLiftSlope;
-        public double LiftSlope
-        {
-            get { return finalLiftSlope; }
-        }
         protected double zeroLiftCdIncrement;
-
-        protected double criticalCl = 1.6;
 
         private double refAreaChildren;
 
@@ -148,8 +146,7 @@ namespace ferram4
         private Vector3d perp = Vector3d.zero;
         private Vector3d liftDirection = Vector3d.zero;
 
-        [KSPField(isPersistant = false)]
-        public Vector3 rootMidChordOffsetFromOrig;
+        [KSPField(isPersistant = false)] public Vector3 rootMidChordOffsetFromOrig;
 
         // in local coordinates
         private Vector3d localWingCentroid = Vector3d.zero;
@@ -176,6 +173,36 @@ namespace ferram4
         protected double NUFAR_totalExposedAreaFactor;
 
         private bool massScaleReady;
+        public double FinalLiftSlope { get; private set; }
+
+        public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
+        {
+            if (massScaleReady)
+                return desiredMass - baseMass;
+            return 0;
+        }
+
+        public ModifierChangeWhen GetModuleMassChangeWhen()
+        {
+            return ModifierChangeWhen.FIXED;
+        }
+
+        public void OnRescale(ScalingFactor factor)
+        {
+            b_2_actual = factor.absolute.linear * b_2;
+            MAC_actual = factor.absolute.linear * MAC;
+            if (part.Modules.Contains("TweakScale"))
+            {
+                PartModule m = part.Modules["TweakScale"];
+                float massScale = (float)m.Fields.GetValue("MassScale");
+                baseMass = part.partInfo.partPrefab.mass + part.partInfo.partPrefab.mass * (massScale - 1);
+                FARLogger.Info("TweakScale massScale for FAR usage: " + massScale);
+            }
+
+            massScaleReady = false;
+
+            StartInitialization();
+        }
 
         public void NUFAR_ClearExposedAreaFactor()
         {
@@ -185,13 +212,10 @@ namespace ferram4
 
         public void NUFAR_CalculateExposedAreaFactor()
         {
-            FARAeroPartModule a = part.Modules.GetModule<FARAeroPartModule>();
+            var a = part.Modules.GetModule<FARAeroPartModule>();
 
             NUFAR_areaExposedFactor = Math.Min(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
             NUFAR_totalExposedAreaFactor = Math.Max(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
-
-            //FARLogger.Info("kN " + a.ProjectedAreas.kN + " kP " + a.ProjectedAreas.kP + " area " + S);
-
         }
 
         public void NUFAR_SetExposedAreaFactor()
@@ -205,13 +229,16 @@ namespace ferram4
             {
                 if (p == null)
                     continue;
-                FARWingAerodynamicModel model = this is FARControllableSurface ? p.Modules.GetModule<FARControllableSurface>() : p.Modules.GetModule<FARWingAerodynamicModel>();
+                FARWingAerodynamicModel model = this is FARControllableSurface
+                                                    ? p.Modules.GetModule<FARControllableSurface>()
+                                                    : p.Modules.GetModule<FARWingAerodynamicModel>();
 
                 ++counterpartsCount;
-                sum             += model.NUFAR_areaExposedFactor;
+                sum += model.NUFAR_areaExposedFactor;
                 totalExposedSum += model.NUFAR_totalExposedAreaFactor;
             }
-            double tmp = 1 / (counterpartsCount);
+
+            double tmp = 1 / counterpartsCount;
             sum *= tmp;
             totalExposedSum *= tmp;
 
@@ -222,20 +249,19 @@ namespace ferram4
             {
                 if (p == null)
                     continue;
-                FARWingAerodynamicModel model = this is FARControllableSurface ? p.Modules.GetModule<FARControllableSurface>() : p.Modules.GetModule<FARWingAerodynamicModel>();
+                FARWingAerodynamicModel model = this is FARControllableSurface
+                                                    ? p.Modules.GetModule<FARControllableSurface>()
+                                                    : p.Modules.GetModule<FARWingAerodynamicModel>();
 
-                model.NUFAR_areaExposedFactor      = sum;
+                model.NUFAR_areaExposedFactor = sum;
                 model.NUFAR_totalExposedAreaFactor = totalExposedSum;
             }
-
         }
 
         public void NUFAR_UpdateShieldingStateFromAreaFactor()
         {
             isShielded = NUFAR_areaExposedFactor < 0.1 * S;
         }
-
-        #region GetFunctions
 
         public double GetStall()
         {
@@ -245,7 +271,6 @@ namespace ferram4
         // ReSharper disable once UnusedMember.Global
         public double GetCl()
         {
-
             double ClUpwards = 1;
             if (HighLogic.LoadedSceneIsFlight)
                 ClUpwards = Vector3.Dot(liftDirection, -vessel.vesselTransform.forward);
@@ -269,6 +294,7 @@ namespace ferram4
         {
             return effective_MAC;
         }
+
         public double Getb_2()
         {
             return effective_b_2;
@@ -293,10 +319,6 @@ namespace ferram4
         {
             return zeroLiftCdIncrement;
         }
-
-        #endregion
-
-        #region Editor Functions
 
         public Vector3d ComputeForceEditor(Vector3d velocityVector, double M, double density)
         {
@@ -324,7 +346,12 @@ namespace ferram4
             stall = 0;
         }
 
-        public override Vector3d PrecomputeCenterOfLift(Vector3d velocity, double MachNumber, double density, FARCenterQuery center)
+        public override Vector3d PrecomputeCenterOfLift(
+            Vector3d velocity,
+            double MachNumber,
+            double density,
+            FARCenterQuery center
+        )
         {
             try
             {
@@ -335,13 +362,13 @@ namespace ferram4
 
                 return force;
             }
-            catch       //FIX ME!!!
-            {           //Yell at KSP devs so that I don't have to engage in bad code practice
-                //FARLogger.Info("The expected exception from the symmetry counterpart part transform internals was caught and suppressed");
+            catch
+            {
+                //FIX ME!!!
+                //Yell at KSP devs so that I don't have to engage in bad code practice
                 return Vector3.zero;
             }
         }
-
 
 
         public void EditorClClear(bool reset_stall)
@@ -350,24 +377,20 @@ namespace ferram4
             Cd = 0;
             if (reset_stall)
                 stall = 0;
-            //            LastAoA = AoA;
-            //            LastAoADot = AoADot;
-            //downWash = 0;
         }
-
-        #endregion
-
-        #region Wing Centroid and Aerodynamic Center
 
         private void PrecomputeCentroid()
         {
             Vector3d WC = rootMidChordOffsetFromOrig;
             if (nonSideAttach <= 0)
-            {
-                WC += -b_2_actual / 3 * (1 + TaperRatio * 2) / (1 + TaperRatio) * (Vector3d.right * srfAttachNegative + Vector3d.up * Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
-            }
+                WC += -b_2_actual /
+                      3 *
+                      (1 + TaperRatio * 2) /
+                      (1 + TaperRatio) *
+                      (Vector3d.right * srfAttachNegative +
+                       Vector3d.up * Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
             else
-                WC += (-MAC_actual * 0.7) * Vector3d.up;
+                WC += -MAC_actual * 0.7 * Vector3d.up;
 
             localWingCentroid = WC;
         }
@@ -385,11 +408,17 @@ namespace ferram4
                 double tmp = Math.Cos(AoA);
                 tmp *= tmp;
                 if (MachNumber < 0.85)
+                {
                     AC_offset = effective_MAC * 0.25 * ParallelInPlane;
+                }
                 else if (MachNumber > 1.4)
+                {
                     AC_offset = effective_MAC * 0.10 * ParallelInPlane;
+                }
                 else if (MachNumber >= 1)
+                {
                     AC_offset = effective_MAC * (-0.375 * MachNumber + 0.625) * ParallelInPlane;
+                }
                 //This is for the transonic instability, which is lessened for highly swept wings
                 else
                 {
@@ -401,17 +430,12 @@ namespace ferram4
                 }
 
                 AC_offset *= tmp;
-
             }
 
             WC += AC_offset;
 
-            return WC;      //WC updated to AC
+            return WC; //WC updated to AC
         }
-
-        #endregion
-
-        #region Initialization
 
         public override void Initialization()
         {
@@ -421,16 +445,17 @@ namespace ferram4
                 b_2_actual = b_2;
                 MAC_actual = MAC;
             }
-            if(baseMass <= 0)
-                baseMass = part.partInfo.partPrefab.mass;       //part.prefabMass is apparently not set until the end of part.Start(), which runs after Start() for PartModules
+
+            if (baseMass <= 0)
+                //part.prefabMass is apparently not set until the end of part.Start(), which runs after Start() for PartModules
+                baseMass = part.partInfo.partPrefab.mass;
 
             StartInitialization();
-            if(HighLogic.LoadedSceneIsEditor)
+            if (HighLogic.LoadedSceneIsEditor)
             {
                 part.OnEditorAttach += OnWingAttach;
                 part.OnEditorDetach += OnWingDetach;
             }
-
 
 
             OnVesselPartsChange += UpdateThisWingInteractions;
@@ -443,28 +468,6 @@ namespace ferram4
 
             if (aeroModule == null)
                 FARLogger.Error("Could not find FARAeroPartModule on same part as FARWingAerodynamicModel!");
-
-            // TODO 1.2: verify if these are renamed or really gone
-            //if (part is ControlSurface)
-            //{
-            //    ControlSurface w = part as ControlSurface;
-            //    w.deflectionLiftCoeff = 0;
-            //    w.dragCoeff = 0;
-            //    w.ctrlSurfaceArea = 0;
-            //    w.ctrlSurfaceRange = 0;
-            //    w.angularDrag = 0;
-            //    w.maximum_drag = 0;
-            //    w.minimum_drag = 0;
-            //}
-            //if (part is Winglet)
-            //{
-            //    Winglet w = part as Winglet;
-            //    w.deflectionLiftCoeff = 0;
-            //    w.dragCoeff = 0;
-            //    w.angularDrag = 0;
-            //    w.maximum_drag = 0;
-            //    w.minimum_drag = 0;
-            //}
 
             OnWingAttach();
             massScaleReady = true;
@@ -483,56 +486,58 @@ namespace ferram4
 
             MidChordSweepSideways = (1 - TaperRatio) / (1 + TaperRatio);
 
-            MidChordSweepSideways = (Math.PI * 0.5 - Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) + MidChordSweepSideways * 4 / transformed_AR)) * MidChordSweepSideways * 0.5;
+            MidChordSweepSideways =
+                (Math.PI * 0.5 -
+                 Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) + MidChordSweepSideways * 4 / transformed_AR)
+                ) *
+                MidChordSweepSideways *
+                0.5;
 
             double sweepHalfChord = MidChordSweep * FARMathUtil.deg2rad;
 
-            sweepPerpLocal = Vector3d.up * Math.Cos(sweepHalfChord) + Vector3d.right * Math.Sin(sweepHalfChord) * srfAttachNegative; //Vector perpendicular to midChord line
-            sweepPerp2Local = Vector3d.up * Math.Sin(MidChordSweepSideways) - Vector3d.right * Math.Cos(MidChordSweepSideways) * srfAttachNegative; //Vector perpendicular to midChord line2
+            //Vector perpendicular to midChord line
+            sweepPerpLocal = Vector3d.up * Math.Cos(sweepHalfChord) +
+                             Vector3d.right * Math.Sin(sweepHalfChord) * srfAttachNegative;
+            //Vector perpendicular to midChord line2
+            sweepPerp2Local = Vector3d.up * Math.Sin(MidChordSweepSideways) -
+                              Vector3d.right * Math.Cos(MidChordSweepSideways) * srfAttachNegative;
 
             PrecomputeCentroid();
 
-            if (FARDebugValues.allowStructuralFailures)
-            {
-                foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
-                    if (temp.name == "wingStress")
-                    {
-                        FARPartStressTemplate template = temp;
+            if (!FARDebugValues.allowStructuralFailures)
+                return;
+            foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
+                if (temp.name == "wingStress")
+                {
+                    FARPartStressTemplate template = temp;
 
-                        YmaxForce = template.YmaxStress;    //in MPa
-                        YmaxForce *= S;
+                    YmaxForce = template.YmaxStress; //in MPa
+                    YmaxForce *= S;
 
-                        XZmaxForce = template.XZmaxStress;
-                        XZmaxForce *= S;
-                        break;
-                    }
-                double maxForceMult = Math.Pow(massMultiplier, FARAeroUtil.massStressPower);
-                YmaxForce *= maxForceMult;
-                XZmaxForce *= maxForceMult;
-            }
+                    XZmaxForce = template.XZmaxStress;
+                    XZmaxForce *= S;
+                    break;
+                }
+
+            double maxForceMult = Math.Pow(massMultiplier, FARAeroUtil.massStressPower);
+            YmaxForce *= maxForceMult;
+            XZmaxForce *= maxForceMult;
         }
 
         public void EditorUpdateWingInteractions()
         {
-
-            //HashSet<FARWingAerodynamicModel> wingsHandled = wingInteraction.UpdateNearbyWingInteractions();     //first update the old nearby wings
             UpdateThisWingInteractions();
-            //wingInteraction.UpdateNearbyWingInteractions(wingsHandled);     //then update the new nearby wings, not doing the ones already handled
         }
 
         public void UpdateThisWingInteractions()
         {
-            if(VesselPartList == null)
+            if (VesselPartList == null)
                 VesselPartList = GetShipPartList();
             if (wingInteraction == null)
                 wingInteraction = new FARWingInteraction(this, part, rootMidChordOffsetFromOrig, srfAttachNegative);
 
             wingInteraction.UpdateWingInteraction(VesselPartList, nonSideAttach == 1);
         }
-
-        #endregion
-
-        #region Physics Frame
 
         public virtual void FixedUpdate()
         {
@@ -546,20 +551,20 @@ namespace ferram4
                 if (!rb || !partVessel || partVessel.packed)
                     return;
 
-                //bool set_vel = false;
-
                 // Check that rb is not destroyed, but vessel is just not null
                 if (partVessel.atmDensity > 0)
                 {
                     CurWingCentroid = WingCentroid();
 
-                    Vector3d velocity = rb.GetPointVelocity(CurWingCentroid) + Krakensbane.GetFrameVelocity()
-                        - FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
+                    Vector3d velocity = rb.GetPointVelocity(CurWingCentroid) +
+                                        Krakensbane.GetFrameVelocity() -
+                                        FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
 
                     double v_scalar = velocity.magnitude;
 
                     if (partVessel.mainBody.ocean)
-                        rho = (partVessel.mainBody.oceanDensity * 1000 * part.submergedPortion + part.atmDensity * (1 - part.submergedPortion));
+                        rho = partVessel.mainBody.oceanDensity * 1000 * part.submergedPortion +
+                              part.atmDensity * (1 - part.submergedPortion);
                     else
                         rho = part.atmDensity;
 
@@ -572,7 +577,7 @@ namespace ferram4
 
                         worldSpaceForce = force;
 
-                        if(part.submergedPortion > 0)
+                        if (part.submergedPortion > 0)
                         {
                             Vector3 velNorm = velocity / v_scalar;
                             Vector3 worldSpaceDragForce = Vector3.Dot(velNorm, force) * velNorm;
@@ -584,7 +589,7 @@ namespace ferram4
                                 float waterFraction = (float)(part.submergedDynamicPressurekPa * part.submergedPortion);
                                 waterFraction /= (float)rho;
 
-                                waterDragForce = worldSpaceDragForce * waterFraction;        //calculate areaDrag vector
+                                waterDragForce = worldSpaceDragForce * waterFraction; //calculate areaDrag vector
                                 waterLiftForce = worldSpaceLiftForce * waterFraction;
 
                                 worldSpaceDragForce -= waterDragForce;
@@ -600,15 +605,15 @@ namespace ferram4
 
                                 worldSpaceDragForce = worldSpaceLiftForce = Vector3.zero;
                             }
-                            aeroModule.hackWaterDragVal += Math.Abs(waterDragForce.magnitude / (rb.mass * rb.velocity.magnitude)) * 5;  //extra water drag factor for wings
-                            //rb.drag += waterDragForce.magnitude / (rb.mass * rb.velocity.magnitude);
 
+                            //extra water drag factor for wings
+                            aeroModule.hackWaterDragVal +=
+                                Math.Abs(waterDragForce.magnitude / (rb.mass * rb.velocity.magnitude)) * 5;
 
                             waterLiftForce *= (float)PhysicsGlobals.BuoyancyWaterLiftScalarEnd;
                             if (part.partBuoyancy.splashedCounter < PhysicsGlobals.BuoyancyWaterDragTimer)
-                            {
-                                waterLiftForce *= (float)(part.partBuoyancy.splashedCounter / PhysicsGlobals.BuoyancyWaterDragTimer);
-                            }
+                                waterLiftForce *=
+                                    (float)(part.partBuoyancy.splashedCounter / PhysicsGlobals.BuoyancyWaterDragTimer);
 
                             double waterLiftScalar;
                             //reduce lift drastically when wing is in water
@@ -646,19 +651,23 @@ namespace ferram4
                         double forwardScaledForceMag = Vector3d.Dot(scaledForce, forward);
                         Vector3d forwardScaledForce = forwardScaledForceMag * (Vector3d)forward;
 
-                        if (Math.Abs(forwardScaledForceMag) > YmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000) || (scaledForce - forwardScaledForce).magnitude > XZmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000))
+                        if (Math.Abs(forwardScaledForceMag) >
+                            YmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000) ||
+                            (scaledForce - forwardScaledForce).magnitude >
+                            XZmaxForce * failureForceScaling * (1 + part.submergedPortion * 1000))
                             if (part.parent && !partVessel.packed)
                             {
                                 partVessel.SendMessage("AerodynamicFailureStatus");
-                                string msg = String.Format(Localizer.Format("FARFlightLogAeroFailure"),
-                                                           KSPUtil.PrintTimeStamp(FlightLogger.met), part.partInfo.title);
+                                string msg = string.Format(Localizer.Format("FARFlightLogAeroFailure"),
+                                                           KSPUtil.PrintTimeStamp(FlightLogger.met),
+                                                           part.partInfo.title);
                                 FlightLogger.eventLog.Add(msg);
                                 part.decouple(25);
                                 if (FARDebugValues.aeroFailureExplosions)
                                     FXMonger.Explode(part, AerodynamicCenter, 1);
                             }
+
                         part.AddForceAtPosition(force, AerodynamicCenter);
-                        //rb.AddForceAtPosition(force, AerodynamicCenter);            //and apply force
                     }
                     else
                     {
@@ -671,19 +680,18 @@ namespace ferram4
                     stall = 0;
                     wingInteraction.ResetWingInteractions();
                 }
-
             }
             else
             {
                 if (isShielded)
-                {
                     Cl = Cd = Cm = stall = 0;
-                }
                 if (!(liftArrow is null))
                 {
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
+
+                // ReSharper disable once InvertIf
                 if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
@@ -693,36 +701,53 @@ namespace ferram4
         }
 
         //This version also updates the wing centroid
-        public Vector3d CalculateForces(Vector3d velocity, double MachNumber, double AoA, double density, bool updateAeroArrows = true)
+        public Vector3d CalculateForces(
+            Vector3d velocity,
+            double MachNumber,
+            double AoA,
+            double density,
+            bool updateAeroArrows = true
+        )
         {
             CurWingCentroid = WingCentroid();
 
             return DoCalculateForces(velocity, MachNumber, AoA, density, 1, updateAeroArrows);
         }
 
-        public Vector3d CalculateForces(Vector3d velocity, double MachNumber, double AoA, double density, double failureForceScaling, bool updateAeroArrows = true)
+        public Vector3d CalculateForces(
+            Vector3d velocity,
+            double MachNumber,
+            double AoA,
+            double density,
+            double failureForceScaling,
+            bool updateAeroArrows = true
+        )
         {
             CurWingCentroid = WingCentroid();
 
             return DoCalculateForces(velocity, MachNumber, AoA, density, failureForceScaling, updateAeroArrows);
         }
 
-        private Vector3d DoCalculateForces(Vector3d velocity, double MachNumber, double AoA, double density, double failureForceScaling, bool updateAeroArrows = true)
+        private Vector3d DoCalculateForces(
+            Vector3d velocity,
+            double MachNumber,
+            double AoA,
+            double density,
+            double failureForceScaling,
+            bool updateAeroArrows = true
+        )
         {
-            //This calculates the angle of attack, adjusting the part's orientation for any deflection
-            //CalculateAoA();
-
             double v_scalar = velocity.magnitude;
-            //if (v_scalar <= 0.1)
-            //    return Vector3d.zero;
 
             Vector3 forward = part_transform.forward;
             Vector3d velocity_normalized = velocity / v_scalar;
 
-            double q = density * v_scalar * v_scalar * 0.0005;   //dynamic pressure, q
+            double q = density * v_scalar * v_scalar * 0.0005; //dynamic pressure, q
 
-            ParallelInPlane = Vector3d.Exclude(forward, velocity).normalized;  //Projection of velocity vector onto the plane of the wing
-            perp = Vector3d.Cross(forward, ParallelInPlane).normalized;       //This just gives the vector to cross with the velocity vector
+            //Projection of velocity vector onto the plane of the wing
+            ParallelInPlane = Vector3d.Exclude(forward, velocity).normalized;
+            //This just gives the vector to cross with the velocity vector
+            perp = Vector3d.Cross(forward, ParallelInPlane).normalized;
             liftDirection = Vector3d.Cross(perp, velocity).normalized;
 
             ParallelInPlaneLocal = part_transform.InverseTransformDirection(ParallelInPlane);
@@ -732,10 +757,17 @@ namespace ferram4
 
             //Throw AoA into lifting line theory and adjust for part exposure and compressibility effects
 
-            double skinFrictionDrag = HighLogic.LoadedSceneIsFlight ? FARAeroUtil.SkinFrictionDrag(density, effective_MAC, v_scalar, MachNumber, vessel.externalTemperature, vessel.mainBody.atmosphereAdiabaticIndex) : 0.005;
+            double skinFrictionDrag = HighLogic.LoadedSceneIsFlight
+                                          ? FARAeroUtil.SkinFrictionDrag(density,
+                                                                         effective_MAC,
+                                                                         v_scalar,
+                                                                         MachNumber,
+                                                                         vessel.externalTemperature,
+                                                                         vessel.mainBody.atmosphereAdiabaticIndex)
+                                          : 0.005;
 
 
-            skinFrictionDrag *= 1.1;    //account for thickness
+            skinFrictionDrag *= 1.1; //account for thickness
 
             CalculateCoefficients(MachNumber, AoA, skinFrictionDrag);
 
@@ -744,40 +776,63 @@ namespace ferram4
             Vector3d L, D;
             if (failureForceScaling >= 1 && part.submergedPortion > 0)
             {
-                L = liftDirection * (Cl * S) * q * (part.submergedPortion * part.submergedLiftScalar + 1 - part.submergedPortion);    //lift; submergedDynPreskPa handles lift
-                D = -velocity_normalized * (Cd * S) * q * (part.submergedPortion * part.submergedDragScalar + 1 - part.submergedPortion);                         //drag is parallel to velocity vector
+                //lift; submergedDynPreskPa handles lift
+                L = liftDirection *
+                    (Cl * S) *
+                    q *
+                    (part.submergedPortion * part.submergedLiftScalar + 1 - part.submergedPortion);
+                //drag is parallel to velocity vector
+                D = -velocity_normalized *
+                    (Cd * S) *
+                    q *
+                    (part.submergedPortion * part.submergedDragScalar + 1 - part.submergedPortion);
             }
             else
             {
-                L = liftDirection * (Cl * S) * q;    //lift; submergedDynPreskPa handles lift
-                D = -velocity_normalized * (Cd * S) * q;                         //drag is parallel to velocity vector
+                //lift; submergedDynPreskPa handles lift
+                L = liftDirection * (Cl * S) * q;
+                //drag is parallel to velocity vector
+                D = -velocity_normalized * (Cd * S) * q;
             }
 
-            if(updateAeroArrows)
+            if (updateAeroArrows)
                 UpdateAeroDisplay(L, D);
 
-            Vector3d force = (L + D);
-            if (double.IsNaN(force.sqrMagnitude) || double.IsNaN(AerodynamicCenter.sqrMagnitude))// || float.IsNaN(moment.magnitude))
+            Vector3d force = L + D;
+            if (double.IsNaN(force.sqrMagnitude) || double.IsNaN(AerodynamicCenter.sqrMagnitude))
             {
-                FARLogger.Warning("Error: Aerodynamic force = " + force.magnitude + " AC Loc = " + AerodynamicCenter.magnitude + " AoA = " + AoA + "\n\rMAC = " + effective_MAC + " B_2 = " + effective_b_2 + " sweepAngle = " + cosSweepAngle + "\n\rMidChordSweep = " + MidChordSweep + " MidChordSweepSideways = " + MidChordSweepSideways + "\n\r at " + part.name);
+                FARLogger.Warning("Error: Aerodynamic force = " +
+                                  force.magnitude +
+                                  " AC Loc = " +
+                                  AerodynamicCenter.magnitude +
+                                  " AoA = " +
+                                  AoA +
+                                  "\n\rMAC = " +
+                                  effective_MAC +
+                                  " B_2 = " +
+                                  effective_b_2 +
+                                  " sweepAngle = " +
+                                  cosSweepAngle +
+                                  "\n\rMidChordSweep = " +
+                                  MidChordSweep +
+                                  " MidChordSweepSideways = " +
+                                  MidChordSweepSideways +
+                                  "\n\r at " +
+                                  part.name);
                 force = AerodynamicCenter = Vector3d.zero;
             }
 
-            double numericalControlFactor = (part.rb.mass * v_scalar * 0.67) / (force.magnitude * TimeWarp.fixedDeltaTime);
+            double numericalControlFactor =
+                part.rb.mass * v_scalar * 0.67 / (force.magnitude * TimeWarp.fixedDeltaTime);
             force *= Math.Min(numericalControlFactor, 1);
 
 
             return force;
-
         }
-
-        #endregion
-
-        #region Wing Mass For Structure
 
         private void Update()
         {
-            if(updateMassNextFrame)
+            if (updateMassNextFrame)
             {
                 GetRefAreaChildren();
                 UpdateMassToAccountForArea();
@@ -793,7 +848,7 @@ namespace ferram4
         [KSPEvent]
         public void OnWingAttach()
         {
-            if(part.parent)
+            if (part.parent)
                 parentWing = part.parent.GetComponent<FARWingAerodynamicModel>();
 
             GetRefAreaChildren();
@@ -805,14 +860,14 @@ namespace ferram4
         {
             if (!(parentWing is null))
                 parentWing.updateMassNextFrame = true;
-
         }
 
         private void UpdateMassToAccountForArea()
         {
             float supportedArea = (float)(refAreaChildren + S);
             if (!(parentWing is null))
-                supportedArea *= 0.66666667f;   //if any supported area has been transferred to another part, we must remove it from here
+                //if any supported area has been transferred to another part, we must remove it from here
+                supportedArea *= 0.66666667f;
             curWingMass = supportedArea * (float)FARAeroUtil.massPerWingAreaSupported * massMultiplier;
 
             desiredMass = curWingMass * wingBaseMassMultiplier;
@@ -826,33 +881,19 @@ namespace ferram4
 
             foreach (Part p in part.children)
             {
-                FARWingAerodynamicModel childWing = p.GetComponent<FARWingAerodynamicModel>();
+                var childWing = p.GetComponent<FARWingAerodynamicModel>();
                 if (childWing is null)
                     continue;
 
-                refAreaChildren += (childWing.refAreaChildren + childWing.S) * 0.33333333333333333333; //Take 1/3 of the area of the child wings
+                //Take 1/3 of the area of the child wings
+                refAreaChildren += (childWing.refAreaChildren + childWing.S) * 0.33333333333333333333;
             }
 
-            if (!(parentWing is null))
-            {
-                parentWing.GetRefAreaChildren();
-                parentWing.UpdateMassToAccountForArea();
-            }
+            if (parentWing is null)
+                return;
+            parentWing.GetRefAreaChildren();
+            parentWing.UpdateMassToAccountForArea();
         }
-
-        public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
-        {
-            if (massScaleReady)
-                return desiredMass - baseMass;
-            return 0;
-        }
-
-        public ModifierChangeWhen GetModuleMassChangeWhen()
-        {
-            return ModifierChangeWhen.FIXED;
-        }
-
-        #endregion
 
         public virtual double CalculateAoA(Vector3d velocity)
         {
@@ -860,10 +901,13 @@ namespace ferram4
             return Math.Asin(PerpVelocity.Clamp(-1, 1));
         }
 
-        #region Interactive Effects
-
         //Calculates camber and flap effects due to wing interactions
-        private void CalculateWingCamberInteractions(double MachNumber, double AoA, out double ACshift, out double ACweight)
+        private void CalculateWingCamberInteractions(
+            double MachNumber,
+            double AoA,
+            out double ACshift,
+            out double ACweight
+        )
         {
             ACshift = 0;
             ACweight = 0;
@@ -873,7 +917,12 @@ namespace ferram4
 
             liftslope = rawLiftSlope;
             wingInteraction.UpdateOrientationForInteraction(ParallelInPlaneLocal);
-            wingInteraction.CalculateEffectsOfUpstreamWing(AoA, MachNumber, ParallelInPlaneLocal, ref ACweight, ref ACshift, ref ClIncrementFromRear);
+            wingInteraction.CalculateEffectsOfUpstreamWing(AoA,
+                                                           MachNumber,
+                                                           ParallelInPlaneLocal,
+                                                           ref ACweight,
+                                                           ref ACshift,
+                                                           ref ClIncrementFromRear);
             double effectiveUpstreamInfluence = wingInteraction.EffectiveUpstreamInfluence;
 
             if (effectiveUpstreamInfluence > 0)
@@ -881,10 +930,10 @@ namespace ferram4
                 effectiveUpstreamInfluence = wingInteraction.EffectiveUpstreamInfluence;
 
                 AoAmax = wingInteraction.EffectiveUpstreamAoAMax;
-                liftslope *= (1 - effectiveUpstreamInfluence);
+                liftslope *= 1 - effectiveUpstreamInfluence;
                 liftslope += wingInteraction.EffectiveUpstreamLiftSlope;
 
-                cosSweepAngle *= (1 - effectiveUpstreamInfluence);
+                cosSweepAngle *= 1 - effectiveUpstreamInfluence;
                 cosSweepAngle += wingInteraction.EffectiveUpstreamCosSweepAngle;
                 cosSweepAngle = cosSweepAngle.Clamp(0d, 1d);
             }
@@ -893,10 +942,9 @@ namespace ferram4
                 liftslope = rawLiftSlope;
                 AoAmax = 0;
             }
+
             AoAmax += rawAoAmax;
         }
-
-        #endregion
 
         //Calculates current stall fraction based on previous stall fraction and current data.
         private void DetermineStall(double AoA)
@@ -924,9 +972,6 @@ namespace ferram4
                 stall = lastStall;
             }
 
-            //if (HighLogic.LoadedSceneIsFlight)
-            //    stall = FARMathUtil.Clamp(stall, lastStall - 2 * TimeWarp.fixedDeltaTime, lastStall + 2 * TimeWarp.fixedDeltaTime);     //Limits stall to increasing at a rate of 2/s
-
             stall = stall.Clamp(0, 1);
             if (stall < 1e-5)
                 stall = 0;
@@ -934,14 +979,13 @@ namespace ferram4
 
 
         /// <summary>
-        /// This calculates the lift and drag coefficients
+        ///     This calculates the lift and drag coefficients
         /// </summary>
         private void CalculateCoefficients(double MachNumber, double AoA, double skinFrictionCoefficient)
         {
-
             minStall = 0;
 
-            rawLiftSlope = CalculateSubsonicLiftSlope(MachNumber);// / AoA;     //Prandtl lifting Line
+            rawLiftSlope = CalculateSubsonicLiftSlope(MachNumber); // / AoA;     //Prandtl lifting Line
 
 
             CalculateWingCamberInteractions(MachNumber, AoA, out double ACshift, out double ACweight);
@@ -951,24 +995,22 @@ namespace ferram4
             if (double.IsNaN(beta) || beta < 0.66332495807107996982298654733414)
                 beta = 0.66332495807107996982298654733414;
 
-            double TanSweep = Math.Sqrt((1 - cosSweepAngle * cosSweepAngle).Clamp(0, 1)) / cosSweepAngle;//Math.Tan(FARMathUtil.Clamp(Math.Acos(cosSweepAngle), 0, Math.PI * 0.5));
+            double TanSweep = Math.Sqrt((1 - cosSweepAngle * cosSweepAngle).Clamp(0, 1)) / cosSweepAngle;
             double beta_TanSweep = beta / TanSweep;
 
 
-            double Cd0 = CdCompressibilityZeroLiftIncrement(MachNumber, cosSweepAngle, TanSweep, beta_TanSweep, beta) + 2 * skinFrictionCoefficient;
+            double Cd0 = CdCompressibilityZeroLiftIncrement(MachNumber, cosSweepAngle, TanSweep, beta_TanSweep, beta) +
+                         2 * skinFrictionCoefficient;
             double CdMax = CdMaxFlatPlate(MachNumber, beta);
             e = FARAeroUtil.CalculateOswaldsEfficiencyNitaScholz(effective_AR, cosSweepAngle, Cd0, TaperRatio);
             piARe = effective_AR * e * Math.PI;
 
             double CosAoA = Math.Cos(AoA);
 
-            //FARLogger.Info("Part: " + part.partInfo.title + " Liftslope: " + liftslope);
-
             if (MachNumber <= 0.8)
             {
                 double Cn = liftslope;
-                finalLiftSlope = liftslope;
-                //Cl = Cn * Math.Sin(2 * AoA) * 0.5;
+                FinalLiftSlope = liftslope;
                 double sinAoA = Math.Sqrt((1 - CosAoA * CosAoA).Clamp(0, 1));
                 Cl = Cn * CosAoA * Math.Sign(AoA);
 
@@ -977,7 +1019,7 @@ namespace ferram4
 
                 if (Math.Abs(Cl) > Math.Abs(ACweight))
                     ACshift *= Math.Abs(ACweight / Cl).Clamp(0, 1);
-                Cd = (Cl * Cl / piARe);     //Drag due to 3D effects on wing and base constant
+                Cd = Cl * Cl / piARe; //Drag due to 3D effects on wing and base constant
                 Cd += Cd0;
             }
             /*
@@ -991,12 +1033,9 @@ namespace ferram4
                 double supersonicLENormalForceFactor = CalculateSupersonicLEFactor(beta, TanSweep, beta_TanSweep);
 
                 double normalForce = GetSupersonicPressureDifference(MachNumber, AoA);
-//                double SinAoA = Math.Sin(AoA);
-                //Cl = coefMult * (normalForce * CosAoA * Math.Sign(AoA) * sonicLEFactor - axialForce * SinAoA);
-                //Cd = coefMult * (Math.Abs(normalForce * SinAoA) * sonicLEFactor + axialForce * CosAoA);
-                finalLiftSlope = coefMult * normalForce * supersonicLENormalForceFactor;
+                FinalLiftSlope = coefMult * normalForce * supersonicLENormalForceFactor;
 
-                Cl = finalLiftSlope * CosAoA * Math.Sign(AoA);
+                Cl = FinalLiftSlope * CosAoA * Math.Sign(AoA);
                 Cd = beta * Cl * Cl / piARe;
 
                 Cd += Cd0;
@@ -1017,7 +1056,6 @@ namespace ferram4
                 supScale *= -4.6296296296296296296296296296296;
 
                 double Cn = liftslope;
-                //Cl = Cn * Math.Sin(2 * AoA) * 0.5;
                 double sinAoA = Math.Sqrt((1 - CosAoA * CosAoA).Clamp(0, 1));
                 Cl = Cn * CosAoA * sinAoA * Math.Sign(AoA);
 
@@ -1027,8 +1065,9 @@ namespace ferram4
                     if (Math.Abs(Cl) > Math.Abs(ACweight))
                         ACshift *= Math.Abs(ACweight / Cl).Clamp(0, 1);
                 }
-                finalLiftSlope = Cn * (1 - supScale);
-                Cl *= (1 - supScale);
+
+                FinalLiftSlope = Cn * (1 - supScale);
+                Cl *= 1 - supScale;
 
                 double M = MachNumber.Clamp(1.2, double.PositiveInfinity);
 
@@ -1036,11 +1075,10 @@ namespace ferram4
 
                 double supersonicLENormalForceFactor = CalculateSupersonicLEFactor(beta, TanSweep, beta_TanSweep);
 
-                //supScale = 1 - supScale; //Adjust for supersonic code
                 double normalForce = GetSupersonicPressureDifference(M, AoA);
 
                 double supersonicLiftSlope = coefMult * normalForce * supersonicLENormalForceFactor * supScale;
-                finalLiftSlope += supersonicLiftSlope;
+                FinalLiftSlope += supersonicLiftSlope;
 
 
                 Cl += CosAoA * Math.Sign(AoA) * supersonicLiftSlope;
@@ -1068,21 +1106,16 @@ namespace ferram4
 
             Cl -= Cl * stall * 0.769;
             Cd += Cd * stall * 3;
-            //double SinAoA = Math.Sqrt(FARMathUtil.Clamp(1 - CosAoA * CosAoA, 0, 1));
             Cd = Math.Max(Cd, CdMax * (1 - CosAoA * CosAoA));
 
-
-            AerodynamicCenter = AerodynamicCenter + ACShiftVec;
+            AerodynamicCenter += ACShiftVec;
 
             Cl *= wingInteraction.ClInterferenceFactor;
 
-            finalLiftSlope *= wingInteraction.ClInterferenceFactor;
+            FinalLiftSlope *= wingInteraction.ClInterferenceFactor;
 
             ClIncrementFromRear = 0;
         }
-
-
-        #region Supersonic Calculations
 
         //Calculates effect of the Mach cone being in front of, along, or behind the leading edge of the wing
         private double CalculateSupersonicLEFactor(double beta, double TanSweep, double beta_TanSweep)
@@ -1090,7 +1123,7 @@ namespace ferram4
             double SupersonicLEFactor;
             double ARTanSweep = effective_AR * TanSweep;
 
-            if (beta_TanSweep < 1)   //"subsonic" leading edge, scales with Tan Sweep
+            if (beta_TanSweep < 1) //"subsonic" leading edge, scales with Tan Sweep
             {
                 if (beta_TanSweep < 0.5)
                 {
@@ -1102,6 +1135,7 @@ namespace ferram4
                     SupersonicLEFactor = (1.57 - 0.28 * (beta_TanSweep - 0.5)) * effective_AR;
                     SupersonicLEFactor /= ARTanSweep + 0.5 - (beta_TanSweep - 0.5) * 0.25;
                 }
+
                 SupersonicLEFactor *= beta;
             }
             else //"supersonic" leading edge, scales with beta
@@ -1120,41 +1154,54 @@ namespace ferram4
 
         //This models the wing using a symmetric diamond airfoil
 
-        private double GetSupersonicPressureDifference(double M, double AoA)
+        private static double GetSupersonicPressureDifference(double M, double AoA)
         {
-            double maxSinBeta = FARAeroUtil.CalculateSinMaxShockAngle(M, FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex);//GetBetaMax(M) * FARMathUtil.deg2rad;
+            double maxSinBeta =
+                FARAeroUtil.CalculateSinMaxShockAngle(M, FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex);
             double minSinBeta = 1 / M;
 
-            double halfAngle = 0.05;            //In radians, Corresponds to ~2.8 degrees or approximately what you would get from a ~4.8% thick diamond airfoil
+            //In radians, Corresponds to ~2.8 degrees or approximately what you would get from a ~4.8% thick diamond airfoil
+            const double halfAngle = 0.05;
 
             double AbsAoA = Math.Abs(AoA);
 
-            double angle1 = halfAngle - AbsAoA;                  //Region 1 is the upper surface ahead of the max thickness
+            //Region 1 is the upper surface ahead of the max thickness
+            double angle1 = halfAngle - AbsAoA;
             double M1;
             //pressure ratio wrt to freestream pressure
-            double p1 = angle1 >= 0 ? ShockWaveCalculation(angle1, M, out M1, maxSinBeta, minSinBeta) : PMExpansionCalculation(Math.Abs(angle1), M, out M1);
+            double p1 = angle1 >= 0
+                            ? ShockWaveCalculation(angle1, M, out M1, maxSinBeta, minSinBeta)
+                            : PMExpansionCalculation(Math.Abs(angle1), M, out M1);
 
             //Region 2 is the upper surface behind the max thickness
             double p2 = PMExpansionCalculation(2 * halfAngle, M1) * p1;
 
-            double angle3 = halfAngle + AbsAoA;                  //Region 3 is the lower surface ahead of the max thickness
+            //Region 3 is the lower surface ahead of the max thickness
+            double angle3 = halfAngle + AbsAoA;
             //pressure ratio wrt to freestream pressure
             double p3 = ShockWaveCalculation(angle3, M, out double M3, maxSinBeta, minSinBeta);
 
             //Region 4 is the lower surface behind the max thickness
             double p4 = PMExpansionCalculation(2 * halfAngle, M3) * p3;
 
-            //FARLogger.Info("" + p1 + " " + p2 + " " + p3 + " " + p4);
-            double pRatio = ((p3 + p4) - (p1 + p2)) * 0.5;
+            double pRatio = (p3 + p4 - (p1 + p2)) * 0.5;
 
             return pRatio;
         }
 
         //Calculates pressure ratio of turning a supersonic flow through a particular angle using a shockwave
-        private double ShockWaveCalculation(double angle, double inM, out double outM, double maxSinBeta, double minSinBeta)
+        private static double ShockWaveCalculation(
+            double angle,
+            double inM,
+            out double outM,
+            double maxSinBeta,
+            double minSinBeta
+        )
         {
-            //float sinBeta = (maxBeta - minBeta) * angle / maxTheta + minBeta;
-            double sinBeta = FARAeroUtil.CalculateSinWeakObliqueShockAngle(inM, FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex, angle);
+            double sinBeta =
+                FARAeroUtil.CalculateSinWeakObliqueShockAngle(inM,
+                                                              FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex,
+                                                              angle);
             if (double.IsNaN(sinBeta))
                 sinBeta = maxSinBeta;
 
@@ -1175,59 +1222,55 @@ namespace ferram4
         }
 
         //Calculates pressure ratio due to turning a supersonic flow through a Prandtl-Meyer Expansion
-        private double PMExpansionCalculation(double angle, double inM, out double outM)
+        private static double PMExpansionCalculation(double angle, double inM, out double outM)
         {
             inM = inM.Clamp(1, double.PositiveInfinity);
             double nu1 = FARAeroUtil.PrandtlMeyerMach.Evaluate((float)inM);
             double theta = angle * FARMathUtil.rad2deg;
             double nu2 = nu1 + theta;
             if (nu2 >= FARAeroUtil.maxPrandtlMeyerTurnAngle)
-            {
-                //minStall += (nu2 - FARAeroUtil.maxPrandtlMeyerTurnAngle) * 0.066666667f;
-                //minStall = Mathf.Clamp01(minStall);
                 nu2 = FARAeroUtil.maxPrandtlMeyerTurnAngle;
-            }
             outM = FARAeroUtil.PrandtlMeyerAngle.Evaluate((float)nu2);
 
             return FARAeroUtil.StagnationPressureCalc(inM) / FARAeroUtil.StagnationPressureCalc(outM);
         }
 
         //Calculates pressure ratio due to turning a supersonic flow through a Prandtl-Meyer Expansion
-        private double PMExpansionCalculation(double angle, double inM)
+        private static double PMExpansionCalculation(double angle, double inM)
         {
             inM = inM.Clamp(1, double.PositiveInfinity);
             double nu1 = FARAeroUtil.PrandtlMeyerMach.Evaluate((float)inM);
             double theta = angle * FARMathUtil.rad2deg;
             double nu2 = nu1 + theta;
             if (nu2 >= FARAeroUtil.maxPrandtlMeyerTurnAngle)
-            {
-                //minStall += (nu2 - FARAeroUtil.maxPrandtlMeyerTurnAngle) * 0.066666667f;
-                //minStall = Mathf.Clamp01(minStall);
                 nu2 = FARAeroUtil.maxPrandtlMeyerTurnAngle;
-            }
             float outM = FARAeroUtil.PrandtlMeyerAngle.Evaluate((float)nu2);
 
             return FARAeroUtil.StagnationPressureCalc(inM) / FARAeroUtil.StagnationPressureCalc(outM);
         }
-
-        #endregion
 
         //Short calculation for peak AoA for stalling
         protected double CalculateAoAmax(double MachNumber)
         {
             double StallAngle;
             if (MachNumber < 0.8)
+            {
                 StallAngle = criticalCl / liftslope;
+            }
             else if (MachNumber > 1.4)
-                StallAngle = 1.0471975511965977461542144610932;     //60 degrees in radians
+            {
+                StallAngle = 1.0471975511965977461542144610932; //60 degrees in radians
+            }
             else
             {
                 double tmp = criticalCl / liftslope;
-                StallAngle = (MachNumber - 0.8) * (1.0471975511965977461542144610932 - tmp) * 1.6666666666666666666666666666667 + tmp;
+                StallAngle = (MachNumber - 0.8) *
+                             (1.0471975511965977461542144610932 - tmp) *
+                             1.6666666666666666666666666666667 +
+                             tmp;
             }
 
             return StallAngle;
-
         }
 
         //Calculates subsonic liftslope
@@ -1239,30 +1282,25 @@ namespace ferram4
             //Based on perpendicular vector find which line is the right one
             double sweepHalfChord = Math.Abs(CosPartAngle) > Math.Abs(tmp) ? CosPartAngle : tmp;
 
-            //if (sweepHalfChord > Math.PI * 0.5)
-            //    sweepHalfChord -= Math.PI;
-
             CosPartAngle = ParallelInPlaneLocal.y.Clamp(-1, 1);
 
             CosPartAngle *= CosPartAngle;
-            double SinPartAngle2 = (1d - CosPartAngle).Clamp(0, 1);               //Get the squared values for the angles
+            //Get the squared values for the angles
+            double SinPartAngle2 = (1d - CosPartAngle).Clamp(0, 1);
 
             effective_b_2 = Math.Max(b_2_actual * CosPartAngle, MAC_actual * SinPartAngle2);
             effective_MAC = MAC_actual * CosPartAngle + b_2_actual * SinPartAngle2;
             transformed_AR = effective_b_2 / effective_MAC;
 
-            sweepHalfChord = Math.Sqrt(Math.Max(1 - sweepHalfChord * sweepHalfChord, 0)) / sweepHalfChord;  //convert to tangent
+            //convert to tangent
+            sweepHalfChord = Math.Sqrt(Math.Max(1 - sweepHalfChord * sweepHalfChord, 0)) / sweepHalfChord;
 
             SetSweepAngle(sweepHalfChord);
 
             effective_AR = transformed_AR * wingInteraction.ARFactor;
 
-            effective_AR = effective_AR.Clamp(0.25, 30d);   //Even this range of effective ARs is large, but it keeps the Oswald's Efficiency numbers in check
-
-            /*if (MachNumber < 1)
-                tmp = Mathf.Clamp(MachNumber, 0, 0.9f);
-            else
-                tmp = 1 / Mathf.Clamp(MachNumber, 1.09f, Mathf.Infinity);*/
+            //Even this range of effective ARs is large, but it keeps the Oswald's Efficiency numbers in check
+            effective_AR = effective_AR.Clamp(0.25, 30d);
 
             if (MachNumber < 0.9)
                 tmp = 1d - MachNumber * MachNumber;
@@ -1286,8 +1324,6 @@ namespace ferram4
         //Transforms cos sweep of the midchord to cosine(sweep of the leading edge)
         private void SetSweepAngle(double tanSweepHalfChord)
         {
-            //cosSweepAngle = cosSweepHalfChord;
-            //cosSweepAngle = Math.Tan(cosSweepAngle);
             double tmp = (1d - TaperRatio) / (1d + TaperRatio);
             tmp *= 2d / transformed_AR;
             tanSweepHalfChord += tmp;
@@ -1297,31 +1333,32 @@ namespace ferram4
         }
 
 
-        #region Compressibility
-
         /// <summary>
-        /// Calculates Cd at 90 degrees AoA so that the numbers are done correctly
+        ///     Calculates Cd at 90 degrees AoA so that the numbers are done correctly
         /// </summary>
-        private double CdMaxFlatPlate(double M, double beta)
+        private static double CdMaxFlatPlate(double M, double beta)
         {
             if (M < 0.5)
                 return 2;
             if (M > 1.2)
                 return 0.4 / (beta * beta) + 1.75;
-            if(M < 1)
-            {
-                double result = M - 0.5;
-                result *= result;
-                return result * 2 + 2;
-            }
-            return 3.39 - 0.609091 * M;
-
+            if (M >= 1)
+                return 3.39 - 0.609091 * M;
+            double result = M - 0.5;
+            result *= result;
+            return result * 2 + 2;
         }
 
         /// <summary>
-        /// This modifies the Cd to account for compressibility effects due to increasing Mach number
+        ///     This modifies the Cd to account for compressibility effects due to increasing Mach number
         /// </summary>
-        private double CdCompressibilityZeroLiftIncrement(double M, double SweepAngle, double TanSweep, double beta_TanSweep, double beta)
+        private double CdCompressibilityZeroLiftIncrement(
+            double M,
+            double SweepAngle,
+            double TanSweep,
+            double beta_TanSweep,
+            double beta
+        )
         {
             double thisInteractionFactor = 1;
             if (wingInteraction.HasWingsUpstream)
@@ -1332,24 +1369,22 @@ namespace ferram4
                     return zeroLiftCdIncrement;
                 }
 
-                thisInteractionFactor = (1 - wingInteraction.EffectiveUpstreamInfluence);
+                thisInteractionFactor = 1 - wingInteraction.EffectiveUpstreamInfluence;
             }
 
             //Based on the method of DATCOM Section 4.1.5.1-C
-            if(M > 1.4)
+            if (M > 1.4)
             {
                 //Subsonic leading edge
-                if(beta_TanSweep < 1)
-                {                           //This constant is due to airfoil shape and thickness
+                if (beta_TanSweep < 1)
+                    //This constant is due to airfoil shape and thickness
                     zeroLiftCdIncrement = 0.009216 / TanSweep;
-                }
                 //Supersonic leading edge
                 else
-                {
                     zeroLiftCdIncrement = 0.009216 / beta;
-                }
                 zeroLiftCdIncrement *= thisInteractionFactor;
-                zeroLiftCdIncrement += wingInteraction.EffectiveUpstreamCd0 * wingInteraction.EffectiveUpstreamInfluence;
+                zeroLiftCdIncrement +=
+                    wingInteraction.EffectiveUpstreamCd0 * wingInteraction.EffectiveUpstreamInfluence;
                 return zeroLiftCdIncrement;
             }
 
@@ -1357,9 +1392,9 @@ namespace ferram4
             //Based on the method of DATCOM Section 4.1.5.1-B
             double tmp = 1 / Math.Sqrt(SweepAngle);
 
-            double dd_MachNumber = 0.8 * tmp;               //Find Drag Divergence Mach Number
+            double dd_MachNumber = 0.8 * tmp; //Find Drag Divergence Mach Number
 
-            if (M < dd_MachNumber)      //If below this number,
+            if (M < dd_MachNumber) //If below this number,
             {
                 zeroLiftCdIncrement = 0;
                 return 0;
@@ -1396,7 +1431,8 @@ namespace ferram4
             if (M < scalingMachNumber)
             {
                 zeroLiftCdIncrement *= thisInteractionFactor;
-                zeroLiftCdIncrement += wingInteraction.EffectiveUpstreamCd0 * wingInteraction.EffectiveUpstreamInfluence;
+                zeroLiftCdIncrement +=
+                    wingInteraction.EffectiveUpstreamCd0 * wingInteraction.EffectiveUpstreamInfluence;
                 return zeroLiftCdIncrement;
             }
 
@@ -1406,20 +1442,16 @@ namespace ferram4
 
             //Subsonic leading edge
             if (beta_TanSweep < 1)
-            {                           //This constant is due to airfoil shape and thickness
+                //This constant is due to airfoil shape and thickness
                 zeroLiftCdIncrement += 0.009216 / TanSweep * scale;
-            }
             //Supersonic leading edge
             else
-            {
                 zeroLiftCdIncrement += 0.009216 / beta * scale;
-            }
             zeroLiftCdIncrement *= thisInteractionFactor;
             zeroLiftCdIncrement += wingInteraction.EffectiveUpstreamCd0 * wingInteraction.EffectiveUpstreamInfluence;
 
             return zeroLiftCdIncrement;
         }
-        #endregion
 
         public override void OnLoad(ConfigNode node)
         {
@@ -1436,28 +1468,19 @@ namespace ferram4
                 double.TryParse(node.GetValue("MidChordSweep"), out MidChordSweep);
         }
 
-        public void OnRescale(ScalingFactor factor)
-        {
-            b_2_actual = factor.absolute.linear * b_2;
-            MAC_actual = factor.absolute.linear * MAC;
-            if(part.Modules.Contains("TweakScale"))
-            {
-                PartModule m = part.Modules["TweakScale"];
-                float massScale = (float)m.Fields.GetValue("MassScale");
-                baseMass = part.partInfo.partPrefab.mass + (part.partInfo.partPrefab.mass * (massScale - 1));
-                FARLogger.Info("TweakScale massScale for FAR usage: " + massScale);
-            }
-            massScaleReady = false;
-
-            StartInitialization();
-        }
-
         private void UpdateAeroDisplay(Vector3 lift, Vector3 drag)
         {
             if (PhysicsGlobals.AeroForceDisplay)
             {
                 if (liftArrow == null)
-                    liftArrow = ArrowPointer.Create(part_transform, localWingCentroid, lift, lift.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale, GUIColors.GetColor(0), true);
+                {
+                    liftArrow = ArrowPointer.Create(part_transform,
+                                                    localWingCentroid,
+                                                    lift,
+                                                    lift.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale,
+                                                    GUIColors.GetColor(0),
+                                                    true);
+                }
                 else
                 {
                     liftArrow.Direction = lift;
@@ -1465,7 +1488,14 @@ namespace ferram4
                 }
 
                 if (dragArrow == null)
-                    dragArrow = ArrowPointer.Create(part_transform, localWingCentroid, drag, drag.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale, GUIColors.GetColor(1), true);
+                {
+                    dragArrow = ArrowPointer.Create(part_transform,
+                                                    localWingCentroid,
+                                                    drag,
+                                                    drag.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale,
+                                                    GUIColors.GetColor(1),
+                                                    true);
+                }
                 else
                 {
                     dragArrow.Direction = drag;
@@ -1479,6 +1509,7 @@ namespace ferram4
                     Destroy(liftArrow);
                     liftArrow = null;
                 }
+
                 if (!(dragArrow is null))
                 {
                     Destroy(dragArrow);
@@ -1497,7 +1528,6 @@ namespace ferram4
 
                 dragForceWing = drag.magnitude;
                 liftForceWing = lift.magnitude;
-
             }
             else if (fieldsVisible)
             {
@@ -1505,7 +1535,6 @@ namespace ferram4
                 Fields["liftForceWing"].guiActive = false;
                 fieldsVisible = false;
             }
-
         }
 
         protected override void OnDestroy()
@@ -1517,17 +1546,19 @@ namespace ferram4
                 Destroy(liftArrow);
                 liftArrow = null;
             }
+
             if (dragArrow != null)
             {
                 Destroy(dragArrow);
                 dragArrow = null;
             }
+
+            // ReSharper disable once InvertIf
             if (wingInteraction != null)
             {
                 wingInteraction.Destroy();
                 wingInteraction = null;
             }
         }
-
     }
 }

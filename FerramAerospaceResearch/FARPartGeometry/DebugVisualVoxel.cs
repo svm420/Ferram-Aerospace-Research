@@ -49,12 +49,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
 {
     internal class DebugVisualVoxel
     {
-        public static float globalScale = 0.9f;
+        public const float globalScale = 0.9f;
         private float scale;
 
         public DebugVisualVoxel(Vector3 pos, double elementScale)
         {
-            Scale = (float) elementScale;
+            Scale = (float)elementScale;
             Position = pos;
         }
 
@@ -121,6 +121,5 @@ namespace FerramAerospaceResearch.FARPartGeometry
             triangles.Add(counter + 2);
             triangles.Add(counter + 3);
         }
-
     }
 }

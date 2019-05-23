@@ -50,8 +50,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
     {
         public readonly Vector3[] vertices;
         public readonly int[] triangles;
-        public Bounds bounds;
         public readonly bool isSkinned;
+        public Bounds bounds;
 
         public MeshData(Vector3[] vertices, int[] tris, Bounds bounds, bool isSkinned = false)
         {

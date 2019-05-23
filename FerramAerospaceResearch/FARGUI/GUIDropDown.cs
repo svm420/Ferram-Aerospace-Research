@@ -45,29 +45,23 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
+// ReSharper disable StaticMemberInGenericType
+
 namespace FerramAerospaceResearch.FARGUI
 {
     public class GUIDropDown<T>
     {
+        private static GUIStyle listStyle;
+        private static GUIStyle toggleBtnStyle;
+        private static GUIStyle dropdownItemStyle;
+
+        private static GUIStyle selectedItemStyle;
+        private readonly string[] stringOptions;
+        private readonly T[] typeOptions;
         private int selectedOption;
         private bool isActive;
         private bool toggleBtnState;
         private Vector2 scrollPos;
-
-        private readonly string[] stringOptions;
-        private readonly T[] typeOptions;
-
-        public T ActiveSelection
-        {
-            get { return typeOptions[selectedOption]; }
-        }
-
-        // ReSharper disable StaticMemberInGenericType
-        private static GUIStyle listStyle;
-        private static GUIStyle toggleBtnStyle;
-        private static GUIStyle dropdownItemStyle;
-        private static GUIStyle selectedItemStyle;
-        // ReSharper restore StaticMemberInGenericType
 
         public GUIDropDown(string[] stringOptions, T[] typeOptions, int defaultOption = 0)
         {
@@ -77,12 +71,20 @@ namespace FerramAerospaceResearch.FARGUI
             selectedOption = defaultOption;
         }
 
+        public T ActiveSelection
+        {
+            get { return typeOptions[selectedOption]; }
+        }
+
         public void GUIDropDownDisplay(params GUILayoutOption[] guiOptions)
         {
             InitStyles();
 
             FARGUIDropDownDisplay display = FARGUIDropDownDisplay.Instance;
-            toggleBtnState = GUILayout.Toggle(toggleBtnState, "▼ " + stringOptions[selectedOption] + " ▼", toggleBtnStyle, guiOptions);
+            toggleBtnState = GUILayout.Toggle(toggleBtnState,
+                                              "▼ " + stringOptions[selectedOption] + " ▼",
+                                              toggleBtnStyle,
+                                              guiOptions);
 
             // Calculate absolute regions for the button and dropdown list, this only works when
             // Event.current.type == EventType.Repaint
@@ -90,94 +92,82 @@ namespace FerramAerospaceResearch.FARGUI
             Rect btnRect = GUILayoutUtility.GetLastRect();
             btnRect.x += relativePos.x;
             btnRect.y += relativePos.y;
-            Rect dropdownRect = new Rect(btnRect.x, btnRect.y + btnRect.height, btnRect.width, 150);
+            var dropdownRect = new Rect(btnRect.x, btnRect.y + btnRect.height, btnRect.width, 150);
 
             if (!isActive && toggleBtnState && Event.current.type == EventType.Repaint)
-            {
                 // User activated the dropdown
                 ShowList(btnRect, dropdownRect);
-            }
             else if (isActive && (!toggleBtnState || !display.ContainsMouse()))
-            {
                 // User deactivated the dropdown or moved the mouse cursor away
                 HideList();
-            }
         }
 
-        private void InitStyles()
+        private static void InitStyles()
         {
             if (listStyle == null)
-            {
                 listStyle = new GUIStyle(GUI.skin.window) {padding = new RectOffset(1, 1, 1, 1)};
-            }
             if (toggleBtnStyle == null)
             {
                 toggleBtnStyle = new GUIStyle(GUI.skin.button);
-                toggleBtnStyle.normal.textColor
-                    = toggleBtnStyle.focused.textColor
-                    = Color.white;
-                toggleBtnStyle.hover.textColor
-                    = toggleBtnStyle.active.textColor
-                    = toggleBtnStyle.onActive.textColor
-                    = Color.yellow;
-                toggleBtnStyle.onNormal.textColor
-                    = toggleBtnStyle.onFocused.textColor
-                    = toggleBtnStyle.onHover.textColor
-                    = Color.green;
+                toggleBtnStyle.normal.textColor = toggleBtnStyle.focused.textColor = Color.white;
+                toggleBtnStyle.hover.textColor =
+                    toggleBtnStyle.active.textColor = toggleBtnStyle.onActive.textColor = Color.yellow;
+                toggleBtnStyle.onNormal.textColor =
+                    toggleBtnStyle.onFocused.textColor = toggleBtnStyle.onHover.textColor = Color.green;
             }
+
             if (dropdownItemStyle == null)
-            {
                 dropdownItemStyle = new GUIStyle(GUI.skin.button)
                 {
                     padding = new RectOffset(2, 2, 2, 2),
                     margin =
                     {
-                        top    = 1,
+                        top = 1,
                         bottom = 1
                     }
                 };
-            }
-            if (selectedItemStyle == null)
+
+            if (selectedItemStyle != null)
+                return;
+            selectedItemStyle = new GUIStyle(GUI.skin.button)
             {
-                selectedItemStyle = new GUIStyle(GUI.skin.button)
+                padding = new RectOffset(2, 2, 2, 2),
+                margin =
                 {
-                    padding = new RectOffset(2, 2, 2, 2),
-                    margin =
-                    {
-                        top    = 1,
-                        bottom = 1
-                    }
-                };
-                selectedItemStyle.normal.textColor
-                    = selectedItemStyle.focused.textColor
-                    = selectedItemStyle.hover.textColor
-                    = selectedItemStyle.active.textColor
-                    = selectedItemStyle.onActive.textColor
-                    = selectedItemStyle.onNormal.textColor
-                    = selectedItemStyle.onFocused.textColor
-                    = selectedItemStyle.onHover.textColor
-                    = XKCDColors.KSPNotSoGoodOrange;
-            }
+                    top = 1,
+                    bottom = 1
+                }
+            };
+            selectedItemStyle.normal.textColor = selectedItemStyle.focused.textColor =
+                                                     selectedItemStyle.hover.textColor =
+                                                         selectedItemStyle.active.textColor =
+                                                             selectedItemStyle.onActive.textColor =
+                                                                 selectedItemStyle.onNormal.textColor =
+                                                                     selectedItemStyle.onFocused.textColor =
+                                                                         selectedItemStyle.onHover.textColor =
+                                                                             XKCDColors.KSPNotSoGoodOrange;
         }
 
         private void ShowList(Rect btnRect, Rect dropdownRect)
         {
-            if (!isActive)
-            {
-                toggleBtnState = isActive = true;
-                FARGUIDropDownDisplay.Instance.ActivateDisplay(GetHashCode(), btnRect, dropdownRect, OnDisplayList, listStyle);
-                InputLockManager.SetControlLock(ControlTypes.All, "DropdownScrollLock");
-            }
+            if (isActive)
+                return;
+            toggleBtnState = isActive = true;
+            FARGUIDropDownDisplay.Instance.ActivateDisplay(GetHashCode(),
+                                                           btnRect,
+                                                           dropdownRect,
+                                                           OnDisplayList,
+                                                           listStyle);
+            InputLockManager.SetControlLock(ControlTypes.All, "DropdownScrollLock");
         }
 
         private void HideList()
         {
-            if (isActive)
-            {
-                toggleBtnState = isActive = false;
-                FARGUIDropDownDisplay.Instance.DisableDisplay();
-                InputLockManager.RemoveControlLock("DropdownScrollLock");
-            }
+            if (!isActive)
+                return;
+            toggleBtnState = isActive = false;
+            FARGUIDropDownDisplay.Instance.DisableDisplay();
+            InputLockManager.RemoveControlLock("DropdownScrollLock");
         }
 
         private void OnDisplayList(int id)
@@ -187,14 +177,14 @@ namespace FerramAerospaceResearch.FARGUI
             for (int i = 0; i < stringOptions.Length; i++)
             {
                 // Highlight the selected item
-                GUIStyle tmpStyle = (selectedOption == i) ? selectedItemStyle : dropdownItemStyle;
-                if (GUILayout.Button(stringOptions[i], tmpStyle))
-                {
-                    FARLogger.Info("Selected " + stringOptions[i]);
-                    selectedOption = i;
-                    HideList();
-                }
+                GUIStyle tmpStyle = selectedOption == i ? selectedItemStyle : dropdownItemStyle;
+                if (!GUILayout.Button(stringOptions[i], tmpStyle))
+                    continue;
+                FARLogger.Info("Selected " + stringOptions[i]);
+                selectedOption = i;
+                HideList();
             }
+
             GUILayout.EndScrollView();
         }
     }
@@ -202,21 +192,16 @@ namespace FerramAerospaceResearch.FARGUI
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class FARGUIDropDownDisplay : MonoBehaviour
     {
-        private static FARGUIDropDownDisplay instance;
-        public static FARGUIDropDownDisplay Instance
-        {
-            get { return instance; }
-        }
-
         private Rect btnRect;
         private Rect displayRect;
         private int windowId;
         private GUI.WindowFunction windowFunction;
         private GUIStyle listStyle;
+        public static FARGUIDropDownDisplay Instance { get; private set; }
 
         private void Awake()
         {
-            instance = this;
+            Instance = this;
         }
 
         private void Start()
@@ -230,15 +215,17 @@ namespace FerramAerospaceResearch.FARGUI
         {
             GUI.skin = HighLogic.Skin;
             if (windowFunction != null)
-            {
-                displayRect = GUILayout.Window(windowId, displayRect, windowFunction, "", listStyle, GUILayout.Height(0));
-            }
+                displayRect = GUILayout.Window(windowId,
+                                               displayRect,
+                                               windowFunction,
+                                               "",
+                                               listStyle,
+                                               GUILayout.Height(0));
         }
 
         public bool ContainsMouse()
         {
-            return btnRect.Contains(GUIUtils.GetMousePos()) ||
-                   displayRect.Contains(GUIUtils.GetMousePos());
+            return btnRect.Contains(GUIUtils.GetMousePos()) || displayRect.Contains(GUIUtils.GetMousePos());
         }
 
         public void ActivateDisplay(int id, Rect buttonRect, Rect rect, GUI.WindowFunction func, GUIStyle style)

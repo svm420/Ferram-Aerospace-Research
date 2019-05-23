@@ -53,11 +53,17 @@ namespace FerramAerospaceResearch
 {
     public static class FARAeroUtil
     {
+        //Based on ratio of density of water to density of air at SL
+        private const double UNDERWATER_DENSITY_FACTOR_MINUS_ONE = 814.51020408163265306122448979592;
+
+        //Standard Reynolds number for transition from laminar to turbulent flow
+        private const double TRANSITION_REYNOLDS_NUMBER = 5e5;
+
+        //Multiplier to skin friction due to surface roughness; approximately an 8% increase in drag
+        private const double ROUGHNESS_SKIN_FRICTION_MULTIPLIER = 1.08;
         private static FloatCurve prandtlMeyerMach;
         private static FloatCurve prandtlMeyerAngle;
         public static double maxPrandtlMeyerTurnAngle;
-//        private static FloatCurve criticalMachNumber = null;
-        //private static FloatCurve liftslope = null;
 
         public static double massPerWingAreaSupported;
         public static double massStressPower;
@@ -67,35 +73,183 @@ namespace FerramAerospaceResearch
         public static int prevBodyIndex = -1;
         public static double[] currentBodyVisc = new double[2];
         private static CelestialBody currentBody;
+
+        public static bool loaded;
+
+        private static List<FARWingAerodynamicModel> curEditorWingCache;
+
+        // Parts currently added to the vehicle in the editor
+        private static List<Part> CurEditorPartsCache;
+
+        // Parts currently added, plus the ghost part(s) about to be attached
+        private static List<Part> AllEditorPartsCache;
+
+        private static int RaycastMaskVal, RaycastMaskEdit;
+
+        private static readonly string[] RaycastLayers =
+        {
+            "Default", "TransparentFX", "Local Scenery", "Disconnected Parts"
+        };
+
         public static CelestialBody CurrentBody
         {
             get
             {
-                if (currentBody is null)
-                {
-                    if (FlightGlobals.Bodies[1] || !FlightGlobals.ActiveVessel)
-                        currentBody = FlightGlobals.Bodies[1];
-                    else
-                        currentBody = FlightGlobals.ActiveVessel.mainBody;
-
-                }
+                if (!(currentBody is null))
+                    return currentBody;
+                if (FlightGlobals.Bodies[1] || !FlightGlobals.ActiveVessel)
+                    currentBody = FlightGlobals.Bodies[1];
+                else
+                    currentBody = FlightGlobals.ActiveVessel.mainBody;
 
                 return currentBody;
             }
         }
 
-        public static bool loaded;
+        public static FloatCurve PrandtlMeyerMach
+        {
+            get
+            {
+                if (prandtlMeyerMach != null)
+                    return prandtlMeyerMach;
+                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
+                prandtlMeyerMach = new FloatCurve();
+                prandtlMeyerAngle = new FloatCurve();
+                double M = 1;
+                double gamma = CurrentBody.atmosphereAdiabaticIndex;
 
-        //Based on ratio of density of water to density of air at SL
-        private const double UNDERWATER_DENSITY_FACTOR_MINUS_ONE = 814.51020408163265306122448979592;
-        //Standard Reynolds number for transition from laminar to turbulent flow
-        private const double TRANSITION_REYNOLDS_NUMBER = 5e5;
-        //Multiplier to skin friction due to surface roughness; approximately an 8% increase in drag
-        private const double ROUGHNESS_SKIN_FRICTION_MULTIPLIER = 1.08;
+                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
+
+                while (M < 250)
+                {
+                    double mach = Math.Sqrt(M * M - 1);
+
+                    double nu = Math.Atan(mach / gamma_);
+                    nu *= gamma_;
+                    nu -= Math.Atan(mach);
+                    nu *= FARMathUtil.rad2deg;
+
+                    double nu_mach = (gamma - 1) / 2;
+                    nu_mach *= M * M;
+                    nu_mach++;
+                    nu_mach *= M;
+                    nu_mach = mach / nu_mach;
+                    nu_mach *= FARMathUtil.rad2deg;
+
+                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
+
+                    nu_mach = 1 / nu_mach;
+
+                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
+
+                    if (M < 3)
+                        M += 0.1f;
+                    else if (M < 10)
+                        M += 0.5f;
+                    else if (M < 25)
+                        M += 2;
+                    else
+                        M += 25;
+                }
+
+                maxPrandtlMeyerTurnAngle = gamma_ - 1;
+                maxPrandtlMeyerTurnAngle *= 90;
+                return prandtlMeyerMach;
+            }
+        }
+
+        public static FloatCurve PrandtlMeyerAngle
+        {
+            get
+            {
+                if (prandtlMeyerAngle != null)
+                    return prandtlMeyerAngle;
+                FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
+                prandtlMeyerMach = new FloatCurve();
+                prandtlMeyerAngle = new FloatCurve();
+                double M = 1;
+                double gamma = CurrentBody.atmosphereAdiabaticIndex;
+                double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
+
+                while (M < 250)
+                {
+                    double mach = Math.Sqrt(M * M - 1);
+
+                    double nu = Math.Atan(mach / gamma_);
+                    nu *= gamma_;
+                    nu -= Math.Atan(mach);
+                    nu *= FARMathUtil.rad2deg;
+
+                    double nu_mach = (gamma - 1) / 2;
+                    nu_mach *= M * M;
+                    nu_mach++;
+                    nu_mach *= M;
+                    nu_mach = mach / nu_mach;
+                    nu_mach *= FARMathUtil.rad2deg;
+
+                    prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
+
+                    nu_mach = 1 / nu_mach;
+
+                    prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
+
+                    if (M < 3)
+                        M += 0.1;
+                    else if (M < 10)
+                        M += 0.5;
+                    else if (M < 25)
+                        M += 2;
+                    else
+                        M += 25;
+                }
+
+                maxPrandtlMeyerTurnAngle = gamma_ - 1;
+                maxPrandtlMeyerTurnAngle *= 90;
+                return prandtlMeyerAngle;
+            }
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        public static List<FARWingAerodynamicModel> CurEditorWings
+        {
+            get { return curEditorWingCache ?? (curEditorWingCache = ListEditorWings()); }
+        }
+
+        public static List<Part> CurEditorParts
+        {
+            get { return CurEditorPartsCache ?? (CurEditorPartsCache = ListEditorParts(false)); }
+        }
+
+        public static List<Part> AllEditorParts
+        {
+            get { return AllEditorPartsCache ?? (AllEditorPartsCache = ListEditorParts(true)); }
+        }
+
+        public static int RaycastMask
+        {
+            get
+            {
+                // Just to avoid the opaque integer constant; maybe it's enough to
+                // document what layers come into it, but this is more explicit.
+                if (RaycastMaskVal != 0)
+                    return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
+                foreach (string name in RaycastLayers)
+                    RaycastMaskVal |= 1 << LayerMask.NameToLayer(name);
+
+                // When parts are being dragged in the editor, they are put into this
+                // layer; however we have to raycast them, or the visible CoL will be
+                // different from the one after the parts are attached.
+                RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
+
+                FARLogger.Info("Raycast mask: " + RaycastMaskVal + " " + RaycastMaskEdit);
+
+                return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
+            }
+        }
 
         public static void SaveCustomAeroDataToConfig()
         {
-            ConfigNode node = new ConfigNode("@FARAeroData[default]:FOR[FerramAerospaceResearch]");
+            var node = new ConfigNode("@FARAeroData[default]:FOR[FerramAerospaceResearch]");
             node.AddValue("%massPerWingAreaSupported", massPerWingAreaSupported);
             node.AddValue("%massStressPower", massStressPower);
             node.AddValue("%ctrlSurfTimeConstant", FARControllableSurface.timeConstant);
@@ -105,18 +259,17 @@ namespace FerramAerospaceResearch
             node.AddNode(new ConfigNode("!BodyAtmosphericData,*"));
 
             foreach (KeyValuePair<int, double[]> pair in bodyAtmosphereConfiguration)
-            {
                 node.AddNode(CreateAtmConfigurationConfigNode(pair.Key, pair.Value));
-            }
 
-            ConfigNode saveNode = new ConfigNode();
+            var saveNode = new ConfigNode();
             saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/CustomFARAeroData.cfg");
+            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
+                          "GameData/FerramAerospaceResearch/CustomFARAeroData.cfg");
         }
 
         private static ConfigNode CreateAtmConfigurationConfigNode(int bodyIndex, double[] atmProperties)
         {
-            ConfigNode node = new ConfigNode("BodyAtmosphericData");
+            var node = new ConfigNode("BodyAtmosphericData");
             node.AddValue("index", bodyIndex);
 
             node.AddValue("viscosityAtReferenceTemp", atmProperties[0]);
@@ -145,19 +298,23 @@ namespace FerramAerospaceResearch
                     double.TryParse(node.GetValue("ctrlSurfTimeConstant"), out FARControllableSurface.timeConstant);
 
                 if (node.HasValue("ctrlSurfTimeConstantFlap"))
-                    double.TryParse(node.GetValue("ctrlSurfTimeConstantFlap"), out FARControllableSurface.timeConstantFlap);
+                    double.TryParse(node.GetValue("ctrlSurfTimeConstantFlap"),
+                                    out FARControllableSurface.timeConstantFlap);
 
                 if (node.HasValue("ctrlSurfTimeConstantSpoiler"))
-                    double.TryParse(node.GetValue("ctrlSurfTimeConstantSpoiler"), out FARControllableSurface.timeConstantSpoiler);
+                    double.TryParse(node.GetValue("ctrlSurfTimeConstantSpoiler"),
+                                    out FARControllableSurface.timeConstantSpoiler);
 
                 bodyAtmosphereConfiguration = new Dictionary<int, double[]>();
                 foreach (ConfigNode bodyProperties in node.GetNodes("BodyAtmosphericData"))
                 {
-                    if (bodyProperties == null || !(bodyProperties.HasValue("index") || bodyProperties.HasValue("name")) || !bodyProperties.HasValue("viscosityAtReferenceTemp")
-                        || !bodyProperties.HasValue("referenceTemp"))
+                    if (bodyProperties == null ||
+                        !(bodyProperties.HasValue("index") || bodyProperties.HasValue("name")) ||
+                        !bodyProperties.HasValue("viscosityAtReferenceTemp") ||
+                        !bodyProperties.HasValue("referenceTemp"))
                         continue;
 
-                    double[] Rgamma_and_gamma = new double[2];
+                    var Rgamma_and_gamma = new double[2];
                     double.TryParse(bodyProperties.GetValue("viscosityAtReferenceTemp"), out double tmp);
 
                     Rgamma_and_gamma[0] = tmp;
@@ -167,24 +324,23 @@ namespace FerramAerospaceResearch
                     Rgamma_and_gamma[1] = tmp;
                     int index = -1;
 
-                    if(bodyProperties.HasValue("name"))
+                    if (bodyProperties.HasValue("name"))
                     {
                         string name = bodyProperties.GetValue("name");
 
-                        foreach(CelestialBody body in FlightGlobals.Bodies)
-                            if(body.bodyName == name)
+                        foreach (CelestialBody body in FlightGlobals.Bodies)
+                            if (body.bodyName == name)
                             {
                                 index = body.flightGlobalsIndex;
                                 break;
                             }
                     }
 
-                    if(index < 0)
+                    if (index < 0)
                         int.TryParse(bodyProperties.GetValue("index"), out index);
 
                     bodyAtmosphereConfiguration.Add(index, Rgamma_and_gamma);
                 }
-
             }
 
             //For any bodies that lack a configuration, use Earth-like properties
@@ -193,7 +349,7 @@ namespace FerramAerospaceResearch
                 if (bodyAtmosphereConfiguration.ContainsKey(body.flightGlobalsIndex))
                     continue;
 
-                double[] Rgamma_and_gamma = new double[2];
+                var Rgamma_and_gamma = new double[2];
                 Rgamma_and_gamma[0] = 1.7894e-5;
                 Rgamma_and_gamma[1] = 288;
 
@@ -201,18 +357,15 @@ namespace FerramAerospaceResearch
             }
 
             foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
-            {
                 if (assembly.assembly.GetName().Name == "AJE")
-                {
                     AJELoaded = true;
-                }
-            }
 
             SetDefaultValuesIfNoValuesLoaded();
 
             loaded = true;
 
-            string forceUpdatePath = KSPUtil.ApplicationRootPath.Replace("\\", "/") + "GameData/FerramAerospaceResearch/FARForceDataUpdate.cfg";
+            string forceUpdatePath = KSPUtil.ApplicationRootPath.Replace("\\", "/") +
+                                     "GameData/FerramAerospaceResearch/FARForceDataUpdate.cfg";
             if (File.Exists(forceUpdatePath))
                 File.Delete(forceUpdatePath);
 
@@ -236,7 +389,8 @@ namespace FerramAerospaceResearch
             if (M <= 0)
                 return 1;
             double value = RayleighPitotTubeStagPressure(M);
-            value--;                                //and now to convert to pressure coefficient
+            //and now to convert to pressure coefficient
+            value--;
             value *= 2 / (gamma * M * M);
 
             return value;
@@ -247,7 +401,7 @@ namespace FerramAerospaceResearch
             double gamma = CurrentBody.atmosphereAdiabaticIndex;
 
             double ratio = M * M;
-            ratio *= (gamma - 1);
+            ratio *= gamma - 1;
             ratio *= 0.5;
             ratio++;
 
@@ -264,11 +418,11 @@ namespace FerramAerospaceResearch
             //Rayleigh Pitot Tube Formula; gives max stagnation pressure behind shock
             double value = (gamma + 1) * M;
             value *= value;
-            value /= (4 * gamma * M * M - 2 * (gamma - 1));
+            value /= 4 * gamma * M * M - 2 * (gamma - 1);
             value = Math.Pow(value, gamma / (gamma - 1));
 
-            value *= (1 - gamma + 2 * gamma * M * M);
-            value /= (gamma + 1);
+            value *= 1 - gamma + 2 * gamma * M * M;
+            value /= gamma + 1;
 
             return value;
         }
@@ -279,160 +433,31 @@ namespace FerramAerospaceResearch
 
             double ratio = M * M;
             ratio *= 2 * gamma;
-            ratio -= (gamma - 1);
-            ratio /= (gamma + 1);
+            ratio -= gamma - 1;
+            ratio /= gamma + 1;
 
             return ratio;
-
         }
 
         public static double MachBehindShockCalc(double M)
         {
             double gamma = CurrentBody.atmosphereAdiabaticIndex;
 
-            double ratio = (gamma - 1);
+            double ratio = gamma - 1;
             ratio *= M * M;
             ratio += 2;
-            ratio /= (2 * gamma * M * M - (gamma - 1));
+            ratio /= 2 * gamma * M * M - (gamma - 1);
             ratio = Math.Sqrt(ratio);
 
             return ratio;
-        }
-        public static FloatCurve PrandtlMeyerMach
-        {
-            get{
-                if (prandtlMeyerMach == null)
-                {
-                    FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
-                    prandtlMeyerMach = new FloatCurve();
-                    prandtlMeyerAngle = new FloatCurve();
-                    double M = 1;
-                    double gamma = CurrentBody.atmosphereAdiabaticIndex;
-
-                    double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
-
-                    while (M < 250)
-                    {
-                        double mach = Math.Sqrt(M * M - 1);
-
-                        double nu = Math.Atan(mach / gamma_);
-                        nu *= gamma_;
-                        nu -= Math.Atan(mach);
-                        nu *= FARMathUtil.rad2deg;
-
-                        double nu_mach = (gamma - 1) / 2;
-                        nu_mach *= M * M;
-                        nu_mach++;
-                        nu_mach *= M;
-                        nu_mach = mach / nu_mach;
-                        nu_mach *= FARMathUtil.rad2deg;
-
-                        prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
-
-                        nu_mach = 1 / nu_mach;
-
-                        prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
-
-                        if (M < 3)
-                            M += 0.1f;
-                        else if (M < 10)
-                            M += 0.5f;
-                        else if (M < 25)
-                            M += 2;
-                        else
-                            M += 25;
-                    }
-
-                    maxPrandtlMeyerTurnAngle = gamma_ - 1;
-                    maxPrandtlMeyerTurnAngle *= 90;
-
-                }
-                return prandtlMeyerMach;
-            }
-        }
-
-        public static FloatCurve PrandtlMeyerAngle
-        {
-            get
-            {
-                if (prandtlMeyerAngle == null)
-                {
-                    FARLogger.Info("Prandtl-Meyer Expansion Curves Initialized");
-                    prandtlMeyerMach = new FloatCurve();
-                    prandtlMeyerAngle = new FloatCurve();
-                    double M = 1;
-                    //float gamma = 1.4f;
-                    double gamma = CurrentBody.atmosphereAdiabaticIndex;
-                    double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
-
-                    while (M < 250)
-                    {
-                        double mach = Math.Sqrt(M * M - 1);
-
-                        double nu = Math.Atan(mach / gamma_);
-                        nu *= gamma_;
-                        nu -= Math.Atan(mach);
-                        nu *= FARMathUtil.rad2deg;
-
-                        double nu_mach = (gamma - 1) / 2;
-                        nu_mach *= M * M;
-                        nu_mach++;
-                        nu_mach *= M;
-                        nu_mach = mach / nu_mach;
-                        nu_mach *= FARMathUtil.rad2deg;
-
-                        prandtlMeyerMach.Add((float)M, (float)nu, (float)nu_mach, (float)nu_mach);
-
-                        nu_mach = 1 / nu_mach;
-
-                        prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
-
-                        if (M < 3)
-                            M += 0.1;
-                        else if (M < 10)
-                            M += 0.5;
-                        else if (M < 25)
-                            M += 2;
-                        else
-                            M += 25;
-                    }
-
-                    maxPrandtlMeyerTurnAngle = gamma_ - 1;
-                    maxPrandtlMeyerTurnAngle *= 90;
-                }
-                return prandtlMeyerAngle;
-            }
         }
 
         public static bool IsNonphysical(Part p)
         {
             return p.physicalSignificance == Part.PhysicalSignificance.NONE ||
-                   (HighLogic.LoadedSceneIsEditor &&
-                    p != EditorLogic.RootPart &&
-                    p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE);
-        }
-
-        private static List<FARWingAerodynamicModel> curEditorWingCache;
-
-        // ReSharper disable once UnusedMember.Global
-        public static List<FARWingAerodynamicModel> CurEditorWings
-        {
-            get { return curEditorWingCache ?? (curEditorWingCache = ListEditorWings()); }
-        }
-        // Parts currently added to the vehicle in the editor
-        private static List<Part> CurEditorPartsCache;
-
-        public static List<Part> CurEditorParts
-        {
-            get { return CurEditorPartsCache ?? (CurEditorPartsCache = ListEditorParts(false)); }
-        }
-
-        // Parts currently added, plus the ghost part(s) about to be attached
-        private static List<Part> AllEditorPartsCache;
-
-        public static List<Part> AllEditorParts
-        {
-            get { return AllEditorPartsCache ?? (AllEditorPartsCache = ListEditorParts(true)); }
+                   HighLogic.LoadedSceneIsEditor &&
+                   p != EditorLogic.RootPart &&
+                   p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE;
         }
 
         public static void ResetEditorParts()
@@ -447,7 +472,7 @@ namespace FerramAerospaceResearch
             return HighLogic.LoadedSceneIsEditor &&
                    EditorLogic.SelectedPart != null &&
                    (EditorLogic.SelectedPart.potentialParent != null ||
-                     (move_too && EditorLogic.SelectedPart == EditorLogic.RootPart));
+                    move_too && EditorLogic.SelectedPart == EditorLogic.RootPart);
         }
 
         public static List<Part> ListEditorParts(bool include_selected)
@@ -457,15 +482,12 @@ namespace FerramAerospaceResearch
             if (EditorLogic.RootPart)
                 RecursePartList(list, EditorLogic.RootPart);
 
-            if (include_selected && EditorAboutToAttach())
-            {
-                RecursePartList(list, EditorLogic.SelectedPart);
+            if (!include_selected || !EditorAboutToAttach())
+                return list;
+            RecursePartList(list, EditorLogic.SelectedPart);
 
-                foreach (Part sym in EditorLogic.SelectedPart.symmetryCounterparts)
-                {
-                    RecursePartList(list, sym);
-                }
-            }
+            foreach (Part sym in EditorLogic.SelectedPart.symmetryCounterparts)
+                RecursePartList(list, sym);
 
             return list;
         }
@@ -474,13 +496,14 @@ namespace FerramAerospaceResearch
         {
             List<Part> list = CurEditorParts;
 
-            List<FARWingAerodynamicModel> wings = new List<FARWingAerodynamicModel>();
+            var wings = new List<FARWingAerodynamicModel>();
             foreach (Part p in list)
             {
-                FARWingAerodynamicModel wing = p.GetComponent<FARWingAerodynamicModel>();
+                var wing = p.GetComponent<FARWingAerodynamicModel>();
                 if (!(wing is null))
                     wings.Add(wing);
             }
+
             return wings;
         }
 
@@ -488,37 +511,7 @@ namespace FerramAerospaceResearch
         {
             list.Add(part);
             foreach (Part p in part.children)
-            {
                 RecursePartList(list, p);
-            }
-        }
-
-        private static int RaycastMaskVal, RaycastMaskEdit;
-        private static readonly String[] RaycastLayers = {
-            "Default", "TransparentFX", "Local Scenery", "Disconnected Parts"
-        };
-
-        public static int RaycastMask
-        {
-            get
-            {
-                // Just to avoid the opaque integer constant; maybe it's enough to
-                // document what layers come into it, but this is more explicit.
-                if (RaycastMaskVal == 0)
-                {
-                    foreach (String name in RaycastLayers)
-                        RaycastMaskVal |= (1 << LayerMask.NameToLayer(name));
-
-                    // When parts are being dragged in the editor, they are put into this
-                    // layer; however we have to raycast them, or the visible CoL will be
-                    // different from the one after the parts are attached.
-                    RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
-
-                    FARLogger.Info("Raycast mask: "+RaycastMaskVal+" "+RaycastMaskEdit);
-                }
-
-                return EditorAboutToAttach(true) ? RaycastMaskEdit : RaycastMaskVal;
-            }
         }
 
         //This approximates e^x; it's slightly inaccurate, but good enough.  It's much faster than an actual exponential function
@@ -545,7 +538,7 @@ namespace FerramAerospaceResearch
                 return 1;
 
             double densityMultFactor = Math.Max(-altitude, 1);
-            densityMultFactor *= UNDERWATER_DENSITY_FACTOR_MINUS_ONE * 0.05;     //base it on the density factor
+            densityMultFactor *= UNDERWATER_DENSITY_FACTOR_MINUS_ONE * 0.05; //base it on the density factor
 
             return densityMultFactor;
         }
@@ -556,7 +549,7 @@ namespace FerramAerospaceResearch
                 return 1;
 
             double densityMultFactor = Math.Max(-vessel.altitude, 1);
-            densityMultFactor *= UNDERWATER_DENSITY_FACTOR_MINUS_ONE * 0.05;     //base it on the density factor
+            densityMultFactor *= UNDERWATER_DENSITY_FACTOR_MINUS_ONE * 0.05; //base it on the density factor
 
             return densityMultFactor;
         }
@@ -574,24 +567,25 @@ namespace FerramAerospaceResearch
                 density += p.submergedDynamicPressurekPa * p.submergedPortion;
                 counter++;
             }
-            if(counter > 0)
+
+            if (counter > 0)
                 density /= counter;
-            density *= 2000;        //need answers in Pa, not kPa
-            density /= (v.srfSpeed * v.srfSpeed);
+            density *= 2000; //need answers in Pa, not kPa
+            density /= v.srfSpeed * v.srfSpeed;
 
             return density;
         }
 
         public static double CalculateCurrentViscosity(double tempInK)
         {
-            double visc = currentBodyVisc[0];        //get viscosity
+            double visc = currentBodyVisc[0]; //get viscosity
 
             double tempRat = tempInK / currentBodyVisc[1];
             tempRat *= tempRat * tempRat;
             tempRat = Math.Sqrt(tempRat);
 
-            visc *= (currentBodyVisc[1] + 110);
-            visc /= (tempInK + 110);
+            visc *= currentBodyVisc[1] + 110;
+            visc /= tempInK + 110;
             visc *= tempRat;
 
             return visc;
@@ -601,10 +595,10 @@ namespace FerramAerospaceResearch
         public static double ReferenceTemperatureRatio(double machNumber, double recoveryFactor, double gamma)
         {
             double tempRatio = machNumber * machNumber;
-            tempRatio *= (gamma - 1);
-            tempRatio *= 0.5;       //account for stagnation temp
+            tempRatio *= gamma - 1;
+            tempRatio *= 0.5; //account for stagnation temp
 
-            tempRatio *= recoveryFactor;    //this accounts for adiabatic wall temp ratio
+            tempRatio *= recoveryFactor; //this accounts for adiabatic wall temp ratio
 
             tempRatio *= 0.58;
             tempRatio += 0.032 * machNumber * machNumber;
@@ -613,7 +607,14 @@ namespace FerramAerospaceResearch
             return tempRatio;
         }
 
-        public static double CalculateReynoldsNumber(double density, double lengthScale, double vel, double machNumber, double externalTemp, double gamma)
+        public static double CalculateReynoldsNumber(
+            double density,
+            double lengthScale,
+            double vel,
+            double machNumber,
+            double externalTemp,
+            double gamma
+        )
         {
             if (lengthScale.NearlyEqual(0))
                 return 0;
@@ -624,7 +625,14 @@ namespace FerramAerospaceResearch
             return Re;
         }
 
-        public static double SkinFrictionDrag(double density, double lengthScale, double vel, double machNumber, double externalTemp, double gamma)
+        public static double SkinFrictionDrag(
+            double density,
+            double lengthScale,
+            double vel,
+            double machNumber,
+            double externalTemp,
+            double gamma
+        )
         {
             if (lengthScale.NearlyEqual(0))
                 return 0;
@@ -643,9 +651,8 @@ namespace FerramAerospaceResearch
 
                 double rarefiedGasVal = machNumber / reynoldsNumber;
                 if (rarefiedGasVal > 0.01)
-                {
-                    return (lamCf + (0.075 - lamCf) * (rarefiedGasVal - 0.01) / (0.99 + rarefiedGasVal)) * ROUGHNESS_SKIN_FRICTION_MULTIPLIER;
-                }
+                    return (lamCf + (0.075 - lamCf) * (rarefiedGasVal - 0.01) / (0.99 + rarefiedGasVal)) *
+                           ROUGHNESS_SKIN_FRICTION_MULTIPLIER;
                 return lamCf * ROUGHNESS_SKIN_FRICTION_MULTIPLIER;
             }
 
@@ -655,28 +662,26 @@ namespace FerramAerospaceResearch
             double turbulentCfInLaminar = 0.074 / Math.Pow(TRANSITION_REYNOLDS_NUMBER, 0.2);
             double turbulentCf = 0.074 / Math.Pow(reynoldsNumber, 0.2);
 
-            return (turbulentCf - transitionFraction * (turbulentCfInLaminar - laminarCf)) * ROUGHNESS_SKIN_FRICTION_MULTIPLIER;
+            return (turbulentCf - transitionFraction * (turbulentCfInLaminar - laminarCf)) *
+                   ROUGHNESS_SKIN_FRICTION_MULTIPLIER;
         }
 
         public static void UpdateCurrentActiveBody(CelestialBody body)
         {
             if (!(body is null) && body.flightGlobalsIndex != prevBodyIndex)
-            {
                 UpdateCurrentActiveBody(body.flightGlobalsIndex, body);
-            }
         }
 
         public static void UpdateCurrentActiveBody(int index, CelestialBody body)
         {
-            if (index != prevBodyIndex)
-            {
-                prevBodyIndex = index;
-                currentBodyVisc = bodyAtmosphereConfiguration[prevBodyIndex];
-                currentBody = body;
+            if (index == prevBodyIndex)
+                return;
+            prevBodyIndex = index;
+            currentBodyVisc = bodyAtmosphereConfiguration[prevBodyIndex];
+            currentBody = body;
 
-                prandtlMeyerMach = null;
-                prandtlMeyerAngle = null;
-            }
+            prandtlMeyerMach = null;
+            prandtlMeyerAngle = null;
         }
 
         //Based on NASA Contractor Report 187173, Exact and Approximate Oblique Shock Equations for Real-Time Applications
@@ -713,7 +718,9 @@ namespace FerramAerospaceResearch
                 phi += Math.PI;
             phi *= 0.33333333;
 
-            double chiW = -0.33333333 * b - Math.Sqrt((-Q).Clamp(0, double.PositiveInfinity)) * (Math.Cos(phi) - 1.7320508f * Math.Sin(phi));
+            double chiW = -0.33333333 * b -
+                          Math.Sqrt((-Q).Clamp(0, double.PositiveInfinity)) *
+                          (Math.Cos(phi) - 1.7320508f * Math.Sin(phi));
 
             double betaW = Math.Sqrt(chiW.Clamp(0, double.PositiveInfinity));
 
@@ -737,7 +744,7 @@ namespace FerramAerospaceResearch
             double tmp = b * b - 4 * a * c;
 
             double sin2def = -b + Math.Sqrt(tmp.Clamp(0, double.PositiveInfinity));
-            sin2def /= (2 * a);
+            sin2def /= 2 * a;
 
             return Math.Sqrt(sin2def);
         }
@@ -777,7 +784,12 @@ namespace FerramAerospaceResearch
 
         //More modern, accurate Oswald's Efficiency
         //http://www.fzt.haw-hamburg.de/pers/Scholz/OPerA/OPerA_PUB_DLRK_12-09-10.pdf
-        public static double CalculateOswaldsEfficiencyNitaScholz(double AR, double CosSweepAngle, double Cd0, double taperRatio)
+        public static double CalculateOswaldsEfficiencyNitaScholz(
+            double AR,
+            double CosSweepAngle,
+            double Cd0,
+            double taperRatio
+        )
         {
             //model coupling between taper and sweep
             double deltaTaper = Math.Acos(CosSweepAngle) * FARMathUtil.rad2deg;
@@ -801,10 +813,11 @@ namespace FerramAerospaceResearch
             double theoreticE = straightWingE * AR + 1;
             theoreticE = 1 / theoreticE;
 
-            double eWingInterference = 0.974008 * theoreticE;// 1 - 2 * (fuse dia / span)^2, using avg val for ratio (0.114) because it isn't easy to get here
-                                                             //this results in this being a simple constant
+            // 1 - 2 * (fuse dia / span)^2, using avg val for ratio (0.114) because it isn't easy to get here
+            //this results in this being a simple constant
+            double eWingInterference = 0.974008 * theoreticE;
 
-            double e = 0.38 * Cd0 * AR * Math.PI;   //accounts for changes due to Mach number and compressibility
+            double e = 0.38 * Cd0 * AR * Math.PI; //accounts for changes due to Mach number and compressibility
             e *= eWingInterference;
             e += 1;
             e = eWingInterference / e;

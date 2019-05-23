@@ -54,32 +54,33 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
 
         public StockJettisonTransformGeoUpdater(ModuleJettison engineFairing, GeometryPartModule geoModule)
         {
-                this.engineFairing = engineFairing;
-                this.geoModule = geoModule;
-                if (ObjectsNotNull())
-                    fairingVisible = engineFairing.jettisonTransform.gameObject.activeSelf && !engineFairing.isJettisoned;
-                else
-                    fairingVisible = false;
+            this.engineFairing = engineFairing;
+            this.geoModule = geoModule;
+            if (ObjectsNotNull())
+                fairingVisible = engineFairing.jettisonTransform.gameObject.activeSelf && !engineFairing.isJettisoned;
+            else
+                fairingVisible = false;
         }
 
         public void EditorGeometryUpdate()
         {
-            if (ObjectsNotNull())
-                if (fairingVisible != engineFairing.jettisonTransform.gameObject.activeSelf)
-                {
-                    geoModule.RebuildAllMeshData();
-                    fairingVisible = !fairingVisible;
-                }
+            if (!ObjectsNotNull())
+                return;
+            if (fairingVisible == engineFairing.jettisonTransform.gameObject.activeSelf)
+                return;
+            geoModule.RebuildAllMeshData();
+            fairingVisible = !fairingVisible;
         }
 
         public void FlightGeometryUpdate()
         {
-            if (ObjectsNotNull())
-                if (fairingVisible != engineFairing.jettisonTransform.gameObject.activeSelf || fairingVisible != !engineFairing.isJettisoned)
-                {
-                    geoModule.RebuildAllMeshData();
-                    fairingVisible = !fairingVisible;
-                }
+            if (!ObjectsNotNull())
+                return;
+            if (fairingVisible == engineFairing.jettisonTransform.gameObject.activeSelf &&
+                fairingVisible == !engineFairing.isJettisoned)
+                return;
+            geoModule.RebuildAllMeshData();
+            fairingVisible = !fairingVisible;
         }
 
         private bool ObjectsNotNull()
@@ -89,11 +90,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 return false;
 
             GameObject o = t.gameObject;
-            if (o == null)
-                return false;
-
-            return true;
+            return o != null;
         }
-
     }
 }

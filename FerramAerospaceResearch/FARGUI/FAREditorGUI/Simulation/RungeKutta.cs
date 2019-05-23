@@ -49,25 +49,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
     internal class RungeKutta4
     {
-//        Vector4 a = new Vector4(0, 0.5f, 0.5f, 1);
-private readonly Vector4 c = new Vector4(1f / 6, 1f / 3, 1f / 3, 1f / 6);
+        private readonly Vector4 c = new Vector4(1f / 6, 1f / 3, 1f / 3, 1f / 6);
 
-//        FARMatrix b = new FARMatrix(3, 4);
+        private readonly double dt;
+        private readonly double endTime;
+        private readonly double[] initCond;
 
-private readonly double dt;
-private readonly double endTime;
-private readonly double[] initCond;
-
-private readonly SimMatrix stateEquations;
+        private readonly SimMatrix stateEquations;
 
         public readonly double[,] soln;
         public readonly double[] time;
 
         public RungeKutta4(double endTime, double dt, SimMatrix eqns, double[] initCond)
         {
-//            b.Add(0.5f, 0, 1);
-//            b.Add(0.5f, 1, 2);
-//            b.Add(1, 2, 3);
             this.endTime = endTime;
             this.dt = dt;
             stateEquations = eqns;
@@ -90,13 +84,14 @@ private readonly SimMatrix stateEquations;
 
                 currentState = NextState(currentState);
 
-                for(int k = 0; k < currentState.Length; k++)
+                for (int k = 0; k < currentState.Length; k++)
                     if (double.IsNaN(currentState[k]) || double.IsInfinity(currentState[k]))
                     {
                         currentState[k] = 0;
                         j = time.Length;
                         t = endTime;
                     }
+
                 j++;
                 t += dt;
             }
@@ -110,7 +105,7 @@ private readonly SimMatrix stateEquations;
                 return new double[time.Length];
             }
 
-            double[] solution = new double[time.Length];
+            var solution = new double[time.Length];
             for (int j = 0; j < solution.Length; j++)
                 solution[j] = soln[i, j];
             return solution;
@@ -118,7 +113,7 @@ private readonly SimMatrix stateEquations;
 
         private double[] NextState(double[] currentState)
         {
-            double[] next = new double[currentState.Length];
+            var next = new double[currentState.Length];
             // dkavolis: f1-f4 where all pointing to the same array...
             var f1 = new double[currentState.Length];
             var f2 = new double[currentState.Length];
@@ -128,39 +123,29 @@ private readonly SimMatrix stateEquations;
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f1[j] += currentState[i] * stateEquations.Value(i, j);
-                }
             }
 
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f2[j] += (currentState[i] + 0.5f * dt * f1[i]) * stateEquations.Value(i, j);
-                }
             }
 
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f3[j] += (currentState[i] + 0.5f * dt * f2[i]) * stateEquations.Value(i, j);
-                }
             }
 
             for (int j = 0; j < next.Length; j++)
             {
                 for (int i = 0; i < currentState.Length; i++)
-                {
                     f4[j] += (currentState[i] + dt * f3[i]) * stateEquations.Value(i, j);
-                }
             }
 
             for (int i = 0; i < next.Length; i++)
-            {
                 next[i] = currentState[i] + dt * (c[0] * f1[i] + c[1] * f2[i] + c[2] * f3[i] + c[3] * f4[i]);
-            }
 
             return next;
         }

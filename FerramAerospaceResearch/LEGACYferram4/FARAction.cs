@@ -59,13 +59,11 @@ namespace ferram4
         // Is constructed each time a part module instance is created.
         // The current AG seems to be stored elsewhere so base.actionGroup
         // is only used for the initial assignment.
-        public FARAction(string guiName, int actionIdentifier)
-            : base(guiName)
+        public FARAction(string guiName, int actionIdentifier) : base(guiName)
         {
             actionGroup = FARActionGroupConfiguration.map(actionIdentifier);
         }
     }
-
 
 
     public static class FARActionGroupConfiguration
@@ -76,19 +74,29 @@ namespace ferram4
         public const int ACTION_COUNT = 3;
 
         // private lookup tables
-        private static readonly KSPActionGroup[] id2actionGroup = { KSPActionGroup.Brakes, KSPActionGroup.None, KSPActionGroup.None };
-        // keys in the configuration file
-        private static readonly string[] configKeys = {  "actionGroupSpoiler",
-                                        "actionGroupIncreaseFlapDeflection",
-                                        "actionGroupDecreaseFlapDeflection" };
-        // for the gui
-        private static readonly string[] guiLabels = { Localizer.Format("FARActionSpoilers"),
-                                      Localizer.Format("FARActionIncreaseFlap"),
-                                      Localizer.Format("FARActionDecreaseFlap") };
+        private static readonly KSPActionGroup[] id2actionGroup =
+        {
+            KSPActionGroup.Brakes, KSPActionGroup.None, KSPActionGroup.None
+        };
 
-        private static readonly string[] currentGuiStrings = { id2actionGroup[0].ToString(),
-                                              id2actionGroup[1].ToString(),
-                                              id2actionGroup[2].ToString() };
+        // keys in the configuration file
+        private static readonly string[] configKeys =
+        {
+            "actionGroupSpoiler", "actionGroupIncreaseFlapDeflection", "actionGroupDecreaseFlapDeflection"
+        };
+
+        // for the gui
+        private static readonly string[] guiLabels =
+        {
+            Localizer.Format("FARActionSpoilers"),
+            Localizer.Format("FARActionIncreaseFlap"),
+            Localizer.Format("FARActionDecreaseFlap")
+        };
+
+        private static readonly string[] currentGuiStrings =
+        {
+            id2actionGroup[0].ToString(), id2actionGroup[1].ToString(), id2actionGroup[2].ToString()
+        };
 
         private static GUIDropDown<KSPActionGroup>[] actionGroupDropDown;
 
@@ -100,43 +108,48 @@ namespace ferram4
         public static void LoadConfiguration()
         {
             string[] namesTmp = Enum.GetNames(typeof(KSPActionGroup));
-            string[] names = new string[namesTmp.Length - 1];
+            var names = new string[namesTmp.Length - 1];
 
-            for(int i = 0; i < namesTmp.Length - 1; ++i)
-            {
+            for (int i = 0; i < namesTmp.Length - 1; ++i)
                 names[i] = namesTmp[i];
-            }
-            KSPActionGroup[] agTypes = new KSPActionGroup[names.Length];
+            var agTypes = new KSPActionGroup[names.Length];
             actionGroupDropDown = new GUIDropDown<KSPActionGroup>[3];
 
-            for(int i = 0; i < agTypes.Length; i++)
-            {
+            for (int i = 0; i < agTypes.Length; i++)
                 agTypes[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), names[i]);
-            }
             // straight forward, reading the (action name, action group) tuples
             PluginConfiguration config = FARDebugAndSettings.config;
             for (int i = 0; i < ACTION_COUNT; ++i)
             {
                 try
                 {
-                    string currentGuiString = currentGuiStrings[i] = id2actionGroup[i].ToString(); // don't forget to initialize the gui
-                    id2actionGroup[i] = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), config.GetValue(configKeys[i], currentGuiString));
+                    // don't forget to initialize the gui
+                    string currentGuiString = currentGuiStrings[i] = id2actionGroup[i].ToString();
+                    id2actionGroup[i] =
+                        (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup),
+                                                   config.GetValue(configKeys[i], currentGuiString));
                     FARLogger.Info($"Loaded AG {configKeys[i]} as {currentGuiString}");
                 }
                 catch (Exception e)
                 {
-                    FARLogger.Warning("Error reading config key '" + configKeys[i] + "' with value '" + config.GetValue(configKeys[i], "n/a") + "' gave " + e);
+                    FARLogger.Warning("Error reading config key '" +
+                                      configKeys[i] +
+                                      "' with value '" +
+                                      config.GetValue(configKeys[i], "n/a") +
+                                      "' gave " +
+                                      e);
                 }
+
                 int initIndex = 0;
-                for(int j = 0; j < agTypes.Length; j++)
+                for (int j = 0; j < agTypes.Length; j++)
                 {
-                    if(id2actionGroup[i] == agTypes[j])
-                    {
-                        initIndex = j;
-                        break;
-                    }
+                    if (id2actionGroup[i] != agTypes[j])
+                        continue;
+                    initIndex = j;
+                    break;
                 }
-                GUIDropDown<KSPActionGroup> dropDown = new GUIDropDown<KSPActionGroup>(names, agTypes, initIndex);
+
+                var dropDown = new GUIDropDown<KSPActionGroup>(names, agTypes, initIndex);
                 actionGroupDropDown[i] = dropDown;
             }
         }
@@ -153,14 +166,13 @@ namespace ferram4
 
         public static void DrawGUI()
         {
-            GUIStyle label = new GUIStyle(GUI.skin.label) {normal = {textColor = GUI.skin.toggle.normal.textColor}};
+            var label = new GUIStyle(GUI.skin.label) {normal = {textColor = GUI.skin.toggle.normal.textColor}};
             GUILayout.Label(Localizer.Format("FARActionDefaultLabel"));
-            GUILayout.BeginHorizontal(); // left column: label, right column: text field
+            // left column: label, right column: text field
+            GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
             for (int i = 0; i < ACTION_COUNT; ++i)
-            {
                 GUILayout.Label(guiLabels[i], label);
-            }
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
             for (int i = 0; i < ACTION_COUNT; ++i)
@@ -168,6 +180,7 @@ namespace ferram4
                 actionGroupDropDown[i].GUIDropDownDisplay(GUILayout.Width(150));
                 id2actionGroup[i] = actionGroupDropDown[i].ActiveSelection;
             }
+
             GUILayout.EndVertical();
             GUILayout.EndHorizontal(); // end of columns
         }

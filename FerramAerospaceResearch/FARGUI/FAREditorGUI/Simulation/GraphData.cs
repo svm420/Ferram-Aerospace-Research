@@ -47,13 +47,13 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {
-	internal class GraphData
+    internal class GraphData
     {
-        public double[] xValues;
         public readonly List<double[]> yValues;
         public readonly List<string> lineNames;
         public readonly List<bool> lineNameVisible;
         public readonly List<Color> lineColors;
+        public double[] xValues;
 
         public GraphData()
         {

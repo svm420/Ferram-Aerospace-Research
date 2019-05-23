@@ -59,7 +59,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             _instantCondition = instantConditionSim;
         }
 
-        public StabilityDerivOutput CalculateStabilityDerivs(CelestialBody body, double alt, double machNumber, int flapSetting, bool spoilers, double alpha, double beta, double phi)
+        public StabilityDerivOutput CalculateStabilityDerivs(
+            CelestialBody body,
+            double alt,
+            double machNumber,
+            int flapSetting,
+            bool spoilers,
+            double alpha,
+            double beta,
+            double phi
+        )
         {
             double pressure = body.GetPressure(alt);
             double temperature = body.GetTemperature(alt);
@@ -68,11 +77,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             double u0 = sspeed * machNumber;
             double q = u0 * u0 * density * 0.5f;
 
-            StabilityDerivOutput stabDerivOutput = new StabilityDerivOutput
+            var stabDerivOutput = new StabilityDerivOutput
             {
                 nominalVelocity = u0,
-                altitude        = alt,
-                body            = body
+                altitude = alt,
+                body = body
             };
 
             Vector3d CoM = Vector3d.zero;
@@ -89,8 +98,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             double Iyz = 0;
             double Ixz = 0;
 
-            InstantConditionSimInput input = new InstantConditionSimInput(alpha, beta, phi, 0, 0, 0, machNumber, 0, flapSetting, spoilers);
-            InstantConditionSimOutput pertOutput = new InstantConditionSimOutput();
+            var input = new InstantConditionSimInput(alpha, beta, phi, 0, 0, 0, machNumber, 0, flapSetting, spoilers);
+            var pertOutput = new InstantConditionSimOutput();
 
             _instantCondition.GetClCdCmSteady(input, out InstantConditionSimOutput nominalOutput, true);
 
@@ -103,31 +112,35 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 if (p.Resources.Count > 0)
                     partMass += p.GetResourceMass();
 
-                //partMass += p.GetModuleMass(p.mass);
                 // If you want to use GetModuleMass, you need to start from p.partInfo.mass, not p.mass
-                CoM  += partMass * (Vector3d)p.transform.TransformPoint(p.CoMOffset);
+                CoM += partMass * (Vector3d)p.transform.TransformPoint(p.CoMOffset);
                 mass += partMass;
-                FARWingAerodynamicModel w = p.GetComponent<FARWingAerodynamicModel>();
-                if (w != null)
-                {
-                    if (w.isShielded)
-                        continue;
+                var w = p.GetComponent<FARWingAerodynamicModel>();
+                if (w == null)
+                    continue;
+                if (w.isShielded)
+                    continue;
 
-                    area += w.S;
-                    MAC  += w.GetMAC() * w.S;
-                    b    += w.Getb_2() * w.S;
-                    if (w is FARControllableSurface controllableSurface)
-                    {
-                        controllableSurface.SetControlStateEditor(CoM, p.transform.up, 0, 0, 0, input.flaps, input.spoilers);
-                    }
-                }
+                area += w.S;
+                MAC += w.GetMAC() * w.S;
+                b += w.Getb_2() * w.S;
+                if (w is FARControllableSurface controllableSurface)
+                    controllableSurface.SetControlStateEditor(CoM,
+                                                              p.transform.up,
+                                                              0,
+                                                              0,
+                                                              0,
+                                                              input.flaps,
+                                                              input.spoilers);
             }
+
             if (area.NearlyEqual(0))
             {
                 area = _instantCondition._maxCrossSectionFromBody;
                 MAC = _instantCondition._bodyLength;
                 b = 1;
             }
+
             MAC /= area;
             b /= area;
             CoM /= mass;
@@ -154,7 +167,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 if (p.Resources.Count > 0)
                     partMass += p.GetResourceMass();
 
-                //partMass += p.GetModuleMass(p.mass);
                 // If you want to use GetModuleMass, you need to start from p.partInfo.mass, not p.mass
 
                 Ix += (y2 + z2) * partMass;
@@ -166,32 +178,55 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 Ixz += -x * z * partMass;
 
                 //And this handles the part's own moment of inertia
-                Vector3    principalInertia = p.Rigidbody.inertiaTensor;
-                Quaternion prncInertRot     = p.Rigidbody.inertiaTensorRotation;
+                Vector3 principalInertia = p.Rigidbody.inertiaTensor;
+                Quaternion prncInertRot = p.Rigidbody.inertiaTensorRotation;
 
                 //The rows of the direction cosine matrix for a quaternion
-                Vector3 Row1 = new Vector3(prncInertRot.x * prncInertRot.x - prncInertRot.y * prncInertRot.y - prncInertRot.z * prncInertRot.z + prncInertRot.w * prncInertRot.w,
-                                           2 * (prncInertRot.x * prncInertRot.y + prncInertRot.z * prncInertRot.w),
-                                           2 * (prncInertRot.x * prncInertRot.z - prncInertRot.y * prncInertRot.w));
+                var Row1 =
+                    new Vector3(prncInertRot.x * prncInertRot.x -
+                                prncInertRot.y * prncInertRot.y -
+                                prncInertRot.z * prncInertRot.z +
+                                prncInertRot.w * prncInertRot.w,
+                                2 * (prncInertRot.x * prncInertRot.y + prncInertRot.z * prncInertRot.w),
+                                2 * (prncInertRot.x * prncInertRot.z - prncInertRot.y * prncInertRot.w));
 
-                Vector3 Row2 = new Vector3(2 * (prncInertRot.x * prncInertRot.y - prncInertRot.z * prncInertRot.w),
-                                           -prncInertRot.x * prncInertRot.x + prncInertRot.y * prncInertRot.y - prncInertRot.z * prncInertRot.z + prncInertRot.w * prncInertRot.w,
-                                           2 * (prncInertRot.y * prncInertRot.z + prncInertRot.x * prncInertRot.w));
+                var Row2 = new Vector3(2 * (prncInertRot.x * prncInertRot.y - prncInertRot.z * prncInertRot.w),
+                                       -prncInertRot.x * prncInertRot.x +
+                                       prncInertRot.y * prncInertRot.y -
+                                       prncInertRot.z * prncInertRot.z +
+                                       prncInertRot.w * prncInertRot.w,
+                                       2 * (prncInertRot.y * prncInertRot.z + prncInertRot.x * prncInertRot.w));
 
-                Vector3 Row3 = new Vector3(2 * (prncInertRot.x * prncInertRot.z + prncInertRot.y * prncInertRot.w),
-                                           2 * (prncInertRot.y * prncInertRot.z - prncInertRot.x * prncInertRot.w),
-                                           -prncInertRot.x * prncInertRot.x - prncInertRot.y * prncInertRot.y + prncInertRot.z * prncInertRot.z + prncInertRot.w * prncInertRot.w);
+                var Row3 = new Vector3(2 * (prncInertRot.x * prncInertRot.z + prncInertRot.y * prncInertRot.w),
+                                       2 * (prncInertRot.y * prncInertRot.z - prncInertRot.x * prncInertRot.w),
+                                       -prncInertRot.x * prncInertRot.x -
+                                       prncInertRot.y * prncInertRot.y +
+                                       prncInertRot.z * prncInertRot.z +
+                                       prncInertRot.w * prncInertRot.w);
 
 
                 //And converting the principal moments of inertia into the coordinate system used by the system
-                Ix += principalInertia.x * Row1.x * Row1.x + principalInertia.y * Row1.y * Row1.y + principalInertia.z * Row1.z * Row1.z;
-                Iy += principalInertia.x * Row2.x * Row2.x + principalInertia.y * Row2.y * Row2.y + principalInertia.z * Row2.z * Row2.z;
-                Iz += principalInertia.x * Row3.x * Row3.x + principalInertia.y * Row3.y * Row3.y + principalInertia.z * Row3.z * Row3.z;
+                Ix += principalInertia.x * Row1.x * Row1.x +
+                      principalInertia.y * Row1.y * Row1.y +
+                      principalInertia.z * Row1.z * Row1.z;
+                Iy += principalInertia.x * Row2.x * Row2.x +
+                      principalInertia.y * Row2.y * Row2.y +
+                      principalInertia.z * Row2.z * Row2.z;
+                Iz += principalInertia.x * Row3.x * Row3.x +
+                      principalInertia.y * Row3.y * Row3.y +
+                      principalInertia.z * Row3.z * Row3.z;
 
-                Ixy += principalInertia.x * Row1.x * Row2.x + principalInertia.y * Row1.y * Row2.y + principalInertia.z * Row1.z * Row2.z;
-                Ixz += principalInertia.x * Row1.x * Row3.x + principalInertia.y * Row1.y * Row3.y + principalInertia.z * Row1.z * Row3.z;
-                Iyz += principalInertia.x * Row2.x * Row3.x + principalInertia.y * Row2.y * Row3.y + principalInertia.z * Row2.z * Row3.z;
+                Ixy += principalInertia.x * Row1.x * Row2.x +
+                       principalInertia.y * Row1.y * Row2.y +
+                       principalInertia.z * Row1.z * Row2.z;
+                Ixz += principalInertia.x * Row1.x * Row3.x +
+                       principalInertia.y * Row1.y * Row3.y +
+                       principalInertia.z * Row1.z * Row3.z;
+                Iyz += principalInertia.x * Row2.x * Row3.x +
+                       principalInertia.y * Row2.y * Row3.y +
+                       principalInertia.z * Row2.z * Row3.z;
             }
+
             Ix *= 1000;
             Iy *= 1000;
             Iz *= 1000;
@@ -204,9 +239,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivOutput.stabDerivs[25] = Iyz;
             stabDerivOutput.stabDerivs[26] = Ixz;
 
-
-            double effectiveG = _instantCondition.CalculateAccelerationDueToGravity(body, alt);     //This is the effect of gravity
-            effectiveG -= u0 * u0 / (alt + body.Radius);                          //This is the effective reduction of gravity due to high velocity
+            //This is the effect of gravity
+            double effectiveG = InstantConditionSim.CalculateAccelerationDueToGravity(body, alt);
+            //This is the effective reduction of gravity due to high velocity
+            effectiveG -= u0 * u0 / (alt + body.Radius);
             double neededCl = mass * effectiveG / (q * area);
 
 
@@ -217,9 +253,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             alpha = FARMathUtil.SelectedSearchMethod(machNumber, _instantCondition.FunctionIterateForAlpha);
             input.alpha = alpha;
             nominalOutput = _instantCondition.iterationOutput;
-            //alpha_str = (alpha * Mathf.PI / 180).ToString();
 
-            input.alpha = (alpha + 2);
+            input.alpha = alpha + 2;
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true, true);
 
@@ -228,11 +263,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             stabDerivOutput.stableAoA = alpha;
             stabDerivOutput.stableAoAState = "";
             if (Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
-                stabDerivOutput.stableAoAState = ((nominalOutput.Cl > neededCl) ? "<" : ">");
+                stabDerivOutput.stableAoAState = nominalOutput.Cl > neededCl ? "<" : ">";
 
-            FARLogger.Info("Cl needed: " + neededCl + ", AoA: " + alpha + ", Cl: " + nominalOutput.Cl + ", Cd: " + nominalOutput.Cd);
+            FARLogger.Info("Cl needed: " +
+                           neededCl +
+                           ", AoA: " +
+                           alpha +
+                           ", Cl: " +
+                           nominalOutput.Cl +
+                           ", Cd: " +
+                           nominalOutput.Cd);
 
-            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / (2 * FARMathUtil.deg2rad);                   //vert vel derivs
+            //vert vel derivs
+            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / (2 * FARMathUtil.deg2rad);
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / (2 * FARMathUtil.deg2rad);
             pertOutput.Cm = (pertOutput.Cm - nominalOutput.Cm) / (2 * FARMathUtil.deg2rad);
 
@@ -243,9 +286,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             pertOutput.Cd *= -q * area / (mass * u0);
             pertOutput.Cm *= q * area * MAC / (Iy * u0);
 
-            stabDerivOutput.stabDerivs[3] = pertOutput.Cl;  //Zw
-            stabDerivOutput.stabDerivs[4] = pertOutput.Cd;  //Xw
-            stabDerivOutput.stabDerivs[5] = pertOutput.Cm;  //Mw
+            stabDerivOutput.stabDerivs[3] = pertOutput.Cl; //Zw
+            stabDerivOutput.stabDerivs[4] = pertOutput.Cd; //Xw
+            stabDerivOutput.stabDerivs[5] = pertOutput.Cm; //Mw
 
             // Rodhern: The motivation for the revised stability derivatives sign interpretations of Zq, Xq, Ze and Xe
             //  is to align the sign conventions used for Zu, Zq, Ze, Xu, Xq and Xe. Further explanation can be found
@@ -256,7 +299,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true);
 
-            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / 0.05 * machNumber;                   //fwd vel derivs
+            //fwd vel derivs
+            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / 0.05 * machNumber;
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / 0.05 * machNumber;
             pertOutput.Cm = (pertOutput.Cm - nominalOutput.Cm) / 0.05 * machNumber;
 
@@ -267,9 +311,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             pertOutput.Cd *= -q * area / (mass * u0);
             pertOutput.Cm *= q * area * MAC / (u0 * Iy);
 
-            stabDerivOutput.stabDerivs[6] = pertOutput.Cl;  //Zu
-            stabDerivOutput.stabDerivs[7] = pertOutput.Cd;  //Xu
-            stabDerivOutput.stabDerivs[8] = pertOutput.Cm;  //Mu
+            stabDerivOutput.stabDerivs[6] = pertOutput.Cl; //Zu
+            stabDerivOutput.stabDerivs[7] = pertOutput.Cd; //Xu
+            stabDerivOutput.stabDerivs[8] = pertOutput.Cm; //Mu
 
             input.machNumber = machNumber;
 
@@ -279,7 +323,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true);
 
-            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / 0.05;                   //pitch rate derivs
+            //pitch rate derivs
+            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / 0.05;
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / 0.05;
             pertOutput.Cm = (pertOutput.Cm - nominalOutput.Cm) / 0.05;
 
@@ -296,7 +341,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true);
 
-            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / 0.1;                   //elevator derivs
+            //elevator derivs
+            pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / 0.1;
             pertOutput.Cd = (pertOutput.Cd - nominalOutput.Cd) / 0.1;
             pertOutput.Cm = (pertOutput.Cm - nominalOutput.Cm) / 0.1;
 
@@ -311,10 +357,11 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             //Lateral Mess
 
             input.pitchValue = 0;
-            input.beta = (beta + 2);
+            input.beta = beta + 2;
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true);
-            pertOutput.Cy = (pertOutput.Cy - nominalOutput.Cy) / (2 * FARMathUtil.deg2rad);                   //sideslip angle derivs
+            //sideslip angle derivs
+            pertOutput.Cy = (pertOutput.Cy - nominalOutput.Cy) / (2 * FARMathUtil.deg2rad);
             pertOutput.Cn = (pertOutput.Cn - nominalOutput.Cn) / (2 * FARMathUtil.deg2rad);
             pertOutput.C_roll = (pertOutput.C_roll - nominalOutput.C_roll) / (2 * FARMathUtil.deg2rad);
 
@@ -334,7 +381,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true);
 
-            pertOutput.Cy = (pertOutput.Cy - nominalOutput.Cy) / 0.05;                   //roll rate derivs
+            //roll rate derivs
+            pertOutput.Cy = (pertOutput.Cy - nominalOutput.Cy) / 0.05;
             pertOutput.Cn = (pertOutput.Cn - nominalOutput.Cn) / 0.05;
             pertOutput.C_roll = (pertOutput.C_roll - nominalOutput.C_roll) / 0.05;
 
@@ -353,7 +401,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             input.betaDot = -0.05;
 
-            _instantCondition.GetClCdCmSteady(input, out pertOutput, true); pertOutput.Cy = (pertOutput.Cy - nominalOutput.Cy) / 0.05f;                   //yaw rate derivs
+            //yaw rate derivs
+            _instantCondition.GetClCdCmSteady(input, out pertOutput, true);
+            pertOutput.Cy = (pertOutput.Cy - nominalOutput.Cy) / 0.05f;
             pertOutput.Cn = (pertOutput.Cn - nominalOutput.Cn) / 0.05f;
             pertOutput.C_roll = (pertOutput.C_roll - nominalOutput.C_roll) / 0.05f;
 
@@ -367,6 +417,5 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             return stabDerivOutput;
         }
-
     }
 }

@@ -52,57 +52,68 @@ namespace ferram4
 {
     public class FARBaseAerodynamics : FARPartModule, ILiftProvider
     {
-        // ReSharper disable NotAccessedField.Global
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCl")]
         public double Cl;
+
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCd")]
         public double Cd;
+
+        // ReSharper disable once NotAccessedField.Global
         [KSPField(isPersistant = false, guiActive = false, guiName = "FARAbbrevCm")]
         public double Cm;
-        // ReSharper restore NotAccessedField.Global
 
-                //protected float MachNumber = 0;
         protected Vector3d velocityEditor = Vector3.zero;
 
         protected Transform part_transform;
 
-        //Reset tinting for this part and its children
- //       private bool resetTinting;
-
         [KSPField(isPersistant = false, guiActive = false)]
         public double S;
-
-        //[KSPField(isPersistant = false, guiActive = false, guiName = "S")]
-        //public float displayS;
-
 
         [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = true)]
         public bool isShielded = true;
 
         public double rho;
 
-        // Keep track if the tinting effect is active or not
-        //private bool tintIsActive = false;
+        // TODO 1.2: provide actual implementation of these new methods
+
+        public bool DisableBodyLift
+        {
+            get { return false; }
+        }
+
+        public bool IsLifting
+        {
+            get { return true; }
+        }
+
+        public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
+        {
+            // Compute the actual center ourselves once per frame
+            // Feed the precomputed values to the vanilla indicator
+            //hacking the old stuff to work with the new
+            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;
+            CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
+            CoLMarker.dir = Vector3.zero;
+            CoLMarker.lift = 1;
+        }
 
         public override void OnAwake()
         {
             base.OnAwake();
             part_transform = part.partTransform;
 
-            //refArea = S;
-            //Terrible, hacky fix for part.partTransform going bad
             if (part.partTransform == null && part == part.vessel.rootPart)
                 part_transform = vessel.vesselTransform;
-            if(HighLogic.LoadedSceneIsEditor)
+            if (HighLogic.LoadedSceneIsEditor)
                 part_transform = part.partTransform;
-
         }
 
         public Vector3d GetVelocity()
         {
             if (HighLogic.LoadedSceneIsFlight)
-                return part.Rigidbody.velocity + Krakensbane.GetFrameVelocityV3f()
-                    - FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
+                return part.Rigidbody.velocity +
+                       Krakensbane.GetFrameVelocityV3f() -
+                       FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
             return velocityEditor;
         }
 
@@ -110,18 +121,15 @@ namespace ferram4
         public Vector3d GetVelocity(Vector3 refPoint)
         {
             Vector3d velocity = Vector3.zero;
-            if (HighLogic.LoadedSceneIsFlight)
-            {
-                if (part.Rigidbody)
-                    velocity += part.Rigidbody.GetPointVelocity(refPoint);
+            if (!HighLogic.LoadedSceneIsFlight)
+                return velocityEditor;
+            if (part.Rigidbody)
+                velocity += part.Rigidbody.GetPointVelocity(refPoint);
 
-                velocity += Krakensbane.GetFrameVelocity() - Krakensbane.GetLastCorrection() * TimeWarp.fixedDeltaTime;
-                velocity -= FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
+            velocity += Krakensbane.GetFrameVelocity() - Krakensbane.GetLastCorrection() * TimeWarp.fixedDeltaTime;
+            velocity -= FARWind.GetWind(FlightGlobals.currentMainBody, part, part.Rigidbody.position);
 
-                return velocity;
-            }
-
-            return velocityEditor;
+            return velocity;
         }
 
         protected virtual void ResetCenterOfLift()
@@ -129,12 +137,15 @@ namespace ferram4
             // Clear state when preparing CoL computation
         }
 
-        public virtual Vector3d PrecomputeCenterOfLift(Vector3d velocity, double MachNumber, double density, FARCenterQuery center)
+        public virtual Vector3d PrecomputeCenterOfLift(
+            Vector3d velocity,
+            double MachNumber,
+            double density,
+            FARCenterQuery center
+        )
         {
             return Vector3d.zero;
         }
-
-
 
         public static List<FARBaseAerodynamics> GetAllEditorModules()
         {
@@ -148,14 +159,19 @@ namespace ferram4
             return parts;
         }
 
-        public static void PrecomputeGlobalCenterOfLift(FARCenterQuery lift, FARCenterQuery dummy, Vector3 vel, double density)
+        public static void PrecomputeGlobalCenterOfLift(
+            FARCenterQuery lift,
+            FARCenterQuery dummy,
+            Vector3 vel,
+            double density
+        )
         {
             /* Center of lift is the location where the derivative of
                the total torque provided by aerodynamic forces relative to
                AoA is zero (or at least minimal). This approximates the
                derivative by a simple subtraction, like before. */
 
-            var parts = GetAllEditorModules();
+            List<FARBaseAerodynamics> parts = GetAllEditorModules();
 
             foreach (FARBaseAerodynamics ba in parts)
             {
@@ -165,43 +181,10 @@ namespace ferram4
 
             // run computations twice to let things like flap interactions settle
             foreach (FARBaseAerodynamics ba in parts)
-            {
                 ba.PrecomputeCenterOfLift(vel, 0.5, density, dummy);
-            }
             foreach (FARBaseAerodynamics ba in parts)
-            {
                 ba.PrecomputeCenterOfLift(vel, 0.5, density, lift);
-            }
         }
-
-        // TODO 1.2: provide actual implementation of these new methods
-        #region ILiftProvider
-        public bool DisableBodyLift
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public bool IsLifting
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public void OnCenterOfLiftQuery(CenterOfLiftQuery CoLMarker)
-        {
-            // Compute the actual center ourselves once per frame
-            // Feed the precomputed values to the vanilla indicator
-            CoLMarker.pos = EditorAeroCenter.VesselRootLocalAeroCenter;      //hacking the old stuff to work with the new
-            CoLMarker.pos = EditorLogic.RootPart.partTransform.localToWorldMatrix.MultiplyPoint3x4(CoLMarker.pos);
-            CoLMarker.dir = Vector3.zero;
-            CoLMarker.lift = 1;
-        }
-        #endregion ILiftProvider
 
         public override void OnLoad(ConfigNode node)
         {

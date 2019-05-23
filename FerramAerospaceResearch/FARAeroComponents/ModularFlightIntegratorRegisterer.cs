@@ -65,7 +65,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             Destroy(this);
         }
 
-        private void UpdateThermodynamicsPre(ModularFlightIntegrator fi)
+        private static void UpdateThermodynamicsPre(ModularFlightIntegrator fi)
         {
             for (int i = 0; i < fi.PartThermalDataCount; i++)
             {
@@ -74,58 +74,57 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (!part.Modules.Contains<FARAeroPartModule>())
                     continue;
 
-                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
-
-                //FARAeroPartModule aeroModule = (FARAeroPartModule)module;
+                var aeroModule = part.Modules.GetModule<FARAeroPartModule>();
 
                 part.radiativeArea = CalculateAreaRadiative(fi, part, aeroModule);
-                part.exposedArea = part.machNumber > 0 ? CalculateAreaExposed(fi, part, aeroModule) : part.radiativeArea;
+                part.exposedArea =
+                    part.machNumber > 0 ? CalculateAreaExposed(fi, part, aeroModule) : part.radiativeArea;
 
                 if (part.exposedArea > part.radiativeArea)
-                    part.exposedArea = part.radiativeArea;      //sanity check just in case
-
-                //fi.SetSkinProperties(ptd);
+                    part.exposedArea = part.radiativeArea; //sanity check just in case
             }
-            //fi.timeSinceLastUpdate = 0;
-            //FARLogger.Info("MFI: " + fi.CoM + " " + Planetarium.GetUniversalTime());
         }
 
-        private void UpdateAerodynamics(ModularFlightIntegrator fi, Part part)
+        private static void UpdateAerodynamics(ModularFlightIntegrator fi, Part part)
         {
-            if (part.Modules.Contains<ModuleAeroSurface>() || (part.Modules.Contains("MissileLauncher") && part.vessel.rootPart == part))     //FIXME Proper model for airbrakes
+            //FIXME Proper model for airbrakes
+            if (part.Modules.Contains<ModuleAeroSurface>() ||
+                part.Modules.Contains("MissileLauncher") && part.vessel.rootPart == part)
             {
                 fi.BaseFIUpdateAerodynamics(part);
             }
             else
             {
                 Rigidbody rb = part.rb;
-                if (rb)
+                if (!rb)
+                    return;
+                part.dragVector = rb.velocity +
+                                  Krakensbane.GetFrameVelocity() -
+                                  FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
+                part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
+                if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
                 {
-                    part.dragVector = rb.velocity + Krakensbane.GetFrameVelocity() - FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
-                    part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
-                    if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
-                    {
-                        part.dragVectorMag = 0f;
-                        part.dragVectorDir = Vector3.zero;
-                        part.dragVectorDirLocal = Vector3.zero;
-                        part.dragScalar = 0f;
-                    }
-                    else
-                    {
-                        part.dragVectorMag = (float)Math.Sqrt(part.dragVectorSqrMag);
-                        part.dragVectorDir = part.dragVector / part.dragVectorMag;
-                        part.dragVectorDirLocal = -part.partTransform.InverseTransformDirection(part.dragVectorDir);
-                        CalculateLocalDynPresAndAngularDrag(fi, part);
-                    }
-                    if (!part.DragCubes.None)
-                        part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
+                    part.dragVectorMag = 0f;
+                    part.dragVectorDir = Vector3.zero;
+                    part.dragVectorDirLocal = Vector3.zero;
+                    part.dragScalar = 0f;
                 }
+                else
+                {
+                    part.dragVectorMag = (float)Math.Sqrt(part.dragVectorSqrMag);
+                    part.dragVectorDir = part.dragVector / part.dragVectorMag;
+                    part.dragVectorDirLocal = -part.partTransform.InverseTransformDirection(part.dragVectorDir);
+                    CalculateLocalDynPresAndAngularDrag(fi, part);
+                }
+
+                if (!part.DragCubes.None)
+                    part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
             }
         }
 
-        private void CalculateLocalDynPresAndAngularDrag(ModularFlightIntegrator fi, Part p)
+        private static void CalculateLocalDynPresAndAngularDrag(ModularFlightIntegrator fi, Part p)
         {
-            if(fi.CurrentMainBody.ocean && p.submergedPortion > 0)
+            if (fi.CurrentMainBody.ocean && p.submergedPortion > 0)
             {
                 p.submergedDynamicPressurekPa = fi.CurrentMainBody.oceanDensity * 1000;
                 p.dynamicPressurekPa = p.atmDensity;
@@ -135,22 +134,30 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 p.submergedDynamicPressurekPa = 0;
                 p.dynamicPressurekPa = p.atmDensity;
             }
+
             double tmp = 0.0005 * p.dragVectorSqrMag;
 
             p.submergedDynamicPressurekPa *= tmp;
             p.dynamicPressurekPa *= tmp;
 
             tmp = p.dynamicPressurekPa * (1.0 - p.submergedPortion);
-            tmp += p.submergedDynamicPressurekPa * PhysicsGlobals.BuoyancyWaterAngularDragScalar * p.waterAngularDragMultiplier * p.submergedPortion;
+            tmp += p.submergedDynamicPressurekPa *
+                   PhysicsGlobals.BuoyancyWaterAngularDragScalar *
+                   p.waterAngularDragMultiplier *
+                   p.submergedPortion;
 
             p.rb.angularDrag = (float)(p.angularDrag * tmp * PhysicsGlobals.AngularDragMultiplier);
 
             tmp = Math.Max(fi.pseudoReDragMult, 1);
-            p.dragScalar = (float)((p.dynamicPressurekPa * (1.0 - p.submergedPortion) + p.submergedDynamicPressurekPa * p.submergedPortion) * tmp);       //dyn pres adjusted for submersion
-            p.bodyLiftScalar = (float)(p.dynamicPressurekPa * (1.0 - p.submergedPortion) + p.submergedDynamicPressurekPa * p.submergedPortion);
+            //dyn pres adjusted for submersion
+            p.dragScalar = (float)((p.dynamicPressurekPa * (1.0 - p.submergedPortion) +
+                                    p.submergedDynamicPressurekPa * p.submergedPortion) *
+                                   tmp);
+            p.bodyLiftScalar = (float)(p.dynamicPressurekPa * (1.0 - p.submergedPortion) +
+                                       p.submergedDynamicPressurekPa * p.submergedPortion);
         }
 
-        private double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part)
+        private static double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part)
         {
             FARAeroPartModule module = null;
             if (part.Modules.Contains<FARAeroPartModule>())
@@ -159,19 +166,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return CalculateAreaRadiative(fi, part, module);
         }
 
-        private double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
+        private static double CalculateAreaRadiative(
+            ModularFlightIntegrator fi,
+            Part part,
+            FARAeroPartModule aeroModule
+        )
         {
-            //double dragCubeExposed = fi.BaseFICalculateAreaExposed(part);
-            if (!(aeroModule is null))
-            {
-                double radArea = aeroModule.ProjectedAreas.totalArea;
-
-                if (radArea > 0)
-                    return radArea;
+            if (aeroModule is null)
                 return fi.BaseFICalculateAreaRadiative(part);
-            }
+            double radArea = aeroModule.ProjectedAreas.totalArea;
 
-            return fi.BaseFICalculateAreaRadiative(part);
+            return radArea > 0 ? radArea : fi.BaseFICalculateAreaRadiative(part);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -184,61 +189,39 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return CalculateAreaExposed(fi, part, module);
         }
 
-        private double CalculateAreaExposed(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
+        private static double CalculateAreaExposed(ModularFlightIntegrator fi, Part part, FARAeroPartModule aeroModule)
         {
-            if (!(aeroModule is null))
-            {
-                double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
-
-                if (exposedArea > 0)
-                    return exposedArea;
+            if (aeroModule is null)
                 return fi.BaseFICalculateAreaExposed(part);
-            }
+            double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
 
-            return fi.BaseFICalculateAreaExposed(part);
-            /*else
-            {
-                if (stockRadArea > 0)
-                    return aeroModule.ProjectedAreas.totalArea * dragCubeExposed / stockRadArea;
-                else
-                    return aeroModule.ProjectedAreas.totalArea;
-            }*/
+            return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
         }
 
-        private double CalculateSunArea(ModularFlightIntegrator fi, PartThermalData ptd)
+        private static double CalculateSunArea(ModularFlightIntegrator fi, PartThermalData ptd)
         {
             FARAeroPartModule module = null;
             if (ptd.part.Modules.Contains<FARAeroPartModule>())
                 module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
-            if (!(module is null))
-            {
-                double sunArea = module.ProjectedAreaWorld(fi.sunVector) * ptd.sunAreaMultiplier;
-
-                if (sunArea > 0)
-                    return sunArea;
+            if (module is null)
                 return fi.BaseFIGetSunArea(ptd);
-            }
+            double sunArea = module.ProjectedAreaWorld(fi.sunVector) * ptd.sunAreaMultiplier;
 
-            return fi.BaseFIGetSunArea(ptd);
+            return sunArea > 0 ? sunArea : fi.BaseFIGetSunArea(ptd);
         }
 
-        private double CalculateBodyArea(ModularFlightIntegrator fi, PartThermalData ptd)
+        private static double CalculateBodyArea(ModularFlightIntegrator fi, PartThermalData ptd)
         {
             FARAeroPartModule module = null;
             if (ptd.part.Modules.Contains<FARAeroPartModule>())
                 module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
-            if (!(module is null))
-            {
-                double bodyArea = module.ProjectedAreaWorld(-fi.Vessel.upAxis) * ptd.bodyAreaMultiplier;
-
-                if (bodyArea > 0)
-                    return bodyArea;
+            if (module is null)
                 return fi.BaseFIBodyArea(ptd);
-            }
+            double bodyArea = module.ProjectedAreaWorld(-fi.Vessel.upAxis) * ptd.bodyAreaMultiplier;
 
-            return fi.BaseFIBodyArea(ptd);
+            return bodyArea > 0 ? bodyArea : fi.BaseFIBodyArea(ptd);
         }
     }
 }

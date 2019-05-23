@@ -60,19 +60,28 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             return _instantCondition.Ready;
         }
 
-        public GraphData MachNumberSweep(double aoAdegrees, double pitch, double lowerBound, double upperBound, int numPoints, int flapSetting, bool spoilers, CelestialBody body)
+        public GraphData MachNumberSweep(
+            double aoAdegrees,
+            double pitch,
+            double lowerBound,
+            double upperBound,
+            int numPoints,
+            int flapSetting,
+            bool spoilers,
+            CelestialBody body
+        )
         {
             FARAeroUtil.UpdateCurrentActiveBody(body);
 
             FARAeroUtil.ResetEditorParts();
 
-            double[] ClValues = new double[numPoints];
-            double[] CdValues = new double[numPoints];
-            double[] CmValues = new double[numPoints];
-            double[] LDValues = new double[numPoints];
-            double[] AlphaValues = new double[numPoints];
+            var ClValues = new double[numPoints];
+            var CdValues = new double[numPoints];
+            var CmValues = new double[numPoints];
+            var LDValues = new double[numPoints];
+            var AlphaValues = new double[numPoints];
 
-            InstantConditionSimInput input = new InstantConditionSimInput(aoAdegrees, 0, 0, 0, 0, 0, 0, pitch, flapSetting, spoilers);
+            var input = new InstantConditionSimInput(aoAdegrees, 0, 0, 0, 0, 0, 0, pitch, flapSetting, spoilers);
 
             for (int i = 0; i < numPoints; i++)
             {
@@ -89,7 +98,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 LDValues[i] = output.Cl * 0.1 / output.Cd;
             }
 
-            GraphData data = new GraphData {xValues = AlphaValues};
+            var data = new GraphData {xValues = AlphaValues};
             data.AddData(ClValues, GUIColors.GetColor(0), Localizer.Format("FARAbbrevCl"), true);
             data.AddData(CdValues, GUIColors.GetColor(1), Localizer.Format("FARAbbrevCd"), true);
             data.AddData(CmValues, GUIColors.GetColor(2), Localizer.Format("FARAbbrevCm"), true);
@@ -98,31 +107,40 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             return data;
         }
 
-        public GraphData AngleOfAttackSweep(double machNumber, double pitch, double lowerBound, double upperBound, int numPoints, int flapSetting, bool spoilers, CelestialBody body)
+        public GraphData AngleOfAttackSweep(
+            double machNumber,
+            double pitch,
+            double lowerBound,
+            double upperBound,
+            int numPoints,
+            int flapSetting,
+            bool spoilers,
+            CelestialBody body
+        )
         {
             if (machNumber.NearlyEqual(0))
                 machNumber = 0.001;
 
-            InstantConditionSimInput input = new InstantConditionSimInput(0, 0, 0, 0, 0, 0, machNumber, pitch, flapSetting, spoilers);
+            var input = new InstantConditionSimInput(0, 0, 0, 0, 0, 0, machNumber, pitch, flapSetting, spoilers);
 
             FARAeroUtil.UpdateCurrentActiveBody(body);
 
             FARAeroUtil.ResetEditorParts();
 
 
-            double[] ClValues = new double[numPoints];
-            double[] CdValues = new double[numPoints];
-            double[] CmValues = new double[numPoints];
-            double[] LDValues = new double[numPoints];
-            double[] AlphaValues = new double[numPoints];
-            double[] ClValues2 = new double[numPoints];
-            double[] CdValues2 = new double[numPoints];
-            double[] CmValues2 = new double[numPoints];
-            double[] LDValues2 = new double[numPoints];
+            var ClValues = new double[numPoints];
+            var CdValues = new double[numPoints];
+            var CmValues = new double[numPoints];
+            var LDValues = new double[numPoints];
+            var AlphaValues = new double[numPoints];
+            var ClValues2 = new double[numPoints];
+            var CdValues2 = new double[numPoints];
+            var CmValues2 = new double[numPoints];
+            var LDValues2 = new double[numPoints];
 
             for (int i = 0; i < 2 * numPoints; i++)
             {
-                double angle = 0;
+                double angle;
                 if (i < numPoints)
                     angle = i / (double)numPoints * (upperBound - lowerBound) + lowerBound;
                 else
@@ -132,7 +150,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
                 _instantCondition.GetClCdCmSteady(input, out InstantConditionSimOutput output, i == 0);
 
-                //                FARLogger.Info("Cl: " + Cl + " Cd: " + Cd);
                 if (i < numPoints)
                 {
                     AlphaValues[i] = angle;
@@ -150,7 +167,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 }
             }
 
-            GraphData data = new GraphData {xValues = AlphaValues};
+            var data = new GraphData {xValues = AlphaValues};
             data.AddData(ClValues2, GUIColors.GetColor(0) * 0.5f, "Cl2", false);
             data.AddData(ClValues, GUIColors.GetColor(0), Localizer.Format("FARAbbrevCl"), true);
 
@@ -166,6 +183,5 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             return data;
         }
-
     }
 }
