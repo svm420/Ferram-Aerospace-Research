@@ -43,6 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
+using System.Globalization;
 using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch
@@ -51,18 +52,6 @@ namespace FerramAerospaceResearch
     {
         public const double rad2deg = 180d / Math.PI;
         public const double deg2rad = Math.PI / 180d;
-
-        private const double rightedge = 30d;
-        private const double leftedge = -rightedge;
-        private const double xstepinitial = 5d;
-        private const double xstepsize = 10d;
-        private const double minpart = 1d / 8d;
-        private const double maxpart = 7d / 8d;
-        private const double tol_triangle = 1E-3;
-        private const double tol_linear = 3E-4;
-        private const double tol_brent = 1E-3;
-        private const double machswitchvalue = 0.30;
-        private const int iterlim = 500;
 
         public static bool NearlyEqual(this double a, double b, double epsilon = 1e-14)
         {
@@ -116,6 +105,30 @@ namespace FerramAerospaceResearch
             return val.CompareTo(max) > 0 ? max : val;
         }
 
+        public static void Swap<T>(ref T a, ref T b)
+        {
+            T tmp = a;
+            a = b;
+            b = tmp;
+        }
+
+        public static bool IsClose(double a, double b, double aTol = 1e-8, double rTol = 1e-5, bool equalNan = false)
+        {
+            if (IsFinite(a) && IsFinite(b))
+                return Math.Abs(a - b) <= aTol + rTol * Math.Abs(b);
+
+            if (equalNan && double.IsNaN(a) && double.IsNaN(b))
+                return true;
+
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            return a == b;
+        }
+
+        public static bool IsFinite(double a)
+        {
+            return !double.IsNaN(a) && !double.IsInfinity(a);
+        }
+
         public static bool Approximately(double p, double q, double error = double.Epsilon)
         {
             return Math.Abs(p - q) < error;
@@ -165,7 +178,8 @@ namespace FerramAerospaceResearch
             return BitConverter.Int64BitsToDouble((long)tmp2 << 32);
         }
 
-        public static double BrentsMethod(
+        // ReSharper disable once UnusedMember.Global
+        public static OptimizationResult BrentsMethod(
             Func<double, double> function,
             double a,
             double b,
@@ -178,7 +192,10 @@ namespace FerramAerospaceResearch
             double fb = function(b);
 
             if (fa * fb >= 0)
-                return 0;
+            {
+                FARLogger.Debug("Brent's method failed to converge in 2 calls due to invalid brackets");
+                return new OptimizationResult(0, 2);
+            }
 
             if (Math.Abs(fa) < Math.Abs(fb))
             {
@@ -192,12 +209,12 @@ namespace FerramAerospaceResearch
             }
 
             double c = a, d = a, fc = function(c);
+            int funcCalls = 3;
 
             double s = b, fs = fb;
 
             bool flag = true;
-            int iter = 0;
-            while (!fs.NearlyEqual(0) && Math.Abs(a - b) > epsilon && iter < maxIter)
+            for (int iter = 0; iter < maxIter; iter++)
             {
                 if (fa - fc > double.Epsilon && fb - fc > double.Epsilon) //inverse quadratic interpolation
                 {
@@ -268,6 +285,7 @@ namespace FerramAerospaceResearch
                 }
 
                 fs = function(s);
+                funcCalls++;
                 d = c;
                 c = b;
 
@@ -293,147 +311,129 @@ namespace FerramAerospaceResearch
                     b = tmp;
                 }
 
-                iter++;
+                if (fs.NearlyEqual(0) || Math.Abs(a - b) <= epsilon)
+                    return new OptimizationResult(s, funcCalls, true);
             }
 
-            return s;
+            FARLogger.Debug($"Brent's method failed to converged in {funcCalls.ToString()} function calls");
+
+            return new OptimizationResult(s, funcCalls);
         }
 
-        public static double SelectedSearchMethod(double machNumber, Func<double, double> function)
+        /// <summary>
+        ///     C# implementation of
+        ///     https://github.com/scipy/scipy/blob/d5617d81064885ef2ec961492bc703f36bb36ee9/scipy/optimize/zeros.py#L95-L363
+        ///     with optional <see cref="minLimit" /> and <see cref="maxLimit" /> constraints for physical problems. The solver
+        ///     terminates when it either reaches the maximum number of iterations <see cref="maxIter" />, current and previous
+        ///     <see cref="function" /> values are equal, current and previous solutions are close enough, are both NaN  or both
+        ///     fall outside limits.
+        /// </summary>
+        /// <param name="function">Function to find root of</param>
+        /// <param name="x0">Initial guess</param>
+        /// <param name="x1">Optional second guess</param>
+        /// <param name="tol">Absolute convergence tolerance</param>
+        /// <param name="rTol">Relative convergence tolerance</param>
+        /// <param name="maxIter">Maximum number of iterations</param>
+        /// <param name="maxLimit">Maximum value of the solution</param>
+        /// <param name="minLimit">Minimum value of the solution</param>
+        /// <returns><see cref="OptimizationResult" /> solution</returns>
+        /// <exception cref="ArgumentException">When initial and second guesses are equal</exception>
+        public static OptimizationResult Secant(
+            Func<double, double> function,
+            double x0,
+            double? x1 = null,
+            double tol = 0.001,
+            double rTol = 0.001,
+            int maxIter = 50,
+            double maxLimit = double.PositiveInfinity,
+            double minLimit = double.NegativeInfinity
+        )
         {
-            // Rodhern: In dkavolis branch BrentsMethod is the favoured root-finding algorithm.
-            //          At slower speeds however SegmentSearchMethod is used as ad hoc root-finder.
-            return machNumber >= machswitchvalue
-                       ? BrentsMethod(function, leftedge, rightedge, tol_brent, iterlim)
-                       : SegmentSearchMethod(function);
-        }
-
-        public static double SegmentSearchMethod(Func<double, double> function)
-        {
-            double x0 = 0d;
-            double f0 = function(x0);
-            var mfobj = new MirroredFunction(function, f0 > 0d);
-            if (mfobj.IsMirrored)
-                f0 = -f0;
-            Func<double, double> f = mfobj.Delegate;
-            double x1 = xstepinitial;
-            double f1 = f(x1);
-            if (f1 < f0)
-                return mfobj.BrentSolve("Negative initial gradient.");
-
-            LblSkipRight:
-            if (f1 > 0)
-                return mfobj.LinearSolution(x0, f0, x1, f1);
-            double x2 = Clamp(x1 + xstepsize, 0d, rightedge);
-            if (Math.Abs(x2 - x1) < tol_brent)
-                // Rodhern: Strict equality replaced with approximate equality for readability in dkavolis branch.
-                return mfobj.BrentSolve("Reached far right edge.");
-            double f2 = f(x2);
-            if (f2 > f1)
+            // ReSharper disable CompareOfFloatsByEqualityOperator
+            int funcCalls = 0;
+            double p0 = x0;
+            double p1;
+            if (x1 is null)
             {
-                // skip right
-                x0 = x1;
-                f0 = f1;
-                x1 = x2;
-                f1 = f2;
-                goto LblSkipRight;
+                const double eps = 1e-4;
+                p1 = x0 * (1 + eps);
+                p1 += p1 >= 0 ? eps : -eps;
+            }
+            else
+            {
+                if (x1 == x0)
+                    throw new ArgumentException($"{nameof(x1)} and {nameof(x0)} must be different");
+                p1 = (double)x1;
             }
 
-            LblTriangle:
-            if (f1 > 0)
-                return mfobj.LinearSolution(x0, f0, x1, f1);
-            if (x2 - x0 < tol_triangle)
-                return mfobj.BrentSolve("Local maximum is negative (search point x= " + x0 + ").");
-            double x01 = (x0 + x1) / 2d;
-            double x12 = (x1 + x2) / 2d;
-            double f01 = f(x01);
-            double f12 = f(x12);
-            if (f01 >= f1 && f01 >= f12)
+            double q0 = function(p0);
+            double q1 = function(p1);
+            funcCalls += 2;
+            double p = 0;
+
+            if (Math.Abs(q1) < Math.Abs(q0))
             {
-                // maximum at x01
-                x1 = x01;
-                f1 = f01;
-                x2 = x1;
-                // f2 = f1;
-                goto LblTriangle;
+                Swap(ref p0, ref p1);
+                Swap(ref q0, ref q1);
             }
 
-            if (f12 > f1 && f12 > f01)
+            for (int itr = 0; itr < maxIter; itr++)
             {
-                // maximum at x12
-                x0 = x1;
-                f0 = f1;
-                x1 = x12;
-                f1 = f12;
-                goto LblTriangle;
-            }
-
-            // shrink around x1
-            x0 = x01;
-            f0 = f01;
-            x2 = x12;
-            // f2 = f12;
-            goto LblTriangle;
-        }
-
-        public class MirroredFunction
-        {
-            private readonly Func<double, double> F;
-
-            public MirroredFunction(Func<double, double> original, bool mirrored)
-            {
-                F = original;
-                IsMirrored = mirrored;
-            }
-
-            public Func<double, double> Delegate
-            {
-                get { return IsMirrored ? InvokeMirrored : F; }
-            }
-
-            public bool IsMirrored { get; }
-
-            private double InvokeMirrored(double x)
-            {
-                return -F.Invoke(-x);
-            }
-
-            public double LinearSolution(double x0, double f0, double x1, double f1)
-            {
-                if (IsMirrored)
+                if (q1 == q0)
                 {
-                    double oldx0 = x0;
-                    double oldf0 = f0;
-                    x0 = -x1;
-                    f0 = -f1;
-                    x1 = -oldx0;
-                    f1 = -oldf0;
+                    if (p1 != p0)
+                        FARLogger.Warning($"Tolerance of {(p1 - p0).ToString(CultureInfo.InvariantCulture)} reached");
+                    FARLogger.Debug($"Secant method converged in {funcCalls.ToString()} function calls");
+                    return new OptimizationResult((p1 + p0) / 2, funcCalls, true);
                 }
 
-                LblLoop:
-                double x = x0 + (x0 - x1) * f0 / (f1 - f0);
-                if (x1 - x0 < tol_linear)
-                    return x;
-                x = Clamp(x, maxpart * x0 + minpart * x1, minpart * x0 + maxpart * x1);
-                double fx = F(x);
-                if (fx < 0d)
+                if (Math.Abs(q1) > Math.Abs(q0))
+                    p = (-q0 / q1 * p1 + p0) / (1 - q0 / q1);
+                else
+                    p = (-q1 / q0 * p0 + p1) / (1 - q1 / q0);
+
+                if (IsClose(p, p1, tol, rTol))
                 {
-                    x0 = x;
-                    f0 = fx;
-                    goto LblLoop;
+                    FARLogger.Debug($"Secant method converged in {funcCalls.ToString()} function calls with tolerance of {(p1 - p).ToString(CultureInfo.InvariantCulture)}");
+                    return new OptimizationResult(p, funcCalls, true);
                 }
 
-                if (fx <= 0d)
-                    return x;
-                x1 = x;
-                f1 = fx;
-                goto LblLoop;
+                p0 = p1;
+                q0 = q1;
+                p1 = p;
+
+                if (double.IsNaN(p0) && double.IsNaN(p1))
+                {
+                    FARLogger.Warning($"Both {nameof(p0)} and {nameof(p1)} are NaN, used {funcCalls.ToString()} function calls");
+                    return new OptimizationResult(p, funcCalls);
+                }
+
+                if (p1 < minLimit && p0 < minLimit || p1 > maxLimit && p0 > maxLimit)
+                {
+                    FARLogger.Warning($"{nameof(p1)} and {nameof(p0)} are outside the limits, used {funcCalls.ToString()} function calls");
+                    return new OptimizationResult(p, funcCalls);
+                }
+
+                q1 = function(p1);
+                funcCalls++;
             }
 
-            public double BrentSolve(string dbgmsg)
+            FARLogger.Warning($"Secant method failed to converge in {funcCalls.ToString()} function calls");
+            return new OptimizationResult(p, funcCalls);
+            // ReSharper restore CompareOfFloatsByEqualityOperator
+        }
+
+        public struct OptimizationResult
+        {
+            public readonly double Result;
+            public readonly bool Converged;
+            public readonly int FunctionCalls;
+
+            public OptimizationResult(double result, int functionCalls, bool converged = false)
             {
-                FARLogger.Info("MirroredFunction (mirrored= " + IsMirrored + ") reverting to BrentsMethod: " + dbgmsg);
-                return BrentsMethod(F, leftedge, rightedge, tol_brent, iterlim);
+                Result = result;
+                FunctionCalls = functionCalls;
+                Converged = converged;
             }
         }
     }

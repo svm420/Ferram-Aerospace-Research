@@ -44,6 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using ferram4;
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
@@ -249,8 +250,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             _instantCondition.GetClCdCmSteady(input, out pertOutput, true, true);
             //Longitudinal Mess
             _instantCondition.SetState(machNumber, neededCl, CoM, 0, input.flaps, input.spoilers);
+            FARMathUtil.OptimizationResult optResult =
+                FARMathUtil.Secant(_instantCondition.FunctionIterateForAlpha,
+                                   0,
+                                   10,
+                                   1e-4,
+                                   1e-4,
+                                   minLimit: -90,
+                                   maxLimit: 90);
+            alpha = optResult.Result;
 
-            alpha = FARMathUtil.SelectedSearchMethod(machNumber, _instantCondition.FunctionIterateForAlpha);
             input.alpha = alpha;
             nominalOutput = _instantCondition.iterationOutput;
 
@@ -260,19 +269,29 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             stabDerivOutput.stableCl = neededCl;
             stabDerivOutput.stableCd = nominalOutput.Cd;
-            stabDerivOutput.stableAoA = alpha;
+            stabDerivOutput.stableAoA = optResult.Converged ? alpha : double.NaN;
             stabDerivOutput.stableAoAState = "";
-            if (Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
+            if (optResult.Converged && Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
                 stabDerivOutput.stableAoAState = nominalOutput.Cl > neededCl ? "<" : ">";
 
             FARLogger.Info("Cl needed: " +
-                           neededCl +
+                           neededCl.ToString(CultureInfo.InvariantCulture) +
                            ", AoA: " +
-                           alpha +
+                           stabDerivOutput.stableAoA.ToString(CultureInfo.InvariantCulture) +
                            ", Cl: " +
-                           nominalOutput.Cl +
+                           nominalOutput.Cl.ToString(CultureInfo.InvariantCulture) +
                            ", Cd: " +
-                           nominalOutput.Cd);
+                           nominalOutput.Cd.ToString(CultureInfo.InvariantCulture) +
+                           ", function calls: " +
+                           optResult.FunctionCalls.ToString());
+
+            if (!optResult.Converged)
+            {
+                // couldn't find stable AoA, no reason to compute invalid stability derivatives
+                for (int i = 3; i < 24; i++)
+                    stabDerivOutput.stabDerivs[i] = double.NaN;
+                return stabDerivOutput;
+            }
 
             //vert vel derivs
             pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / (2 * FARMathUtil.deg2rad);
