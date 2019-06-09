@@ -125,7 +125,8 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         {
         } //use the fairing events instead
 
-        private static void FairingDeployGeometryUpdate(Part p)
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        private void FairingDeployGeometryUpdate(Part p)
         {
             ThreadSafeDebugLogger.Instance.RegisterMessage("Fairing Geometry Update");
             validParts[p].GeometryPartModuleRebuildMeshData();
