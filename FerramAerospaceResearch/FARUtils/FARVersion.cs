@@ -1,5 +1,5 @@
 /*
-Ferram Aerospace Research v0.15.10.1 "Lundgren"
+Ferram Aerospace Research v0.15.11.0 "Mach"
 =========================
 Copyright 2019, Daumantas Kavolis, aka dkavolis
 
@@ -47,9 +47,9 @@ namespace FerramAerospaceResearch.FARUtils
         // using byte here because 0-255 should be enough for any version number
         public const byte Major = 0;
         public const byte Minor = 15;
-        public const byte Build = 10;
-        public const byte Revision = 1;
-        public const string Name = "Lundgren";
+        public const byte Build = 11;
+        public const byte Revision = 0;
+        public const string Name = "Mach";
 
         public static readonly string String = $"v{Major}.{Minor}.{Build}.{Revision}";
         public static readonly string VersionString = $"{String} '{Name}'";

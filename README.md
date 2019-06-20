@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.15.10.1 "Lundgren"
+Ferram Aerospace Research Continued v0.15.11.0 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,8 +64,10 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
------------------------master branch---------------------
+0.15.11.0V "Mach"------------------------------------
 
+Chute staging now works with stage lock ([#68](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/68))  
+Fix German localization formatting ([#70](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/70), [@HebaruSan](https://github.com/HebaruSan))  
 Greatly improve stable angle of attack solver in stability derivative calculation, now works for all cases where stable angle of attack exists and converges faster ([#65](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/65))  
 Fix aerodynamic torque simulation and expose total aerodynamic force and torque through API ([#22](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/22), [@BenChung](https://github.com/BenChung))  
 Shaders are now platform specific ([#60](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/60))  
