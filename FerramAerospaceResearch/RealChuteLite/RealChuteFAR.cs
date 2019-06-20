@@ -1069,12 +1069,6 @@ namespace FerramAerospaceResearch.RealChuteLite
 
             CalculateSafeToDeployEstimate();
 
-            if (!staged &&
-                GameSettings.LAUNCH_STAGES.GetKeyDown() &&
-                vessel.isActiveVessel &&
-                (part.inverseStage == StageManager.CurrentStage - 1 || StageManager.CurrentStage == 0))
-                ActivateRC();
-
             if (!staged)
                 return;
             //Checks if the parachute must disarm
@@ -1162,6 +1156,13 @@ namespace FerramAerospaceResearch.RealChuteLite
             //Hide/show UI event removal
             GameEvents.onHideUI.Remove(HideUI);
             GameEvents.onShowUI.Remove(ShowUI);
+            GameEvents.onStageActivate.Remove(OnStageActivate);
+        }
+
+        private void OnStageActivate(int stage)
+        {
+            if (!staged && stage == part.inverseStage)
+                ActivateRC();
         }
 
         public override void OnStart(StartState startState)
@@ -1210,6 +1211,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 //Hide/show UI event addition
                 GameEvents.onHideUI.Add(HideUI);
                 GameEvents.onShowUI.Add(ShowUI);
+                GameEvents.onStageActivate.Add(OnStageActivate);
 
                 if (CanRepack)
                     SetRepack();
