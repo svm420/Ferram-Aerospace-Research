@@ -12,9 +12,9 @@
         "GameDir": "$(KSPGameData)$(ModName)/",
         "VersionMajor": 0,
         "VersionMinor": 15,
-        "VersionBuild": 10,
-        "VersionRevision": 1,
-        "VersionName": "Lundgren",
+        "VersionBuild": 11,
+        "VersionRevision": 0,
+        "VersionName": "Mach",
         "Year": 2019,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
         "VersionString": "$(NumericalVersion) \"$(VersionName)\"",
@@ -62,7 +62,7 @@
     "replace": {
         "regex": [
             {
-                "pattern": "**/*.cs",
+                "pattern": "ferram*/**/*.cs",
                 "substitutions": [
                     {
                         "search": "([Cc]opyright )\\d+",
