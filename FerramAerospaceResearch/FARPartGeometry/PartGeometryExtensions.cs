@@ -213,8 +213,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     string transformString =
                         (string)module.GetType().GetField(currentPartModuleTransforms[j]).GetValue(module);
                     Transform.AddRange(string.IsNullOrEmpty(transformString)
-                                           ? p.FindModelComponents<Transform>(transformString)
-                                           : p.FindModelComponents<Transform>(currentPartModuleTransforms[j]));
+                                           ? p.FindModelComponents<Transform>(currentPartModuleTransforms[j])
+                                           : p.FindModelComponents<Transform>(transformString));
                 }
             }
 
