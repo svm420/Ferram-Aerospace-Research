@@ -1,5 +1,5 @@
 /*
-Ferram Aerospace Research v0.15.11.0 "Mach"
+Ferram Aerospace Research v0.15.11.1 "Mach"
 =========================
 Copyright 2019, Daumantas Kavolis, aka dkavolis
 
@@ -48,7 +48,7 @@ namespace FerramAerospaceResearch.FARUtils
         public const byte Major = 0;
         public const byte Minor = 15;
         public const byte Build = 11;
-        public const byte Revision = 0;
+        public const byte Revision = 1;
         public const string Name = "Mach";
 
         public static readonly string String = $"v{Major}.{Minor}.{Build}.{Revision}";

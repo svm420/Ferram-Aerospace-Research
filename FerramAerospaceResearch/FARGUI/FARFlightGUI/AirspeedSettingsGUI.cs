@@ -1,5 +1,5 @@
 /*
-Ferram Aerospace Research v0.15.11.0 "Mach"
+Ferram Aerospace Research v0.15.11.1 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 

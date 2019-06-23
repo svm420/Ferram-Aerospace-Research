@@ -13,7 +13,7 @@
         "VersionMajor": 0,
         "VersionMinor": 15,
         "VersionBuild": 11,
-        "VersionRevision": 0,
+        "VersionRevision": 1,
         "VersionName": "Mach",
         "Year": 2019,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",

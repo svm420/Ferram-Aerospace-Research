@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.15.11.0 "Mach"
+Ferram Aerospace Research Continued v0.15.11.1 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,6 +64,10 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.15.11.1V "Mach"------------------------------------
+
+Fix [#72](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/72) ([#73](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/73))  
+
 0.15.11.0V "Mach"------------------------------------
 
 Chute staging now works with stage lock ([#68](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/68))  
