@@ -136,7 +136,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             foreach (FARAeroPartModule m in _currentAeroModules)
             {
-                if (m is null)
+                if (m is null || m.transform == null)
                     continue;
                 aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
                 aeroForces.AddTorque(m.worldSpaceTorque);
