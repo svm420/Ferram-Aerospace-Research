@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.1 "Mach"
+Ferram Aerospace Research v0.15.11.2 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -136,7 +136,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             foreach (FARAeroPartModule m in _currentAeroModules)
             {
-                if (m is null)
+                if (m is null || m == null)
                     continue;
                 aeroForces.AddForce(m.transform.position, m.totalWorldSpaceAeroForce);
                 aeroForces.AddTorque(m.worldSpaceTorque);
