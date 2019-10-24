@@ -258,7 +258,20 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                                    1e-4,
                                    minLimit: -90,
                                    maxLimit: 90);
-            alpha = optResult.Result;
+            int calls = optResult.FunctionCalls;
+
+            // if stable AoA doesn't exist, calculate derivatives at 0 incidence
+            if (!optResult.Converged)
+            {
+                FARLogger.Info("Stable angle of attack not found, calculating derivatives at 0 incidence instead");
+                alpha = 0;
+                _instantCondition.FunctionIterateForAlpha(alpha);
+                calls += 1;
+            }
+            else
+            {
+                alpha = optResult.Result;
+            }
 
             input.alpha = alpha;
             nominalOutput = _instantCondition.iterationOutput;
@@ -269,9 +282,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             stabDerivOutput.stableCl = neededCl;
             stabDerivOutput.stableCd = nominalOutput.Cd;
-            stabDerivOutput.stableAoA = optResult.Converged ? alpha : double.NaN;
+            stabDerivOutput.stableAoA = alpha;
             stabDerivOutput.stableAoAState = "";
-            if (optResult.Converged && Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
+            if (Math.Abs((nominalOutput.Cl - neededCl) / neededCl) > 0.1)
                 stabDerivOutput.stableAoAState = nominalOutput.Cl > neededCl ? "<" : ">";
 
             FARLogger.Info("Cl needed: " +
@@ -283,15 +296,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                            ", Cd: " +
                            nominalOutput.Cd.ToString(CultureInfo.InvariantCulture) +
                            ", function calls: " +
-                           optResult.FunctionCalls.ToString());
-
-            if (!optResult.Converged)
-            {
-                // couldn't find stable AoA, no reason to compute invalid stability derivatives
-                for (int i = 3; i < 24; i++)
-                    stabDerivOutput.stabDerivs[i] = double.NaN;
-                return stabDerivOutput;
-            }
+                           calls.ToString());
 
             //vert vel derivs
             pertOutput.Cl = (pertOutput.Cl - nominalOutput.Cl) / (2 * FARMathUtil.deg2rad);
