@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.15.11.1 "Mach"
+Ferram Aerospace Research Continued v0.15.11.2 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,6 +64,13 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.15.11.2V "Mach"------------------------------------
+
+Update to MM 4.0.3
+
+Revert NaN stability derivatives if no stable AoA is found [#75](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/75) ([#81](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/81))  
+Fix [#74](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/74) ([#76](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/76), [@parachutingturtle](https://github.com/dkavolis/Ferram-Aerospace-Research/issues?q=is%3Apr+author%3Aparachutingturtle))  
+
 0.15.11.1V "Mach"------------------------------------
 
 Fix [#72](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/72) ([#73](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/73))  
