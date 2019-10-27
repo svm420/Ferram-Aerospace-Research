@@ -34,6 +34,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.15.11.2")]
-[assembly: AssemblyFileVersion("0.15.11.2")]
+[assembly: AssemblyVersion("0.15.11.3")]
+[assembly: AssemblyFileVersion("0.15.11.3")]
 [assembly: KSPAssemblyDependency("ModularFlightIntegrator", 1, 0)]

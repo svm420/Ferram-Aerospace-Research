@@ -31,7 +31,7 @@ namespace Editor
             new ShaderTarget
             {
                 suffix   = "_macosx",
-                platform = BuildTarget.StandaloneOSXUniversal
+                platform = BuildTarget.StandaloneOSX
             }
         };
 

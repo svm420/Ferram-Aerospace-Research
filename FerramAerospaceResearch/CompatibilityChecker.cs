@@ -43,7 +43,7 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class CompatibilityChecker : MonoBehaviour
     {
-        public const int KSP_MAJOR_MAX = 1, KSP_MAJOR_MIN = 1, KSP_MINOR_MAX = 7, KSP_MINOR_MIN = 4;
+        public const int KSP_MAJOR_MAX = 1, KSP_MAJOR_MIN = 1, KSP_MINOR_MAX = 8, KSP_MINOR_MIN = 8;
 
         //Version of the compatibility checker itself.
         private static int _version = 6;
