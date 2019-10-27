@@ -9,10 +9,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch
 {
-    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    [KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class InstallChecker : MonoBehaviour
     {
         protected void Start()
@@ -25,6 +26,29 @@ namespace FerramAerospaceResearch
                                                                                         .Name)
                                                                     .Where(a => a.url !=
                                                                                 "FerramAerospaceResearch/Plugins");
+
+#if DEBUG
+            IEnumerable<AssemblyLoader.LoadedAssembly> scaleRedist =
+                AssemblyLoader.loadedAssemblies.Where(a => a.assembly.GetName()
+                                                            .Name.IndexOf("Scale_Redist",
+                                                                          StringComparison.OrdinalIgnoreCase) >=
+                                                           0);
+            if (scaleRedist.Any())
+            {
+                IEnumerable<string> paths = scaleRedist
+                                            .Select(a => a.path)
+                                            .Select(p =>
+                                                        Uri.UnescapeDataString(new Uri(Path.GetFullPath(KSPUtil
+                                                                                                            .ApplicationRootPath))
+                                                                               .MakeRelativeUri(new Uri(p))
+                                                                               .ToString()
+                                                                               .Replace('/',
+                                                                                        Path
+                                                                                            .DirectorySeparatorChar)));
+                FARLogger.Info($"Scale Redist loaded:\n\t{string.Join("\n\t", paths)}");
+            }
+#endif
+
             if (!assemblies.Any())
                 return;
             IEnumerable<string> badPaths = assemblies
