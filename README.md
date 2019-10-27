@@ -66,8 +66,14 @@ CHANGELOG
 =======================================================
 0.15.11.3V "Mach"------------------------------------
 
-Update to KSP 1.8
-Update shaders to Unity 2019.2
+Update to MM 4.1.0  
+Update to MFI 1.2.7.0  
+
+Update to KSP 1.8  
+Update shaders to Unity 2019.2  
+Update .NET to 4.8  
+
+InstallChecker now runs instantly instead of waiting for main menu  
 
 0.15.11.2V "Mach"------------------------------------
 
