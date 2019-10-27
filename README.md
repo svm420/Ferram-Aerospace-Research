@@ -69,7 +69,7 @@ CHANGELOG
 Update to MM 4.1.0  
 Update to MFI 1.2.7.0  
 
-Update to KSP 1.8  
+Update to KSP 1.8  (thanks [@lukecologne](https://github.com/lukecologne))  
 Update shaders to Unity 2019.2  
 Update .NET to 4.8  
 
