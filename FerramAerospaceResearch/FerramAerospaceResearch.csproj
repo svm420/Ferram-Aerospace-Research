@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -87,13 +87,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompatibilityChecker.cs" />
+    <Compile Include="Configuration\ConfigNodeWrapper.cs" />
+    <Compile Include="Configuration\ConfigParserAttribute.cs" />
+    <Compile Include="Configuration\ConfigValue.cs" />
+    <Compile Include="Configuration\FARConfig.cs" />
+    <Compile Include="Configuration\FlightLogConfig.cs" />
+    <Compile Include="Configuration\FARConfigParser.cs" />
+    <Compile Include="Configuration\IConfigNode.cs" />
+    <Compile Include="Configuration\FARConfigProvider.cs" />
+    <Compile Include="Configuration\FARConfigSetup.cs" />
     <Compile Include="FARAeroComponents\FlightForceContext.cs" />
     <Compile Include="FARAeroComponents\ModularFlightIntegratorRegisterer.cs" />
     <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />
     <Compile Include="FARAeroComponents\VesselIntakeRamDrag.cs" />
     <Compile Include="FARAPI.cs" />
     <Compile Include="FARAssets.cs" />
-    <Compile Include="FARConfig.cs" />
     <Compile Include="FARDebugAndSettings.cs" />
     <Compile Include="FARFloatCurve.cs" />
     <Compile Include="FARGUI\FAREditorGUI\DesignConcerns\AreaRulingConcern.cs" />
@@ -126,6 +134,7 @@
     <Compile Include="FARSettingsScenarioModule.cs" />
     <Compile Include="FARThreading\ThreadSafeDebugLogger.cs" />
     <Compile Include="FARThreading\VoxelizationThreadpool.cs" />
+    <Compile Include="FARUtils\AssemblyUtils.cs" />
     <Compile Include="FARUtils\CsvWriter.cs" />
     <Compile Include="FARUtils\ShaderPropertyIds.cs" />
     <Compile Include="FARUtils\StringFormatter.cs" />
