@@ -89,19 +89,19 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             " stall fraction"
         };
 
-        private CsvWriter writer;
-
-        public int Period { get; set; } = 2;
-        public int FlushPeriod { get; set; } = 10;
-
-        private Coroutine coroutine;
-        private bool headerWritten;
-
         private readonly Dictionary<string, object> replacements = new Dictionary<string, object>
         {
             {VesselNameKey, "unknown"},
             {DatetimeKey, "no_date"}
         };
+
+        private CsvWriter writer;
+
+        private Coroutine coroutine;
+        private bool headerWritten;
+
+        public int Period { get; set; } = 2;
+        public int FlushPeriod { get; set; } = 10;
 
         public bool IsActive
         {
@@ -120,11 +120,11 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (vessel == null)
                 throw new ArgumentNullException(nameof(vessel));
 
-            var go = new GameObject($"{vessel.vesselName}_logger");
-            var logger = go.AddComponent<FlightDataLogger>();
-            go.transform.parent = vessel.transform;
+            var logger = vessel.gameObject.AddComponent<FlightDataLogger>();
             logger.Vessel = vessel;
             logger.writer = new CsvWriter(logger.GetFilename());
+            logger.Period = FlightLogConfig.Instance.Period;
+            logger.FlushPeriod = FlightLogConfig.Instance.FlushPeriod;
 
             return logger;
         }
@@ -246,9 +246,9 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             if (Vessel != null)
                 replacements[VesselNameKey] = Vessel.vesselName;
-            replacements[DatetimeKey] = DateTime.Now.ToString(FARConfig.Instance.LogDateTimeFormat);
-            string filename = Path.Combine(FARConfig.Instance.LogsDirectory,
-                                           FARConfig.Instance.LogNameFormat.ToString(replacements));
+            replacements[DatetimeKey] = DateTime.Now.ToString(FlightLogConfig.Instance.DatetimeFormat);
+            string filename = Path.Combine(FlightLogConfig.Instance.Directory,
+                                           FlightLogConfig.Instance.NameFormat.ToString(replacements));
 
             return filename;
         }
