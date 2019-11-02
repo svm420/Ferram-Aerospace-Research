@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.3 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -263,8 +263,7 @@ namespace FerramAerospaceResearch
 
             var saveNode = new ConfigNode();
             saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
-                          "GameData/FerramAerospaceResearch/CustomFARAeroData.cfg");
+            saveNode.Save(FARConfig.CombineFARRoot("CustomFARAeroData.cfg"));
         }
 
         private static ConfigNode CreateAtmConfigurationConfigNode(int bodyIndex, double[] atmProperties)
@@ -364,8 +363,7 @@ namespace FerramAerospaceResearch
 
             loaded = true;
 
-            string forceUpdatePath = KSPUtil.ApplicationRootPath.Replace("\\", "/") +
-                                     "GameData/FerramAerospaceResearch/FARForceDataUpdate.cfg";
+            string forceUpdatePath = FARConfig.CombineFARRoot("FARForceDataUpdate.cfg");
             if (File.Exists(forceUpdatePath))
                 File.Delete(forceUpdatePath);
 

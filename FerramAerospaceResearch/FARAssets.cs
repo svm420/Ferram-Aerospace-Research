@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -16,8 +14,7 @@ namespace FerramAerospaceResearch
     {
         private const string AssetBundleExtension = ".far";
 
-        private static readonly string assetBundleRootPath =
-            Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
+        private const string AssetBundleRelPath = "Assets";
 
         public static FARShaderCache ShaderCache { get; private set; }
         public static FARTextureCache TextureCache { get; private set; }
@@ -94,7 +91,7 @@ namespace FerramAerospaceResearch
 
             protected virtual void SetBundlePath(string name)
             {
-                BundlePath = Path.GetFullPath(Path.Combine(assetBundleRootPath, name) + AssetBundleExtension);
+                BundlePath = FARConfig.CombineFARRoot(AssetBundleRelPath, name + AssetBundleExtension);
             }
         }
 
@@ -176,11 +173,14 @@ namespace FerramAerospaceResearch
             public void Initialize()
             {
                 Add("icon_button_stock",
-                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_stock", false));
+                    GameDatabase.Instance.GetTexture(FARConfig.FARGameDataRelative("Textures", "icon_button_stock"),
+                                                     false));
                 Add("icon_button_blizzy",
-                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_blizzy", false));
+                    GameDatabase.Instance.GetTexture(FARConfig.FARGameDataRelative("Textures", "icon_button_stock"),
+                                                     false));
                 Add("sprite_debug_voxel",
-                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/sprite_debug_voxel", false));
+                    GameDatabase.Instance.GetTexture(FARConfig.FARGameDataRelative("Textures", "icon_button_stock"),
+                                                     false));
                 IconLarge = this["icon_button_stock"];
                 IconSmall = this["icon_button_blizzy"];
                 VoxelTexture = this["sprite_debug_voxel"];

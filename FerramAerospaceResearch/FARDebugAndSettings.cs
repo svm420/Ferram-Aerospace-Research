@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.3 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -135,7 +135,7 @@ namespace FerramAerospaceResearch
                 if (FARDebugButtonBlizzy != null)
                     return;
                 FARDebugButtonBlizzy = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARDebugButtonBlizzy");
-                FARDebugButtonBlizzy.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
+                FARDebugButtonBlizzy.TexturePath = FARConfig.FARGameDataRelative("Textures", "icon_button_blizzy");
                 FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
                 FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
             }
@@ -501,7 +501,7 @@ namespace FerramAerospaceResearch
                     if (FARDebugValues.useBlizzyToolbar)
                     {
                         FARDebugButtonBlizzy = ToolbarManager.Instance.add("ferram4", "FARDebugButtonBlizzy");
-                        FARDebugButtonBlizzy.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
+                        FARDebugButtonBlizzy.TexturePath = FARConfig.FARGameDataRelative("Textures", "icon_button_blizzy");
                         FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
                         FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
                     }

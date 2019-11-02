@@ -62,8 +62,7 @@ namespace FerramAerospaceResearch
 
             var saveNode = new ConfigNode();
             saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
-                          "GameData/FerramAerospaceResearch/CustomFARAeroStress.cfg");
+            saveNode.Save(FARConfig.CombineFARRoot("CustomFARAeroStress.cfg"));
         }
 
         private static ConfigNode CreateAeroStressConfigNode(FARPartStressTemplate template)
