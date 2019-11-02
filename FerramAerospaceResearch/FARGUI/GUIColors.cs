@@ -44,87 +44,35 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System.Collections.Generic;
 using System.Text;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
 {
-    internal class GUIColors
+    // ReSharper disable once ClassNeverInstantiated.Global - instantiated through reflection
+    [ConfigParserAttribute("guiColors")]
+    internal class GUIColors : FARConfigParser<GUIColors>
     {
-        private static GUIColors _instance;
-        private List<Color> colors;
+        private const string ClColorName = "ClColor";
+        private const string CdColorName = "CdColor";
+        private const string CmColorName = "CmColor";
+        private const string LDColorName = "L_DColor";
+        private static readonly char[] separators = {',', ' ', ';'};
 
-        private GUIColors()
-        {
-            LoadColors();
-        }
-
-        public static GUIColors Instance
-        {
-            get { return _instance ?? (_instance = new GUIColors()); }
-        }
+        private readonly List<Color> colors = new List<Color>();
 
         public Color this[int index]
         {
-            get
-            {
-                if (_instance == null)
-                    _instance = new GUIColors();
-                return _instance.colors[index];
-            }
-            set
-            {
-                if (_instance == null)
-                    _instance = new GUIColors();
-                _instance.colors[index] = value;
-            }
+            get { return colors[index]; }
+            set { colors[index] = value; }
         }
 
         public static Color GetColor(int index)
         {
-            if (_instance == null)
-                _instance = new GUIColors();
-
-            return _instance.colors[index];
-        }
-
-        public void LoadColors()
-        {
-            colors = new List<Color>();
-            FARLogger.Info("Loading FAR GUI Colors");
-            foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARGUIColors"))
-            {
-                if (node.HasValue("ClColor"))
-                    colors.Add(ReadColor(node.GetValue("ClColor")));
-
-                if (node.HasValue("CdColor"))
-                    colors.Add(ReadColor(node.GetValue("CdColor")));
-
-                if (node.HasValue("CmColor"))
-                    colors.Add(ReadColor(node.GetValue("CmColor")));
-
-                if (node.HasValue("L_DColor"))
-                    colors.Add(ReadColor(node.GetValue("L_DColor")));
-            }
-        }
-
-        public void SaveColors()
-        {
-            var node = new ConfigNode("@FARGUIColors[default]:FOR[FerramAerospaceResearch]");
-            node.AddValue("%ClColor", SaveColor(colors[0]));
-            node.AddValue("%CdColor", SaveColor(colors[1]));
-            node.AddValue("%CmColor", SaveColor(colors[2]));
-            node.AddValue("%L_DColor", SaveColor(colors[3]));
-
-            var saveNode = new ConfigNode();
-            saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
-                          "GameData/FerramAerospaceResearch/CustomFARGUIColors.cfg");
+            return Instance[index];
         }
 
         private static Color ReadColor(string input)
         {
-            char[] separators = {',', ' ', ';'};
             string[] splitValues = input.Split(separators);
 
             int curIndex = 0;
@@ -166,6 +114,42 @@ namespace FerramAerospaceResearch.FARGUI
             builder.Append(color.b);
 
             return builder.ToString();
+        }
+
+        public override void Reset()
+        {
+            colors.Clear();
+        }
+
+        public override void Parse(IConfigNode node)
+        {
+            if (node.HasValue(ClColorName))
+                colors.Add(ReadColor(node.GetValue(ClColorName)));
+
+            if (node.HasValue(CdColorName))
+                colors.Add(ReadColor(node.GetValue(CdColorName)));
+
+            if (node.HasValue(CmColorName))
+                colors.Add(ReadColor(node.GetValue(CmColorName)));
+
+            if (node.HasValue(LDColorName))
+                colors.Add(ReadColor(node.GetValue(LDColorName)));
+        }
+
+        public override void SaveTo(IConfigNode node)
+        {
+            node.AddValue($"%{ClColorName}", SaveColor(colors[0]));
+            node.AddValue($"%{CdColorName}", SaveColor(colors[1]));
+            node.AddValue($"%{CmColorName}", SaveColor(colors[2]));
+            node.AddValue($"%{LDColorName}", SaveColor(colors[3]));
+        }
+
+        public override void DebugString(StringBuilder sb)
+        {
+            AppendEntry(sb, ClColorName, colors[0]);
+            AppendEntry(sb, CdColorName, colors[1]);
+            AppendEntry(sb, CmColorName, colors[2]);
+            AppendEntry(sb, LDColorName, colors[3]);
         }
     }
 }
