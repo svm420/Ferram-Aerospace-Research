@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.3 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -615,7 +615,7 @@ namespace FerramAerospaceResearch
             FARAeroUtil.SaveCustomAeroDataToConfig();
             FARAeroStress.SaveCustomStressTemplates();
             FARActionGroupConfiguration.SaveConfiguration();
-            GUIColors.Instance.SaveColors();
+            FARConfig.Instance.SaveConfig();
             config.save();
         }
 
