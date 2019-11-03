@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -12,16 +13,12 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     internal class FARAssets : MonoBehaviour
     {
-        private const string AssetBundleExtension = ".far";
-
-        private const string AssetBundleRelPath = "Assets";
-
         public static FARShaderCache ShaderCache { get; private set; }
         public static FARTextureCache TextureCache { get; private set; }
 
         private void Start()
         {
-            ShaderCache = new FARShaderCache("farshaders");
+            ShaderCache = new FARShaderCache();
             TextureCache = new FARTextureCache();
             TextureCache.Initialize();
             StartCoroutine(LoadAssetsAsync());
@@ -36,25 +33,34 @@ namespace FerramAerospaceResearch
         public class FARAssetDictionary<T> : Dictionary<string, T> where T : Object
         {
             private AssetBundle assetBundle;
-            private string bundleName;
 
-            public FARAssetDictionary(string bundleName)
+            private string bundlePath;
+
+            public FARAssetDictionary()
             {
-                BundleName = bundleName;
+            }
+
+            public FARAssetDictionary(string bundlePath)
+            {
+                BundlePath = bundlePath;
             }
 
             public string BundleName
             {
-                // ReSharper disable once UnusedMember.Global
-                get { return bundleName; }
-                private set
-                {
-                    bundleName = value;
-                    SetBundlePath(value);
-                }
+                get { return Path.GetFileName(BundlePath); }
             }
 
-            public string BundlePath { get; private set; }
+            public string BundleDirectory
+            {
+                get { return Path.GetDirectoryName(BundlePath); }
+            }
+
+            public string BundlePath
+            {
+                get { return bundlePath; }
+                set { bundlePath = FARConfig.CombineGameData(value); }
+            }
+
             public bool AssetsLoaded { get; private set; }
 
             public IEnumerator LoadAsync()
@@ -88,38 +94,11 @@ namespace FerramAerospaceResearch
             protected virtual void OnLoad()
             {
             }
-
-            protected virtual void SetBundlePath(string name)
-            {
-                BundlePath = FARConfig.CombineFARRoot(AssetBundleRelPath, name + AssetBundleExtension);
-            }
         }
 
         public class FARShaderCache : FARAssetDictionary<Shader>
         {
-            public FARShaderCache(string bundleName) : base(bundleName)
-            {
-            }
-
-            public ShaderMaterialPair LineRenderer { get; private set; }
-            public ShaderMaterialPair DebugVoxels { get; private set; }
-
-            protected override void OnLoad()
-            {
-                LineRenderer = new ShaderMaterialPair(Shader.Find("Hidden/Internal-Colored"));
-                if (TryGetValue("FerramAerospaceResearch/Debug Voxel Mesh", out Shader voxelShader))
-                {
-                    DebugVoxels = new ShaderMaterialPair(voxelShader);
-                    DebugVoxels.Material.SetFloat(ShaderPropertyIds.Cutoff, 0.45f);
-                }
-                else
-                {
-                    FARLogger.Warning("Could not find voxel mesh shader. Using Sprites/Default for rendering, you WILL see depth artifacts");
-                    DebugVoxels = new ShaderMaterialPair(Shader.Find("Sprites/Default"));
-                }
-            }
-
-            protected override void SetBundlePath(string name)
+            public FARShaderCache()
             {
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (Application.platform)
@@ -128,23 +107,40 @@ namespace FerramAerospaceResearch
                     case RuntimePlatform.WindowsPlayer
                         when SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL", StringComparison.Ordinal):
                         FARLogger.Info("Loading shaders from Linux bundle");
-                        name += "_linux"; //For OpenGL users on Windows we load the Linux shaders to fix OpenGL issues
+                        //For OpenGL users on Windows we load the Linux shaders to fix OpenGL issues
+                        BundlePath = FARShadersConfig.Instance.BundleLinux;
                         break;
                     case RuntimePlatform.WindowsPlayer:
                         FARLogger.Info("Loading shaders from Windows bundle");
-                        name += "_windows";
+                        BundlePath = FARShadersConfig.Instance.BundleWindows;
                         break;
                     case RuntimePlatform.OSXPlayer:
                         FARLogger.Info("Loading shaders from MacOSX bundle");
-                        name += "_macosx";
+                        BundlePath = FARShadersConfig.Instance.BundleMac;
                         break;
                     default:
                         // Should never reach this
                         FARLogger.Error($"Invalid runtime platform {Application.platform}");
                         break;
                 }
+            }
 
-                base.SetBundlePath(name);
+            public ShaderMaterialPair LineRenderer { get; private set; }
+            public ShaderMaterialPair DebugVoxels { get; private set; }
+
+            protected override void OnLoad()
+            {
+                LineRenderer = new ShaderMaterialPair(Shader.Find(FARShadersConfig.Instance.LineRenderer));
+                if (TryGetValue(FARShadersConfig.Instance.DebugVoxel, out Shader voxelShader))
+                {
+                    DebugVoxels = new ShaderMaterialPair(voxelShader);
+                    DebugVoxels.Material.SetFloat(ShaderPropertyIds.Cutoff, FARShadersConfig.Instance.DebugVoxelCutoff);
+                }
+                else
+                {
+                    FARLogger.Warning($"Could not find voxel mesh shader. Using fallback shader {FARShadersConfig.Instance.DebugVoxelFallback}, you WILL likely see depth artifacts");
+                    DebugVoxels = new ShaderMaterialPair(Shader.Find(FARShadersConfig.Instance.DebugVoxelFallback));
+                }
             }
 
             public class ShaderMaterialPair
@@ -173,14 +169,11 @@ namespace FerramAerospaceResearch
             public void Initialize()
             {
                 Add("icon_button_stock",
-                    GameDatabase.Instance.GetTexture(FARConfig.FARGameDataRelative("Textures", "icon_button_stock"),
-                                                     false));
+                    GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonStock, false));
                 Add("icon_button_blizzy",
-                    GameDatabase.Instance.GetTexture(FARConfig.FARGameDataRelative("Textures", "icon_button_stock"),
-                                                     false));
+                    GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonBlizzy, false));
                 Add("sprite_debug_voxel",
-                    GameDatabase.Instance.GetTexture(FARConfig.FARGameDataRelative("Textures", "icon_button_stock"),
-                                                     false));
+                    GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.SpriteDebugVoxel, false));
                 IconLarge = this["icon_button_stock"];
                 IconSmall = this["icon_button_blizzy"];
                 VoxelTexture = this["sprite_debug_voxel"];
