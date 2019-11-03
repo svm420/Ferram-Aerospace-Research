@@ -91,6 +91,8 @@
     <Compile Include="Configuration\ConfigParserAttribute.cs" />
     <Compile Include="Configuration\ConfigValue.cs" />
     <Compile Include="Configuration\FARConfig.cs" />
+    <Compile Include="Configuration\FARShadersConfig.cs" />
+    <Compile Include="Configuration\FARTexturesConfig.cs" />
     <Compile Include="Configuration\FlightLogConfig.cs" />
     <Compile Include="Configuration\FARConfigParser.cs" />
     <Compile Include="Configuration\IConfigNode.cs" />
