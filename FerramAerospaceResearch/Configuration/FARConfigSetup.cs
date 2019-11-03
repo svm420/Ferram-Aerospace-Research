@@ -68,13 +68,9 @@ namespace FerramAerospaceResearch
             {
                 if (Parsers.TryGetValue(name, out FARConfigParser configParser))
                 {
-                    if (configParser.GetType() == parser.GetType())
-                    {
-                        FARLogger.Warning($"Parser '{name}' is already registered");
-                        return;
-                    }
-
-                    FARLogger.Warning($"Parser '{name}' is registered with different type {configParser.GetType().ToString()}");
+                    FARLogger.Warning(configParser.GetType() == parser.GetType()
+                                          ? $"Parser '{name}' is already registered"
+                                          : $"Parser '{name}' is registered with different type {configParser.GetType().ToString()}");
                     return;
                 }
 
