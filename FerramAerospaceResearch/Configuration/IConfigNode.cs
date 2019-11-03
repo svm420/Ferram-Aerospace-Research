@@ -82,254 +82,139 @@ namespace FerramAerospaceResearch
         bool SetValue(string name, string newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, string newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            string newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, string newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, bool newValue, bool createIfNotFound = false);
         bool SetValue(string name, bool newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, bool newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            bool newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, bool newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, byte newValue, bool createIfNotFound = false);
         bool SetValue(string name, byte newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, byte newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            byte newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, byte newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, sbyte newValue, bool createIfNotFound = false);
         bool SetValue(string name, sbyte newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, sbyte newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            sbyte newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, sbyte newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, char newValue, bool createIfNotFound = false);
         bool SetValue(string name, char newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, char newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            char newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, char newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, decimal newValue, bool createIfNotFound = false);
         bool SetValue(string name, decimal newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, decimal newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            decimal newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, decimal newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, double newValue, bool createIfNotFound = false);
         bool SetValue(string name, double newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, double newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            double newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, double newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, float newValue, bool createIfNotFound = false);
         bool SetValue(string name, float newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, float newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            float newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, float newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, int newValue, bool createIfNotFound = false);
         bool SetValue(string name, int newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, int newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            int newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, int newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, uint newValue, bool createIfNotFound = false);
         bool SetValue(string name, uint newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, uint newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            uint newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, uint newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, long newValue, bool createIfNotFound = false);
         bool SetValue(string name, long newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, long newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            long newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, long newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, ulong newValue, bool createIfNotFound = false);
         bool SetValue(string name, ulong newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, ulong newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            ulong newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, ulong newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, short newValue, bool createIfNotFound = false);
         bool SetValue(string name, short newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, short newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            short newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, short newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, ushort newValue, bool createIfNotFound = false);
         bool SetValue(string name, ushort newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, ushort newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            ushort newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, ushort newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Vector2 newValue, bool createIfNotFound = false);
         bool SetValue(string name, Vector2 newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Vector2 newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Vector2 newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Vector2 newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Vector3 newValue, bool createIfNotFound = false);
         bool SetValue(string name, Vector3 newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Vector3 newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Vector3 newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Vector3 newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Vector3d newValue, bool createIfNotFound = false);
         bool SetValue(string name, Vector3d newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Vector3d newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Vector3d newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Vector3d newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Vector4 newValue, bool createIfNotFound = false);
         bool SetValue(string name, Vector4 newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Vector4 newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Vector4 newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Vector4 newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Quaternion newValue, bool createIfNotFound = false);
         bool SetValue(string name, Quaternion newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Quaternion newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Quaternion newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Quaternion newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, QuaternionD newValue, bool createIfNotFound = false);
         bool SetValue(string name, QuaternionD newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, QuaternionD newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            QuaternionD newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, QuaternionD newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Matrix4x4 newValue, bool createIfNotFound = false);
         bool SetValue(string name, Matrix4x4 newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Matrix4x4 newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Matrix4x4 newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Matrix4x4 newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Color newValue, bool createIfNotFound = false);
         bool SetValue(string name, Color newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Color newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Color newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Color newValue, string vcomment, int index, bool createIfNotFound = false);
 
         bool SetValue(string name, Color32 newValue, bool createIfNotFound = false);
         bool SetValue(string name, Color32 newValue, int index, bool createIfNotFound = false);
         bool SetValue(string name, Color32 newValue, string vcomment, bool createIfNotFound = false);
 
-        bool SetValue(
-            string name,
-            Color32 newValue,
-            string vcomment,
-            int index,
-            bool createIfNotFound = false);
+        bool SetValue(string name, Color32 newValue, string vcomment, int index, bool createIfNotFound = false);
 
         void RemoveValue(string name);
         void RemoveValues(params string[] names);
