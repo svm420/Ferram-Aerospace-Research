@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using FerramAerospaceResearch.FARUtils;
@@ -9,19 +8,6 @@ namespace FerramAerospaceResearch
     [ConfigParserAttribute("flightLog")]
     public class FlightLogConfig : FARConfigParser<FlightLogConfig>
     {
-        public static readonly ConfigValue<string> DirectoryDefault =
-            new ConfigValue<string>("directory", Path.Combine(FARConfig.FARRootPath, "logs"));
-
-        public static readonly ConfigValue<string> NameFormatDefault =
-            new ConfigValue<string>("nameFormat", "<<<VESSEL_NAME>>>_<<<DATETIME>>>.csv");
-
-        public static readonly ConfigValue<string> DatetimeFormatDefault =
-            new ConfigValue<string>("datetimeFormat", "yyyy_MM_dd_HH_mm_ss");
-
-        public static readonly ConfigValue<int> PeriodDefault = new ConfigValue<int>("period", 2);
-
-        public static readonly ConfigValue<int> FlushPeriodDefault = new ConfigValue<int>("flushPeriod", 10);
-
         private string directory;
         private string datetimeFormat;
 
@@ -48,49 +34,65 @@ namespace FerramAerospaceResearch
             get { return flushPeriod; }
         }
 
-        public StringFormatter NameFormat { get; } = new StringFormatter(NameFormatDefault.Value);
+        public StringFormatter NameFormat { get; } = new StringFormatter(Defaults.NameFormat.Value);
 
         public override void Reset()
         {
-            directory = DirectoryDefault.Value;
-            datetimeFormat = DatetimeFormatDefault.Value;
-            NameFormat.FormatString = NameFormatDefault.Value;
-            period = PeriodDefault.Value;
-            flushPeriod = FlushPeriodDefault.Value;
+            directory = Defaults.Directory.Value;
+            datetimeFormat = Defaults.DatetimeFormat.Value;
+            NameFormat.FormatString = Defaults.NameFormat.Value;
+            period = Defaults.Period.Value;
+            flushPeriod = Defaults.FlushPeriod.Value;
         }
 
         public override void Parse(IConfigNode node)
         {
-            if (node.TryGetValue(DirectoryDefault.Name, ref directory))
+            if (node.TryGetValue(Defaults.Directory.Name, ref directory))
                 if (!Path.IsPathRooted(directory))
                     directory = Path.Combine(FARConfig.KSPRootPath, directory);
 
-            node.TryGetValue(DatetimeFormatDefault.Name, ref datetimeFormat);
+            node.TryGetValue(Defaults.DatetimeFormat.Name, ref datetimeFormat);
 
             string str = string.Empty;
-            if (node.TryGetValue(NameFormatDefault.Name, ref str))
+            if (node.TryGetValue(Defaults.NameFormat.Name, ref str))
                 NameFormat.FormatString = str;
 
-            node.TryGetValue(PeriodDefault.Name, ref period);
-            node.TryGetValue(FlushPeriodDefault.Name, ref flushPeriod);
+            node.TryGetValue(Defaults.Period.Name, ref period);
+            node.TryGetValue(Defaults.FlushPeriod.Name, ref flushPeriod);
         }
 
         public override void SaveTo(IConfigNode node)
         {
-            node.AddValue($"%{DirectoryDefault.Name}", directory);
-            node.AddValue($"%{NameFormatDefault.Name}", NameFormat.FormatString);
-            node.AddValue($"%{DatetimeFormatDefault.Name}", datetimeFormat);
-            node.AddValue($"%{PeriodDefault.Name}", period);
-            node.AddValue($"%{FlushPeriodDefault.Name}", flushPeriod);
+            node.AddValue(Defaults.Directory.EditableName, directory);
+            node.AddValue(Defaults.NameFormat.EditableName, NameFormat.FormatString);
+            node.AddValue(Defaults.DatetimeFormat.EditableName, datetimeFormat);
+            node.AddValue(Defaults.Period.EditableName, period);
+            node.AddValue(Defaults.FlushPeriod.EditableName, flushPeriod);
         }
 
         public override void DebugString(StringBuilder sb)
         {
-            AppendEntry(sb, DirectoryDefault.Name, directory);
-            AppendEntry(sb, NameFormatDefault.Name, NameFormat.FormatString);
-            AppendEntry(sb, DatetimeFormatDefault.Name, datetimeFormat);
-            AppendEntry(sb, PeriodDefault.Name, period);
-            AppendEntry(sb, FlushPeriodDefault.Name, flushPeriod);
+            AppendEntry(sb, Defaults.Directory.Name, directory);
+            AppendEntry(sb, Defaults.NameFormat.Name, NameFormat.FormatString);
+            AppendEntry(sb, Defaults.DatetimeFormat.Name, datetimeFormat);
+            AppendEntry(sb, Defaults.Period.Name, period);
+            AppendEntry(sb, Defaults.FlushPeriod.Name, flushPeriod);
+        }
+
+        public static class Defaults
+        {
+            public static readonly ConfigValue<string> Directory =
+                new ConfigValue<string>("directory", Path.Combine(FARConfig.FARRootPath, "logs"));
+
+            public static readonly ConfigValue<string> NameFormat =
+                new ConfigValue<string>("nameFormat", "<<<VESSEL_NAME>>>_<<<DATETIME>>>.csv");
+
+            public static readonly ConfigValue<string> DatetimeFormat =
+                new ConfigValue<string>("datetimeFormat", "yyyy_MM_dd_HH_mm_ss");
+
+            public static readonly ConfigValue<int> Period = new ConfigValue<int>("period", 2);
+
+            public static readonly ConfigValue<int> FlushPeriod = new ConfigValue<int>("flushPeriod", 10);
         }
     }
 }
