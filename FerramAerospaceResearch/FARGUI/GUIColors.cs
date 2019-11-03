@@ -42,8 +42,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI
@@ -52,104 +50,20 @@ namespace FerramAerospaceResearch.FARGUI
     [ConfigParser("guiColors")]
     internal class GUIColors : FARConfigParser<GUIColors>
     {
-        private const string ClColorName = "ClColor";
-        private const string CdColorName = "CdColor";
-        private const string CmColorName = "CmColor";
-        private const string LDColorName = "L_DColor";
-        private static readonly char[] separators = {',', ' ', ';'};
-
-        private readonly List<Color> colors = new List<Color>();
+        public ColorConfigValue ClColor { get; } = new ColorConfigValue("ClColor", new Color(0, 1, 1));
+        public ColorConfigValue CdColor { get; } = new ColorConfigValue("CdColor", new Color(1, 0, 0));
+        public ColorConfigValue CmColor { get; } = new ColorConfigValue("CmColor", new Color(1, 0.922f, 0.016f));
+        public ColorConfigValue LdColor { get; } = new ColorConfigValue("L_DColor", new Color(0, 1, 0));
 
         public Color this[int index]
         {
-            get { return colors[index]; }
-            set { colors[index] = value; }
+            get { return ((ColorConfigValue)ConfigValues[index]).Value; }
+            set { ((ColorConfigValue)ConfigValues[index]).Value = value; }
         }
 
         public static Color GetColor(int index)
         {
             return Instance[index];
-        }
-
-        private static Color ReadColor(string input)
-        {
-            string[] splitValues = input.Split(separators);
-
-            int curIndex = 0;
-            var color = new Color {a = 1};
-            foreach (string s in splitValues)
-            {
-                if (s.Length <= 0)
-                    continue;
-                if (!float.TryParse(s, out float val))
-                    continue;
-                switch (curIndex)
-                {
-                    case 0:
-                        color.r = val;
-                        break;
-                    case 1:
-                        color.g = val;
-                        break;
-                    default:
-                        color.b = val;
-                        return color;
-                }
-
-                curIndex++;
-            }
-
-            return color;
-        }
-
-        private static string SaveColor(Color color)
-        {
-            var builder = new StringBuilder();
-
-            //Should return string in format of color.r, color.g, color.b
-            builder.Append(color.r);
-            builder.Append(",");
-            builder.Append(color.g);
-            builder.Append(",");
-            builder.Append(color.b);
-
-            return builder.ToString();
-        }
-
-        public override void Reset()
-        {
-            colors.Clear();
-        }
-
-        public override void Parse(IConfigNode node)
-        {
-            if (node.HasValue(ClColorName))
-                colors.Add(ReadColor(node.GetValue(ClColorName)));
-
-            if (node.HasValue(CdColorName))
-                colors.Add(ReadColor(node.GetValue(CdColorName)));
-
-            if (node.HasValue(CmColorName))
-                colors.Add(ReadColor(node.GetValue(CmColorName)));
-
-            if (node.HasValue(LDColorName))
-                colors.Add(ReadColor(node.GetValue(LDColorName)));
-        }
-
-        public override void SaveTo(IConfigNode node)
-        {
-            node.AddValue($"%{ClColorName}", SaveColor(colors[0]));
-            node.AddValue($"%{CdColorName}", SaveColor(colors[1]));
-            node.AddValue($"%{CmColorName}", SaveColor(colors[2]));
-            node.AddValue($"%{LDColorName}", SaveColor(colors[3]));
-        }
-
-        public override void DebugString(StringBuilder sb)
-        {
-            AppendEntry(sb, ClColorName, colors[0]);
-            AppendEntry(sb, CdColorName, colors[1]);
-            AppendEntry(sb, CmColorName, colors[2]);
-            AppendEntry(sb, LDColorName, colors[3]);
         }
     }
 }
