@@ -1,10 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
@@ -44,7 +43,7 @@ namespace FerramAerospaceResearch
                 yield break;
             }
 
-            var provider = new ConfigProvider(Path.GetFullPath(KSPUtil.ApplicationRootPath));
+            var provider = new ConfigProvider();
             foreach (KeyValuePair<ConfigParserAttribute, Type> pair in parserTypes)
             {
                 object parserInstance = Activator.CreateInstance(pair.Value);
@@ -65,11 +64,6 @@ namespace FerramAerospaceResearch
 
         public class ConfigProvider : FARConfigProvider
         {
-            public ConfigProvider(string path)
-            {
-                KSPRootPath = path;
-            }
-
             public override IConfigNode[] LoadConfigs(string name)
             {
                 ConfigNode[] nodes = GameDatabase.Instance.GetConfigNodes(name);
@@ -100,8 +94,6 @@ namespace FerramAerospaceResearch
             {
                 return new ConfigNodeWrapper(name, vcomment);
             }
-
-            public override string KSPRootPath { get; }
 
             public void Register(string name, FARConfigParser parser)
             {

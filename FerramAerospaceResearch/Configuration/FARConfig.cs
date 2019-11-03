@@ -59,8 +59,6 @@ namespace FerramAerospaceResearch
         public const string ModDirectoryName = "FerramAerospaceResearch";
         private static FARConfig instance;
 
-        private static string gameDataPath;
-
         private readonly Dictionary<string, IConfigNode> configs = new Dictionary<string, IConfigNode>();
 
         private FARConfig()
@@ -85,6 +83,8 @@ namespace FerramAerospaceResearch
             Path.GetFullPath(Path.Combine(Assembly.GetExecutingAssembly().Location, "..", ".."));
 
         public static string FARRelativePath { get; } = Path.Combine("GameData", ModDirectoryName);
+        public static string GameDataPath { get; } = Path.GetFullPath(Path.Combine(FARRootPath, ".."));
+        public static string KSPRootPath { get; } = Path.GetFullPath(Path.Combine(GameDataPath, ".."));
 
         public static FARConfig Instance
         {
@@ -100,16 +100,6 @@ namespace FerramAerospaceResearch
                 instance.PrintConfig();
                 return instance;
             }
-        }
-
-        public static string KSPRootPath
-        {
-            get { return Provider.KSPRootPath; }
-        }
-
-        public static string GameDataPath
-        {
-            get { return gameDataPath ??= Path.Combine(KSPRootPath, "GameData"); }
         }
 
         public bool ContainsConfig(string name)

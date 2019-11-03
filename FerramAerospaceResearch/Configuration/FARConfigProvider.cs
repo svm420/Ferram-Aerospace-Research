@@ -9,7 +9,5 @@ namespace FerramAerospaceResearch
         public abstract IConfigNode CreateNode();
         public abstract IConfigNode CreateNode(string name);
         public abstract IConfigNode CreateNode(string name, string vcomment);
-
-        public abstract string KSPRootPath { get; }
     }
 }
