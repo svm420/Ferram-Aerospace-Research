@@ -49,7 +49,7 @@ using UnityEngine;
 namespace FerramAerospaceResearch.FARGUI
 {
     // ReSharper disable once ClassNeverInstantiated.Global - instantiated through reflection
-    [ConfigParserAttribute("guiColors")]
+    [ConfigParser("guiColors")]
     internal class GUIColors : FARConfigParser<GUIColors>
     {
         private const string ClColorName = "ClColor";

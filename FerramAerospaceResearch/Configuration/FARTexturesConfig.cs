@@ -3,7 +3,7 @@ using System.Text;
 namespace FerramAerospaceResearch
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    [ConfigParserAttribute("textures")]
+    [ConfigParser("textures")]
     public class FARTexturesConfig : FARConfigParser<FARTexturesConfig>
     {
         private string iconButtonBlizzy;

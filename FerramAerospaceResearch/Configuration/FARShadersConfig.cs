@@ -3,7 +3,7 @@ using System.Text;
 namespace FerramAerospaceResearch
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    [ConfigParserAttribute("shaders")]
+    [ConfigParser("shaders")]
     public class FARShadersConfig : FARConfigParser<FARShadersConfig>
     {
         private string bundleLinux;

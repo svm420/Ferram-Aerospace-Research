@@ -5,7 +5,7 @@ using FerramAerospaceResearch.FARUtils;
 namespace FerramAerospaceResearch
 {
     // ReSharper disable once ClassNeverInstantiated.Global - instantiated through reflection
-    [ConfigParserAttribute("flightLog")]
+    [ConfigParser("flightLog")]
     public class FlightLogConfig : FARConfigParser<FlightLogConfig>
     {
         private string directory;
