@@ -135,7 +135,7 @@ namespace FerramAerospaceResearch
                 if (FARDebugButtonBlizzy != null)
                     return;
                 FARDebugButtonBlizzy = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARDebugButtonBlizzy");
-                FARDebugButtonBlizzy.TexturePath = FARConfig.FARGameDataRelative("Textures", "icon_button_blizzy");
+                FARDebugButtonBlizzy.TexturePath = FARTexturesConfig.Instance.IconButtonBlizzy;
                 FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
                 FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
             }
@@ -501,7 +501,7 @@ namespace FerramAerospaceResearch
                     if (FARDebugValues.useBlizzyToolbar)
                     {
                         FARDebugButtonBlizzy = ToolbarManager.Instance.add("ferram4", "FARDebugButtonBlizzy");
-                        FARDebugButtonBlizzy.TexturePath = FARConfig.FARGameDataRelative("Textures", "icon_button_blizzy");
+                        FARDebugButtonBlizzy.TexturePath = FARTexturesConfig.Instance.IconButtonBlizzy;
                         FARDebugButtonBlizzy.ToolTip = "FAR Debug Options";
                         FARDebugButtonBlizzy.OnClick += e => debugMenu = !debugMenu;
                     }

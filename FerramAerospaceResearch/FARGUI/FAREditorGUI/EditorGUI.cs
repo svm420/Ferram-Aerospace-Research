@@ -683,7 +683,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (blizzyEditorGUIButton != null)
                 return;
             blizzyEditorGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FAREditorButtonBlizzy");
-            blizzyEditorGUIButton.TexturePath = FARConfig.FARGameDataRelative("Textures", "icon_button_blizzy");
+            blizzyEditorGUIButton.TexturePath = FARTexturesConfig.Instance.IconButtonBlizzy;
             blizzyEditorGUIButton.ToolTip = "FAR Editor";
             blizzyEditorGUIButton.OnClick += e => showGUI = !showGUI;
         }

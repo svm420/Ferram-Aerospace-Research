@@ -10,6 +10,8 @@ namespace FerramAerospaceResearch
     {
         private string directory;
         private string datetimeFormat;
+        private int period;
+        private int flushPeriod;
 
         public string Directory
         {
@@ -20,9 +22,6 @@ namespace FerramAerospaceResearch
         {
             get { return datetimeFormat; }
         }
-
-        private int period;
-        private int flushPeriod;
 
         public int Period
         {
