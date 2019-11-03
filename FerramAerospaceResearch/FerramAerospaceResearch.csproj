@@ -98,6 +98,7 @@
     <Compile Include="Configuration\IConfigNode.cs" />
     <Compile Include="Configuration\FARConfigProvider.cs" />
     <Compile Include="Configuration\FARConfigSetup.cs" />
+    <Compile Include="Configuration\StringFormatterConfigValue.cs" />
     <Compile Include="FARAeroComponents\FlightForceContext.cs" />
     <Compile Include="FARAeroComponents\ModularFlightIntegratorRegisterer.cs" />
     <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />
