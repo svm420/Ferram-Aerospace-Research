@@ -146,17 +146,17 @@ namespace FerramAerospaceResearch
 
         public static string CombineFARRoot(string filename)
         {
-            return Combine(FARRootPath, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(FARRootPath, filename);
         }
 
         public static string CombineFARRoot(string dir1, string filename)
         {
-            return Combine(FARRootPath, dir1, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(FARRootPath, dir1, filename);
         }
 
         public static string CombineFARRoot(string dir1, string dir2, string filename)
         {
-            return Combine(FARRootPath, dir1, dir2, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(FARRootPath, dir1, dir2, filename);
         }
 
         public static string FARGameDataRelative(string filename)
@@ -176,32 +176,32 @@ namespace FerramAerospaceResearch
 
         public static string CombineKSPRoot(string filename)
         {
-            return Combine(KSPRootPath, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(KSPRootPath, filename);
         }
 
         public static string CombineKSPRoot(string dir1, string filename)
         {
-            return Combine(KSPRootPath, dir1, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(KSPRootPath, dir1, filename);
         }
 
         public static string CombineKSPRoot(string dir1, string dir2, string filename)
         {
-            return Combine(KSPRootPath, dir1, dir2, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(KSPRootPath, dir1, dir2, filename);
         }
 
         public static string CombineGameData(string filename)
         {
-            return Combine(GameDataPath, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(GameDataPath, filename);
         }
 
         public static string CombineGameData(string dir1, string filename)
         {
-            return Combine(GameDataPath, dir1, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(GameDataPath, dir1, filename);
         }
 
         public static string CombineGameData(string dir1, string dir2, string filename)
         {
-            return Combine(GameDataPath, dir1, dir2, filename);
+            return Path.IsPathRooted(filename) ? filename : Combine(GameDataPath, dir1, dir2, filename);
         }
 
         public void LoadConfig()

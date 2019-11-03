@@ -81,7 +81,8 @@ namespace FerramAerospaceResearch
         public static class Defaults
         {
             public static readonly ConfigValue<string> Directory =
-                new ConfigValue<string>("directory", Path.Combine(FARConfig.FARRootPath, "logs"));
+                new ConfigValue<string>("directory",
+                                        FARConfig.CombineGameData("..", "Logs", FARConfig.ModDirectoryName));
 
             public static readonly ConfigValue<string> NameFormat =
                 new ConfigValue<string>("nameFormat", "<<<VESSEL_NAME>>>_<<<DATETIME>>>.csv");
