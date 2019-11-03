@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 using FerramAerospaceResearch.FARUtils;
 
@@ -10,15 +12,52 @@ namespace FerramAerospaceResearch
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class FARConfigSetup : MonoBehaviour
     {
+        private List<KeyValuePair<ConfigParserAttribute, Type>> parserTypes;
+
         private void Start()
         {
-            var provider = new ConfigProvider(Path.GetFullPath(KSPUtil.ApplicationRootPath));
+            StartCoroutine(InstantiateParsers());
+        }
 
-            foreach (KeyValuePair<ConfigParserAttribute, Type> pair in AssemblyUtils
-                .FindAttribute<ConfigParserAttribute>())
+        private void CollectTypes()
+        {
+            parserTypes =
+                new List<KeyValuePair<ConfigParserAttribute, Type>>(AssemblyUtils
+                                                                        .FindAttribute<ConfigParserAttribute>());
+        }
+
+        private IEnumerator InstantiateParsers()
+        {
+            // iterating over every type in every assembly may be expensive so do it asynchronously
+            Task task = Task.Factory.StartNew(CollectTypes);
+            yield return null;
+
+            // wait until all the types are collected
+            while (!task.IsCompleted)
+                yield return null;
+
+            if (task.Exception != null)
             {
-                if (Activator.CreateInstance(pair.Value) is FARConfigParser instance)
-                    provider.Register(pair.Key.Name, instance);
+                FARLogger.Error("Collecting types failed with exceptions:");
+                foreach (Exception ex in task.Exception.InnerExceptions)
+                    FARLogger.Error($"  {ex.ToString()}");
+                yield break;
+            }
+
+            var provider = new ConfigProvider(Path.GetFullPath(KSPUtil.ApplicationRootPath));
+            foreach (KeyValuePair<ConfigParserAttribute, Type> pair in parserTypes)
+            {
+                object parserInstance = Activator.CreateInstance(pair.Value);
+                if (!(parserInstance is FARConfigParser instance))
+                {
+                    FARLogger.Warning($"Found type with ConfigParserAttribute '{pair.Key.Name}' with the wrong type {parserInstance.GetType().ToString()}");
+                    continue;
+                }
+
+                provider.Register(pair.Key.Name, instance);
+
+                // distribute instantiations over multiple frames
+                yield return null;
             }
 
             FARConfig.Provider = provider;
