@@ -18,17 +18,21 @@ namespace FerramAerospaceResearch
             StartCoroutine(InstantiateParsers());
         }
 
-        private void CollectTypes()
+        private void CollectTypes(IEnumerable<AssemblyLoader.LoadedAssembly> loadedAssemblies)
         {
             parserTypes =
                 new List<KeyValuePair<ConfigParserAttribute, Type>>(AssemblyUtils
-                                                                        .FindAttribute<ConfigParserAttribute>());
+                                                                        .FindAttribute<ConfigParserAttribute
+                                                                        >(loadedAssemblies));
         }
 
         private IEnumerator InstantiateParsers()
         {
             // iterating over every type in every assembly may be expensive so do it asynchronously
-            Task task = Task.Factory.StartNew(CollectTypes);
+            Task task =
+                Task.Factory.StartNew(() =>
+                                          CollectTypes(new List<AssemblyLoader.LoadedAssembly>(AssemblyLoader
+                                                                                                   .loadedAssemblies)));
             yield return null;
 
             // wait until all the types are collected

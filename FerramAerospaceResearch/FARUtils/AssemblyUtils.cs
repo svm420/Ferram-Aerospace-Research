@@ -18,13 +18,21 @@ namespace FerramAerospaceResearch.FARUtils
             return FindTypesInAssembly<T>(Assembly.GetExecutingAssembly(), inherit);
         }
 
-        public static IEnumerable<Type> FindTypes<T>(bool inherit)
+        public static IEnumerable<Type> FindTypes<T>(
+            IEnumerable<AssemblyLoader.LoadedAssembly> loadedAssemblies,
+            bool inherit
+        )
         {
             // AssemblyLoader.loadedTypes don't have all the types from all the assemblies
-            foreach (AssemblyLoader.LoadedAssembly loadedAssembly in AssemblyLoader.loadedAssemblies)
+            foreach (AssemblyLoader.LoadedAssembly loadedAssembly in loadedAssemblies)
                 foreach (Type type in loadedAssembly.assembly.GetTypes())
                     if (type.IsDefined(typeof(T), inherit))
                         yield return type;
+        }
+
+        public static IEnumerable<Type> FindTypes<T>(bool inherit)
+        {
+            return FindTypes<T>(AssemblyLoader.loadedAssemblies, inherit);
         }
 
         public static IEnumerable<KeyValuePair<T, Type>> FindAttributeInAssembly<T>(
@@ -43,13 +51,21 @@ namespace FerramAerospaceResearch.FARUtils
             return FindAttributeInAssembly<T>(Assembly.GetExecutingAssembly(), inherit);
         }
 
-        public static IEnumerable<KeyValuePair<T, Type>> FindAttribute<T>(bool inherit = true) where T : Attribute
+        public static IEnumerable<KeyValuePair<T, Type>> FindAttribute<T>(
+            IEnumerable<AssemblyLoader.LoadedAssembly> loadedAssemblies,
+            bool inherit = true
+        ) where T : Attribute
         {
             // AssemblyLoader.loadedTypes don't have all the types from all the assemblies
-            foreach (AssemblyLoader.LoadedAssembly loadedAssembly in AssemblyLoader.loadedAssemblies)
+            foreach (AssemblyLoader.LoadedAssembly loadedAssembly in loadedAssemblies)
                 foreach (Type type in loadedAssembly.assembly.GetTypes())
                     if (type.GetCustomAttribute(typeof(T), inherit) is T attribute)
                         yield return new KeyValuePair<T, Type>(attribute, type);
+        }
+
+        public static IEnumerable<KeyValuePair<T, Type>> FindAttribute<T>(bool inherit = true) where T : Attribute
+        {
+            return FindAttribute<T>(AssemblyLoader.loadedAssemblies, inherit);
         }
     }
 }
