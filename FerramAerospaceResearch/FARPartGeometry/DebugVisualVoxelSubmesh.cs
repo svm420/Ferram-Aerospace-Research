@@ -87,8 +87,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             MeshRenderer = GetComponent<MeshRenderer>();
 
             meshFilter.mesh = Mesh;
-            MeshRenderer.material = FARAssets.ShaderCache.DebugVoxels.Material;
-            MeshRenderer.material.mainTexture = FARAssets.TextureCache.VoxelTexture;
+            MeshRenderer.material = FARAssets.Instance.ShaderCache.DebugVoxels.Material;
+            MeshRenderer.material.mainTexture = FARAssets.Instance.TextureCache.VoxelTexture;
             SetupMeshRenderer();
         }
 

@@ -149,12 +149,6 @@ namespace FerramAerospaceResearch
         // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void OnAppLauncherReadySetup()
         {
-            StartCoroutine(Setup());
-        }
-
-        private IEnumerator Setup()
-        {
-            while (!FARAssets.TextureCache.Loaded) yield return null;
             OnGUIAppLauncherReady();
             GameEvents.onGUIApplicationLauncherReady.Remove(OnAppLauncherReadySetup);
             Toggle += onAppLaunchToggle;
@@ -169,7 +163,8 @@ namespace FerramAerospaceResearch
 
         private static void OnGUIAppLauncherReady()
         {
-            FARLogger.Info("Adding Debug Button");
+            Texture2D icon = FARAssets.Instance.TextureCache.IconLarge;
+            FARLogger.Info($"Adding Debug Button with {icon.ToString()}");
             FARDebugButtonStock = ApplicationLauncher.Instance.AddModApplication(ToggleGUI,
                                                                                  ToggleGUI,
                                                                                  null,
@@ -181,7 +176,7 @@ namespace FerramAerospaceResearch
                                                                                  ApplicationLauncher.AppScenes.VAB |
                                                                                  ApplicationLauncher.AppScenes.SPH |
                                                                                  ApplicationLauncher.AppScenes.FLIGHT,
-                                                                                 FARAssets.TextureCache.IconLarge);
+                                                                                 icon);
         }
 
         private static void onAppLaunchToggle()

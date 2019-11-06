@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.3 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -105,7 +105,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //Based on Kronal Vessel Viewer CoM axes rendering
             if (_rendererMaterial == null)
             {
-                Material lineMaterial = FARAssets.ShaderCache.LineRenderer.Material;
+                Material lineMaterial = FARAssets.Instance.ShaderCache.LineRenderer.Material;
 
                 _rendererMaterial = new Material(lineMaterial)
                 {

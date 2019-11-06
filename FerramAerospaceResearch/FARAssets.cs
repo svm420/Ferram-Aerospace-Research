@@ -10,24 +10,64 @@ using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch
 {
-    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     internal class FARAssets : MonoBehaviour
     {
-        public static FARShaderCache ShaderCache { get; private set; }
-        public static FARTextureCache TextureCache { get; private set; }
+        public enum LoadState
+        {
+            None,
+            InProgress,
+            Completed,
+            Error
+        }
 
-        private void Start()
+        private static FARAssets instance;
+        private static readonly object locker = new object();
+
+        public static FARAssets Instance
+        {
+            get
+            {
+                lock (locker)
+                {
+                    if (instance != null)
+                        return instance;
+
+                    var go = new GameObject("FARAssets");
+                    instance = go.AddComponent<FARAssets>();
+                    DontDestroyOnLoad(go);
+
+                    return instance;
+                }
+            }
+        }
+
+        public LoadState State { get; private set; } = LoadState.None;
+        public FARShaderCache ShaderCache { get; private set; }
+        public FARTextureCache TextureCache { get; private set; }
+
+        private void Awake()
         {
             ShaderCache = new FARShaderCache();
             TextureCache = new FARTextureCache();
+            LoadAssets();
+        }
+
+        private void LoadAssets()
+        {
+            if (State != LoadState.None)
+                return;
+            State = LoadState.InProgress;
             TextureCache.Initialize();
             StartCoroutine(LoadAssetsAsync());
         }
 
-        private static IEnumerator LoadAssetsAsync()
+        private IEnumerator LoadAssetsAsync()
         {
             // using a separate method to chain asset loading in the future
             yield return ShaderCache.LoadAsync();
+            State = ShaderCache.State == LoadState.Error ? LoadState.Error : LoadState.Completed;
+            if (State == LoadState.Error)
+                FARLogger.Error("There were errors loading FAR assets. FAR will not work properly");
         }
 
         public class FARAssetDictionary<T> : Dictionary<string, T> where T : Object
@@ -35,8 +75,6 @@ namespace FerramAerospaceResearch
             private AssetBundle assetBundle;
 
             private string bundlePath;
-
-            public bool Loaded { get; protected set; }
 
             public FARAssetDictionary()
             {
@@ -46,6 +84,8 @@ namespace FerramAerospaceResearch
             {
                 BundlePath = bundlePath;
             }
+
+            public LoadState State { get; protected set; } = LoadState.None;
 
             public string BundleName
             {
@@ -67,6 +107,7 @@ namespace FerramAerospaceResearch
 
             public IEnumerator LoadAsync()
             {
+                State = LoadState.InProgress;
                 FARLogger.Debug($"Loading asset bundle {BundlePath}");
                 AssetBundleCreateRequest createRequest = AssetBundle.LoadFromFileAsync(BundlePath);
                 yield return createRequest;
@@ -75,6 +116,7 @@ namespace FerramAerospaceResearch
                 if (assetBundle == null)
                 {
                     FARLogger.Error($"Could not load asset bundle from {BundlePath}");
+                    State = LoadState.Error;
                     yield break;
                 }
 
@@ -91,7 +133,7 @@ namespace FerramAerospaceResearch
                 AssetsLoaded = true;
 
                 OnLoad();
-                Loaded = true;
+                State = LoadState.Completed;
             }
 
             protected virtual void OnLoad()
@@ -165,22 +207,20 @@ namespace FerramAerospaceResearch
 
         public class FARTextureCache : Dictionary<string, Texture2D>
         {
-            public bool Loaded { get; private set;}
+            public bool Loaded { get; private set; }
             public Texture2D IconLarge { get; private set; }
             public Texture2D IconSmall { get; private set; }
             public Texture2D VoxelTexture { get; private set; }
 
             public void Initialize()
             {
-                Add("icon_button_stock",
-                    GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonStock, false));
-                Add("icon_button_blizzy",
-                    GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonBlizzy, false));
-                Add("sprite_debug_voxel",
-                    GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.SpriteDebugVoxel, false));
-                IconLarge = this["icon_button_stock"];
-                IconSmall = this["icon_button_blizzy"];
-                VoxelTexture = this["sprite_debug_voxel"];
+                IconLarge = GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonStock, false);
+                IconSmall = GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonBlizzy, false);
+                VoxelTexture = GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.SpriteDebugVoxel, false);
+
+                Add("icon_button_stock", IconLarge);
+                Add("icon_button_blizzy", IconSmall);
+                Add("sprite_debug_voxel", VoxelTexture);
 
                 Loaded = true;
             }
