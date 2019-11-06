@@ -43,6 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using ferram4;
@@ -148,6 +149,12 @@ namespace FerramAerospaceResearch
         // ReSharper disable once MemberCanBeMadeStatic.Local -> static does not work with GameEvents
         private void OnAppLauncherReadySetup()
         {
+            StartCoroutine(Setup());
+        }
+
+        private IEnumerator Setup()
+        {
+            while (!FARAssets.TextureCache.Loaded) yield return null;
             OnGUIAppLauncherReady();
             GameEvents.onGUIApplicationLauncherReady.Remove(OnAppLauncherReadySetup);
             Toggle += onAppLaunchToggle;

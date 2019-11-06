@@ -36,6 +36,8 @@ namespace FerramAerospaceResearch
 
             private string bundlePath;
 
+            public bool Loaded { get; protected set; }
+
             public FARAssetDictionary()
             {
             }
@@ -89,6 +91,7 @@ namespace FerramAerospaceResearch
                 AssetsLoaded = true;
 
                 OnLoad();
+                Loaded = true;
             }
 
             protected virtual void OnLoad()
@@ -162,6 +165,7 @@ namespace FerramAerospaceResearch
 
         public class FARTextureCache : Dictionary<string, Texture2D>
         {
+            public bool Loaded { get; private set;}
             public Texture2D IconLarge { get; private set; }
             public Texture2D IconSmall { get; private set; }
             public Texture2D VoxelTexture { get; private set; }
@@ -177,6 +181,8 @@ namespace FerramAerospaceResearch
                 IconLarge = this["icon_button_stock"];
                 IconSmall = this["icon_button_blizzy"];
                 VoxelTexture = this["sprite_debug_voxel"];
+
+                Loaded = true;
             }
         }
     }
