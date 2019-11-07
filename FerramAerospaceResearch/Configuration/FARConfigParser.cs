@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,8 @@ namespace FerramAerospaceResearch
 {
     public abstract class FARConfigParser
     {
+        public event Action onChanged;
+
         public virtual void Reset()
         {
         }
@@ -25,6 +28,11 @@ namespace FerramAerospaceResearch
         public static void AppendEntry<T>(StringBuilder sb, string name, T value)
         {
             sb.Append("    ").Append(name).Append(": ").AppendLine(value.ToString());
+        }
+
+        protected void InvokeOnChanged()
+        {
+            onChanged?.Invoke();
         }
     }
 
@@ -69,9 +77,21 @@ namespace FerramAerospaceResearch
         {
             var list = new List<IConfigValue>();
             foreach (PropertyInfo property in ConfigValueProperties)
-                list.Add(property.GetValue(this) as IConfigValue);
+            {
+                var value = property.GetValue(this) as IConfigValue;
+                if (value == null)
+                    continue;
+                list.Add(value);
+                value.onChanged += OnValueChanged;
+            }
 
             return list;
+        }
+
+        private void OnValueChanged(IConfigValue value)
+        {
+            FARLogger.Debug($"Config value {ConfigName}[{value.Name}] changed");
+            InvokeOnChanged();
         }
 
         private static List<PropertyInfo> BuildProperties()

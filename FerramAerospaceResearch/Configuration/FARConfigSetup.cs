@@ -47,7 +47,12 @@ namespace FerramAerospaceResearch
                 yield break;
             }
 
-            var provider = new ConfigProvider();
+            ConfigProvider provider;
+            // if reloading, don't create new one, just update
+            if (FARConfig.Provider is ConfigProvider cp)
+                provider = cp;
+            else
+                provider = new ConfigProvider();
             foreach (KeyValuePair<ConfigParserAttribute, Type> pair in parserTypes)
             {
                 object parserInstance = Activator.CreateInstance(pair.Value);

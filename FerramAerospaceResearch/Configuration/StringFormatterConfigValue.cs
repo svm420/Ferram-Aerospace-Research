@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using FerramAerospaceResearch.FARUtils;
 
@@ -23,15 +24,18 @@ namespace FerramAerospaceResearch
 
         public void Parse(IConfigNode node)
         {
-            if (node.TryGetValue(Name, ref formatString))
-                Parse(formatString);
+            string str = string.Empty;
+            if (node.TryGetValue(Name, ref str))
+                Parse(str);
         }
 
         public void Save(IConfigNode node)
         {
-            node.AddValue(Name, formatString);
+            node.AddValue(Name, FormatString);
         }
 
+        public event Action<IConfigValue> onChanged;
+        public event Action<IConfigValue<string>> onValueChanged;
         public string Name { get; }
 
         public string EditableName
@@ -45,6 +49,17 @@ namespace FerramAerospaceResearch
         {
             get { return FormatString; }
             set { FormatString = value; }
+        }
+
+        public override void Parse(string str)
+        {
+            string old = FormatString;
+            base.Parse(str);
+
+            if (old == FormatString)
+                return;
+            onChanged?.Invoke(this);
+            onValueChanged?.Invoke(this);
         }
     }
 }

@@ -7,7 +7,6 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace FerramAerospaceResearch
 {
     internal class FARAssets : MonoBehaviour
@@ -32,10 +31,7 @@ namespace FerramAerospaceResearch
                     if (instance != null)
                         return instance;
 
-                    var go = new GameObject("FARAssets");
-                    instance = go.AddComponent<FARAssets>();
-                    DontDestroyOnLoad(go);
-
+                    Setup();
                     return instance;
                 }
             }
@@ -45,29 +41,104 @@ namespace FerramAerospaceResearch
         public FARShaderCache ShaderCache { get; private set; }
         public FARTextureCache TextureCache { get; private set; }
 
+        private static void Setup()
+        {
+            var go = new GameObject("FARAssets");
+            instance = go.AddComponent<FARAssets>();
+            DontDestroyOnLoad(go);
+            instance.LoadAssets();
+        }
+
         private void Awake()
         {
             ShaderCache = new FARShaderCache();
             TextureCache = new FARTextureCache();
-            LoadAssets();
         }
 
         private void LoadAssets()
         {
             if (State != LoadState.None)
                 return;
-            State = LoadState.InProgress;
-            TextureCache.Initialize();
-            StartCoroutine(LoadAssetsAsync());
+            ReloadAssets();
+        }
+
+        public static void ModuleManagerPostLoad()
+        {
+            lock (locker)
+            {
+                if (instance == null)
+                    Setup();
+                else
+                    instance.ReloadAssets();
+            }
+        }
+
+        internal void ReloadAssets()
+        {
+            StartLoading(LoadAssetsAsync());
         }
 
         private IEnumerator LoadAssetsAsync()
         {
+            TextureCache.LoadAll();
+
             // using a separate method to chain asset loading in the future
-            yield return ShaderCache.LoadAsync();
-            State = ShaderCache.State == LoadState.Error ? LoadState.Error : LoadState.Completed;
+            yield return LoadAll();
+        }
+
+        internal void ReloadShaders()
+        {
+            StartLoading(LoadShaders());
+        }
+
+        private void StartLoading(IEnumerator enumerator)
+        {
+            StartCoroutine(WrapLoading(enumerator));
+        }
+
+        internal void ReloadTextures()
+        {
+            TextureCache.LoadAll();
+        }
+
+        private IEnumerator WrapLoading(IEnumerator enumerator)
+        {
+            State = LoadState.InProgress;
+
+            // wait for config to be loaded
+            while (FARConfig.State != FARConfig.ConfigState.Loaded)
+                yield return null;
+
+            yield return enumerator;
             if (State == LoadState.Error)
-                FARLogger.Error("There were errors loading FAR assets. FAR will not work properly");
+            {
+                FARLogger.Error("There were errors loading FARAssets");
+            }
+            else
+            {
+                State = LoadState.Completed;
+            }
+        }
+
+        private IEnumerator LoadAll()
+        {
+            yield return LoadShaders();
+        }
+
+        private IEnumerator LoadShaders()
+        {
+            yield return ShaderCache.LoadAsync();
+
+            if (ShaderCache.State != LoadState.Error)
+                yield break;
+            FARLogger.Error("There were errors loading FAR shaders.");
+            State = LoadState.Error;
+        }
+
+        private void OnDestroy()
+        {
+            TextureCache.Unregister();
+            ShaderCache.Unregister();
         }
 
         public class FARAssetDictionary<T> : Dictionary<string, T> where T : Object
@@ -108,6 +179,7 @@ namespace FerramAerospaceResearch
             public IEnumerator LoadAsync()
             {
                 State = LoadState.InProgress;
+                AssetsLoaded = false;
                 FARLogger.Debug($"Loading asset bundle {BundlePath}");
                 AssetBundleCreateRequest createRequest = AssetBundle.LoadFromFileAsync(BundlePath);
                 yield return createRequest;
@@ -154,14 +226,17 @@ namespace FerramAerospaceResearch
                         FARLogger.Info("Loading shaders from Linux bundle");
                         //For OpenGL users on Windows we load the Linux shaders to fix OpenGL issues
                         BundlePath = FARShadersConfig.Instance.BundleLinux;
+                        FARShadersConfig.Instance.BundleLinux.onValueChanged += ReloadAssets;
                         break;
                     case RuntimePlatform.WindowsPlayer:
                         FARLogger.Info("Loading shaders from Windows bundle");
                         BundlePath = FARShadersConfig.Instance.BundleWindows;
+                        FARShadersConfig.Instance.BundleWindows.onValueChanged += ReloadAssets;
                         break;
                     case RuntimePlatform.OSXPlayer:
                         FARLogger.Info("Loading shaders from MacOSX bundle");
                         BundlePath = FARShadersConfig.Instance.BundleMac;
+                        FARShadersConfig.Instance.BundleMac.onValueChanged += ReloadAssets;
                         break;
                     default:
                         // Should never reach this
@@ -172,6 +247,35 @@ namespace FerramAerospaceResearch
 
             public ShaderMaterialPair LineRenderer { get; private set; }
             public ShaderMaterialPair DebugVoxels { get; private set; }
+
+            internal void Unregister()
+            {
+                // ReSharper disable once SwitchStatementMissingSomeCases
+                switch (Application.platform)
+                {
+                    case RuntimePlatform.LinuxPlayer:
+                    case RuntimePlatform.WindowsPlayer
+                        when SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL", StringComparison.Ordinal):
+                        FARShadersConfig.Instance.BundleLinux.onValueChanged -= ReloadAssets;
+                        break;
+                    case RuntimePlatform.WindowsPlayer:
+                        FARShadersConfig.Instance.BundleWindows.onValueChanged -= ReloadAssets;
+                        break;
+                    case RuntimePlatform.OSXPlayer:
+                        FARShadersConfig.Instance.BundleMac.onValueChanged -= ReloadAssets;
+                        break;
+                    default:
+                        // Should never reach this
+                        FARLogger.Error($"Invalid runtime platform {Application.platform}");
+                        break;
+                }
+            }
+
+            private void ReloadAssets(IConfigValue<string> bundlePath)
+            {
+                BundlePath = bundlePath.Value;
+                Instance.ReloadShaders();
+            }
 
             protected override void OnLoad()
             {
@@ -207,22 +311,66 @@ namespace FerramAerospaceResearch
 
         public class FARTextureCache : Dictionary<string, Texture2D>
         {
+            public FARTextureCache()
+            {
+                Add("icon_button_stock", IconLarge);
+                Add("icon_button_blizzy", IconSmall);
+                Add("sprite_debug_voxel", VoxelTexture);
+
+                FARTexturesConfig config = FARTexturesConfig.Instance;
+                config.IconButtonStock.onValueChanged += ReloadStockButton;
+                config.IconButtonBlizzy.onValueChanged += ReloadBlizzyButton;
+                config.SpriteDebugVoxel.onValueChanged += ReloadVoxel;
+
+                GameEvents.OnGameDatabaseLoaded.Add(LoadAll);
+            }
+
             public bool Loaded { get; private set; }
             public Texture2D IconLarge { get; private set; }
             public Texture2D IconSmall { get; private set; }
             public Texture2D VoxelTexture { get; private set; }
 
-            public void Initialize()
+            internal void Unregister()
             {
-                IconLarge = GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonStock, false);
-                IconSmall = GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.IconButtonBlizzy, false);
-                VoxelTexture = GameDatabase.Instance.GetTexture(FARTexturesConfig.Instance.SpriteDebugVoxel, false);
+                FARTexturesConfig config = FARTexturesConfig.Instance;
+                config.IconButtonStock.onValueChanged -= ReloadStockButton;
+                config.IconButtonBlizzy.onValueChanged -= ReloadBlizzyButton;
+                config.SpriteDebugVoxel.onValueChanged -= ReloadVoxel;
+                GameEvents.OnGameDatabaseLoaded.Remove(LoadAll);
+            }
 
-                Add("icon_button_stock", IconLarge);
-                Add("icon_button_blizzy", IconSmall);
-                Add("sprite_debug_voxel", VoxelTexture);
+            public void LoadAll()
+            {
+                if (!GameDatabase.Instance.IsReady())
+                {
+                    FARLogger.Debug("Trying to load textures before GameDatabase has been loaded");
+                    return;
+                }
+
+                FARTexturesConfig config = FARTexturesConfig.Instance;
+                ReloadStockButton(config.IconButtonStock);
+                ReloadBlizzyButton(config.IconButtonBlizzy);
+                ReloadVoxel(config.SpriteDebugVoxel);
 
                 Loaded = true;
+            }
+
+            private void ReloadStockButton(IConfigValue<string> value)
+            {
+                IconLarge = GameDatabase.Instance.GetTexture(value.Value, false);
+                this["icon_button_stock"] = IconLarge;
+            }
+
+            private void ReloadBlizzyButton(IConfigValue<string> value)
+            {
+                IconSmall = GameDatabase.Instance.GetTexture(value.Value, false);
+                this["icon_button_blizzy"] = IconSmall;
+            }
+
+            private void ReloadVoxel(IConfigValue<string> value)
+            {
+                VoxelTexture = GameDatabase.Instance.GetTexture(value.Value, false);
+                this["sprite_debug_voxel"] = VoxelTexture;
             }
         }
     }

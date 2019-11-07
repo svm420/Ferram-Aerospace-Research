@@ -53,6 +53,13 @@ namespace FerramAerospaceResearch
 {
     public class FARConfig
     {
+        public enum ConfigState
+        {
+            Invalid,
+            Loading,
+            Loaded
+        }
+
         public const string ConfigNodeName = "FARConfig";
         public const string ConfigSectionName = "CONFIG";
         public const string CustomConfigFilename = "CustomFARConfig.cfg";
@@ -64,6 +71,9 @@ namespace FerramAerospaceResearch
         private FARConfig()
         {
             SetupDefault();
+
+            foreach (KeyValuePair<string, FARConfigParser> pair in Parsers)
+                pair.Value.onChanged += MarkDirty;
         }
 
         public static FARConfigProvider Provider { get; internal set; }
@@ -86,6 +96,8 @@ namespace FerramAerospaceResearch
         public static string GameDataPath { get; } = Path.GetFullPath(Path.Combine(FARRootPath, ".."));
         public static string KSPRootPath { get; } = Path.GetFullPath(Path.Combine(GameDataPath, ".."));
 
+        public static bool MMLoaded { get; private set; }
+
         public static FARConfig Instance
         {
             get
@@ -96,15 +108,37 @@ namespace FerramAerospaceResearch
 
                 // delay loading until FARConfig has been instantiated, this allows parsers to access
                 // FARConfig instance in their parse methods
+                if (!MMLoaded)
+                    return instance;
                 instance.LoadConfig();
-                instance.PrintConfig();
                 return instance;
             }
+        }
+
+        public bool IsDirty { get; private set; }
+
+        public static ConfigState State { get; private set; } = ConfigState.Invalid;
+
+        private void MarkDirty()
+        {
+            IsDirty = true;
         }
 
         public bool ContainsConfig(string name)
         {
             return Parsers.ContainsKey(name);
+        }
+
+        public static void ModuleManagerPostLoad()
+        {
+            MMLoaded = true;
+            if (instance == null)
+                instance = Instance;
+            else
+                instance.LoadConfig();
+
+            // MM patches exist outside the game, no need to output duplicate config
+            instance.IsDirty = false;
         }
 
         private void SetupDefault()
@@ -196,6 +230,7 @@ namespace FerramAerospaceResearch
 
         public void LoadConfig()
         {
+            State = ConfigState.Loading;
             IConfigNode[] nodes = Provider.LoadConfigs(ConfigNodeName);
 
             string name = string.Empty;
@@ -208,11 +243,22 @@ namespace FerramAerospaceResearch
                     name = "default" + (count++).ToString();
                 }
 
-                configs.Add(name, config);
+                if (configs.ContainsKey(name))
+                {
+                    FARLogger.Info($"Overwriting CONFIG {name}");
+                    configs[name] = config;
+                }
+                else
+                {
+                    configs.Add(name, config);
+                }
 
                 FARLogger.Debug($"Loading config {name}");
                 LoadConfig(config, name);
             }
+
+            State = ConfigState.Loaded;
+            PrintConfig();
         }
 
         public void LoadConfig(string name)
@@ -258,6 +304,8 @@ namespace FerramAerospaceResearch
 
         public void SaveConfig()
         {
+            if (!IsDirty)
+                return;
             SaveConfig(CombineGameData(CustomConfigFilename));
         }
 
@@ -275,6 +323,7 @@ namespace FerramAerospaceResearch
             IConfigNode saveNode = Provider.CreateNode();
             saveNode.AddNode(node);
             saveNode.Save(CombineKSPRoot(filename));
+            IsDirty = false;
         }
 
         [Conditional("DEBUG")]

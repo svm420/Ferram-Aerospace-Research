@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace FerramAerospaceResearch
         string Name { get; }
 
         string EditableName { get; }
+        event Action<IConfigValue> onChanged;
         void Reset();
         void DebugString(StringBuilder sb);
 
@@ -20,6 +22,7 @@ namespace FerramAerospaceResearch
     {
         T Default { get; }
         T Value { get; set; }
+        event Action<IConfigValue<T>> onValueChanged;
     }
 
     // abstract class since non-generic methods don't accept generic arguments
@@ -35,33 +38,41 @@ namespace FerramAerospaceResearch
             transform = null;
             Name = name;
             Default = value;
-            Value = value;
+            this.value = Default;
         }
 
-        protected ConfigValue(string name, T value, Func<T, T> transform)
+        protected ConfigValue(string name, T value, Func<T, T> transform) : this(name, transform(value))
         {
             this.transform = transform;
-            Name = name;
-            Default = transform(value);
-            Value = value;
         }
 
+        public event Action<IConfigValue> onChanged;
+        public event Action<IConfigValue<T>> onValueChanged;
         public string Name { get; }
         public T Default { get; }
 
         public T Value
         {
             get { return value; }
-            set { this.value = transform == null ? value : transform(value); }
+            set
+            {
+                T old = this.value;
+                this.value = transform == null ? value : transform(value);
+                if (EqualityComparer<T>.Default.Equals(this.value, old))
+                    return;
+
+                onChanged?.Invoke(this);
+                onValueChanged?.Invoke(this);
+            }
         }
 
         public void Parse(IConfigNode node)
         {
+            T old = value;
             ParseValue(node);
+            value = old;
             Value = value;
         }
-
-        protected abstract void ParseValue(IConfigNode node);
 
         public abstract void Save(IConfigNode node);
 
@@ -79,6 +90,8 @@ namespace FerramAerospaceResearch
         {
             sb.Append("    ").Append(Name).Append(": ").AppendLine(Value.ToString());
         }
+
+        protected abstract void ParseValue(IConfigNode node);
 
         // implicit conversion to the stored value
         public static implicit operator T(ConfigValue<T> cv)

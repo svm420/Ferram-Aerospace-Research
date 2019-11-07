@@ -55,7 +55,7 @@ namespace FerramAerospaceResearch.FARUtils
 
         private readonly List<Field> fields = new List<Field>();
         private readonly StringBuilder stringBuilder = new StringBuilder();
-        protected string formatString;
+        private string formatString;
 
         public StringFormatter(string formatString)
         {
@@ -68,7 +68,7 @@ namespace FerramAerospaceResearch.FARUtils
             set { Parse(value); }
         }
 
-        public void Parse(string str)
+        public virtual void Parse(string str)
         {
             fields.Clear();
             formatString = str;
