@@ -89,15 +89,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 
         public override DesignConcernSeverity GetSeverity()
         {
-            switch (_editorFacility)
+            return _editorFacility switch
             {
-                case EditorFacilities.VAB:
-                    return DesignConcernSeverity.WARNING;
-                case EditorFacilities.SPH:
-                    return DesignConcernSeverity.CRITICAL;
-                default:
-                    return DesignConcernSeverity.WARNING;
-            }
+                EditorFacilities.VAB => DesignConcernSeverity.WARNING,
+                EditorFacilities.SPH => DesignConcernSeverity.CRITICAL,
+                _ => DesignConcernSeverity.WARNING
+            };
         }
     }
 }

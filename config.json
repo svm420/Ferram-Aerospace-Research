@@ -27,7 +27,6 @@
         "AssetBundleDir": "$(UnityDir)AssetBundles/"
     },
     "post_build": {
-        "pdb2mdb": "$(SolutionDir)../KSP Assemblies/pdb2mdb.exe",
         "clean": [],
         "install": [
             {

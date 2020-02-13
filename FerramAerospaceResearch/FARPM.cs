@@ -49,33 +49,21 @@ namespace FerramAerospaceResearch
         // ReSharper disable once UnusedMember.Global
         public object ProcessVariable(string variable)
         {
-            switch (variable)
+            return variable switch
             {
-                case "FARPM_DYNAMIC_PRESSURE_Q":
-                    return FARAPI.ActiveVesselDynPres();
-                case "FARPM_LIFT_COEFFICIENT_CL":
-                    return FARAPI.ActiveVesselLiftCoeff();
-                case "FARPM_DRAG_COEFFICIENT_CD":
-                    return FARAPI.ActiveVesselDragCoeff();
-                case "FARPM_REFAREA":
-                    return FARAPI.ActiveVesselRefArea();
-                case "FARPM_MACHNUMBER":
-                    return FlightGlobals.ActiveVessel.mach;
-                case "FARPM_TERMINALVELOCITY":
-                    return FARAPI.ActiveVesselTermVelEst();
-                case "FARPM_BALLISTIC_COEFFICIENT":
-                    return FARAPI.ActiveVesselBallisticCoeff();
-                case "FARPM_ANGLE_OF_ATTACK":
-                    return FARAPI.ActiveVesselAoA();
-                case "FARPM_SIDESLIP":
-                    return FARAPI.ActiveVesselSideslip();
-                case "FARPM_THRUST_SPECIFIC_FUEL_CONSUMPTION":
-                    return FARAPI.ActiveVesselTSFC();
-                case "FARPM_STALL_FRACTION":
-                    return FARAPI.ActiveVesselStallFrac();
-            }
-
-            return null;
+                "FARPM_DYNAMIC_PRESSURE_Q" => FARAPI.ActiveVesselDynPres(),
+                "FARPM_LIFT_COEFFICIENT_CL" => FARAPI.ActiveVesselLiftCoeff(),
+                "FARPM_DRAG_COEFFICIENT_CD" => FARAPI.ActiveVesselDragCoeff(),
+                "FARPM_REFAREA" => FARAPI.ActiveVesselRefArea(),
+                "FARPM_MACHNUMBER" => FlightGlobals.ActiveVessel.mach,
+                "FARPM_TERMINALVELOCITY" => FARAPI.ActiveVesselTermVelEst(),
+                "FARPM_BALLISTIC_COEFFICIENT" => FARAPI.ActiveVesselBallisticCoeff(),
+                "FARPM_ANGLE_OF_ATTACK" => FARAPI.ActiveVesselAoA(),
+                "FARPM_SIDESLIP" => FARAPI.ActiveVesselSideslip(),
+                "FARPM_THRUST_SPECIFIC_FUEL_CONSUMPTION" => FARAPI.ActiveVesselTSFC(),
+                "FARPM_STALL_FRACTION" => FARAPI.ActiveVesselStallFrac(),
+                _ => null
+            };
         }
     }
 }

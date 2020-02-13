@@ -9,7 +9,7 @@ namespace FerramAerospaceResearch
 
         public new static IEqualityComparer<T> Default
         {
-            get { return _defaultComparer ?? (_defaultComparer = new ObjectReferenceEqualityComparer<T>()); }
+            get { return _defaultComparer ??= new ObjectReferenceEqualityComparer<T>(); }
         }
 
         public override bool Equals(T x, T y)

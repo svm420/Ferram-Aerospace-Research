@@ -61,7 +61,7 @@ namespace FerramAerospaceResearch.FARGUI
 
         public static GUIColors Instance
         {
-            get { return _instance ?? (_instance = new GUIColors()); }
+            get { return _instance ??= new GUIColors(); }
         }
 
         public Color this[int index]

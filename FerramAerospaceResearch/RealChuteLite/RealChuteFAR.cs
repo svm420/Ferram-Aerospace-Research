@@ -269,15 +269,12 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                switch (DeploymentState)
+                return DeploymentState switch
                 {
-                    case DeploymentStates.PREDEPLOYED:
-                    case DeploymentStates.DEPLOYED:
-                        return true;
-
-                    default:
-                        return false;
-                }
+                    DeploymentStates.PREDEPLOYED => true,
+                    DeploymentStates.DEPLOYED => true,
+                    _ => false
+                };
             }
         }
 
@@ -323,19 +320,18 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         public static GUIStyle BoldLabel
         {
-            get { return boldLabel ?? (boldLabel = new GUIStyle(HighLogic.Skin.label) {fontStyle = FontStyle.Bold}); }
+            get { return boldLabel ??= new GUIStyle(HighLogic.Skin.label) {fontStyle = FontStyle.Bold}; }
         }
 
         public static GUIStyle YellowLabel
         {
             get
             {
-                return yellowLabel ??
-                       (yellowLabel = new GUIStyle(HighLogic.Skin.label)
-                           {
-                               normal = {textColor = XKCDColors.BrightYellow},
-                               hover = {textColor = XKCDColors.BrightYellow}
-                           });
+                return yellowLabel ??= new GUIStyle(HighLogic.Skin.label)
+                {
+                    normal = {textColor = XKCDColors.BrightYellow},
+                    hover = {textColor = XKCDColors.BrightYellow}
+                };
             }
         }
 
@@ -343,33 +339,32 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                return redLabel ??
-                       (redLabel = new GUIStyle(HighLogic.Skin.label)
-                           {
-                               normal = {textColor = XKCDColors.Red},
-                               hover = {textColor = XKCDColors.Red}
-                           });
+                return redLabel ??= new GUIStyle(HighLogic.Skin.label)
+                {
+                    normal = {textColor = XKCDColors.Red},
+                    hover = {textColor = XKCDColors.Red}
+                };
             }
         }
 
         private BaseEvent DeployE
         {
-            get { return deploy ?? (deploy = Events["GUIDeploy"]); }
+            get { return deploy ??= Events["GUIDeploy"]; }
         }
 
         private BaseEvent Disarm
         {
-            get { return disarm ?? (disarm = Events["GUIDisarm"]); }
+            get { return disarm ??= Events["GUIDisarm"]; }
         }
 
         private BaseEvent CutE
         {
-            get { return cutE ?? (cutE = Events["GUICut"]); }
+            get { return cutE ??= Events["GUICut"]; }
         }
 
         private BaseEvent Repack
         {
-            get { return repack ?? (repack = Events["GUIRepack"]); }
+            get { return repack ??= Events["GUIRepack"]; }
         }
 
         //Not needed
