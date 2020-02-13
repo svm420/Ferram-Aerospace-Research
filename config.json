@@ -7,7 +7,7 @@
         "ModDir": "$(SolutionDir)$(ModDirRelative)",
         "PluginDir": "$(ModDir)Plugins/",
         "AssetDir": "$(ModDir)Assets/",
-        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.8.0/",
+        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.9.0/",
         "KSPGameData": "$(KSP_DIR_INSTALL)GameData/",
         "GameDir": "$(KSPGameData)$(ModName)/",
         "VersionMajor": 0,
@@ -22,7 +22,7 @@
         "KSPMajorMin": 1,
         "KSPMajorMax": 1,
         "KSPMinorMin": 8,
-        "KSPMinorMax": 8,
+        "KSPMinorMax": 9,
         "UnityDir": "Unity/$(ModName)/",
         "AssetBundleDir": "$(UnityDir)AssetBundles/"
     },
