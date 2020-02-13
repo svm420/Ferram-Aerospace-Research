@@ -97,12 +97,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
             FARLogger.Info("FARVesselAero on " + vessel.name + " reporting startup");
             base.OnStart();
 
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                enabled = false;
-                return;
-            }
-
             if (!HighLogic.LoadedSceneIsFlight)
             {
                 enabled = false;

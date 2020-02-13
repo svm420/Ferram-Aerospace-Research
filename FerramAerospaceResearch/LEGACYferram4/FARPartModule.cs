@@ -79,12 +79,6 @@ namespace ferram4
 
         public virtual void Initialization()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                enabled = false;
-                return;
-            }
-
             OnVesselPartsChange = UpdateShipPartsList;
             UpdateShipPartsList();
         }

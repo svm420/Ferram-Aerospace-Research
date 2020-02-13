@@ -104,12 +104,6 @@ namespace FerramAerospaceResearch
 
         private void Start()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                enabled = false;
-                return;
-            }
-
             Instance = this;
 
             FARLogger.Info("Vehicle Voxel Setup started");

@@ -84,12 +84,23 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private int _sendUpdateTick;
         private int _meshesToUpdate = -1;
 
-        [SerializeField] private bool forceUseColliders;
-        [SerializeField] private bool forceUseMeshes;
-        [SerializeField] private bool ignoreForMainAxis;
-        [SerializeField] private List<string> ignoredTransforms, unignoredTransforms;
-        [SerializeField] private bool ignoreIfNoRenderer;
-        [SerializeField] private bool rebuildOnAnimation;
+        [SerializeField]
+        private bool forceUseColliders;
+
+        [SerializeField]
+        private bool forceUseMeshes;
+
+        [SerializeField]
+        private bool ignoreForMainAxis;
+
+        [SerializeField]
+        private List<string> ignoredTransforms, unignoredTransforms;
+
+        [SerializeField]
+        private bool ignoreIfNoRenderer;
+
+        [SerializeField]
+        private bool rebuildOnAnimation;
 
         public bool HasCrossSectionAdjusters
         {
@@ -193,12 +204,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void Start()
         {
             destroyed = false;
-
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                enabled = false;
-                return;
-            }
 
             //RebuildAllMeshData();
             SetupIGeometryUpdaters();

@@ -122,7 +122,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         private void Start()
         {
-            if (CompatibilityChecker.IsAllCompatible() && Instance == null)
+            if (Instance == null)
             {
                 Instance = this;
             }

@@ -99,12 +99,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             base.OnStart();
 
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                enabled = false;
-                return;
-            }
-
             showGUI = savedShowGUI;
             //since we're sharing the button, we need these shenanigans now
             if (FARDebugAndSettings.FARDebugButtonStock && HighLogic.LoadedSceneIsFlight)

@@ -57,7 +57,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void Start()
         {
-            if (CompatibilityChecker.IsAllCompatible() && Instance == null)
+            if (Instance == null)
                 Instance = this;
             else
                 Destroy(this);

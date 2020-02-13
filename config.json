@@ -127,27 +127,6 @@
                         "replace": "\\g<1>$(VersionMajor), $(VersionMinor)\\g<2>"
                     }
                 ]
-            },
-            {
-                "pattern": "$(ModName)/CompatibilityChecker.cs",
-                "substitutions": [
-                    {
-                        "search": "(KSP_MAJOR_MAX\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMajorMax)"
-                    },
-                    {
-                        "search": "(KSP_MAJOR_MIN\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMajorMin)"
-                    },
-                    {
-                        "search": "(KSP_MINOR_MAX\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMinorMax)"
-                    },
-                    {
-                        "search": "(KSP_MINOR_MIN\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMinorMin)"
-                    }
-                ]
             }
         ],
         "template_files": [

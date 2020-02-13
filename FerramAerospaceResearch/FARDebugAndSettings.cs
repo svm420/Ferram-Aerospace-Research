@@ -101,12 +101,6 @@ namespace FerramAerospaceResearch
 
         private void Start()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                enabled = false;
-                return;
-            }
-
             FARAeroSection.GenerateCrossFlowDragCurve();
             FARAeroStress.LoadStressTemplates();
             FARAeroUtil.LoadAeroDataFromConfig();
@@ -621,9 +615,6 @@ namespace FerramAerospaceResearch
 
         private void OnDestroy()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
-                return;
-
             GameEvents.onGameSceneSwitchRequested.Remove(OnSceneChange);
 
             FARDebugButtonBlizzy?.Destroy();
