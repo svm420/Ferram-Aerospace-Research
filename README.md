@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.15.11.3 "Mach"
+Ferram Aerospace Research Continued v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,6 +64,13 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.15.11.4V "Mach"------------------------------------  
+
+Update to MM 4.1.3  
+Update to KSP 1.9  
+
+Removed CompatibilityChecker  
+
 0.15.11.3V "Mach"------------------------------------
 
 Update to MM 4.1.0  
