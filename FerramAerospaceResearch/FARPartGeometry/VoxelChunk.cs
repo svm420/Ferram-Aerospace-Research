@@ -50,7 +50,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
     internal class VoxelChunk
     {
         private readonly PartSizePair[] voxelPoints;
-        private DebugVisualVoxel[,,] visualVoxels;
         private HashSet<Part> overridingParts;
 
         private double _size;
@@ -265,10 +264,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return voxelPoints[index];
         }
 
-        public void VisualizeVoxels(Matrix4x4 vesselLocalToWorldMatrix, DebugVisualVoxelMeshController voxelMesh)
+        public void VisualizeVoxels<T>(Matrix4x4 vesselLocalToWorldMatrix, DebugVoxelMesh voxelMesh, T builder)
+            where T : IDebugVoxelMeshBuilder<DebugVoxel>
         {
-            ClearVisualVoxels();
-            visualVoxels = new DebugVisualVoxel[8, 8, 8];
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++)
                     for (int k = 0; k < 8; k++)
@@ -282,23 +280,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                         elementSize *= _size * 0.5f;
                         var vx =
-                            new DebugVisualVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner +
-                                                                                           new Vector3d(i, j, k) *
-                                                                                           _size),
-                                                 elementSize);
-                        voxelMesh.DebugVoxels.Add(vx);
-                        visualVoxels[i, j, k] = vx;
+                            new DebugVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner +
+                                                                                     new Vector3d(i, j, k) * _size),
+                                           (float)elementSize);
+                        voxelMesh.Add(builder, vx);
                     }
-        }
-
-        public void ClearVisualVoxels()
-        {
-            if (visualVoxels == null)
-                return;
-            for (int i = 0; i < 8; i++)
-                for (int j = 0; j < 8; j++)
-                    for (int k = 0; k < 8; k++)
-                        visualVoxels[i, j, k] = null;
         }
     }
 

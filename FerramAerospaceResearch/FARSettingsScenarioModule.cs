@@ -128,6 +128,7 @@ namespace FerramAerospaceResearch
             node.AddValue("numVoxelsDebrisVessel", voxelSettings.numVoxelsDebrisVessel);
             node.AddValue("minPhysTicksPerUpdate", voxelSettings.minPhysTicksPerUpdate);
             node.AddValue("useHigherResVoxelPoints", voxelSettings.useHigherResVoxelPoints);
+            node.AddValue("use32BitIndices", voxelSettings.use32BitIndices);
             node.AddValue("index", settings.index);
 
             FlightGUI.SaveActiveData();
@@ -164,6 +165,8 @@ namespace FerramAerospaceResearch
                 voxelSettings.minPhysTicksPerUpdate = int.Parse(node.GetValue("minPhysTicksPerUpdate"));
             if (node.HasValue("useHigherResVoxelPoints"))
                 voxelSettings.useHigherResVoxelPoints = bool.Parse(node.GetValue("useHigherResVoxelPoints"));
+            if (node.HasValue("use32BitIndices"))
+                voxelSettings.use32BitIndices = bool.Parse(node.GetValue("use32BitIndices"));
 
             if (index == -1)
             {
@@ -306,6 +309,14 @@ namespace FerramAerospaceResearch
                                                                          : "Low Res SubVoxels");
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Mesh: use 32 bit indices: ");
+            voxelSettings.use32BitIndices = GUILayout.Toggle(voxelSettings.use32BitIndices,
+                                                             voxelSettings.use32BitIndices
+                                                                 ? "32 bit indices"
+                                                                 : "16 bit indices");
+            GUILayout.EndHorizontal();
+
             GUILayout.EndVertical();
         }
     }
@@ -348,17 +359,25 @@ namespace FerramAerospaceResearch
         public int numVoxelsDebrisVessel;
         public int minPhysTicksPerUpdate;
         public bool useHigherResVoxelPoints;
+        public bool use32BitIndices;
 
         public FARVoxelSettings() : this(250000, 20000, 80, true)
         {
         }
 
-        public FARVoxelSettings(int vesselCount, int debrisCount, int minPhysTicks, bool higherResVoxPoints)
+        public FARVoxelSettings(
+            int vesselCount,
+            int debrisCount,
+            int minPhysTicks,
+            bool higherResVoxPoints,
+            bool use32BitIndices = false
+        )
         {
             numVoxelsControllableVessel = vesselCount;
             numVoxelsDebrisVessel = debrisCount;
             minPhysTicksPerUpdate = minPhysTicks;
             useHigherResVoxelPoints = higherResVoxPoints;
+            this.use32BitIndices = use32BitIndices;
         }
     }
 }

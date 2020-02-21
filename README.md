@@ -70,6 +70,7 @@ Update to MM 4.1.3
 Update to KSP 1.9  
 
 Removed CompatibilityChecker  
+Debug voxel mesh is now built as a single mesh, with possible submeshes. Choose between 16 (default) and 32 bit vertex indices from the Space Centre settings menu. ([#86](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/86))  
 
 0.15.11.3V "Mach"------------------------------------
 
