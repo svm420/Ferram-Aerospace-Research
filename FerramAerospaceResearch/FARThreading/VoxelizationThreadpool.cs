@@ -135,7 +135,11 @@ namespace FerramAerospaceResearch.FARThreading
         public void RunOnMainThread(Action action)
         {
             if (inMainThread)
+            {
                 action();
+                return;
+            }
+
             var task = new Task(action);
             lock (queuedMainThreadTasks)
             {
