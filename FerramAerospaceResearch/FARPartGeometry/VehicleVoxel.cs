@@ -1,5 +1,5 @@
 /*
-Ferram Aerospace Research v0.15.11.3 "Mach"
+Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -68,7 +68,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private static double maxLocation = 255;
         private static byte maxLocationByte = 255;
         private static bool useHigherResVoxels;
-        private readonly DebugVisualVoxelMeshController voxelMesh;
+        private DebugVoxelMesh voxelMesh;
         private readonly object _locker = new object();
 
         private double invElementSize;
@@ -80,7 +80,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private VehicleVoxel()
         {
-            voxelMesh = new DebugVisualVoxelMeshController {Active = false};
+            VoxelizationThreadpool.Instance.RunOnMainThread(() =>
+            {
+                voxelMesh = DebugVoxelMesh.Create();
+                voxelMesh.gameObject.SetActive(false);
+            });
         }
 
         public double ElementSize { get; private set; }
@@ -1345,34 +1349,35 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public void ClearVisualVoxels()
         {
-            FARLogger.Debug("Clearing visual voxels");
-            voxelMesh.Active = false;
-            for (int i = 0; i < xLength; i++)
+            if (voxelMesh == null)
+                return;
+            VoxelizationThreadpool.Instance.RunOnMainThread(() =>
             {
-                for (int j = 0; j < yLength; j++)
-                {
-                    for (int k = 0; k < zLength; k++)
-                        voxelChunks[i, j, k]?.ClearVisualVoxels();
-                }
-            }
-
-            voxelMesh.Clear(true);
+                FARLogger.Debug("Clearing visual voxels");
+                voxelMesh.gameObject.SetActive(false);
+                voxelMesh.Clear();
+            });
         }
 
         public void VisualizeVoxel(Matrix4x4 vesselLocalToWorldMatrix)
         {
             FARLogger.Debug("Creating visual voxels");
+            var builder = new DebugVoxel.Builder();
+            voxelMesh.Clear(builder, xLength * yLength * zLength * 128, false);
             for (int i = 0; i < xLength; i++)
             {
                 for (int j = 0; j < yLength; j++)
                 {
                     for (int k = 0; k < zLength; k++)
-                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, voxelMesh);
+                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, voxelMesh, builder);
                 }
             }
 
-            voxelMesh.RebuildSafe();
-            voxelMesh.Active = true;
+            VoxelizationThreadpool.Instance.RunOnMainThread(() =>
+            {
+                voxelMesh.Apply(builder);
+                voxelMesh.gameObject.SetActive(true);
+            });
         }
 
         //Only use to change size, not part

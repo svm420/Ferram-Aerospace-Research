@@ -86,7 +86,8 @@ namespace FerramAerospaceResearch.RealChuteLite
         private readonly int id = Guid.NewGuid().GetHashCode();
 
         //Stealing values from the stock module
-        [KSPField] public float autoCutSpeed = 0.5f;
+        [KSPField]
+        public float autoCutSpeed = 0.5f;
 
         [KSPField(guiName = "RCLSettingMinPres", isPersistant = true, guiActive = true, guiActiveEditor = true),
          UI_FloatRange(stepIncrement = 0.01f, maxValue = 0.5f, minValue = 0.01f)]
@@ -96,31 +97,48 @@ namespace FerramAerospaceResearch.RealChuteLite
          UI_FloatRange(stepIncrement = 50f, maxValue = 5000f, minValue = 50f)]
         public float deployAltitude = 700;
 
-        [KSPField] public string capName = "cap", canopyName = "canopy";
-        [KSPField] public string semiDeployedAnimation = "semiDeploy", fullyDeployedAnimation = "fullyDeploy";
-        [KSPField] public float semiDeploymentSpeed = 0.5f, deploymentSpeed = 0.16667f;
-        [KSPField] public bool invertCanopy = true;
+        [KSPField]
+        public string capName = "cap", canopyName = "canopy";
+
+        [KSPField]
+        public string semiDeployedAnimation = "semiDeploy", fullyDeployedAnimation = "fullyDeploy";
+
+        [KSPField]
+        public float semiDeploymentSpeed = 0.5f, deploymentSpeed = 0.16667f;
+
+        [KSPField]
+        public bool invertCanopy = true;
 
         // ReSharper disable once NotAccessedField.Global -> unity
         //Persistant fields
         //this cannot be persistent to ensure that bad values aren't saved, and since these chutes aren't customizable there's no reason to save this
-        [KSPField(isPersistant = false)] public float preDeployedDiameter = 1, deployedDiameter = 25;
-        [KSPField(isPersistant = true)] public float caseMass, time;
-        [KSPField(isPersistant = true)] public bool armed, staged, initiated;
+        [KSPField(isPersistant = false)]
+        public float preDeployedDiameter = 1, deployedDiameter = 25;
+
+        [KSPField(isPersistant = true)]
+        public float caseMass, time;
+
+        [KSPField(isPersistant = true)]
+        public bool armed, staged, initiated;
 
         [KSPField(isPersistant = true, guiActive = true, guiName = "RCLStatusSpare")]
         public int chuteCount = 5;
 
-        [KSPField(isPersistant = true)] public string depState = Localizer.Format("RCLStatusStowed");
-        [KSPField(isPersistant = true)] public float currentArea;
-        [KSPField(isPersistant = true)] public double chuteTemperature = 300;
+        [KSPField(isPersistant = true)]
+        public string depState = Localizer.Format("RCLStatusStowed");
+
+        [KSPField(isPersistant = true)]
+        public float currentArea;
+
+        [KSPField(isPersistant = true)]
+        public double chuteTemperature = 300;
 
         // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = true,
-            guiActive = false,
-            guiName = "RCLStatusChuteTemp",
-            guiFormat = "0.00",
-            guiUnits = "RCLTempUnit")]
+                  guiActive = false,
+                  guiName = "RCLStatusChuteTemp",
+                  guiFormat = "0.00",
+                  guiUnits = "RCLTempUnit")]
         public float currentTemp = 20;
 
         // ReSharper disable once NotAccessedField.Global -> unity
@@ -269,15 +287,12 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                switch (DeploymentState)
+                return DeploymentState switch
                 {
-                    case DeploymentStates.PREDEPLOYED:
-                    case DeploymentStates.DEPLOYED:
-                        return true;
-
-                    default:
-                        return false;
-                }
+                    DeploymentStates.PREDEPLOYED => true,
+                    DeploymentStates.DEPLOYED => true,
+                    _ => false
+                };
             }
         }
 
@@ -323,19 +338,18 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         public static GUIStyle BoldLabel
         {
-            get { return boldLabel ?? (boldLabel = new GUIStyle(HighLogic.Skin.label) {fontStyle = FontStyle.Bold}); }
+            get { return boldLabel ??= new GUIStyle(HighLogic.Skin.label) {fontStyle = FontStyle.Bold}; }
         }
 
         public static GUIStyle YellowLabel
         {
             get
             {
-                return yellowLabel ??
-                       (yellowLabel = new GUIStyle(HighLogic.Skin.label)
-                           {
-                               normal = {textColor = XKCDColors.BrightYellow},
-                               hover = {textColor = XKCDColors.BrightYellow}
-                           });
+                return yellowLabel ??= new GUIStyle(HighLogic.Skin.label)
+                {
+                    normal = {textColor = XKCDColors.BrightYellow},
+                    hover = {textColor = XKCDColors.BrightYellow}
+                };
             }
         }
 
@@ -343,33 +357,32 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                return redLabel ??
-                       (redLabel = new GUIStyle(HighLogic.Skin.label)
-                           {
-                               normal = {textColor = XKCDColors.Red},
-                               hover = {textColor = XKCDColors.Red}
-                           });
+                return redLabel ??= new GUIStyle(HighLogic.Skin.label)
+                {
+                    normal = {textColor = XKCDColors.Red},
+                    hover = {textColor = XKCDColors.Red}
+                };
             }
         }
 
         private BaseEvent DeployE
         {
-            get { return deploy ?? (deploy = Events["GUIDeploy"]); }
+            get { return deploy ??= Events["GUIDeploy"]; }
         }
 
         private BaseEvent Disarm
         {
-            get { return disarm ?? (disarm = Events["GUIDisarm"]); }
+            get { return disarm ??= Events["GUIDisarm"]; }
         }
 
         private BaseEvent CutE
         {
-            get { return cutE ?? (cutE = Events["GUICut"]); }
+            get { return cutE ??= Events["GUICut"]; }
         }
 
         private BaseEvent Repack
         {
-            get { return repack ?? (repack = Events["GUIRepack"]); }
+            get { return repack ??= Events["GUIRepack"]; }
         }
 
         //Not needed
@@ -392,8 +405,6 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         public override string GetInfo()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
-                return string.Empty;
             //Info in the editor part window
             float tmpPartMass = TotalMass;
             massDelta = 0;
@@ -505,11 +516,11 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         //Deploys the parachutes if possible
         [KSPEvent(guiActive = true,
-            active = true,
-            externalToEVAOnly = true,
-            guiActiveUnfocused = true,
-            guiName = "RCLEventDeploy",
-            unfocusedRange = 5)]
+                  active = true,
+                  externalToEVAOnly = true,
+                  guiActiveUnfocused = true,
+                  guiName = "RCLEventDeploy",
+                  unfocusedRange = 5)]
         public void GUIDeploy()
         {
             ActivateRC();
@@ -517,22 +528,22 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         //Cuts main chute chute
         [KSPEvent(guiActive = true,
-            active = true,
-            externalToEVAOnly = true,
-            guiActiveUnfocused = true,
-            guiName = "RCLEventCut",
-            unfocusedRange = 5)]
+                  active = true,
+                  externalToEVAOnly = true,
+                  guiActiveUnfocused = true,
+                  guiName = "RCLEventCut",
+                  unfocusedRange = 5)]
         public void GUICut()
         {
             Cut();
         }
 
         [KSPEvent(guiActive = true,
-            active = true,
-            externalToEVAOnly = true,
-            guiActiveUnfocused = true,
-            guiName = "RCLEventDisarm",
-            unfocusedRange = 5)]
+                  active = true,
+                  externalToEVAOnly = true,
+                  guiActiveUnfocused = true,
+                  guiName = "RCLEventDisarm",
+                  unfocusedRange = 5)]
         public void GUIDisarm()
         {
             armed = false;
@@ -544,11 +555,11 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         //Repacks chute from EVA if in space or on the ground
         [KSPEvent(guiActive = false,
-            active = true,
-            externalToEVAOnly = true,
-            guiActiveUnfocused = true,
-            guiName = "RCLEventRepack",
-            unfocusedRange = 5)]
+                  active = true,
+                  externalToEVAOnly = true,
+                  guiActiveUnfocused = true,
+                  guiName = "RCLEventRepack",
+                  unfocusedRange = 5)]
         public void GUIRepack()
         {
             if (!CanRepack)
@@ -986,7 +997,7 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         private void Update()
         {
-            if (!CompatibilityChecker.IsAllCompatible() || !HighLogic.LoadedSceneIsFlight)
+            if (!HighLogic.LoadedSceneIsFlight)
                 return;
 
             //Makes the chute icon blink if failed
@@ -1041,10 +1052,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         private void FixedUpdate()
         {
             //Flight values
-            if (!CompatibilityChecker.IsAllCompatible() ||
-                !HighLogic.LoadedSceneIsFlight ||
-                FlightGlobals.ActiveVessel == null ||
-                part.Rigidbody == null)
+            if (!HighLogic.LoadedSceneIsFlight || FlightGlobals.ActiveVessel == null || part.Rigidbody == null)
                 return;
             pos = part.partTransform.position;
             asl = FlightGlobals.getAltitudeAtPos(pos);
@@ -1139,10 +1147,7 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         private void OnGUI()
         {
-            if (!CompatibilityChecker.IsAllCompatible() ||
-                !HighLogic.LoadedSceneIsFlight && !HighLogic.LoadedSceneIsEditor ||
-                !visible ||
-                hid)
+            if (!HighLogic.LoadedSceneIsFlight && !HighLogic.LoadedSceneIsEditor || !visible || hid)
                 return;
             GUI.skin = HighLogic.Skin;
             window = GUILayout.Window(id, window, Window, Localizer.Format("RCLGUITitle"));
@@ -1150,8 +1155,7 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         private void OnDestroy()
         {
-            if (!CompatibilityChecker.IsAllCompatible() ||
-                !HighLogic.LoadedSceneIsFlight && !HighLogic.LoadedSceneIsEditor)
+            if (!HighLogic.LoadedSceneIsFlight && !HighLogic.LoadedSceneIsEditor)
                 return;
             //Hide/show UI event removal
             GameEvents.onHideUI.Remove(HideUI);
@@ -1169,18 +1173,6 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight)
                 return;
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                Actions.ForEach(a => a.active = false);
-                Events.ForEach(e =>
-                {
-                    e.active = false;
-                    e.guiActive = false;
-                    e.guiActiveEditor = false;
-                });
-                Fields["chuteCount"].guiActive = false;
-                return;
-            }
 
             //Staging icon
             part.stagingIcon = "PARACHUTES";
@@ -1264,8 +1256,6 @@ namespace FerramAerospaceResearch.RealChuteLite
 
         public override void OnLoad(ConfigNode node)
         {
-            if (!CompatibilityChecker.IsAllCompatible())
-                return;
             if (HighLogic.LoadedScene == GameScenes.LOADING || !PartLoader.Instance.IsReady() || part.partInfo == null)
             {
                 if (deployAltitude <= 500)

@@ -7,13 +7,13 @@
         "ModDir": "$(SolutionDir)$(ModDirRelative)",
         "PluginDir": "$(ModDir)Plugins/",
         "AssetDir": "$(ModDir)Assets/",
-        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.8.0/",
+        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.9.0/",
         "KSPGameData": "$(KSP_DIR_INSTALL)GameData/",
         "GameDir": "$(KSPGameData)$(ModName)/",
         "VersionMajor": 0,
         "VersionMinor": 15,
         "VersionBuild": 11,
-        "VersionRevision": 3,
+        "VersionRevision": 4,
         "VersionName": "Mach",
         "Year": 2019,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
@@ -22,12 +22,11 @@
         "KSPMajorMin": 1,
         "KSPMajorMax": 1,
         "KSPMinorMin": 8,
-        "KSPMinorMax": 8,
+        "KSPMinorMax": 9,
         "UnityDir": "Unity/$(ModName)/",
         "AssetBundleDir": "$(UnityDir)AssetBundles/"
     },
     "post_build": {
-        "pdb2mdb": "$(SolutionDir)../KSP Assemblies/pdb2mdb.exe",
         "clean": [],
         "install": [
             {
@@ -126,27 +125,6 @@
                     {
                         "search": "(KSPAssembly\\(\"\\w+\", )\\d+, \\d+(\\))",
                         "replace": "\\g<1>$(VersionMajor), $(VersionMinor)\\g<2>"
-                    }
-                ]
-            },
-            {
-                "pattern": "$(ModName)/CompatibilityChecker.cs",
-                "substitutions": [
-                    {
-                        "search": "(KSP_MAJOR_MAX\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMajorMax)"
-                    },
-                    {
-                        "search": "(KSP_MAJOR_MIN\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMajorMin)"
-                    },
-                    {
-                        "search": "(KSP_MINOR_MAX\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMinorMax)"
-                    },
-                    {
-                        "search": "(KSP_MINOR_MIN\\s*=\\s*)\\d+",
-                        "replace": "\\g<1>$(KSPMinorMin)"
                     }
                 ]
             }

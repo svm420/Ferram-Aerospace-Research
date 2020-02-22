@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.3 "Mach"
+Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -182,17 +182,13 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
         public bool IsVisible(OverlayType type)
         {
-            switch (type)
+            return type switch
             {
-                case OverlayType.AREA:
-                    return _areaRenderer != null && _areaRenderer.enabled;
-                case OverlayType.DERIV:
-                    return _derivRenderer != null && _derivRenderer.enabled;
-                case OverlayType.COEFF:
-                    return _coeffRenderer != null && _coeffRenderer.enabled;
-                default:
-                    return false;
-            }
+                OverlayType.AREA => (_areaRenderer != null && _areaRenderer.enabled),
+                OverlayType.DERIV => (_derivRenderer != null && _derivRenderer.enabled),
+                OverlayType.COEFF => (_coeffRenderer != null && _coeffRenderer.enabled),
+                _ => false
+            };
         }
 
         public bool AnyVisible()

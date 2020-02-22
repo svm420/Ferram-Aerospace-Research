@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.3 "Mach"
+Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -437,13 +437,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 if (velLocal.sqrMagnitude > 0.001f)
                     torqueVector -= dampingMoment * nonAxialAngLocalVel +
-                                    rollDampingMoment *
                                     axialAngLocalVel *
-                                    axialAngLocalVel.magnitude /
+                                    (rollDampingMoment * axialAngLocalVel.magnitude) /
                                     velLocal.sqrMagnitude;
                 else
                     torqueVector -= dampingMoment * nonAxialAngLocalVel +
-                                    rollDampingMoment * axialAngLocalVel * axialAngLocalVel.magnitude / 0.001f;
+                                    axialAngLocalVel * (rollDampingMoment * axialAngLocalVel.magnitude) / 0.001f;
 
                 forceVector *= data.dragFactor;
                 torqueVector *= data.dragFactor;

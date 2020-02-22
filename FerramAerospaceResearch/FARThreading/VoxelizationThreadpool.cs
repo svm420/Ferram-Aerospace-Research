@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.3 "Mach"
+Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -135,7 +135,11 @@ namespace FerramAerospaceResearch.FARThreading
         public void RunOnMainThread(Action action)
         {
             if (inMainThread)
+            {
                 action();
+                return;
+            }
+
             var task = new Task(action);
             lock (queuedMainThreadTasks)
             {

@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.3 "Mach"
+Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -89,15 +89,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns
 
         public override DesignConcernSeverity GetSeverity()
         {
-            switch (_editorFacility)
+            return _editorFacility switch
             {
-                case EditorFacilities.VAB:
-                    return DesignConcernSeverity.WARNING;
-                case EditorFacilities.SPH:
-                    return DesignConcernSeverity.CRITICAL;
-                default:
-                    return DesignConcernSeverity.WARNING;
-            }
+                EditorFacilities.VAB => DesignConcernSeverity.WARNING,
+                EditorFacilities.SPH => DesignConcernSeverity.CRITICAL,
+                _ => DesignConcernSeverity.WARNING
+            };
         }
     }
 }

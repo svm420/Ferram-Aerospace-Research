@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.3 "Mach"
+Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -96,12 +96,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             FARLogger.Info("FARVesselAero on " + vessel.name + " reporting startup");
             base.OnStart();
-
-            if (!CompatibilityChecker.IsAllCompatible())
-            {
-                enabled = false;
-                return;
-            }
 
             if (!HighLogic.LoadedSceneIsFlight)
             {

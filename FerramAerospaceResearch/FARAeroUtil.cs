@@ -1,5 +1,5 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.3 "Mach"
+Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -212,17 +212,17 @@ namespace FerramAerospaceResearch
         // ReSharper disable once UnusedMember.Global
         public static List<FARWingAerodynamicModel> CurEditorWings
         {
-            get { return curEditorWingCache ?? (curEditorWingCache = ListEditorWings()); }
+            get { return curEditorWingCache ??= ListEditorWings(); }
         }
 
         public static List<Part> CurEditorParts
         {
-            get { return CurEditorPartsCache ?? (CurEditorPartsCache = ListEditorParts(false)); }
+            get { return CurEditorPartsCache ??= ListEditorParts(false); }
         }
 
         public static List<Part> AllEditorParts
         {
-            get { return AllEditorPartsCache ?? (AllEditorPartsCache = ListEditorParts(true)); }
+            get { return AllEditorPartsCache ??= ListEditorParts(true); }
         }
 
         public static int RaycastMask

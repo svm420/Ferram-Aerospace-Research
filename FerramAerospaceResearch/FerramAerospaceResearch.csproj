@@ -18,7 +18,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -28,7 +28,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;INFO</DefineConstants>
@@ -86,7 +86,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompatibilityChecker.cs" />
     <Compile Include="FARAeroComponents\FlightForceContext.cs" />
     <Compile Include="FARAeroComponents\ModularFlightIntegratorRegisterer.cs" />
     <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />
@@ -110,6 +109,8 @@
     <Compile Include="FARKSPAddonMainMenuSetup.cs" />
     <Compile Include="FARKSPAddonSpaceCenterScene.cs" />
     <Compile Include="FARPartExtensions.cs" />
+    <Compile Include="FARPartGeometry\DebugVoxel.cs" />
+    <Compile Include="FARPartGeometry\DebugVoxelMesh.cs" />
     <Compile Include="FARPartGeometry\FARAnimOverrides.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\AirbreathingEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\CompoundPartGeoUpdater.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="FARPartGeometry\GeometryModification\IntakeCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\IntegratedIntakeEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\StockProcAsteroidGeoUpdater.cs" />
+    <Compile Include="FARPartGeometry\IDebugVoxelMeshBuilder.cs" />
     <Compile Include="FARPartGeometry\PartSizePair.cs" />
     <Compile Include="FARPartGeometry\PartSizePair4Bit.cs" />
     <Compile Include="FARPartGeometry\PartSizePair8Bit.cs" />
@@ -156,9 +158,6 @@
     <Compile Include="FARGUI\GUIDropDown.cs" />
     <Compile Include="FARGUI\GUIUtils.cs" />
     <Compile Include="FARGUI\FAREditorGUI\StabilityDerivGUI.cs" />
-    <Compile Include="FARPartGeometry\DebugVisualVoxel.cs" />
-    <Compile Include="FARPartGeometry\DebugVisualVoxelMeshController.cs" />
-    <Compile Include="FARPartGeometry\DebugVisualVoxelSubmesh.cs" />
     <Compile Include="FARPartGeometry\GeometryMesh.cs" />
     <Compile Include="FARPartGeometry\GeometryPartModule.cs" />
     <Compile Include="FARMathUtil.cs" />
