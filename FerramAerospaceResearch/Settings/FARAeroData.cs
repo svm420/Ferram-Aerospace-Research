@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FerramAerospaceResearch.Reflection;
 using FerramAerospaceResearch.Threading;
+using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnassignedField.Global
@@ -69,11 +70,7 @@ namespace FerramAerospaceResearch.Settings
 
         private static IEnumerator LoadGlobals()
         {
-            while (HighLogic.LoadedScene == GameScenes.LOADING)
-                yield return null;
-
-            while (FlightGlobals.fetch == null)
-                yield return null;
+            yield return new WaitWhile(() => HighLogic.LoadedScene == GameScenes.LOADING || FlightGlobals.fetch == null);
 
             foreach (BodySettings settings in AtmosphericData)
             {
