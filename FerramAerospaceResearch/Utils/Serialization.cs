@@ -11,7 +11,8 @@ namespace FerramAerospaceResearch
         private static readonly Dictionary<Type, Serializer> serializers = new Dictionary<Type, Serializer>
         {
             {
-                typeof(int), new Serializer
+                typeof(int),
+                new Serializer
                 {
                     Parse = (string s, out object value) => TryParse<int>(s, out value, int.TryParse),
                     Save = (node, s, value) => node.AddValue(s, (int)value)
@@ -305,7 +306,7 @@ namespace FerramAerospaceResearch
                 nodeName = $"@{id}";
                 if (name != null)
                     nodeName += $"[{name}]";
-                nodeName += ":AFTER[FerramAerospaceResearch]";
+                nodeName += ":FOR[FerramAerospaceResearch]";
             }
             else
             {
