@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -160,7 +160,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             var o = new GameObject();
 
-            var renderer = o.gameObject.AddComponent<LineRenderer>();
+            LineRenderer renderer = o.gameObject.AddComponent<LineRenderer>();
 
             // need to copy the material properties so the same material is not
             // reused between renderers
@@ -280,7 +280,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             for (int i = 0; i < xCoords.Length; i++)
             {
-                Vector3 vec = Vector3.up * (float)xCoords[i] - Vector3.forward * (float)(yCoords[i] * yScalingFactor);
+                Vector3 vec = Vector3.up * (float)xCoords[i] -
+                              Vector3.forward * (float)(yCoords[i] * yScalingFactor);
                 vec = transformMatrix.MultiplyVector(vec);
                 renderer.SetPosition(i, vec);
             }

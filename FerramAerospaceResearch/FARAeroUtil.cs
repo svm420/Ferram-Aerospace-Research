@@ -238,7 +238,7 @@ namespace FerramAerospaceResearch
                 // When parts are being dragged in the editor, they are put into this
                 // layer; however we have to raycast them, or the visible CoL will be
                 // different from the one after the parts are attached.
-                RaycastMaskEdit = RaycastMaskVal | (1 << LayerMask.NameToLayer("Ignore Raycast"));
+                RaycastMaskEdit = RaycastMaskVal | 1 << LayerMask.NameToLayer("Ignore Raycast");
 
                 FARLogger.Info("Raycast mask: " + RaycastMaskVal + " " + RaycastMaskEdit);
 
@@ -498,7 +498,7 @@ namespace FerramAerospaceResearch
             var wings = new List<FARWingAerodynamicModel>();
             foreach (Part p in list)
             {
-                var wing = p.GetComponent<FARWingAerodynamicModel>();
+                FARWingAerodynamicModel wing = p.GetComponent<FARWingAerodynamicModel>();
                 if (!(wing is null))
                     wings.Add(wing);
             }
@@ -774,7 +774,8 @@ namespace FerramAerospaceResearch
         // ReSharper disable once UnusedMember.Global
         public static double CalculateOswaldsEfficiency(double AR, double CosSweepAngle, double Cd0)
         {
-            double e = 1 - 0.02 * FARMathUtil.PowApprox(AR, 0.7) * FARMathUtil.PowApprox(Math.Acos(CosSweepAngle), 2.2);
+            double e = 1 -
+                       0.02 * FARMathUtil.PowApprox(AR, 0.7) * FARMathUtil.PowApprox(Math.Acos(CosSweepAngle), 2.2);
             double tmp = AR * Cd0 * Mathf.PI + 1;
             e /= tmp;
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -110,7 +110,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 p.minimum_drag = 0;
                 p.angularDrag = 0;
 
-                var g = p.GetComponent<GeometryPartModule>();
+                GeometryPartModule g = p.GetComponent<GeometryPartModule>();
                 if (!(g is null))
                 {
                     _currentGeoModules.Add(g);
@@ -134,7 +134,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private PartModule.StartState StartState()
         {
-            var startState = PartModule.StartState.None;
+            PartModule.StartState startState = PartModule.StartState.None;
             if (HighLogic.LoadedSceneIsEditor)
                 startState |= PartModule.StartState.Editor;
             else if (HighLogic.LoadedSceneIsFlight)
@@ -408,7 +408,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 geoModulesReady = 0;
                 foreach (Part p in vessel.Parts)
                 {
-                    var g = p.Modules.GetModule<GeometryPartModule>();
+                    GeometryPartModule g = p.Modules.GetModule<GeometryPartModule>();
                     if (g is null)
                         continue;
                     _currentGeoModules.Add(g);

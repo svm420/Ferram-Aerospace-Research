@@ -67,8 +67,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private static double maxLocation = 255;
         private static byte maxLocationByte = 255;
         private static bool useHigherResVoxels;
-        private DebugVoxelMesh voxelMesh;
         private readonly object _locker = new object();
+        private DebugVoxelMesh voxelMesh;
 
         private double invElementSize;
         private VoxelChunk[,,] voxelChunks;
@@ -406,10 +406,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             sectionThickness = ElementSize;
 
-            Matrix4x4 sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero,
-                                                                  Quaternion.FromToRotation(new Vector3(0, 0, 1),
-                                                                                            orientationVector),
-                                                                  Vector3.one);
+            var sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero,
+                                                            Quaternion.FromToRotation(new Vector3(0, 0, 1),
+                                                                                      orientationVector),
+                                                            Vector3.one);
             Matrix4x4 vesselToSectionNormal = sectionNormalToVesselCoords.inverse;
 
             //Code has multiple optimizations to take advantage of the limited range of values that are included.  They are listed below
@@ -420,7 +420,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             //Check y first, since it is most likely to be the flow direction
             if (y >= z && y >= x)
             {
-                int sectionCount = yCellLength + (int)(xCellLength * x / y + 1) + (int)(zCellLength * z / y + 1);
+                int sectionCount =
+                    yCellLength + (int)(xCellLength * x / y + 1) + (int)(zCellLength * z / y + 1);
                 sectionCount = Math.Min(sectionCount, crossSections.Length);
                 double angleSizeIncreaseFactor = Math.Sqrt((x + y + z) / y);
                 //account for different angles effects on voxel cube's projected area
@@ -481,7 +482,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             jSect1 = jMin >> 3;
                             jSect2 >>= 3;
-                            jSect3 = (jMax - 1) >> 3;
+                            jSect3 = jMax - 1 >> 3;
 
                             if (jSect1 >= yLength) //if the smallest sect is above the limit, they all are
                                 continue;
@@ -682,7 +683,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else if (x > y && x > z)
             {
-                int sectionCount = xCellLength + (int)(yCellLength * y / x + 1) + (int)(zCellLength * z / x + 1);
+                int sectionCount =
+                    xCellLength + (int)(yCellLength * y / x + 1) + (int)(zCellLength * z / x + 1);
                 sectionCount = Math.Min(sectionCount, crossSections.Length);
                 double angleSizeIncreaseFactor = Math.Sqrt((x + y + z) / x);
                 //account for different angles effects on voxel cube's projected area
@@ -723,7 +725,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (plane.y * plane.z > 0)
                             {
                                 iSect1 = (int)(-(plane.y * jOverall + plane.z * kOverall + plane.w) + 0.5);
-                                iSect3 = (int)(-(plane.y * (jOverall + 7) + plane.z * (kOverall + 7) + plane.w) + 0.5);
+                                iSect3 = (int)(-(plane.y * (jOverall + 7) + plane.z * (kOverall + 7) + plane.w) +
+                                               0.5);
                             }
                             else
                             {
@@ -738,7 +741,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             iSect1 = iMin >> 3;
                             iSect2 >>= 3;
-                            iSect3 = (iMax - 1) >> 3;
+                            iSect3 = iMax - 1 >> 3;
 
                             if (iSect1 >= xLength) //if the smallest sect is above the limit, they all are
                                 continue;
@@ -938,7 +941,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else
             {
-                int sectionCount = zCellLength + (int)(xCellLength * x / z + 1) + (int)(yCellLength * y / z + 1);
+                int sectionCount =
+                    zCellLength + (int)(xCellLength * x / z + 1) + (int)(yCellLength * y / z + 1);
                 sectionCount = Math.Min(sectionCount, crossSections.Length);
                 //account for different angles effects on voxel cube's projected area
                 double angleSizeIncreaseFactor = Math.Sqrt((x + y + z) / z);
@@ -982,7 +986,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (plane.x * plane.y > 0)
                             {
                                 kSect1 = (int)(-(plane.x * iOverall + plane.y * jOverall + plane.w) + 0.5);
-                                kSect3 = (int)(-(plane.x * (iOverall + 7) + plane.y * (jOverall + 7) + plane.w) + 0.5);
+                                kSect3 = (int)(-(plane.x * (iOverall + 7) + plane.y * (jOverall + 7) + plane.w) +
+                                               0.5);
                             }
                             else
                             {
@@ -997,7 +1002,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             kSect1 = kMin >> 3;
                             kSect2 >>= 3;
-                            kSect3 = (kMax - 1) >> 3;
+                            kSect3 = kMax - 1 >> 3;
 
                             if (kSect1 >= zLength) //if the smallest sect is above the limit, they all are
                                 continue;
@@ -1245,7 +1250,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         )
         {
             // ReSharper disable BitwiseOperatorOnEnumWithoutFlags
-            var filledPlanes = VoxelOrientationPlane.NONE;
+            VoxelOrientationPlane filledPlanes = VoxelOrientationPlane.NONE;
             bool partGetsForces = true;
 
             Part p = voxel.part;
@@ -2185,7 +2190,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Vector3d p1p2 = pt2 - pt1;
             Vector3d p1p3 = pt3 - pt1;
 
-            Vector3d tmp = Vector3d.Cross(p1p2, p1p3);
+            var tmp = Vector3d.Cross(p1p2, p1p3);
 
             var result = new Vector4d(tmp.x, tmp.y, tmp.z);
 
@@ -2204,7 +2209,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Vector3d p1p2 = pt2 - pt1;
             Vector3d p1p3 = pt3 - pt1;
 
-            Vector3d tmp = Vector3d.Cross(p1p2, p1p3);
+            var tmp = Vector3d.Cross(p1p2, p1p3);
 
             var result = new Vector4d(tmp.x, tmp.y, tmp.z);
 

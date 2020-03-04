@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -73,7 +73,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (!part.Modules.Contains<FARAeroPartModule>())
                     continue;
 
-                var aeroModule = part.Modules.GetModule<FARAeroPartModule>();
+                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
 
                 part.radiativeArea = CalculateAreaRadiative(fi, part, aeroModule);
                 part.exposedArea =
@@ -97,8 +97,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Rigidbody rb = part.rb;
                 if (!rb)
                     return;
-                part.dragVector = rb.velocity +
-                                  Krakensbane.GetFrameVelocity() -
+                part.dragVector = rb.velocity + Krakensbane.GetFrameVelocity() -
                                   FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
                 part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
                 if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)

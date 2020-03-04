@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -60,16 +60,22 @@ namespace ferram4
 
 
         // ReSharper disable once NotAccessedField.Global
-        [KSPField(isPersistant = false)] public Vector3 controlSurfacePivot = new Vector3(1f, 0f, 0f);
+        [KSPField(isPersistant = false)]
+        public Vector3 controlSurfacePivot = new Vector3(1f, 0f, 0f);
 
-        [KSPField(isPersistant = false)] public float ctrlSurfFrac = 1;
+        [KSPField(isPersistant = false)]
+        public float ctrlSurfFrac = 1;
 
-        [KSPField(isPersistant = false)] public string transformName = "obj_ctrlSrf";
+        [KSPField(isPersistant = false)]
+        public string transformName = "obj_ctrlSrf";
 
         // These TWO fields MUST be set up so that they are copied by Object.Instantiate.
         // Otherwise detaching and re-attaching wings with deflected flaps etc breaks until save/load.
-        [SerializeField] protected Quaternion MovableOrig = Quaternion.identity;
-        [SerializeField] private bool MovableOrigReady;
+        [SerializeField]
+        protected Quaternion MovableOrig = Quaternion.identity;
+
+        [SerializeField]
+        private bool MovableOrigReady;
 
         //        protected int MovableSectionFlip = 1;
 
@@ -77,86 +83,86 @@ namespace ferram4
 
         [KSPField(guiName = "FARCtrlSurfPitch", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-             maxValue = 100.0f,
-             minValue = -100f,
-             scene = UI_Scene.All,
-             stepIncrement = 5f)]
+                       maxValue = 100.0f,
+                       minValue = -100f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 5f)]
         public float pitchaxis = 100.0f;
 
         [KSPField(guiName = "FARCtrlSurfYaw", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-             maxValue = 100.0f,
-             minValue = -100f,
-             scene = UI_Scene.All,
-             stepIncrement = 5f)]
+                       maxValue = 100.0f,
+                       minValue = -100f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 5f)]
         public float yawaxis = 100.0f;
 
         [KSPField(guiName = "FARCtrlSurfRoll", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-             maxValue = 100.0f,
-             minValue = -100f,
-             scene = UI_Scene.All,
-             stepIncrement = 5f)]
+                       maxValue = 100.0f,
+                       minValue = -100f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 5f)]
         public float rollaxis = 100.0f;
 
         [KSPField(guiName = "FARCtrlSurfAoA", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-             maxValue = 200.0f,
-             minValue = -200f,
-             scene = UI_Scene.All,
-             stepIncrement = 5f)]
+                       maxValue = 200.0f,
+                       minValue = -200f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 5f)]
         public float pitchaxisDueToAoA;
 
         [KSPField(guiName = "FARCtrlSurfBrakeRudder", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-             maxValue = 100.0f,
-             minValue = -100f,
-             scene = UI_Scene.All,
-             stepIncrement = 5f)]
+                       maxValue = 100.0f,
+                       minValue = -100f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 5f)]
         public float brakeRudder;
 
         [KSPField(guiName = "FARCtrlSurfCtrlDeflect", guiActiveEditor = false, isPersistant = true),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-             maxValue = 40,
-             minValue = -40,
-             scene = UI_Scene.All,
-             stepIncrement = 0.5f)]
+                       maxValue = 40,
+                       minValue = -40,
+                       scene = UI_Scene.All,
+                       stepIncrement = 0.5f)]
         public float maxdeflect = 15;
 
         // ReSharper disable once ConvertToConstant.Local
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         [KSPField(guiName = "FARCtrlSurfFlapSpoiler", guiActiveEditor = true, guiActive = true),
          UI_Toggle(affectSymCounterparts = UI_Scene.All,
-             scene = UI_Scene.All,
-             disabledText = "FARCtrlSurfStdText",
-             enabledText = "FARCtrlSurfStdText")]
+                   scene = UI_Scene.All,
+                   disabledText = "FARCtrlSurfStdText",
+                   enabledText = "FARCtrlSurfStdText")]
         private bool showFlpCtrl = false;
 
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         // ReSharper disable once ConvertToConstant.Local
         [KSPField(guiName = "FARCtrlSurfStdTitle", guiActiveEditor = true, guiActive = true),
          UI_Toggle(affectSymCounterparts = UI_Scene.All,
-             scene = UI_Scene.All,
-             disabledText = "FARCtrlSurfStdText",
-             enabledText = "FARCtrlSurfStdText")]
+                   scene = UI_Scene.All,
+                   disabledText = "FARCtrlSurfStdText",
+                   enabledText = "FARCtrlSurfStdText")]
         private bool showStdCtrl = false;
 
         private bool prevFlpCtrl = true;
 
         [KSPField(guiName = "FARCtrlSurfFlap", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_Toggle(affectSymCounterparts = UI_Scene.All,
-             enabledText = "FARCtrlSurfFlapActive",
-             scene = UI_Scene.All,
-             disabledText = "FARCtrlSurfFlapInActive")]
+                   enabledText = "FARCtrlSurfFlapActive",
+                   scene = UI_Scene.All,
+                   disabledText = "FARCtrlSurfFlapInActive")]
         public bool isFlap;
 
         private bool prevIsFlap;
 
         [KSPField(guiName = "FARCtrlSurfSpoiler", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_Toggle(affectSymCounterparts = UI_Scene.All,
-             enabledText = "FARCtrlSurfFlapActive",
-             scene = UI_Scene.All,
-             disabledText = "FARCtrlSurfFlapInActive")]
+                   enabledText = "FARCtrlSurfFlapActive",
+                   scene = UI_Scene.All,
+                   disabledText = "FARCtrlSurfFlapInActive")]
         public bool isSpoiler;
 
         private bool prevIsSpoiler;
@@ -166,10 +172,10 @@ namespace ferram4
 
         [KSPField(guiName = "FARCtrlSurfFlapDeflect", guiActiveEditor = false, isPersistant = true),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-             maxValue = 85,
-             minValue = -85,
-             scene = UI_Scene.All,
-             stepIncrement = 0.5f)]
+                       maxValue = 85,
+                       minValue = -85,
+                       scene = UI_Scene.All,
+                       stepIncrement = 0.5f)]
         public float maxdeflectFlap = 15;
 
         protected double PitchLocation;
@@ -226,7 +232,7 @@ namespace ferram4
 
             Vector3 relPosVector = AerodynamicCenter - vessel.CoM;
 
-            Vector3 maxMomentVector = Vector3.Cross(relPosVector, maxLiftVec);
+            var maxMomentVector = Vector3.Cross(relPosVector, maxLiftVec);
 
             Vector3 vesselRelMaxMoment = vessel.ReferenceTransform.worldToLocalMatrix.MultiplyVector(maxMomentVector);
 

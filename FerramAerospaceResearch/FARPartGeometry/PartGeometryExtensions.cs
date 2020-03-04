@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -74,7 +74,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 Matrix4x4 matrix = worldToBasisMatrix * t.localToWorldMatrix;
 
-                var mc = t.GetComponent<MeshCollider>();
+                MeshCollider mc = t.GetComponent<MeshCollider>();
                 Mesh m = null;
                 if (mc != null)
                 {
@@ -84,7 +84,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
 
 
-                var mf = t.GetComponent<MeshFilter>();
+                MeshFilter mf = t.GetComponent<MeshFilter>();
                 if (mf != null)
                 {
                     m = mf.sharedMesh;
@@ -93,7 +93,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
                 else
                 {
-                    var smr = t.GetComponent<SkinnedMeshRenderer>();
+                    SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
                     if (smr != null)
                     {
                         m = new Mesh();
@@ -150,12 +150,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 Transform t = transforms[i];
 
-                var mc = t.GetComponent<MeshCollider>();
+                MeshCollider mc = t.GetComponent<MeshCollider>();
                 Matrix4x4 matrix = worldToBasisMatrix * t.localToWorldMatrix;
 
                 if (mc == null)
                 {
-                    var bc = t.GetComponent<BoxCollider>();
+                    BoxCollider bc = t.GetComponent<BoxCollider>();
                     if (bc != null)
                     {
                         bounds.Encapsulate(matrix.MultiplyPoint3x4(bc.bounds.min));

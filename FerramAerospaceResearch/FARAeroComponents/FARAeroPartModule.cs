@@ -439,7 +439,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Vector3 localForceTemp = Vector3.Dot(partLocalVelNorm, partLocalForce) * partLocalVelNorm;
 
-            partLocalForce = localForceTemp * part.dragScalar + (partLocalForce - localForceTemp) * part.bodyLiftScalar;
+            partLocalForce = localForceTemp * part.dragScalar +
+                             (partLocalForce - localForceTemp) * part.bodyLiftScalar;
             partLocalTorque *= part.dragScalar;
 
             part.dragScalar = 0;
@@ -573,7 +574,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             bool failureOccured = false;
             if (part.Modules.Contains<ModuleProceduralFairing>())
             {
-                var fairing = part.Modules.GetModule<ModuleProceduralFairing>();
+                ModuleProceduralFairing fairing = part.Modules.GetModule<ModuleProceduralFairing>();
                 fairing.ejectionForce = 0.5f;
 
                 fairing.DeployFairing();

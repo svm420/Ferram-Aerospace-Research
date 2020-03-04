@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -303,7 +303,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             if (p is null)
                 return;
-            var g = p.GetComponent<GeometryPartModule>();
+            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
             if (g == null || !g.Ready)
                 return;
             if (type == ConstructionEventType.Unknown)
@@ -316,7 +316,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             if (p is null)
                 return;
-            var g = p.GetComponent<GeometryPartModule>();
+            GeometryPartModule g = p.GetComponent<GeometryPartModule>();
             if (g != null && g.Ready)
                 g.EditorUpdate();
         }
@@ -332,14 +332,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     continue;
                 if (p.Modules.Contains<FARWingAerodynamicModel>())
                 {
-                    var w = p.Modules.GetModule<FARWingAerodynamicModel>();
+                    FARWingAerodynamicModel w = p.Modules.GetModule<FARWingAerodynamicModel>();
                     if (updateWingInteractions)
                         w.EditorUpdateWingInteractions();
                     _wingAerodynamicModel.Add(w);
                 }
                 else if (p.Modules.Contains<FARControllableSurface>())
                 {
-                    var c = p.Modules.GetModule<FARControllableSurface>();
+                    FARControllableSurface c = p.Modules.GetModule<FARControllableSurface>();
                     if (updateWingInteractions)
                         c.EditorUpdateWingInteractions();
                     _wingAerodynamicModel.Add(c);
@@ -423,7 +423,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             {
                 if (!p.Modules.Contains<GeometryPartModule>())
                     continue;
-                var g = p.Modules.GetModule<GeometryPartModule>();
+                GeometryPartModule g = p.Modules.GetModule<GeometryPartModule>();
                 if (g == null)
                     continue;
                 if (g.Ready)
@@ -712,7 +712,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             {
                 if (p.Modules.Contains<ModuleWheelDeployment>())
                 {
-                    var l = p.Modules.GetModule<ModuleWheelDeployment>();
+                    ModuleWheelDeployment l = p.Modules.GetModule<ModuleWheelDeployment>();
                     l.ActionToggle(new KSPActionParam(KSPActionGroup.Gear,
                                                       gearToggle ? KSPActionType.Activate : KSPActionType.Deactivate));
                 }

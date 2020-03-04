@@ -454,13 +454,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (module is ModuleResourceIntake intake)
                 {
-                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster =
+                    var intakeAdjuster =
                         IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
                 else
                 {
-                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster =
+                    var intakeAdjuster =
                         IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
@@ -474,14 +474,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (module is ModuleResourceIntake intake)
                 {
-                    IntakeCrossSectionAdjuster intakeAdjuster =
-                        IntakeCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
+                    var intakeAdjuster = IntakeCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
                 else
                 {
-                    IntakeCrossSectionAdjuster intakeAdjuster =
-                        IntakeCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
+                    var intakeAdjuster = IntakeCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
 
@@ -658,13 +656,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private static MeshData GetColliderMeshData(Transform t)
         {
-            var mc = t.GetComponent<MeshCollider>();
+            MeshCollider mc = t.GetComponent<MeshCollider>();
             if (mc != null)
             {
                 //we can't used mc.sharedMesh because it does not contain all the triangles or verts for some reason
                 //must instead get the mesh filter and use its shared mesh
 
-                var mf = t.GetComponent<MeshFilter>();
+                MeshFilter mf = t.GetComponent<MeshFilter>();
                 if (mf != null)
                 {
                     Mesh m = mf.sharedMesh;
@@ -683,7 +681,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else
             {
-                var bc = t.GetComponent<BoxCollider>();
+                BoxCollider bc = t.GetComponent<BoxCollider>();
                 if (bc != null)
                     return CreateBoxMeshFromBoxCollider(bc.size, bc.center);
             }
@@ -694,7 +692,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private MeshData GetVisibleMeshData(Transform t, bool skipIfNoRenderer, bool onlyMeshes)
         {
             Mesh m;
-            var mf = t.GetComponent<MeshFilter>();
+            MeshFilter mf = t.GetComponent<MeshFilter>();
 
             //if we've decided to force use of meshes, we don't want colliders
             if (onlyMeshes && t.GetComponent<MeshCollider>() != null)
@@ -704,7 +702,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 if (skipIfNoRenderer && !unignoredTransforms.Contains(t.name))
                 {
-                    var mr = t.GetComponent<MeshRenderer>();
+                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
                     if (mr == null)
                     {
                         DebugAddNoRenderer(t);
@@ -714,7 +712,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 #if DEBUG
                 else
                 {
-                    var mr = t.GetComponent<MeshRenderer>();
+                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
                     if (mr == null)
                         DebugAddNoRenderer(t);
                 }
@@ -731,7 +729,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 return new MeshData(m.vertices, m.triangles, m.bounds);
             }
 
-            var smr = t.GetComponent<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
             if (smr == null)
                 return null;
             m = new Mesh();
@@ -771,7 +769,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if ((forceUseColliders ||
                  isFairing ||
                  isDrill ||
-                 rendererBounds.size.x * rendererBounds.size.z < colliderBounds.size.x * colliderBounds.size.z * 1.6f &&
+                 rendererBounds.size.x * rendererBounds.size.z <
+                 colliderBounds.size.x * colliderBounds.size.z * 1.6f &&
                  rendererBounds.size.y < colliderBounds.size.y * 1.2f &&
                  (rendererBounds.center - colliderBounds.center).magnitude < 0.3f) &&
                 !forceUseMeshes)
