@@ -241,9 +241,7 @@ namespace FerramAerospaceResearch
         {
             if (isPatch)
             {
-                id = $"%{id}";
-                if (index != null)
-                    id += $",{((int)index).ToString()}";
+                id = index != null ? $"@{id},{((int)index).ToString()}" : $"%{id}";
             }
 
             if (valueType.IsEnum)
