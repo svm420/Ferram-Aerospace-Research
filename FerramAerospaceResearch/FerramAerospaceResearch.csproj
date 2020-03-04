@@ -111,7 +111,6 @@
     <Compile Include="FARPartExtensions.cs" />
     <Compile Include="FARPartGeometry\DebugVoxel.cs" />
     <Compile Include="FARPartGeometry\DebugVoxelMesh.cs" />
-    <Compile Include="FARPartGeometry\FARAnimOverrides.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\AirbreathingEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\CompoundPartGeoUpdater.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\ICrossSectionAdjuster.cs" />
@@ -132,7 +131,6 @@
     <Compile Include="FARAeroComponents\FARAeroSection.cs" />
     <Compile Include="FARAeroComponents\FARVesselAero.cs" />
     <Compile Include="FARAeroComponents\VehicleAerodynamics.cs" />
-    <Compile Include="LEGACYferram4\FARAeroStress.cs" />
     <Compile Include="FARAeroUtil.cs" />
     <Compile Include="LEGACYferram4\FARBaseAerodynamics.cs" />
     <Compile Include="LEGACYferram4\FARCenterQuery.cs" />
@@ -180,6 +178,10 @@
     <Compile Include="RealChuteLite\ChuteCalculator.cs" />
     <Compile Include="RealChuteLite\PhysicsWatch.cs" />
     <Compile Include="RealChuteLite\RealChuteFAR.cs" />
+    <Compile Include="Settings\FARAeroData.cs" />
+    <Compile Include="Settings\FARAeroStress.cs" />
+    <Compile Include="Settings\FARAnimOverrides.cs" />
+    <Compile Include="Settings\FARPartModuleTransformExceptions.cs" />
     <Compile Include="ToolbarWrapper.cs" />
     <Compile Include="Utils\ConfigAdapter.cs" />
     <Compile Include="Utils\GameDatabaseTextureLoader.cs" />
