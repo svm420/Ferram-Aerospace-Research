@@ -115,11 +115,18 @@ namespace FerramAerospaceResearch
                 if (!save.Node.HasData)
                     continue;
 
-                Serialization.MakeTopNode(topNode, node, pair.Key, null, isPatch);
-
                 string path = PathUtil.Combine(KSPUtils.GameDataPath, $"{prefix}_{pair.Key}{extension}");
                 FARLogger.DebugFormat("Saving {0} to {1}", pair.Key, path);
-                topNode.Save(path);
+                if (!pair.Value.Reflection.AllowMultiple)
+                {
+                    Serialization.MakeTopNode(topNode, node, pair.Key, null, isPatch);
+                    topNode.Save(path);
+                }
+                else
+                {
+                    node.Save(path);
+                }
+
                 topNode.ClearData();
                 node.ClearData();
             }
@@ -154,16 +161,14 @@ namespace FerramAerospaceResearch
         }
 
         /// <inheritdoc />
-        public bool OnListValue(
-            int index,
-            object value,
-            ListValueReflection reflection,
-            out object newValue
-        )
+        public bool OnListValue(int index, object value, ListValueReflection reflection, out object newValue)
         {
+            if (index == 0 && IsPatch)
+                Node.AddValue($"!{reflection.Name}", "deleted");
+
             newValue = default;
             if (value != null)
-                Serialization.AddValue(Node, reflection.Name, value, reflection.ValueType, IsPatch, index);
+                Serialization.AddValue(Node, reflection.Name, value, reflection.ValueType, false, index);
 
             return false;
         }
@@ -194,16 +199,23 @@ namespace FerramAerospaceResearch
             out object newValue
         )
         {
+            if (index == 0 && IsPatch)
+            {
+                Node.AddNode(string.IsNullOrEmpty(reflection.Name)
+                                 ? $"!{reflection.NodeId},*"
+                                 : $"!{reflection.NodeId}[{reflection.Name}],*");
+            }
+
             newValue = default;
             var save = new SaveVisitor
             {
-                IsPatch = IsPatch,
+                IsPatch = false,
                 Node = new ConfigNode()
             };
             nodeReflection.Save(save, value);
 
             if (save.Node.HasData)
-                Serialization.AddNode(Node, save.Node, nodeReflection.Id, reflection.Name, IsPatch, index);
+                Serialization.AddNode(Node, save.Node, nodeReflection.Id, reflection.Name);
 
             return false;
         }
@@ -262,11 +274,7 @@ namespace FerramAerospaceResearch
         }
 
         /// <inheritdoc />
-        public bool OnNodeList(
-            ListValueReflection reflection,
-            NodeReflection nodeReflection,
-            out IList newValue
-        )
+        public bool OnNodeList(ListValueReflection reflection, NodeReflection nodeReflection, out IList newValue)
         {
             ConfigNode[] nodes = Node.GetNodes(reflection.NodeId);
             var load = new LoadVisitor();
