@@ -283,23 +283,25 @@ namespace FerramAerospaceResearch.Reflection
 
             public abstract void VisitNode(object owner, NodeReflection reflection);
 
-            protected static void CopyList(IList from, IList to)
+            protected static void CopyList(IList from, IList to, Type valueType)
             {
                 if (from is null || to is null)
                     return;
+
+                object def = valueType.IsValueType ? Activator.CreateInstance(valueType) : null;
 
                 int count = from.Count;
                 if (to.IsFixedSize)
                 {
                     count = Math.Min(count, to.Count);
                     for (int i = 0; i < count; i++)
-                        to[i] = from[i];
+                        to[i] = from[i] ?? def;
                 }
                 else
                 {
                     to.Clear();
                     for (int i = 0; i < count; i++)
-                        to.Add(from[i]);
+                        to.Add(from[i] ?? def);
                 }
             }
         }
@@ -319,7 +321,7 @@ namespace FerramAerospaceResearch.Reflection
             public override void VisitValueList(object owner, ListValueReflection reflection)
             {
                 if (Loader.OnValueList(reflection, out IList list))
-                    CopyList(list, reflection.GetMember(owner) as IList);
+                    CopyList(list, reflection.GetMember(owner) as IList, reflection.ValueType);
             }
 
             /// <inheritdoc />
@@ -330,7 +332,7 @@ namespace FerramAerospaceResearch.Reflection
             )
             {
                 if (Loader.OnNodeList(reflection, nodeReflection, out IList list))
-                    CopyList(list, reflection.GetMember(owner) as IList);
+                    CopyList(list, reflection.GetMember(owner) as IList, reflection.ValueType);
             }
 
             /// <inheritdoc />
