@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -92,18 +92,18 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
-            guiActive = false,
-            guiActiveEditor = false,
-            guiFormat = "F3",
-            guiUnits = "FARUnitKN")]
+                  guiActive = false,
+                  guiActiveEditor = false,
+                  guiFormat = "F3",
+                  guiUnits = "FARUnitKN")]
         public float dragForce;
 
         // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
-            guiActive = false,
-            guiActiveEditor = false,
-            guiFormat = "F3",
-            guiUnits = "FARUnitKN")]
+                  guiActive = false,
+                  guiActiveEditor = false,
+                  guiFormat = "F3",
+                  guiUnits = "FARUnitKN")]
         public float liftForce;
 
         private Transform partTransform;
