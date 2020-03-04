@@ -44,7 +44,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System.Collections.Generic;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.FARUtils;
 using ProceduralFairings;
 using UnityEngine;
 

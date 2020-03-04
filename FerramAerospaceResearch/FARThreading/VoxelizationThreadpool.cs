@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARThreading
 {
@@ -100,7 +99,6 @@ namespace FerramAerospaceResearch.FARThreading
         private void SetupMainThread()
         {
             _mainThread = Thread.CurrentThread;
-            FARLogger.Debug("Main thread: " + _mainThread.Name);
         }
 
         private void ExecuteQueuedVoxelization()

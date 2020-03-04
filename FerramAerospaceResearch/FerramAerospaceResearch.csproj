@@ -91,7 +91,6 @@
     <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />
     <Compile Include="FARAeroComponents\VesselIntakeRamDrag.cs" />
     <Compile Include="FARAPI.cs" />
-    <Compile Include="FARAssets.cs" />
     <Compile Include="FARDebugAndSettings.cs" />
     <Compile Include="FARFloatCurve.cs" />
     <Compile Include="FARGUI\FAREditorGUI\DesignConcerns\AreaRulingConcern.cs" />
@@ -126,7 +125,6 @@
     <Compile Include="FARSettingsScenarioModule.cs" />
     <Compile Include="FARThreading\ThreadSafeDebugLogger.cs" />
     <Compile Include="FARThreading\VoxelizationThreadpool.cs" />
-    <Compile Include="FARUtils\ShaderPropertyIds.cs" />
     <Compile Include="LEGACYferram4\FARAction.cs" />
     <Compile Include="FARGUI\FAREditorGUI\EditorAeroCenter.cs" />
     <Compile Include="FARAeroComponents\FARAeroPartModule.cs" />
@@ -190,6 +188,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FerramAerospaceResearch.Base\FerramAerospaceResearch.Base.csproj">
+      <Project>{8e4e9138-a949-4ded-a08c-4ce3442887b4}</Project>
+      <Name>FerramAerospaceResearch.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ferramGraph\ferramGraph.csproj">
       <Project>{0ccfed24-728c-432b-9fdc-30bef1116ede}</Project>
       <Name>ferramGraph</Name>

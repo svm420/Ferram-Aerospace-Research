@@ -43,7 +43,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System.Text;
-using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 {

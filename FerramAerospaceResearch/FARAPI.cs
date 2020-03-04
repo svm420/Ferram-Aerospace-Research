@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -54,7 +53,7 @@ namespace FerramAerospaceResearch
 {
     public static class FARAPI
     {
-        public static FARVersion Version { get; } = new FARVersion();
+        public static Version Version { get; } = new Version();
 
         /// <summary>
         ///     Toggle or enable/disable FAR speed display.

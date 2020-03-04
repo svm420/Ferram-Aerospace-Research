@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using FerramAerospaceResearch;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace

@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FerramAerospaceResearch.FARUtils;
 using KSP.Localization;
 using StringLeakTest;
 using UnityEngine;

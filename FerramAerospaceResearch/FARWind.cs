@@ -43,7 +43,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch
@@ -81,7 +80,7 @@ namespace FerramAerospaceResearch
             }
             catch (Exception e)
             {
-                FARLogger.Info("[FARWIND] Exception! " + e.Message + e.StackTrace);
+                FARLogger.InfoFormat("[FARWIND] Exception! {0}\n{1}", e.Message, e.StackTrace);
                 return Vector3.zero;
             }
         }

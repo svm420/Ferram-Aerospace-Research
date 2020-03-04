@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -47,7 +47,6 @@ using ferram4;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents

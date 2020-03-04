@@ -44,7 +44,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Globalization;
-using FerramAerospaceResearch.FARUtils;
 
 namespace FerramAerospaceResearch
 {
@@ -211,7 +210,7 @@ namespace FerramAerospaceResearch
             double c = a, d = a, fc = function(c);
             int funcCalls = 3;
 
-            double s = b, fs = fb;
+            double s = b;
 
             bool flag = true;
             for (int iter = 0; iter < maxIter; iter++)
@@ -284,7 +283,7 @@ namespace FerramAerospaceResearch
                     flag = false;
                 }
 
-                fs = function(s);
+                double fs = function(s);
                 funcCalls++;
                 d = c;
                 c = b;

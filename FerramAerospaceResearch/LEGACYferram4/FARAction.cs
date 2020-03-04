@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARGUI;
-using FerramAerospaceResearch.FARUtils;
 using KSP.IO;
 using KSP.Localization;
 using UnityEngine;

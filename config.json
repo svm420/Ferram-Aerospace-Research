@@ -15,7 +15,7 @@
         "VersionBuild": 11,
         "VersionRevision": 4,
         "VersionName": "Mach",
-        "Year": 2019,
+        "Year": 2020,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
         "VersionString": "$(NumericalVersion) \"$(VersionName)\"",
         "VersionRegex": "\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?\\s*\"\\w+\"",
@@ -23,8 +23,10 @@
         "KSPMajorMax": 1,
         "KSPMinorMin": 8,
         "KSPMinorMax": 9,
-        "UnityDir": "Unity/$(ModName)/",
-        "AssetBundleDir": "$(UnityDir)AssetBundles/"
+        "UnityDir": "$(SolutionDir)Unity/$(ModName)/",
+        "AssetBundleDir": "$(UnityDir)AssetBundles/",
+        "UnityAssetsDir": "$(UnityDir)Assets/",
+        "UnityPluginsDir": "$(UnityAssetsDir)Plugins/"
     },
     "post_build": {
         "clean": [],
@@ -38,6 +40,18 @@
                 "destination": "$(AssetDir)"
             }
         ],
+        "[FerramAerospaceResearch.Base]": {
+            "install": [
+                {
+                    "source": "$(TargetDir)$(TargetName).*",
+                    "destination": "$(PluginDir)"
+                },
+                {
+                    "source": "$(TargetDir)$(TargetName).*",
+                    "destination": "$(UnityPluginsDir)"
+                }
+            ]
+        },
         "[FerramAerospaceResearch]": {
             "clean": [
                 "$(GameDir)"
@@ -74,7 +88,7 @@
                 ]
             },
             {
-                "pattern": "$(ModName)/FARUtils/FARVersion.cs",
+                "pattern": "$(ModName).Base/Version.cs",
                 "substitutions": [
                     {
                         "search": "Major = \\d+;",
@@ -112,7 +126,7 @@
                 ]
             },
             {
-                "pattern": "$(ModName)/Properties/AssemblyInfo.cs",
+                "pattern": "$(ModName)*/Properties/AssemblyInfo.cs",
                 "substitutions": [
                     {
                         "search": "(Copyright .* )\\d+",

@@ -1,5 +1,4 @@
 using System;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 /* RealChuteLite is the work of Christophe Savard (stupid_chris), and is licensed the same way than the rest of FAR is.

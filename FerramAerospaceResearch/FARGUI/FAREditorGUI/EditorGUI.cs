@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -53,7 +53,7 @@ using FerramAerospaceResearch.FARGUI.FAREditorGUI.DesignConcerns;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Resources;
 using KSP.Localization;
 using KSP.UI.Screens;
 using ModuleWheels;
@@ -683,7 +683,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             if (blizzyEditorGUIButton != null)
                 return;
             blizzyEditorGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FAREditorButtonBlizzy");
-            blizzyEditorGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
+            blizzyEditorGUIButton.TexturePath = FARAssets.Instance.Textures.IconSmall.Url;
             blizzyEditorGUIButton.ToolTip = "FAR Editor";
             blizzyEditorGUIButton.OnClick += e => showGUI = !showGUI;
         }

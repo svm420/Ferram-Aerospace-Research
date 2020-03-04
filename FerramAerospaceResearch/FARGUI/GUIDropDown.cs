@@ -42,7 +42,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
-using FerramAerospaceResearch.FARUtils;
+
 using UnityEngine;
 
 // ReSharper disable StaticMemberInGenericType

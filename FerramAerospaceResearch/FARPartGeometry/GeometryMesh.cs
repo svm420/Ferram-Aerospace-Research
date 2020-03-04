@@ -44,7 +44,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry

@@ -46,7 +46,7 @@ using System.Collections.Generic;
 using System.Text;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Resources;
 using KSP.IO;
 using KSP.Localization;
 using StringLeakTest;
@@ -282,7 +282,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             mainGuiRect = GUILayout.Window(GetHashCode(),
                                            mainGuiRect,
                                            MainFlightGUIWindow,
-                                           "FAR, " + FARVersion.VersionString,
+                                           "FAR, " + Version.LongString,
                                            GUILayout.MinWidth(230));
             GUIUtils.ClampToScreen(mainGuiRect);
 
@@ -386,7 +386,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (blizzyFlightGUIButton != null)
                 return;
             blizzyFlightGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARFlightButtonBlizzy");
-            blizzyFlightGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
+            blizzyFlightGUIButton.TexturePath = FARAssets.Instance.Textures.IconSmall.Url;
             blizzyFlightGUIButton.ToolTip = "FAR Flight Sys";
             blizzyFlightGUIButton.OnClick += e => showGUI = !showGUI;
         }

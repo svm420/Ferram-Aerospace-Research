@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -50,7 +50,6 @@ using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
-using FerramAerospaceResearch.FARUtils;
 using KSP.IO;
 using KSP.UI.Screens;
 using UnityEngine;
@@ -168,7 +167,7 @@ namespace FerramAerospaceResearch
                                                                                  ApplicationLauncher.AppScenes.VAB |
                                                                                  ApplicationLauncher.AppScenes.SPH |
                                                                                  ApplicationLauncher.AppScenes.FLIGHT,
-                                                                                 FARAssets.TextureCache.IconLarge);
+                                                                                 FARAssets.Instance.Textures.IconLarge);
         }
 
         private static void onAppLaunchToggle()
@@ -201,7 +200,7 @@ namespace FerramAerospaceResearch
                 debugWinPos = GUILayout.Window("FARDebug".GetHashCode(),
                                                debugWinPos,
                                                debugWindow,
-                                               "FAR Debug Options, " + FARVersion.VersionString,
+                                               "FAR Debug Options, " + Version.LongString,
                                                GUILayout.ExpandWidth(true),
                                                GUILayout.ExpandHeight(true));
                 if (!inputLocked && debugWinPos.Contains(GUIUtils.GetMousePos()))

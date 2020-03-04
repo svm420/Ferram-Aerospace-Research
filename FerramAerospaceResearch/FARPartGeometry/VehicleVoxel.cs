@@ -48,7 +48,6 @@ using System.Linq;
 using System.Threading;
 using ferram4;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry

@@ -47,7 +47,6 @@ using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch

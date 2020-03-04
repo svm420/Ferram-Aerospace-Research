@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FerramAerospaceResearch.Resources;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -66,8 +67,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 get
                 {
-                    Material mat = FARAssets.ShaderCache.DebugVoxels.Material;
-                    mat.mainTexture = FARAssets.TextureCache.VoxelTexture;
+                    Material mat = FARAssets.Instance.Shaders.DebugVoxel;
+                    mat.mainTexture = FARAssets.Instance.Textures.DebugVoxel;
+
                     return mat;
                 }
             }
