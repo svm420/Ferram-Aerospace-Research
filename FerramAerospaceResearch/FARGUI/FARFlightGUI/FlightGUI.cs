@@ -79,6 +79,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private FlightStatusGUI _flightStatusGUI;
         private StabilityAugmentation _stabilityAugmentation;
         private FlightDataGUI _flightDataGUI;
+        private FlightDataLogger flightDataLogger;
 
         private bool showFlightDataWindow;
         private bool showSettingsWindow;
@@ -129,6 +130,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 vesselFlightGUI[_vessel] = this;
             else
                 vesselFlightGUI.Add(_vessel, this);
+            flightDataLogger = FlightDataLogger.CreateLogger(_vessel);
 
             enabled = true;
 
@@ -164,6 +166,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             airSpeedGUI = null;
 
             AeroVizGUI?.SaveSettings();
+
+            if (flightDataLogger)
+            {
+                flightDataLogger.StopLogging();
+                flightDataLogger = null;
+            }
 
             _flightStatusGUI = null;
             settingsWindow = null;
@@ -335,6 +343,25 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                                                   Localizer.Format("FARFlightGUIFltSettings"),
                                                   buttonStyle,
                                                   GUILayout.ExpandWidth(true));
+
+            bool logging = GUILayout.Toggle(flightDataLogger.IsActive,
+                                            Localizer.Format("FARFlightGUIFltLogging"),
+                                            buttonStyle,
+                                            GUILayout.ExpandWidth(true));
+            if (logging != flightDataLogger.IsActive)
+            {
+                if (!flightDataLogger.IsActive)
+                    flightDataLogger.StartLogging();
+                else
+                    flightDataLogger.StopLogging();
+            }
+
+            flightDataLogger.Period =
+                GUIUtils.TextEntryForInt(Localizer.Format("FARFlightGUIFltLogPeriod"), 150, flightDataLogger.Period);
+            flightDataLogger.FlushPeriod =
+                GUIUtils.TextEntryForInt(Localizer.Format("FARFlightGUIFltLogFlushPeriod"),
+                                         150,
+                                         flightDataLogger.FlushPeriod);
 
             GUILayout.Label(Localizer.Format("FARFlightGUIFltAssistance"));
 

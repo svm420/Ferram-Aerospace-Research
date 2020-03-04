@@ -6,7 +6,7 @@ namespace FerramAerospaceResearch
         public const byte Major = 0;
         public const byte Minor = 15;
         public const byte Build = 11;
-        public const byte Revision = 3;
+        public const byte Revision = 4;
         public const string Name = "Mach";
 
         /// <summary>

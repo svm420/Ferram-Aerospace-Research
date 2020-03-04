@@ -115,6 +115,7 @@
         <Compile Include="Resources\ShaderPropertyIds.cs" />
         <Compile Include="Threading\MainThread.cs" />
         <Compile Include="Threading\ReaderWriteLockExtensions.cs" />
+        <Compile Include="Utils\CsvWriter.cs" />
         <Compile Include="Utils\FARLogger.cs" />
         <Compile Include="Utils\FARLogHandler.cs" />
         <Compile Include="Utils\FARUtils.cs" />
