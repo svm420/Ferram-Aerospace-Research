@@ -83,7 +83,7 @@ namespace FerramAerospaceResearch
 
                 if (!FARConfig.Debug.DumpOnLoad)
                     return;
-                SaveConfigs("Custom", true, ".cfg.far");
+                SaveConfigs("Custom", true, ".cfg.far", true);
             }
             finally
             {
@@ -96,11 +96,7 @@ namespace FerramAerospaceResearch
             SaveConfigs("Custom");
         }
 
-        private static void SaveConfigs(
-            string prefix,
-            bool isPatch = true,
-            string extension = ".cfg"
-        )
+        private static void SaveConfigs(string prefix, bool isPatch = true, string extension = ".cfg", bool force = false)
         {
             var topNode = new ConfigNode();
             var node = new ConfigNode();
@@ -111,6 +107,9 @@ namespace FerramAerospaceResearch
             };
             foreach (KeyValuePair<string, ReflectedConfig> pair in ConfigReflection.Instance.Configs)
             {
+                if (!pair.Value.Reflection.ShouldSave && !force)
+                    continue;
+
                 pair.Value.Reflection.Save(save, pair.Value.Instance);
 
                 if (!save.Node.HasData)

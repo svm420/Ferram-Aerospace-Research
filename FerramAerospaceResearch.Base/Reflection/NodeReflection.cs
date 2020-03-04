@@ -14,11 +14,6 @@ namespace FerramAerospaceResearch.Reflection
         private const BindingFlags AllFlags = PublicFlags | PrivateFlags;
 
         /// <summary>
-        /// Id of this config node
-        /// </summary>
-        public string Id { get; private set; }
-
-        /// <summary>
         /// All the created <see cref="NodeReflection"/> for each type
         /// </summary>
         private static readonly Dictionary<Type, NodeReflection> nodes = new Dictionary<Type, NodeReflection>();
@@ -67,9 +62,24 @@ namespace FerramAerospaceResearch.Reflection
         }
 
         /// <summary>
+        /// Id of this config node
+        /// </summary>
+        public string Id { get; private set; }
+
+        /// <summary>
         /// Whether this node can be declared multiple times at the top level scope
         /// </summary>
         public bool AllowMultiple { get; private set; }
+
+        /// <summary>
+        /// Whether this node is root
+        /// </summary>
+        public bool IsRootNode { get; private set; }
+
+        /// <summary>
+        /// Whether this node should be saved
+        /// </summary>
+        public bool ShouldSave { get; private set; }
 
         private object FindOrMakeInstance()
         {
@@ -94,9 +104,12 @@ namespace FerramAerospaceResearch.Reflection
             Id = node?.Id ?? type.Name;
 
             // there should only be 1 root node for one type
-            if (node != null && node.IsRoot)
+            if (node != null)
             {
-                AllowMultiple = node.AllowMultiple;
+                IsRootNode = node.IsRoot;
+                ShouldSave = node.ShouldSave;
+                if (node.IsRoot)
+                    AllowMultiple = node.AllowMultiple;
             }
 
             // if this is a member of some type

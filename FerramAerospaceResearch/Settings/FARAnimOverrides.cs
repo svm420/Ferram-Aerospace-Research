@@ -6,7 +6,7 @@ using FerramAerospaceResearch.Reflection;
 
 namespace FerramAerospaceResearch.Settings
 {
-    [ConfigNode("FARAnimOverride", true, true)]
+    [ConfigNode("FARAnimOverride", true, true, false)]
     public class FARAnimOverrides : Singleton<FARAnimOverrides>, Interfaces.IConfigNode
     {
         [ConfigValue]

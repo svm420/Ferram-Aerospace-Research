@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.Settings
 {
-    [ConfigNode("FARPartModuleTransformExceptions", true)]
+    [ConfigNode("FARPartModuleTransformExceptions", true, shouldSave: false)]
     public class FARPartModuleTransformExceptions : Singleton<FARPartModuleTransformExceptions>, Interfaces.IConfigNode
     {
         [ConfigValue]

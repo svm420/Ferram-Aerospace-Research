@@ -11,6 +11,11 @@ namespace FerramAerospaceResearch.Reflection
         public readonly bool AllowMultiple;
 
         /// <summary>
+        ///     Whether this node should be saved
+        /// </summary>
+        public readonly bool ShouldSave;
+
+        /// <summary>
         ///     Node name
         /// </summary>
         public readonly string Id;
@@ -20,11 +25,12 @@ namespace FerramAerospaceResearch.Reflection
         /// </summary>
         public readonly bool IsRoot;
 
-        public ConfigNodeAttribute(string id, bool isRoot = false, bool allowMultiple = false)
+        public ConfigNodeAttribute(string id, bool isRoot = false, bool allowMultiple = false, bool shouldSave = true)
         {
             Id = id;
             IsRoot = isRoot;
             AllowMultiple = allowMultiple;
+            ShouldSave = shouldSave;
         }
     }
 }
