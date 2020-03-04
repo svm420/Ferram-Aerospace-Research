@@ -70,7 +70,8 @@ namespace FerramAerospaceResearch.Settings
 
         private static IEnumerator LoadGlobals()
         {
-            yield return new WaitWhile(() => HighLogic.LoadedScene == GameScenes.LOADING || FlightGlobals.fetch == null);
+            yield return new WaitWhile(() => HighLogic.LoadedScene == GameScenes.LOADING ||
+                                             FlightGlobals.fetch == null);
 
             foreach (BodySettings settings in AtmosphericData)
             {
@@ -112,17 +113,7 @@ namespace FerramAerospaceResearch.Settings
                 return;
             AtmosphericData.Clear();
             foreach (KeyValuePair<int, BodySettings> pair in AtmosphericConfiguration)
-            {
-                int i;
-                for (i = 0; i < AtmosphericData.Count; i++)
-                    if (pair.Key == AtmosphericData[i].Index || pair.Value.Name == AtmosphericData[i].Name)
-                        break;
-
-                if (i < AtmosphericData.Count)
-                    AtmosphericData[i] = pair.Value;
-                else
-                    AtmosphericData.Add(pair.Value);
-            }
+                AtmosphericData.Add(pair.Value);
         }
 
         /// <inheritdoc />
