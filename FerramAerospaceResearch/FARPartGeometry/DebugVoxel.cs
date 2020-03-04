@@ -68,6 +68,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 get
                 {
                     Material mat = FARAssets.Instance.Shaders.DebugVoxel;
+
+                    if (mat?.shader == null)
+                        mat = FARAssets.Instance.Shaders.DebugVoxelFallback;
+                    else if (mat.HasProperty(ShaderPropertyIds.Cutoff))
+                        mat.SetFloat(ShaderPropertyIds.Cutoff, FARConfig.Shaders.DebugVoxel.Cutoff);
+
                     mat.mainTexture = FARAssets.Instance.Textures.DebugVoxel;
 
                     return mat;
