@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -44,6 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using FerramAerospaceResearch;
+using FerramAerospaceResearch.Settings;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -51,9 +52,6 @@ namespace ferram4
 {
     public class FARControllableSurface : FARWingAerodynamicModel, ITorqueProvider
     {
-        public static double timeConstant = 0.25;
-        public static double timeConstantFlap = 10;
-        public static double timeConstantSpoiler = 0.75;
         protected Transform movableSection;
 
         private bool flipAxis;
@@ -201,6 +199,24 @@ namespace ferram4
         private bool justStarted;
 
         private Transform lastReferenceTransform;
+
+        public static double timeConstant
+        {
+            get { return FARAeroData.ControlSurfaceTimeConstant; }
+            set { FARAeroData.ControlSurfaceTimeConstant = value; }
+        }
+
+        public static double timeConstantFlap
+        {
+            get { return FARAeroData.ControlSurfaceTimeConstantFlap; }
+            set { FARAeroData.ControlSurfaceTimeConstantFlap = value; }
+        }
+
+        public static double timeConstantSpoiler
+        {
+            get { return FARAeroData.ControlSurfaceTimeConstantSpoiler; }
+            set { FARAeroData.ControlSurfaceTimeConstantSpoiler = value; }
+        }
 
         protected Transform MovableSection
         {
@@ -376,7 +392,7 @@ namespace ferram4
             if (!FARDebugValues.allowStructuralFailures)
                 return;
             foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
-                if (temp.name == "ctrlSurfStress")
+                if (temp.Name == "ctrlSurfStress")
                 {
                     FARPartStressTemplate template = temp;
                     double maxForceMult = Math.Pow(massMultiplier, FARAeroUtil.massStressPower);
@@ -384,11 +400,11 @@ namespace ferram4
                     YmaxForce *= 1 - ctrlSurfFrac;
                     XZmaxForce *= 1 - ctrlSurfFrac;
 
-                    double tmp = template.YmaxStress; //in MPa
+                    double tmp = template.YMaxStress; //in MPa
                     tmp *= S * ctrlSurfFrac * maxForceMult;
                     YmaxForce += tmp;
 
-                    tmp = template.XZmaxStress; //in MPa
+                    tmp = template.XZMaxStress; //in MPa
                     tmp *= S * ctrlSurfFrac * maxForceMult;
                     XZmaxForce += tmp;
                     break;

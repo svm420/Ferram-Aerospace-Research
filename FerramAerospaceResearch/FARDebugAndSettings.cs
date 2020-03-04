@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -51,6 +51,7 @@ using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.Resources;
+using FerramAerospaceResearch.Settings;
 using KSP.IO;
 using KSP.UI.Screens;
 using UnityEngine;
@@ -102,9 +103,7 @@ namespace FerramAerospaceResearch
         private void Start()
         {
             FARAeroSection.GenerateCrossFlowDragCurve();
-            FARAeroStress.LoadStressTemplates();
             FARAeroUtil.LoadAeroDataFromConfig();
-            //LoadConfigs();
             DontDestroyOnLoad(this);
 
             debugMenu = false;
@@ -319,12 +318,14 @@ namespace FerramAerospaceResearch
 
             int flightGlobalsIndex = FlightGlobals.Bodies[atmBodyIndex].flightGlobalsIndex;
 
-            double[] atmProperties = FARAeroUtil.bodyAtmosphereConfiguration[flightGlobalsIndex];
+            BodySettings atmProperties = FARAeroData.AtmosphericConfiguration[flightGlobalsIndex];
 
-            atmProperties[0] = GUIUtils.TextEntryForDouble("Gas Viscosity:", 80, atmProperties[0]);
-            atmProperties[1] = GUIUtils.TextEntryForDouble("Ref Temp for Viscosity:", 80, atmProperties[1]);
+            atmProperties.ReferenceViscosity =
+                GUIUtils.TextEntryForDouble("Gas Viscosity:", 80, atmProperties.ReferenceViscosity);
+            atmProperties.ReferenceTemperature =
+                GUIUtils.TextEntryForDouble("Ref Temp for Viscosity:", 80, atmProperties.ReferenceTemperature);
 
-            FARAeroUtil.bodyAtmosphereConfiguration[flightGlobalsIndex] = atmProperties;
+            FARAeroData.AtmosphericConfiguration[flightGlobalsIndex] = atmProperties;
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
@@ -341,7 +342,7 @@ namespace FerramAerospaceResearch
             {
                 GUILayout.BeginHorizontal();
                 bool active = GUILayout.Toggle(i == aeroStressIndex,
-                                               FARAeroStress.StressTemplates[i].name,
+                                               FARAeroStress.StressTemplates[i].Name,
                                                buttonStyle,
                                                GUILayout.Width(150));
                 if (GUILayout.Button("-", buttonStyle, GUILayout.Width(30), GUILayout.Height(30)))
@@ -362,17 +363,18 @@ namespace FerramAerospaceResearch
             {
                 var newTemplate = new FARPartStressTemplate
                 {
-                    XZmaxStress = 500,
-                    YmaxStress = 500,
-                    name = "default",
-                    isSpecialTemplate = false,
-                    minNumResources = 0,
-                    resources = new List<string>(),
-                    excludeResources = new List<string>(),
-                    rejectUnlistedResources = false,
-                    crewed = false,
-                    flowModeNeeded = false,
-                    flowMode = ResourceFlowMode.NO_FLOW
+                    XZMaxStress = 500,
+                    YMaxStress = 500,
+                    Name = "default",
+                    IsSpecial = false,
+                    Resources =
+                    {
+                        NumRequired = 0,
+                        RejectUnlisted = false,
+                        FlowMode = ResourceFlowMode.NO_FLOW
+                    },
+                    RequiresCrew = false,
+                    FlowModeNeeded = false
                 };
 
                 FARAeroStress.StressTemplates.Add(newTemplate);
@@ -383,40 +385,36 @@ namespace FerramAerospaceResearch
 
             FARPartStressTemplate activeTemplate = FARAeroStress.StressTemplates[aeroStressIndex];
 
-            GUIUtils.TextEntryField("Name:", 80, ref activeTemplate.name);
+            GUIUtils.TextEntryField("Name:", 80, ref activeTemplate.Name);
 
-            activeTemplate.YmaxStress =
-                GUIUtils.TextEntryForDouble("Axial (Y-axis) Max Stress:", 240, activeTemplate.YmaxStress);
-            activeTemplate.XZmaxStress =
-                GUIUtils.TextEntryForDouble("Lateral (X,Z-axis) Max Stress:", 240, activeTemplate.XZmaxStress);
+            activeTemplate.YMaxStress =
+                GUIUtils.TextEntryForDouble("Axial (Y-axis) Max Stress:", 240, activeTemplate.YMaxStress);
+            activeTemplate.XZMaxStress =
+                GUIUtils.TextEntryForDouble("Lateral (X,Z-axis) Max Stress:", 240, activeTemplate.XZMaxStress);
 
-            activeTemplate.crewed = GUILayout.Toggle(activeTemplate.crewed, "Requires Crew Compartment");
+            activeTemplate.RequiresCrew = GUILayout.Toggle(activeTemplate.RequiresCrew, "Requires Crew Compartment");
 
-            string tmp = activeTemplate.minNumResources.ToString();
+            string tmp = activeTemplate.Resources.NumRequired.ToString();
             GUIUtils.TextEntryField("Min Num Resources:", 80, ref tmp);
             tmp = Regex.Replace(tmp, @"[^\d]", "");
-            activeTemplate.minNumResources = Convert.ToInt32(tmp);
+            activeTemplate.Resources.NumRequired = Convert.ToInt32(tmp);
 
             GUILayout.Label("Req Resources:");
-            StringListUpdateGUI(activeTemplate.resources, buttonStyle, boxStyle);
+            StringListUpdateGUI(activeTemplate.Resources.Resources, buttonStyle, boxStyle);
 
             GUILayout.Label("Exclude Resources:");
-            StringListUpdateGUI(activeTemplate.excludeResources, buttonStyle, boxStyle);
+            StringListUpdateGUI(activeTemplate.Resources.Excluded, buttonStyle, boxStyle);
 
-            activeTemplate.rejectUnlistedResources =
-                GUILayout.Toggle(activeTemplate.rejectUnlistedResources, "Reject Unlisted Res");
+            activeTemplate.Resources.RejectUnlisted =
+                GUILayout.Toggle(activeTemplate.Resources.RejectUnlisted, "Reject Unlisted Res");
 
-            activeTemplate.flowModeNeeded =
-                GUILayout.Toggle(activeTemplate.flowModeNeeded, "Requires Specific Flow Mode");
-            if (activeTemplate.flowModeNeeded)
-                activeTemplate.flowMode =
-                    (ResourceFlowMode)GUILayout.SelectionGrid((int)activeTemplate.flowMode, FlowMode_str, 1);
+            activeTemplate.FlowModeNeeded =
+                GUILayout.Toggle(activeTemplate.FlowModeNeeded, "Requires Specific Flow Mode");
+            if (activeTemplate.FlowModeNeeded)
+                activeTemplate.Resources.FlowMode =
+                    (ResourceFlowMode)GUILayout.SelectionGrid((int)activeTemplate.Resources.FlowMode, FlowMode_str, 1);
 
-            activeTemplate.isSpecialTemplate =
-                GUILayout.Toggle(activeTemplate.isSpecialTemplate, "Special Hardcoded Usage");
-
-            FARAeroStress.StressTemplates[aeroStressIndex] = activeTemplate;
-
+            activeTemplate.IsSpecial = GUILayout.Toggle(activeTemplate.IsSpecial, "Special Hardcoded Usage");
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
@@ -581,10 +579,8 @@ namespace FerramAerospaceResearch
             else
                 FARDebugValues.aeroFailureExplosions = true;
 
-            FARAeroStress.LoadStressTemplates();
             FARAeroUtil.LoadAeroDataFromConfig();
             FARActionGroupConfiguration.LoadConfiguration();
-            FARAnimOverrides.LoadAnimOverrides();
 
             hasScenarioChanged = true;
         }
@@ -605,8 +601,6 @@ namespace FerramAerospaceResearch
             node.AddValue("useBlizzyToolbar", FARDebugValues.useBlizzyToolbar & ToolbarManager.ToolbarAvailable);
             node.AddValue("aeroFailureExplosions", FARDebugValues.aeroFailureExplosions);
 
-            FARAeroUtil.SaveCustomAeroDataToConfig();
-            FARAeroStress.SaveCustomStressTemplates();
             FARActionGroupConfiguration.SaveConfiguration();
             ConfigAdapter.Save();
             config.save();

@@ -49,6 +49,7 @@ using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.RealChuteLite;
+using FerramAerospaceResearch.Settings;
 using KSP.Localization;
 using UnityEngine;
 
@@ -286,8 +287,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (FARDebugValues.allowStructuralFailures && !partStressOverride)
             {
                 FARPartStressTemplate template = FARAeroStress.DetermineStressTemplate(part);
-                partStressMaxY = template.YmaxStress;
-                partStressMaxXZ = template.XZmaxStress;
+                partStressMaxY = template.YMaxStress;
+                partStressMaxXZ = template.XZMaxStress;
             }
 
             partTransform = part.partTransform;
@@ -725,11 +726,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
             FARPartStressTemplate defaultTemplate = FARAeroStress.DetermineStressTemplate(part);
             if (stressTemplate.HasValue("YmaxStress"))
                 if (!double.TryParse(stressTemplate.GetValue("YmaxStress"), out partStressMaxY))
-                    partStressMaxY = defaultTemplate.YmaxStress;
+                    partStressMaxY = defaultTemplate.YMaxStress;
             // ReSharper disable once InvertIf
             if (stressTemplate.HasValue("XZmaxStress"))
                 if (!double.TryParse(stressTemplate.GetValue("XZmaxStress"), out partStressMaxXZ))
-                    partStressMaxXZ = defaultTemplate.XZmaxStress;
+                    partStressMaxXZ = defaultTemplate.XZMaxStress;
         }
 
         private void OnDestroy()

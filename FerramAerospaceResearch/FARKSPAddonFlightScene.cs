@@ -58,9 +58,7 @@ namespace FerramAerospaceResearch
             VoxelizationThreadpool.RunInMainThread = Debug.isDebugBuild;
 
             FARAeroSection.GenerateCrossFlowDragCurve();
-            FARAeroStress.LoadStressTemplates();
             FARAeroUtil.LoadAeroDataFromConfig();
-            FARAnimOverrides.LoadAnimOverrides();
 
             FARAeroForceDisplayScale = PhysicsGlobals.AeroForceDisplayScale;
             PhysicsGlobals.AeroForceDisplayScale = 0;

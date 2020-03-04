@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -46,6 +46,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using ferram4;
+using FerramAerospaceResearch.Settings;
 using UnityEngine;
 
 namespace FerramAerospaceResearch
@@ -68,9 +69,8 @@ namespace FerramAerospaceResearch
         public static double massStressPower;
         public static bool AJELoaded;
 
-        public static Dictionary<int, double[]> bodyAtmosphereConfiguration;
         public static int prevBodyIndex = -1;
-        public static double[] currentBodyVisc = new double[2];
+        public static BodySettings currentBodyData;
         private static CelestialBody currentBody;
 
         public static bool loaded;
@@ -246,114 +246,10 @@ namespace FerramAerospaceResearch
             }
         }
 
-        public static void SaveCustomAeroDataToConfig()
-        {
-            var node = new ConfigNode("@FARAeroData[default]:FOR[FerramAerospaceResearch]");
-            node.AddValue("%massPerWingAreaSupported", massPerWingAreaSupported);
-            node.AddValue("%massStressPower", massStressPower);
-            node.AddValue("%ctrlSurfTimeConstant", FARControllableSurface.timeConstant);
-            node.AddValue("%ctrlSurfTimeConstantFlap", FARControllableSurface.timeConstantFlap);
-            node.AddValue("%ctrlSurfTimeConstantSpoiler", FARControllableSurface.timeConstantSpoiler);
-
-            node.AddNode(new ConfigNode("!BodyAtmosphericData,*"));
-
-            foreach (KeyValuePair<int, double[]> pair in bodyAtmosphereConfiguration)
-                node.AddNode(CreateAtmConfigurationConfigNode(pair.Key, pair.Value));
-
-            var saveNode = new ConfigNode();
-            saveNode.AddNode(node);
-            saveNode.Save(KSPUtil.ApplicationRootPath.Replace("\\", "/") +
-                          "GameData/FerramAerospaceResearch/CustomFARAeroData.cfg");
-        }
-
-        private static ConfigNode CreateAtmConfigurationConfigNode(int bodyIndex, double[] atmProperties)
-        {
-            var node = new ConfigNode("BodyAtmosphericData");
-            node.AddValue("index", bodyIndex);
-
-            node.AddValue("viscosityAtReferenceTemp", atmProperties[0]);
-            node.AddValue("referenceTemp", atmProperties[1]);
-
-            return node;
-        }
-
         public static void LoadAeroDataFromConfig()
         {
             if (loaded)
                 return;
-
-            foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARAeroData"))
-            {
-                if (node == null)
-                    continue;
-
-                if (node.HasValue("massPerWingAreaSupported"))
-                    double.TryParse(node.GetValue("massPerWingAreaSupported"), out massPerWingAreaSupported);
-
-                if (node.HasValue("massStressPower"))
-                    double.TryParse(node.GetValue("massStressPower"), out massStressPower);
-
-                if (node.HasValue("ctrlSurfTimeConstant"))
-                    double.TryParse(node.GetValue("ctrlSurfTimeConstant"), out FARControllableSurface.timeConstant);
-
-                if (node.HasValue("ctrlSurfTimeConstantFlap"))
-                    double.TryParse(node.GetValue("ctrlSurfTimeConstantFlap"),
-                                    out FARControllableSurface.timeConstantFlap);
-
-                if (node.HasValue("ctrlSurfTimeConstantSpoiler"))
-                    double.TryParse(node.GetValue("ctrlSurfTimeConstantSpoiler"),
-                                    out FARControllableSurface.timeConstantSpoiler);
-
-                bodyAtmosphereConfiguration = new Dictionary<int, double[]>();
-                foreach (ConfigNode bodyProperties in node.GetNodes("BodyAtmosphericData"))
-                {
-                    if (bodyProperties == null ||
-                        !(bodyProperties.HasValue("index") || bodyProperties.HasValue("name")) ||
-                        !bodyProperties.HasValue("viscosityAtReferenceTemp") ||
-                        !bodyProperties.HasValue("referenceTemp"))
-                        continue;
-
-                    var Rgamma_and_gamma = new double[2];
-                    double.TryParse(bodyProperties.GetValue("viscosityAtReferenceTemp"), out double tmp);
-
-                    Rgamma_and_gamma[0] = tmp;
-
-                    double.TryParse(bodyProperties.GetValue("referenceTemp"), out tmp);
-
-                    Rgamma_and_gamma[1] = tmp;
-                    int index = -1;
-
-                    if (bodyProperties.HasValue("name"))
-                    {
-                        string name = bodyProperties.GetValue("name");
-
-                        foreach (CelestialBody body in FlightGlobals.Bodies)
-                            if (body.bodyName == name)
-                            {
-                                index = body.flightGlobalsIndex;
-                                break;
-                            }
-                    }
-
-                    if (index < 0)
-                        int.TryParse(bodyProperties.GetValue("index"), out index);
-
-                    bodyAtmosphereConfiguration.Add(index, Rgamma_and_gamma);
-                }
-            }
-
-            //For any bodies that lack a configuration, use Earth-like properties
-            foreach (CelestialBody body in FlightGlobals.Bodies)
-            {
-                if (bodyAtmosphereConfiguration.ContainsKey(body.flightGlobalsIndex))
-                    continue;
-
-                var Rgamma_and_gamma = new double[2];
-                Rgamma_and_gamma[0] = 1.7894e-5;
-                Rgamma_and_gamma[1] = 288;
-
-                bodyAtmosphereConfiguration.Add(body.flightGlobalsIndex, Rgamma_and_gamma);
-            }
 
             foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
                 if (assembly.assembly.GetName().Name == "AJE")
@@ -369,7 +265,7 @@ namespace FerramAerospaceResearch
                 File.Delete(forceUpdatePath);
 
             //Get Kerbin
-            currentBodyVisc = bodyAtmosphereConfiguration[1];
+            currentBodyData = FARAeroData.AtmosphericConfiguration[1];
         }
 
         private static void SetDefaultValuesIfNoValuesLoaded()
@@ -577,13 +473,13 @@ namespace FerramAerospaceResearch
 
         public static double CalculateCurrentViscosity(double tempInK)
         {
-            double visc = currentBodyVisc[0]; //get viscosity
+            double visc = currentBodyData.ReferenceViscosity; //get viscosity
 
-            double tempRat = tempInK / currentBodyVisc[1];
+            double tempRat = tempInK / currentBodyData.ReferenceTemperature;
             tempRat *= tempRat * tempRat;
             tempRat = Math.Sqrt(tempRat);
 
-            visc *= currentBodyVisc[1] + 110;
+            visc *= currentBodyData.ReferenceTemperature + 110;
             visc /= tempInK + 110;
             visc *= tempRat;
 
@@ -676,7 +572,7 @@ namespace FerramAerospaceResearch
             if (index == prevBodyIndex)
                 return;
             prevBodyIndex = index;
-            currentBodyVisc = bodyAtmosphereConfiguration[prevBodyIndex];
+            currentBodyData = FARAeroData.AtmosphericConfiguration[prevBodyIndex];
             currentBody = body;
 
             prandtlMeyerMach = null;

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -46,6 +46,7 @@ using System;
 using System.Collections.Generic;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARAeroComponents;
+using FerramAerospaceResearch.Settings;
 using KSP.Localization;
 using TweakScale;
 using UnityEngine;
@@ -510,14 +511,14 @@ namespace ferram4
             if (!FARDebugValues.allowStructuralFailures)
                 return;
             foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
-                if (temp.name == "wingStress")
+                if (temp.Name == "wingStress")
                 {
                     FARPartStressTemplate template = temp;
 
-                    YmaxForce = template.YmaxStress; //in MPa
+                    YmaxForce = template.YMaxStress; //in MPa
                     YmaxForce *= S;
 
-                    XZmaxForce = template.XZmaxStress;
+                    XZmaxForce = template.XZMaxStress;
                     XZmaxForce *= S;
                     break;
                 }
