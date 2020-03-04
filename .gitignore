@@ -20,9 +20,6 @@ releases
 .pytest_cache
 *.pyc
 
-// unignore Debug build DLLs
-!bin/[Dd]ebug/[Ff]erram*.dll
-
 // Rider
 .idea
 
