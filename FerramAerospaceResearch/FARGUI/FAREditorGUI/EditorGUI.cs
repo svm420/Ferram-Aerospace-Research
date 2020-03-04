@@ -169,10 +169,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             _stabDeriv = new StabilityDerivGUI(_simManager, flapSettingDropDown, celestialBodyDropdown);
             _stabDerivLinSim = new StabilityDerivSimulationGUI(_simManager);
 
-            Color crossSection = GUIColors.GetColor(3);
+            Color crossSection = FARConfig.GUIColors.LdColor;
             crossSection.a = 0.8f;
 
-            Color crossSectionDeriv = GUIColors.GetColor(2);
+            Color crossSectionDeriv = FARConfig.GUIColors.CmColor;
             crossSectionDeriv.a = 0.8f;
 
             _areaRulingOverlay =

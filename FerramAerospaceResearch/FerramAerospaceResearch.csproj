@@ -21,7 +21,7 @@
     <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;ASSERT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -105,6 +105,7 @@
     <Compile Include="FARGUI\FARFlightGUI\VesselFlightInfo.cs" />
     <Compile Include="FARGUI\FARFlightGUI\PhysicsCalcs.cs" />
     <Compile Include="FARGUI\FARFlightGUI\StringBuilderExtNumeric.cs" />
+    <Compile Include="FARKSPAdapter.cs" />
     <Compile Include="FARKSPAddonMainMenuSetup.cs" />
     <Compile Include="FARKSPAddonSpaceCenterScene.cs" />
     <Compile Include="FARPartExtensions.cs" />
@@ -136,7 +137,6 @@
     <Compile Include="LEGACYferram4\FARBaseAerodynamics.cs" />
     <Compile Include="LEGACYferram4\FARCenterQuery.cs" />
     <Compile Include="LEGACYferram4\FARControllableSurface.cs" />
-    <Compile Include="FARGUI\GUIColors.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\EditorSimManager.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\EquationSystem.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\RungeKutta.cs" />
@@ -181,8 +181,10 @@
     <Compile Include="RealChuteLite\PhysicsWatch.cs" />
     <Compile Include="RealChuteLite\RealChuteFAR.cs" />
     <Compile Include="ToolbarWrapper.cs" />
-    <Compile Include="FARUtils\FARLogger.cs" />
-    <Compile Include="FARUtils\FARVersion.cs" />
+    <Compile Include="Utils\ConfigAdapter.cs" />
+    <Compile Include="Utils\GameDatabaseTextureLoader.cs" />
+    <Compile Include="Utils\KSPUtils.cs" />
+    <Compile Include="Utils\Serialization.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

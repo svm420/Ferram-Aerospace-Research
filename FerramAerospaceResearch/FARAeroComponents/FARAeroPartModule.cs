@@ -628,7 +628,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                     worldLiftArrow,
                                                     worldLiftArrow.magnitude *
                                                     FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(0),
+                                                    FARConfig.GUIColors.ClColor,
                                                     true);
                 }
                 else
@@ -644,7 +644,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                     worldDragArrow,
                                                     worldDragArrow.magnitude *
                                                     FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(1),
+                                                    FARConfig.GUIColors.CdColor,
                                                     true);
                 }
                 else
@@ -662,7 +662,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                           worldSpaceTorque,
                                                           worldSpaceTorque.magnitude *
                                                           FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                          GUIColors.GetColor(2),
+                                                          FARConfig.GUIColors.CmColor,
                                                           true);
                     }
                     else

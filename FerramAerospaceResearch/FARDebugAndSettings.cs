@@ -50,6 +50,7 @@ using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
+using FerramAerospaceResearch.Resources;
 using KSP.IO;
 using KSP.UI.Screens;
 using UnityEngine;
@@ -458,21 +459,21 @@ namespace FerramAerospaceResearch
             GUILayout.Label("Editor GUI Graph Colors");
 
 
-            Color tmpColor = GUIColors.Instance[0];
+            Color tmpColor = FARConfig.GUIColors.ClColor;
             ChangeColor("Cl", ref tmpColor, ref cLTexture);
-            GUIColors.Instance[0] = tmpColor;
+            FARConfig.GUIColors.ClColor = tmpColor;
 
-            tmpColor = GUIColors.Instance[1];
+            tmpColor = FARConfig.GUIColors.CdColor;
             ChangeColor("Cd", ref tmpColor, ref cDTexture);
-            GUIColors.Instance[1] = tmpColor;
+            FARConfig.GUIColors.CdColor = tmpColor;
 
-            tmpColor = GUIColors.Instance[2];
+            tmpColor = FARConfig.GUIColors.CmColor;
             ChangeColor("Cm", ref tmpColor, ref cMTexture);
-            GUIColors.Instance[2] = tmpColor;
+            FARConfig.GUIColors.CmColor = tmpColor;
 
-            tmpColor = GUIColors.Instance[3];
+            tmpColor = FARConfig.GUIColors.LdColor;
             ChangeColor("L_D", ref tmpColor, ref l_DTexture);
-            GUIColors.Instance[3] = tmpColor;
+            FARConfig.GUIColors.LdColor = tmpColor;
 
             FARActionGroupConfiguration.DrawGUI();
             GUILayout.Label("Other Options"); // DaMichel: put it above the toolbar toggle
@@ -591,11 +592,10 @@ namespace FerramAerospaceResearch
         /// <summary> Update GUI after a new scenario was loaded. </summary>
         private void OnScenarioChanged()
         {
-            GUIColors guiColors = GUIColors.Instance;
-            ReColorTexture(guiColors[0], ref cLTexture);
-            ReColorTexture(guiColors[1], ref cDTexture);
-            ReColorTexture(guiColors[2], ref cMTexture);
-            ReColorTexture(guiColors[3], ref l_DTexture);
+            ReColorTexture(FARConfig.GUIColors.ClColor, ref cLTexture);
+            ReColorTexture(FARConfig.GUIColors.CdColor, ref cDTexture);
+            ReColorTexture(FARConfig.GUIColors.CmColor, ref cMTexture);
+            ReColorTexture(FARConfig.GUIColors.LdColor, ref l_DTexture);
         }
 
         public static void SaveConfigs(ConfigNode node)
@@ -608,7 +608,7 @@ namespace FerramAerospaceResearch
             FARAeroUtil.SaveCustomAeroDataToConfig();
             FARAeroStress.SaveCustomStressTemplates();
             FARActionGroupConfiguration.SaveConfiguration();
-            GUIColors.Instance.SaveColors();
+            ConfigAdapter.Save();
             config.save();
         }
 

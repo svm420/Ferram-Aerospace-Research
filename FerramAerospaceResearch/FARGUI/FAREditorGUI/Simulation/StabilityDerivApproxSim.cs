@@ -143,19 +143,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             double[] yVal = transSolve.GetSolution(0);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
-            lines.AddData(yVal, GUIColors.GetColor(3), "β", true);
+            lines.AddData(yVal, FARConfig.GUIColors.LdColor, "β", true);
 
             yVal = transSolve.GetSolution(1);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
-            lines.AddData(yVal, GUIColors.GetColor(2), "p", true);
+            lines.AddData(yVal, FARConfig.GUIColors.CmColor, "p", true);
 
             yVal = transSolve.GetSolution(2);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
-            lines.AddData(yVal, GUIColors.GetColor(1), "r", true);
+            lines.AddData(yVal, FARConfig.GUIColors.CdColor, "r", true);
 
             yVal = transSolve.GetSolution(3);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
-            lines.AddData(yVal, GUIColors.GetColor(0), "φ", true);
+            lines.AddData(yVal, FARConfig.GUIColors.ClColor, "φ", true);
 
             return lines;
         }
@@ -232,19 +232,19 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
 
             double[] yVal = transSolve.GetSolution(0);
             ScaleAndClampValues(yVal, 1, 50);
-            lines.AddData(yVal, GUIColors.GetColor(3), "w", true);
+            lines.AddData(yVal, FARConfig.GUIColors.LdColor, "w", true);
 
             yVal = transSolve.GetSolution(1);
             ScaleAndClampValues(yVal, 1, 50);
-            lines.AddData(yVal, GUIColors.GetColor(2), "u", true);
+            lines.AddData(yVal, FARConfig.GUIColors.CmColor, "u", true);
 
             yVal = transSolve.GetSolution(2);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
-            lines.AddData(yVal, GUIColors.GetColor(1), "q", true);
+            lines.AddData(yVal, FARConfig.GUIColors.CdColor, "q", true);
 
             yVal = transSolve.GetSolution(3);
             ScaleAndClampValues(yVal, 180 / Math.PI, 50);
-            lines.AddData(yVal, GUIColors.GetColor(0), "θ", true);
+            lines.AddData(yVal, FARConfig.GUIColors.ClColor, "θ", true);
 
             return lines;
         }

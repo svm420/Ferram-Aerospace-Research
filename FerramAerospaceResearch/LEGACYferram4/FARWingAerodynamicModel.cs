@@ -1476,7 +1476,7 @@ namespace ferram4
                                                     localWingCentroid,
                                                     lift,
                                                     lift.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(0),
+                                                    FARConfig.GUIColors.ClColor,
                                                     true);
                 }
                 else
@@ -1491,7 +1491,7 @@ namespace ferram4
                                                     localWingCentroid,
                                                     drag,
                                                     drag.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(1),
+                                                    FARConfig.GUIColors.CdColor,
                                                     true);
                 }
                 else

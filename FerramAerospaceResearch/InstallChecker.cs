@@ -1,4 +1,4 @@
-/*
+﻿/*
  * InstallChecker, originally by Majiir
  * Released into the public domain using a CC0 Public Domain Dedication: http://creativecommons.org/publicdomain/zero/1.0/
  */
@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
-    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    [FARAddon(800)]
     internal class InstallChecker : MonoBehaviour
     {
         protected void Start()
