@@ -20,9 +20,9 @@ namespace FerramAerospaceResearch.Resources
         {
             var asset = new LoadableAsset<Texture2D>
             {
+                AssetLoaders = FARAssets.Instance.Loaders.Textures,
                 Key = name,
-                Node = node,
-                AssetLoaders = FARAssets.Instance.Loaders.Textures
+                Node = node
             };
             SetupAsset(asset);
             return asset;

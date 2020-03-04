@@ -20,9 +20,9 @@ namespace FerramAerospaceResearch.Resources
         {
             var asset = new ShaderAssetRequest
             {
+                AssetLoaders = FARAssets.Instance.Loaders.Shaders,
                 Key = name,
-                Node = node,
-                AssetLoaders = FARAssets.Instance.Loaders.Shaders
+                Node = node
             };
             SetupAsset(asset);
             return asset;
