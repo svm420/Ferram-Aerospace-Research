@@ -21,9 +21,9 @@ namespace FerramAerospaceResearch.Config
         public string DatetimeFormat { get; set; } = "yyyy_MM_dd_HH_mm_ss";
 
         [ConfigValue("period")]
-        public Observable<int> LogPeriod { get; set; } = new Observable<int>(2);
+        public Observable<int> LogPeriod { get; } = new Observable<int>(50);
 
         [ConfigValue("flushPeriod")]
-        public Observable<int> FlushPeriod { get; set; } = new Observable<int>(10);
+        public Observable<int> FlushPeriod { get; } = new Observable<int>(10);
     }
 }

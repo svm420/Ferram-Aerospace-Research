@@ -99,7 +99,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private Coroutine coroutine;
         private bool headerWritten;
 
-        public int Period { get; set; } = 2;
+        public int Period { get; set; } = 50;
         public int FlushPeriod { get; set; } = 10;
 
         public bool IsActive
@@ -184,16 +184,25 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 headerWritten = true;
             }
 
-            int lastFlushed = Time.frameCount;
+            double logTime = Planetarium.fetch.time;
+            int flushCounter = 0;
             while (true)
             {
                 Log(gui);
-                yield return WaitForFrames(Period);
-                int frameCount = Time.frameCount;
-                if (frameCount - lastFlushed < FlushPeriod)
-                    continue;
-                writer.Flush();
-                lastFlushed = frameCount;
+                logTime += Period * 0.001;
+
+                while (Planetarium.fetch.time <= logTime)
+                    yield return null;
+
+                if (flushCounter >= FlushPeriod)
+                {
+                    writer.Flush();
+                    flushCounter = 0;
+                }
+                else
+                {
+                    flushCounter++;
+                }
             }
         }
 
@@ -201,18 +210,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         {
             FARLogger.Error(msg);
             StopLogging();
-        }
-
-        private static IEnumerator WaitForFrames(int count)
-        {
-            int i = 0;
-            while (i < count)
-            {
-                // only advance the counter if game is not paused
-                if (!Planetarium.Pause)
-                    i++;
-                yield return null;
-            }
         }
 
         private void Log(FlightGUI gui)
