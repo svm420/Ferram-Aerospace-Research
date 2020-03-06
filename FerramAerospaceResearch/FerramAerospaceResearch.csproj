@@ -110,16 +110,12 @@
     <Compile Include="FARKSPAddonMainMenuSetup.cs" />
     <Compile Include="FARKSPAddonSpaceCenterScene.cs" />
     <Compile Include="FARPartExtensions.cs" />
-    <Compile Include="FARPartGeometry\DebugVoxel.cs" />
-    <Compile Include="FARPartGeometry\DebugVoxelMesh.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\AirbreathingEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\CompoundPartGeoUpdater.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\ICrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\IntakeCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\IntegratedIntakeEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\StockProcAsteroidGeoUpdater.cs" />
-    <Compile Include="FARPartGeometry\IDebugVoxelMeshBuilder.cs" />
-    <Compile Include="FARPartGeometry\MeshBuildData.cs" />
     <Compile Include="FARPartGeometry\PartSizePair.cs" />
     <Compile Include="FARPartGeometry\PartSizePair4Bit.cs" />
     <Compile Include="FARPartGeometry\PartSizePair8Bit.cs" />

@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using FerramAerospaceResearch.Resources;
 using UnityEngine;
 
-namespace FerramAerospaceResearch.FARPartGeometry
+namespace FerramAerospaceResearch.Geometry
 {
     public struct DebugVoxel
     {
@@ -75,7 +74,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 {
                     Material mat = FARAssets.Instance.Shaders.DebugVoxel;
 
-                    if (mat?.shader == null)
+                    if (mat == null || mat.shader == null)
                         mat = FARAssets.Instance.Shaders.DebugVoxelFallback;
                     else if (mat.HasProperty(ShaderPropertyIds.Cutoff))
                         mat.SetFloat(ShaderPropertyIds.Cutoff, FARConfig.Shaders.DebugVoxel.Cutoff);

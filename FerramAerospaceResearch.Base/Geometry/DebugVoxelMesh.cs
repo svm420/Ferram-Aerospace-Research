@@ -4,13 +4,15 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FerramAerospaceResearch.FARPartGeometry
+namespace FerramAerospaceResearch.Geometry
 {
     [RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(MeshFilter))]
     public class DebugVoxelMesh : MonoBehaviour
     {
         // limit of vertices in each mesh imposed by Unity if using 16 bit indices
         public const int MaxVerticesPerSubmesh = 65535;
+
+        public static bool Use32BitIndices = false;
 
         private int currentOffset;
         private int indicesPerSubmesh;
@@ -22,10 +24,16 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public MeshFilter Filter { get; private set; }
         public MeshBuildData Data { get; } = new MeshBuildData();
 
-        public bool Use32BitIndices
+        private bool uInt32BitIndices;
+
+        private bool UInt32BitIndices
         {
-            get { return Mesh.indexFormat == IndexFormat.UInt32; }
-            set { Mesh.indexFormat = value ? IndexFormat.UInt32 : IndexFormat.UInt16; }
+            get { return uInt32BitIndices; }
+            set
+            {
+                uInt32BitIndices = value;
+                Mesh.indexFormat = value ? IndexFormat.UInt32 : IndexFormat.UInt16;
+            }
         }
 
         public static DebugVoxelMesh Create(Transform parent = null)
@@ -44,7 +52,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             FARLogger.Debug("Setting up debug voxel mesh");
             Mesh = new Mesh();
-            Use32BitIndices = FARSettingsScenarioModule.VoxelSettings.use32BitIndices;
+            UInt32BitIndices = Use32BitIndices;
             Filter = GetComponent<MeshFilter>();
             Renderer = GetComponent<MeshRenderer>();
 
@@ -86,7 +94,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             if (clearMesh)
                 Mesh.Clear();
-            Use32BitIndices = FARSettingsScenarioModule.VoxelSettings.use32BitIndices;
+            UInt32BitIndices = Use32BitIndices;
             Data.Uvs.Clear();
             Data.Vertices.Clear();
             Data.Colors.Clear();
@@ -109,7 +117,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             int meshes;
             int voxelsPerSubmesh;
-            if (Use32BitIndices)
+            if (uInt32BitIndices)
             {
                 voxelsPerSubmesh = count;
                 meshes = 1;
@@ -143,7 +151,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             builder.Build(voxel, Data, currentOffset);
 
             // check if submesh is filled, 32 bit indices can store 4B vertices so there should be no need to check
-            if (Use32BitIndices || Data.Vertices.Count < nextVertexCount)
+            if (uInt32BitIndices || Data.Vertices.Count < nextVertexCount)
                 return;
 
             currentOffset = Data.Vertices.Count;
@@ -175,7 +183,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             //TODO: replace with Mesh.SetIndices(List<int>, ...) when using Unity 2019.3+
 
-            if (Use32BitIndices)
+            if (uInt32BitIndices)
             {
                 // only 1 submesh
                 Renderer.material = builder.MeshMaterial;

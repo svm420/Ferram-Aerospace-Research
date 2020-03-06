@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace FerramAerospaceResearch.FARPartGeometry
+namespace FerramAerospaceResearch.Geometry
 {
     public interface IDebugVoxelMeshBuilder
     {

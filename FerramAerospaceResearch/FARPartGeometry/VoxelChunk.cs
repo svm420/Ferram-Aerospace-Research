@@ -43,6 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System.Collections.Generic;
+using FerramAerospaceResearch.Geometry;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
