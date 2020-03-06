@@ -44,6 +44,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
 
             /// <inheritdoc />
+            public bool HasColor
+            {
+                get { return false; }
+            }
+
+            /// <inheritdoc />
             public int UVChannels
             {
                 get { return 1; }
@@ -81,36 +87,30 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
 
             /// <inheritdoc />
-            public void Build(
-                DebugVoxel voxel,
-                List<Vector3> vertices,
-                List<List<Vector2>> uvs,
-                List<int> indices,
-                int offset
-            )
+            public void Build(DebugVoxel voxel, MeshBuildData buildData, int offset)
             {
-                int counter = vertices.Count - offset;
+                int counter = buildData.Vertices.Count - offset;
 
-                vertices.Add(voxel.BottomLeft);
-                uvs[0].Add(new Vector2(0, 0));
+                buildData.Vertices.Add(voxel.BottomLeft);
+                buildData.Uvs[0].Add(new Vector2(0, 0));
 
-                vertices.Add(voxel.TopLeft);
-                uvs[0].Add(new Vector2(0, 1));
+                buildData.Vertices.Add(voxel.TopLeft);
+                buildData.Uvs[0].Add(new Vector2(0, 1));
 
-                vertices.Add(voxel.TopRight);
-                uvs[0].Add(new Vector2(1, 1));
+                buildData.Vertices.Add(voxel.TopRight);
+                buildData.Uvs[0].Add(new Vector2(1, 1));
 
-                vertices.Add(voxel.BottomRight);
-                uvs[0].Add(new Vector2(1, 0));
+                buildData.Vertices.Add(voxel.BottomRight);
+                buildData.Uvs[0].Add(new Vector2(1, 0));
 
                 // left-handed triangles
-                indices.Add(counter);
-                indices.Add(counter + 1);
-                indices.Add(counter + 2);
+                buildData.Indices.Add(counter);
+                buildData.Indices.Add(counter + 1);
+                buildData.Indices.Add(counter + 2);
 
-                indices.Add(counter);
-                indices.Add(counter + 2);
-                indices.Add(counter + 3);
+                buildData.Indices.Add(counter);
+                buildData.Indices.Add(counter + 2);
+                buildData.Indices.Add(counter + 3);
             }
         }
     }

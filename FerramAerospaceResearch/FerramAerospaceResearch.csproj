@@ -119,6 +119,7 @@
     <Compile Include="FARPartGeometry\GeometryModification\IntegratedIntakeEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\StockProcAsteroidGeoUpdater.cs" />
     <Compile Include="FARPartGeometry\IDebugVoxelMeshBuilder.cs" />
+    <Compile Include="FARPartGeometry\MeshBuildData.cs" />
     <Compile Include="FARPartGeometry\PartSizePair.cs" />
     <Compile Include="FARPartGeometry\PartSizePair4Bit.cs" />
     <Compile Include="FARPartGeometry\PartSizePair8Bit.cs" />

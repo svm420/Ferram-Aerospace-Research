@@ -11,6 +11,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
         int VerticesPerVoxel { get; }
 
         /// <summary>
+        /// Whether each vertex has color component
+        /// </summary>
+        bool HasColor { get; }
+
+        /// <summary>
         /// Number of UV channels
         /// </summary>
         int UVChannels { get; }
@@ -37,10 +42,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
         /// Build a single voxel by appending the corresponding lists
         /// </summary>
         /// <param name="voxel">Voxel to build mesh for</param>
-        /// <param name="vertices">List of mesh vertices</param>
-        /// <param name="uvs">Nested list of mesh uvs, should have a list for each UV channel</param>
-        /// <param name="indices">List of indices</param>
+        /// <param name="buildData">Build data</param>
         /// <param name="offset">Offset to remove from indices before adding them to the list, for use with Unity submeshes</param>
-        void Build(T voxel, List<Vector3> vertices, List<List<Vector2>> uvs, List<int> indices, int offset);
+        void Build(T voxel, MeshBuildData buildData, int offset);
     }
 }

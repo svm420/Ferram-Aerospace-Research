@@ -12,7 +12,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         // limit of vertices in each mesh imposed by Unity if using 16 bit indices
         public const int MaxVerticesPerSubmesh = 65535;
 
-        private int currentSubmesh;
         private int currentOffset;
         private int indicesPerSubmesh;
         private int verticesPerSubmesh;
@@ -21,9 +20,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public Mesh Mesh { get; private set; }
         public MeshRenderer Renderer { get; private set; }
         public MeshFilter Filter { get; private set; }
-        public List<Vector3> Vertices { get; } = new List<Vector3>();
-        public List<List<Vector2>> Uvs { get; } = new List<List<Vector2>>();
-        public List<List<int>> Indices { get; } = new List<List<int>>();
+        public MeshBuildData Data { get; } = new MeshBuildData();
 
         public bool Use32BitIndices
         {
@@ -90,12 +87,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (clearMesh)
                 Mesh.Clear();
             Use32BitIndices = FARSettingsScenarioModule.VoxelSettings.use32BitIndices;
-            Uvs.Clear();
-            Vertices.Clear();
-            foreach (List<int> sublist in Indices)
+            Data.Uvs.Clear();
+            Data.Vertices.Clear();
+            Data.Colors.Clear();
+            foreach (List<int> sublist in Data.SubmeshIndices)
                 sublist.Clear();
 
-            currentSubmesh = 0;
+            Data.CurrentSubmesh = 0;
             nextVertexCount = 0;
             currentOffset = 0;
         }
@@ -128,47 +126,51 @@ namespace FerramAerospaceResearch.FARPartGeometry
             verticesPerVoxel = builder.VerticesPerVoxel;
 
             int nVertices = count * builder.VerticesPerVoxel;
-            if (Vertices.Capacity < nVertices)
-                Vertices.Capacity = nVertices;
+            if (Data.Vertices.Capacity < nVertices)
+                Data.Vertices.Capacity = nVertices;
 
-            SetupNestedList(Indices, meshes, indicesPerSubmesh);
-            SetupNestedList(Uvs, builder.UVChannels, nVertices);
+            if (builder.HasColor && Data.Colors.Capacity < nVertices)
+                Data.Colors.Capacity = nVertices;
+
+            SetupNestedList(Data.SubmeshIndices, meshes, indicesPerSubmesh);
+            SetupNestedList(Data.Uvs, builder.UVChannels, nVertices);
 
             FARLogger.InfoFormat("Reserved {0} voxels in {1} submeshes", count.ToString(), meshes.ToString());
         }
 
         public void Add<T, Builder>(Builder builder, T voxel) where Builder : IDebugVoxelMeshBuilder<T>
         {
-            builder.Build(voxel, Vertices, Uvs, Indices[currentSubmesh], currentOffset);
+            builder.Build(voxel, Data, currentOffset);
 
             // check if submesh is filled, 32 bit indices can store 4B vertices so there should be no need to check
-            if (Use32BitIndices || Vertices.Count < nextVertexCount)
+            if (Use32BitIndices || Data.Vertices.Count < nextVertexCount)
                 return;
 
-            currentOffset = Vertices.Count;
-            currentSubmesh++;
-            nextVertexCount = Vertices.Count + verticesPerSubmesh;
+            currentOffset = Data.Vertices.Count;
+            Data.CurrentSubmesh++;
+            nextVertexCount = Data.Vertices.Count + verticesPerSubmesh;
 
             // make sure the next list for indices is valid and reserve memory to for performance
-            if (Indices.Count > currentSubmesh)
+            if (Data.Indices.Count > Data.CurrentSubmesh)
                 return;
-            Indices.Add(new List<int>());
-            Indices.Capacity = indicesPerSubmesh;
+            Data.SubmeshIndices.Add(new List<int>());
+            Data.Indices.Capacity = indicesPerSubmesh;
         }
 
         public void Apply<Builder>(Builder builder) where Builder : IDebugVoxelMeshBuilder
         {
             Mesh.Clear();
             FARLogger.InfoFormat("Built voxel mesh with {0} voxels in {1} submeshes",
-                                 (Vertices.Count / verticesPerVoxel).ToString(),
-                                 Indices.Count.ToString());
+                                 (Data.Vertices.Count / verticesPerVoxel).ToString(),
+                                 Data.SubmeshIndices.Count.ToString());
 
-            Mesh.SetVertices(Vertices);
-            for (int i = 0; i < Uvs.Count; i++)
+            Mesh.SetVertices(Data.Vertices);
+            Mesh.SetColors(Data.Colors);
+            for (int i = 0; i < Data.Uvs.Count; i++)
             {
-                if (Uvs[i].Count == 0)
+                if (Data.Uvs[i].Count == 0)
                     continue;
-                Mesh.SetUVs(i, Uvs[i]);
+                Mesh.SetUVs(i, Data.Uvs[i]);
             }
 
             //TODO: replace with Mesh.SetIndices(List<int>, ...) when using Unity 2019.3+
@@ -177,18 +179,18 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 // only 1 submesh
                 Renderer.material = builder.MeshMaterial;
-                Mesh.SetIndices(Indices[0].ToArray(), builder.Topology, 0);
+                Mesh.SetIndices(Data.SubmeshIndices[0].ToArray(), builder.Topology, 0);
             }
             else
             {
                 // ignore empty index lists
-                int count = Indices.Sum(list => list.Count == 0 ? 0 : 1);
+                int count = Data.SubmeshIndices.Sum(list => list.Count == 0 ? 0 : 1);
                 Mesh.subMeshCount = count;
                 var materials = new Material[count];
 
                 int offset = 0;
                 int j = 0;
-                foreach (List<int> t in Indices)
+                foreach (List<int> t in Data.SubmeshIndices)
                 {
                     if (t.Count == 0)
                         continue;
@@ -217,8 +219,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 MeshTopology.Triangles => 3,
                 MeshTopology.Quads => 4,
                 MeshTopology.Lines => 2,
-                MeshTopology.LineStrip => 10, // variable number so use some value, list will still grow as needed
                 MeshTopology.Points => 1,
+                MeshTopology.LineStrip => throw new NotImplementedException("LineStrip is not supported"),
                 _ => throw new ArgumentOutOfRangeException(nameof(topology), topology, null)
             };
         }
