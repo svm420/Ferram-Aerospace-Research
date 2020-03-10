@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
+using UnityEngine.Networking;
 using Object = UnityEngine.Object;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -19,6 +20,9 @@ namespace FerramAerospaceResearch
         private static readonly string assetBundleRootPath =
             Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Assets");
 
+        private static readonly string texturesRootPath =
+            Path.GetFullPath(Path.Combine(Assembly.GetExecutingAssembly().Location, "../../Textures"));
+
         public static FARShaderCache ShaderCache { get; private set; }
         public static FARTextureCache TextureCache { get; private set; }
 
@@ -26,13 +30,13 @@ namespace FerramAerospaceResearch
         {
             ShaderCache = new FARShaderCache("farshaders");
             TextureCache = new FARTextureCache();
-            TextureCache.Initialize();
             StartCoroutine(LoadAssetsAsync());
         }
 
         private static IEnumerator LoadAssetsAsync()
         {
             // using a separate method to chain asset loading in the future
+            yield return TextureCache.Initialize();
             yield return ShaderCache.LoadAsync();
         }
 
@@ -173,17 +177,34 @@ namespace FerramAerospaceResearch
             public Texture2D IconSmall { get; private set; }
             public Texture2D VoxelTexture { get; private set; }
 
-            public void Initialize()
+            public IEnumerator Initialize()
             {
-                Add("icon_button_stock",
-                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_stock", false));
-                Add("icon_button_blizzy",
-                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/icon_button_blizzy", false));
-                Add("sprite_debug_voxel",
-                    GameDatabase.Instance.GetTexture("FerramAerospaceResearch/Textures/sprite_debug_voxel", false));
-                IconLarge = this["icon_button_stock"];
-                IconSmall = this["icon_button_blizzy"];
-                VoxelTexture = this["sprite_debug_voxel"];
+                yield return LoadTexture("icon_button_stock.png", texture => IconLarge = texture);
+                yield return LoadTexture("icon_button_blizzy.png", texture => IconSmall = texture);
+                yield return LoadTexture("sprite_debug_voxel.png", texture => VoxelTexture = texture);
+            }
+
+            private IEnumerator LoadTexture(string url, Action<Texture2D> onLoad)
+            {
+                string path = $@"file://{Path.Combine(texturesRootPath, url)}";
+                FARLogger.DebugFormat("Loading texture from {0}", path);
+                using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(path))
+                {
+                    yield return request.Send();
+
+                    if (!string.IsNullOrEmpty(request.error))
+                    {
+                        FARLogger.Error($"Error loading texture from {request.url}: {request.error}");
+                    }
+                    else
+                    {
+                        FARLogger.DebugFormat("Texture loaded from from {0}", request.url);
+                        Texture2D content = DownloadHandlerTexture.GetContent(request);
+                        string name = Path.GetFileNameWithoutExtension(url);
+                        Add(name, content);
+                        onLoad?.Invoke(content);
+                    }
+                }
             }
         }
     }
