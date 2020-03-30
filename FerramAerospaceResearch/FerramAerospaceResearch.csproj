@@ -86,6 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FARAeroComponents\DummyAirstreamShield.cs" />
     <Compile Include="FARAeroComponents\FlightForceContext.cs" />
     <Compile Include="FARAeroComponents\ModularFlightIntegratorRegisterer.cs" />
     <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />

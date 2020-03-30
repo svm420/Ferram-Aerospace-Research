@@ -88,6 +88,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private ArrowPointer dragArrow;
         private ArrowPointer momentArrow;
 
+        private DummyAirstreamShield shield;
+
         private bool fieldsVisible;
 
         // ReSharper disable once NotAccessedField.Global -> unity
@@ -144,7 +146,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             part.ShieldedFromAirstream = value;
             if (!value)
+            {
+                part.RemoveShield(shield);
                 return;
+            }
+
+            part.AddShield(shield);
             worldSpaceAeroForce = Vector3.zero;
             worldSpaceTorque = Vector3.zero;
 
@@ -198,6 +205,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (projectedArea.totalArea <= 0)
             {
                 part.ShieldedFromAirstream = true;
+                part.AddShield(shield);
                 if (fieldsVisible)
                 {
                     Fields["dragForce"].guiActive = false;
@@ -226,6 +234,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             else
             {
                 part.ShieldedFromAirstream = false;
+                part.RemoveShield(shield);
             }
 
             double areaForStress = projectedArea.totalArea / 6;
@@ -265,6 +274,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private void Start()
         {
+            shield = new DummyAirstreamShield {part = part};
+
             if (waterSlowDragNew < 0)
             {
                 waterSlowDragNew = PhysicsGlobals.BuoyancyWaterDragSlow;
@@ -440,8 +451,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Vector3 localForceTemp = Vector3.Dot(partLocalVelNorm, partLocalForce) * partLocalVelNorm;
 
-            partLocalForce = localForceTemp * part.dragScalar +
-                             (partLocalForce - localForceTemp) * part.bodyLiftScalar;
+            partLocalForce = localForceTemp * part.dragScalar + (partLocalForce - localForceTemp) * part.bodyLiftScalar;
             partLocalTorque *= part.dragScalar;
 
             part.dragScalar = 0;
