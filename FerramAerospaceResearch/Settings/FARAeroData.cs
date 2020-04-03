@@ -86,6 +86,9 @@ namespace FerramAerospaceResearch.Settings
                         }
                 }
 
+                if (AtmosphericConfiguration.ContainsKey(index))
+                    continue;
+
                 AtmosphericConfiguration.Add(index, settings);
             }
 

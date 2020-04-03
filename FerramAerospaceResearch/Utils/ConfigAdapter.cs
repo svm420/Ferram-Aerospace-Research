@@ -59,7 +59,10 @@ namespace FerramAerospaceResearch
 
                         load.Node = root;
                         object instance = pair.Value.Instance;
-                        pair.Value.Reflection.Load(load, ref instance);
+                        int errors = pair.Value.Reflection.Load(load, ref instance);
+
+                        if (errors > 0)
+                            FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), pair.Key);
                     }
                     else
                     {
@@ -76,7 +79,10 @@ namespace FerramAerospaceResearch
                         {
                             load.Node = node;
                             object instance = pair.Value.Instance;
-                            pair.Value.Reflection.Load(load, ref instance);
+                            int errors = pair.Value.Reflection.Load(load, ref instance);
+
+                            if (errors > 0)
+                                FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), node.name);
                         }
                     }
                 }
@@ -96,7 +102,12 @@ namespace FerramAerospaceResearch
             SaveConfigs("Custom");
         }
 
-        private static void SaveConfigs(string prefix, bool isPatch = true, string extension = ".cfg", bool force = false)
+        private static void SaveConfigs(
+            string prefix,
+            bool isPatch = true,
+            string extension = ".cfg",
+            bool force = false
+        )
         {
             var topNode = new ConfigNode();
             var node = new ConfigNode();
@@ -266,7 +277,13 @@ namespace FerramAerospaceResearch
             if (node != null)
             {
                 var load = new LoadVisitor {Node = node};
-                reflection.Load(load, ref nodeObject);
+                int errors = reflection.Load(load, ref nodeObject);
+
+                if (errors > 0)
+                    FARLogger.ErrorFormat("{0} errors while loading {1}[{2}]",
+                                          errors.ToString(),
+                                          node.name,
+                                          reflection.Name);
             }
 
             newValue = nodeObject;
@@ -291,8 +308,14 @@ namespace FerramAerospaceResearch
                 index++;
 
                 load.Node = node;
-                object item = nodeReflection.Load(load);
+                object item = nodeReflection.Load(load, out int errors);
                 SetItem(items, item, i);
+
+                if (errors > 0)
+                    FARLogger.ErrorFormat("{0} errors while loading {1}[{2}]",
+                                          errors.ToString(),
+                                          node.name,
+                                          i.ToString());
             }
 
             newValue = items;

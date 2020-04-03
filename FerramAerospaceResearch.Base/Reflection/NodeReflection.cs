@@ -205,13 +205,22 @@ namespace FerramAerospaceResearch.Reflection
             return !clone ? original : new NodeReflection(original, cloneName, mi);
         }
 
-        private void Apply(ref object owner, NodeVisitor visitor)
+        private int Apply(ref object owner, NodeVisitor visitor)
         {
+            int count = 0;
             FARLogger.TraceFormat("Applying visitor to config node {0}[{1}]", Id, Name ?? "{null}");
             foreach (ValueReflection value in Values)
             {
                 FARLogger.TraceFormat("Visiting value {0}[{1}].{2}", Id, Name, value.Name);
-                visitor.VisitValue(owner, value);
+                try
+                {
+                    visitor.VisitValue(owner, value);
+                }
+                catch (Exception e)
+                {
+                    FARLogger.ExceptionFormat(e, "Exception loading value {0} in {1}", value.Name, value.DeclaringType);
+                    count++;
+                }
             }
 
             foreach (ListValueReflection reflection in ListValues)
@@ -225,12 +234,35 @@ namespace FerramAerospaceResearch.Reflection
                                           Name ?? "{null}",
                                           reflection.NodeId,
                                           reflection.Name ?? "{null}");
-                    visitor.VisitNodeList(owner, reflection, nodeReflection);
+                    try
+                    {
+                        visitor.VisitNodeList(owner, reflection, nodeReflection);
+                    }
+                    catch (Exception e)
+                    {
+                        FARLogger.ExceptionFormat(e,
+                                                  "Exception loading node ({2}) list {0} in {1}",
+                                                  reflection.Name,
+                                                  reflection.DeclaringType,
+                                                  reflection.NodeId);
+                        count++;
+                    }
                 }
                 else
                 {
                     FARLogger.TraceFormat("Visiting list values {0}[{1}].{2}", Id, Name ?? "{null}", reflection.Name);
-                    visitor.VisitValueList(owner, reflection);
+                    try
+                    {
+                        visitor.VisitValueList(owner, reflection);
+                    }
+                    catch (Exception e)
+                    {
+                        FARLogger.ExceptionFormat(e,
+                                                  "Exception loading value list {0} in {1}",
+                                                  reflection.Name,
+                                                  reflection.DeclaringType);
+                        count++;
+                    }
                 }
             }
 
@@ -241,32 +273,48 @@ namespace FerramAerospaceResearch.Reflection
                                       Name ?? "{null}",
                                       node.Id,
                                       node.Name ?? "{null}");
-                visitor.VisitNode(owner, node);
+                try
+                {
+                    visitor.VisitNode(owner, node);
+                }
+                catch (Exception e)
+                {
+                    FARLogger.ExceptionFormat(e,
+                                              "Exception loading node {2}[{0}] in {1}",
+                                              node.Name,
+                                              node.DeclaringType,
+                                              node.Id);
+                    count++;
+                }
             }
+
+            return count;
         }
 
-        public void Save(INodeSaver saver, object instance)
+        public int Save(INodeSaver saver, object instance)
         {
             var save = new NodeReader {Saver = saver};
             var node = instance as IConfigNode;
             node?.BeforeSaved();
-            Apply(ref instance, save);
+            int count = Apply(ref instance, save);
             node?.AfterSaved();
+            return count;
         }
 
-        public void Load(INodeLoader loader, ref object instance)
+        public int Load(INodeLoader loader, ref object instance)
         {
             var load = new NodeLoader {Loader = loader};
             var node = instance as IConfigNode;
             node?.BeforeLoaded();
-            Apply(ref instance, load);
+            int count = Apply(ref instance, load);
             node?.AfterLoaded();
+            return count;
         }
 
-        public object Load(INodeLoader loader)
+        public object Load(INodeLoader loader, out int errors)
         {
             object instance = FindOrMakeInstance();
-            Load(loader, ref instance);
+            errors = Load(loader, ref instance);
             return instance;
         }
 

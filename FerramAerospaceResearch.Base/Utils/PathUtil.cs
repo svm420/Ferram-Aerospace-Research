@@ -19,22 +19,22 @@ namespace FerramAerospaceResearch
 
         public static string Combine(string path, string filename)
         {
-            return Path.IsPathRooted(filename) ? filename : Path.Combine(path, filename);
+            return IsAbsolute(filename) ? filename : Path.Combine(path, filename);
         }
 
         public static string Combine(string path, string dir1, string filename)
         {
-            return Path.IsPathRooted(filename) ? filename : Path.Combine(path, dir1, filename);
+            return IsAbsolute(filename) ? filename : Path.Combine(path, dir1, filename);
         }
 
         public static string Combine(string path, string dir1, string dir2, string filename)
         {
-            return Path.IsPathRooted(filename) ? filename : Path.Combine(path, dir1, dir2, filename);
+            return IsAbsolute(filename) ? filename : Path.Combine(path, dir1, dir2, filename);
         }
 
         public static string Combine(params string[] paths)
         {
-            return Path.IsPathRooted(paths[paths.Length - 1]) ? paths[paths.Length - 1] : Path.Combine(paths);
+            return IsAbsolute(paths[paths.Length - 1]) ? paths[paths.Length - 1] : Path.Combine(paths);
         }
 
         public static Func<string, string> CombineDelegate(string root)
@@ -50,6 +50,25 @@ namespace FerramAerospaceResearch
         public static Func<string, string, string, string> CombineDelegate3(string root)
         {
             return (d1, d2, s) => Combine(root, d1, d2, s);
+        }
+
+        public static bool IsAbsolute(string path, bool retry = true)
+        {
+            try
+            {
+                return Path.IsPathRooted(path);
+            }
+            catch (ArgumentException e)
+            {
+                if (retry)
+                {
+                    FARLogger.Warning($"Invalid path: {path}, retrying");
+                    return IsAbsolute(path.Replace("\\", "/"), false);
+                }
+
+                FARLogger.Exception(e, $"Exception in path: {path}");
+                throw;
+            }
         }
     }
 }
