@@ -9,13 +9,19 @@ namespace FerramAerospaceResearch
         public const string ModDirectoryName = "FerramAerospaceResearch";
 
         public static string PluginsDir { get; } =
-            Path.GetFullPath(Path.Combine(ReflectionUtils.ExecutingAssembly.Location, ".."));
+            AbsPath(Path.Combine(ReflectionUtils.ExecutingAssembly.Location, ".."));
 
-        public static string RootDir { get; } = Path.GetFullPath(Path.Combine(PluginsDir, ".."));
-        public static string AssetsDir { get; } = Path.Combine(RootDir, "Assets");
-        public static string TexturesDir { get; } = Path.Combine(RootDir, "Textures");
-        public static string ParentDir { get; } = Path.GetFullPath(Path.Combine(RootDir, ".."));
-        public static string PParentDir { get; } = Path.GetFullPath(Path.Combine(ParentDir, ".."));
+        public static string RootDir { get; } = AbsPath(Path.Combine(PluginsDir, ".."));
+        public static string AssetsDir { get; } = AbsPath(Path.Combine(RootDir, "Assets"));
+        public static string TexturesDir { get; } = AbsPath(Path.Combine(RootDir, "Textures"));
+        public static string ParentDir { get; } = AbsPath(Path.Combine(RootDir, ".."));
+        public static string PParentDir { get; } = AbsPath(Path.Combine(ParentDir, ".."));
+
+        public static string AbsPath(string path)
+        {
+            // C# works with either '/' or '\' but KSP will serialise '\\' as '\' and parsing will fail
+            return Path.GetFullPath(path).Replace("\\", "/");
+        }
 
         public static string Combine(string path, string filename)
         {
@@ -39,17 +45,17 @@ namespace FerramAerospaceResearch
 
         public static Func<string, string> CombineDelegate(string root)
         {
-            return s => Combine(root, s);
+            return s => AbsPath(Combine(root, s));
         }
 
         public static Func<string, string, string> CombineDelegate2(string root)
         {
-            return (d, s) => Combine(root, d, s);
+            return (d, s) => AbsPath(Combine(root, d, s));
         }
 
         public static Func<string, string, string, string> CombineDelegate3(string root)
         {
-            return (d1, d2, s) => Combine(root, d1, d2, s);
+            return (d1, d2, s) => AbsPath(Combine(root, d1, d2, s));
         }
 
         public static bool IsAbsolute(string path, bool retry = true)

@@ -21,8 +21,7 @@ namespace FerramAerospaceResearch.Config
                                    PathUtil.CombineDelegate(PathUtil.ParentDir));
 
         [ConfigValue("debugVoxel")]
-        public DebugVoxelNode DebugVoxel { get; } =
-            new DebugVoxelNode("FerramAerospaceResearch/Debug Voxel Mesh");
+        public DebugVoxelNode DebugVoxel { get; } = new DebugVoxelNode("FerramAerospaceResearch/Debug Voxel Mesh");
 
         [ConfigValue("lineRenderer")]
         public ShaderNode LineRenderer { get; } = new ShaderNode("Hidden/Internal-Colored");
