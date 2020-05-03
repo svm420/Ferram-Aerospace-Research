@@ -43,6 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
+using FerramAerospaceResearch.Settings;
 using ModularFI;
 using UnityEngine;
 
@@ -56,7 +57,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             FARLogger.Info("Modular Flight Integrator function registration started");
             ModularFlightIntegrator.RegisterUpdateAerodynamicsOverride(UpdateAerodynamics);
             ModularFlightIntegrator.RegisterUpdateThermodynamicsPre(UpdateThermodynamicsPre);
-            ModularFlightIntegrator.RegisterCalculateAreaExposedOverride(CalculateAreaRadiative);
+            ModularFlightIntegrator.RegisterCalculateAreaExposedOverride(CalculateAreaExposed);
             ModularFlightIntegrator.RegisterCalculateAreaRadiativeOverride(CalculateAreaRadiative);
             ModularFlightIntegrator.RegisterGetSunAreaOverride(CalculateSunArea);
             ModularFlightIntegrator.RegisterGetBodyAreaOverride(CalculateBodyArea);
@@ -79,7 +80,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 part.exposedArea =
                     part.machNumber > 0 ? CalculateAreaExposed(fi, part, aeroModule) : part.radiativeArea;
 
-                if (part.exposedArea > part.radiativeArea)
+                if (FARSettings.ExposedAreaLimited && part.exposedArea > part.radiativeArea)
                     part.exposedArea = part.radiativeArea; //sanity check just in case
             }
         }
@@ -97,7 +98,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Rigidbody rb = part.rb;
                 if (!rb)
                     return;
-                part.dragVector = rb.velocity + Krakensbane.GetFrameVelocity() -
+                part.dragVector = rb.velocity +
+                                  Krakensbane.GetFrameVelocity() -
                                   FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
                 part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
                 if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
@@ -177,8 +179,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return radArea > 0 ? radArea : fi.BaseFICalculateAreaRadiative(part);
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private double CalculateAreaExposed(ModularFlightIntegrator fi, Part part)
+        private static double CalculateAreaExposed(ModularFlightIntegrator fi, Part part)
         {
             FARAeroPartModule module = null;
             if (part.Modules.Contains<FARAeroPartModule>())
@@ -191,7 +192,39 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             if (aeroModule is null)
                 return fi.BaseFICalculateAreaExposed(part);
-            double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
+
+            double exposedArea = 0;
+            if (FARSettings.ExposedAreaUsesKSPHack)
+            {
+                FARAeroPartModule.ProjectedArea areas = aeroModule.ProjectedAreas;
+
+                // blame Squad for whatever this is, apparently exposed area is not base on geometry only...
+                // without these... corrections convection heating is far lower than in stock and parts don't heat up as much
+                float multiplier = 1f / part.DragCubes.DragCurveMultiplier.Evaluate((float)fi.mach);
+                for (int i = 0; i < 6; i++)
+                {
+                    float dot = Vector3.Dot(part.DragCubes.DragVector,
+                                              FARAeroPartModule.ProjectedArea.FaceDirections[i]);
+                    float dragValue =
+                        PhysicsGlobals.DragCurveValue(part.DragCubes.SurfaceCurves,
+                                                      ((dot + 1.0f) * 0.5f),
+                                                      (float)fi.mach);
+                    double hackArea = areas[i] * dragValue;
+                    float weight = part.DragCubes.WeightedDrag[i];
+
+                    float areaWeight;
+                    if (weight > 0.01 && weight < 1.0)
+                        areaWeight = 1f / weight;
+                    else
+                        areaWeight = 1f;
+
+                    exposedArea += hackArea * multiplier * areaWeight;
+                }
+            }
+            else
+            {
+                exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
+            }
 
             return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
         }

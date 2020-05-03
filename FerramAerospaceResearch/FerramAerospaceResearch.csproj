@@ -177,6 +177,7 @@
     <Compile Include="RealChuteLite\ChuteCalculator.cs" />
     <Compile Include="RealChuteLite\PhysicsWatch.cs" />
     <Compile Include="RealChuteLite\RealChuteFAR.cs" />
+    <Compile Include="Settings\Settings.cs" />
     <Compile Include="Settings\FARAeroData.cs" />
     <Compile Include="Settings\FARAeroStress.cs" />
     <Compile Include="Settings\FARAnimOverrides.cs" />
