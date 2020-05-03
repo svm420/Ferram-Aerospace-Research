@@ -52,6 +52,7 @@ using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.Resources;
 using FerramAerospaceResearch.Settings;
+using FerramAerospaceResearch.Threading;
 using KSP.IO;
 using KSP.UI.Screens;
 using UnityEngine;
@@ -602,7 +603,8 @@ namespace FerramAerospaceResearch
             node.AddValue("aeroFailureExplosions", FARDebugValues.aeroFailureExplosions);
 
             FARActionGroupConfiguration.SaveConfiguration();
-            ConfigAdapter.Save();
+            // save in off thread so that it doesn't delay scene changes
+            MainThread.StartCoroutine(ConfigAdapter.SaveAll);
             config.save();
         }
 

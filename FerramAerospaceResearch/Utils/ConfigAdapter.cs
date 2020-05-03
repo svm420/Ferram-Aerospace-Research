@@ -100,6 +100,27 @@ namespace FerramAerospaceResearch
             }
         }
 
+        public static IEnumerator SaveAll()
+        {
+            if (FARConfig.IsLoading)
+                yield break;
+
+            FARConfig.IsLoading = true;
+
+            try
+            {
+                Task task = Task.Factory.StartNew(Save);
+                yield return new WaitUntil(() => task.IsCompleted);
+
+                if (task.Exception != null)
+                    FARLogger.Exception(task.Exception, "Exception while saving up configs");
+            }
+            finally
+            {
+                FARConfig.IsLoading = false;
+            }
+        }
+
         public static void Save()
         {
             SaveConfigs("Custom");
