@@ -19,7 +19,7 @@
         <DebugType>portable</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE;ASSERT</DefineConstants>
+        <DefineConstants>DEBUG;TRACE;ASSERT;LOG_TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

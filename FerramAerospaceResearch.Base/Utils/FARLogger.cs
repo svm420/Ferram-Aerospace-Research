@@ -46,7 +46,7 @@ namespace FerramAerospaceResearch
             LogHandler.LogDebug(Tag, message);
         }
 
-        [Conditional("TRACE"), MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [Conditional("LOG_TRACE"), MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Trace(object message)
         {
             LogHandler.LogTrace(Tag, message);
@@ -103,7 +103,7 @@ namespace FerramAerospaceResearch
             LogHandler.LogDebugFormat(Tag, format, args);
         }
 
-        [Conditional("TRACE"), MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [Conditional("LOG_TRACE"), MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void TraceFormat(string format, params object[] args)
         {
             LogHandler.LogTraceFormat(Tag, format, args);
