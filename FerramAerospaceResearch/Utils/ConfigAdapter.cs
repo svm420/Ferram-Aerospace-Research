@@ -10,6 +10,7 @@ namespace FerramAerospaceResearch
     [FARAddon(700, true)]
     public class ConfigAdapter : MonoSingleton<ConfigAdapter>, IWaitForAddon, IReloadable
     {
+        private static readonly Dictionary<string, string> lastConfigs = new Dictionary<string, string>();
         public int Priority { get; set; } = 999;
 
         public void DoReload()
@@ -45,6 +46,10 @@ namespace FerramAerospaceResearch
         public static void LoadConfigs()
         {
             FARConfig.IsLoading = true;
+
+            // clear config cache so it can be rebuilt
+            lastConfigs.Clear();
+
             var load = new LoadVisitor();
             try
             {
@@ -87,9 +92,7 @@ namespace FerramAerospaceResearch
                     }
                 }
 
-                if (!FARConfig.Debug.DumpOnLoad)
-                    return;
-                SaveConfigs("Custom", true, ".cfg.far", true);
+                SaveConfigs("Custom", true, ".cfg.far", FARConfig.Debug.DumpOnLoad);
             }
             finally
             {
@@ -118,7 +121,7 @@ namespace FerramAerospaceResearch
             };
             foreach (KeyValuePair<string, ReflectedConfig> pair in ConfigReflection.Instance.Configs)
             {
-                if (!pair.Value.Reflection.ShouldSave && !force)
+                if (!pair.Value.Reflection.ShouldSave)
                     continue;
 
                 pair.Value.Reflection.Save(save, pair.Value.Instance);
@@ -127,15 +130,32 @@ namespace FerramAerospaceResearch
                     continue;
 
                 string path = PathUtil.Combine(KSPUtils.GameDataPath, $"{prefix}_{pair.Key}{extension}");
-                FARLogger.DebugFormat("Saving {0} to {1}", pair.Key, path);
+                string nodeStr;
+
                 if (!pair.Value.Reflection.AllowMultiple)
                 {
                     Serialization.MakeTopNode(topNode, node, pair.Key, null, isPatch);
-                    topNode.Save(path);
+                    nodeStr = topNode.ToString();
                 }
                 else
                 {
-                    node.Save(path);
+                    nodeStr = node.ToString();
+                }
+
+                if (lastConfigs.TryGetValue(pair.Key, out string oldStr))
+                    lastConfigs[pair.Key] = nodeStr;
+                else
+                    lastConfigs.Add(pair.Key, nodeStr);
+
+                // only write if requested or if the node has been modified, first time oldStr should be null so can be skipped
+                if (force || (!string.IsNullOrEmpty(oldStr) && nodeStr != oldStr))
+                {
+                    FARLogger.DebugFormat("Saving {0} config to {1}", pair.Key, path);
+                    System.IO.File.WriteAllText(path, nodeStr);
+                }
+                else
+                {
+                    FARLogger.DebugFormat("{0} does not require saving", pair.Key);
                 }
 
                 topNode.ClearData();
