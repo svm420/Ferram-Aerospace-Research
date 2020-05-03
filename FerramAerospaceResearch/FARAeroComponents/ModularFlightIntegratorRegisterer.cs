@@ -124,7 +124,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
                 if (aeroModule)
                     for (int i = 0; i < 6; i++)
-                        part.DragCubes.AreaOccluded[i] = (float)aeroModule.ProjectedAreas[i];
+                        part.DragCubes.AreaOccluded[FARAeroPartModule.ProjectedArea.FaceMap[i]] =
+                            (float)aeroModule.ProjectedAreas[i];
                 part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
             }
         }

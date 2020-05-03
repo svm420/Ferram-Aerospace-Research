@@ -775,6 +775,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3d.right, Vector3d.left, Vector3d.up, Vector3d.down, Vector3d.forward, Vector3d.back
             };
 
+            // a map onto stock cube faces, adds a bit of robustness when mapping from ProjectedAreas to drag cubes faces arrays
+            public static readonly int[] FaceMap =
+            {
+                (int)DragCube.DragFace.XP,
+                (int)DragCube.DragFace.XN,
+                (int)DragCube.DragFace.YP,
+                (int)DragCube.DragFace.YN,
+                (int)DragCube.DragFace.ZP,
+                (int)DragCube.DragFace.ZN
+            };
+
             // since this is POD struct, use pointer casting for quick indexed access
             public unsafe double this[int index]
             {
