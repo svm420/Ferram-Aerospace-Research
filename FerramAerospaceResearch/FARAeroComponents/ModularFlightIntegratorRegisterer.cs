@@ -117,8 +117,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     CalculateLocalDynPresAndAngularDrag(fi, part);
                 }
 
-                if (!part.DragCubes.None)
-                    part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
+                if (part.DragCubes.None)
+                    return;
+
+                // make sure drag cube areas are correct based on voxelization
+                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
+                if (aeroModule)
+                    for (int i = 0; i < 6; i++)
+                        part.DragCubes.AreaOccluded[i] = (float)aeroModule.ProjectedAreas[i];
+                part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
             }
         }
 
@@ -193,38 +200,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (aeroModule is null)
                 return fi.BaseFICalculateAreaExposed(part);
 
-            double exposedArea = 0;
-            if (FARSettings.ExposedAreaUsesKSPHack)
-            {
-                FARAeroPartModule.ProjectedArea areas = aeroModule.ProjectedAreas;
-
-                // blame Squad for whatever this is, apparently exposed area is not base on geometry only...
-                // without these... corrections convection heating is far lower than in stock and parts don't heat up as much
-                float multiplier = 1f / part.DragCubes.DragCurveMultiplier.Evaluate((float)fi.mach);
-                for (int i = 0; i < 6; i++)
-                {
-                    float dot = Vector3.Dot(part.DragCubes.DragVector,
-                                              FARAeroPartModule.ProjectedArea.FaceDirections[i]);
-                    float dragValue =
-                        PhysicsGlobals.DragCurveValue(part.DragCubes.SurfaceCurves,
-                                                      ((dot + 1.0f) * 0.5f),
-                                                      (float)fi.mach);
-                    double hackArea = areas[i] * dragValue;
-                    float weight = part.DragCubes.WeightedDrag[i];
-
-                    float areaWeight;
-                    if (weight > 0.01 && weight < 1.0)
-                        areaWeight = 1f / weight;
-                    else
-                        areaWeight = 1f;
-
-                    exposedArea += hackArea * multiplier * areaWeight;
-                }
-            }
-            else
-            {
-                exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
-            }
+            // Apparently stock exposed area is actually weighted by some function of mach number...
+            // otherwise heating is much lower
+            double exposedArea = FARSettings.ExposedAreaUsesKSPHack
+                                     ? part.DragCubes.ExposedArea
+                                     : aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
 
             return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
         }
