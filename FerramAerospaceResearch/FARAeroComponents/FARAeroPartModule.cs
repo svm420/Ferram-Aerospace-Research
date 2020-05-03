@@ -187,12 +187,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Matrix4x4 transformMatrix = part.partTransform.worldToLocalMatrix * vesselToWorldMatrix;
 
-            IncrementAreas(ref transformedArea, (float)areas.iP * Vector3.right, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.iN * -Vector3.right, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.jP * Vector3.up, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.jN * -Vector3.up, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.kP * Vector3.forward, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.kN * -Vector3.forward, transformMatrix);
+            for (int i = 0; i < 6; i++)
+                IncrementAreas(ref transformedArea, (float)areas[i] * ProjectedArea.FaceDirections[i], transformMatrix);
 
             projectedArea = transformedArea;
             projectedArea.totalArea = projectedArea.iN +
@@ -769,11 +765,36 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public struct ProjectedArea
         {
-            public double iN, iP; //area in x direction
-            public double jN, jP; //area in y direction
-            public double kN, kP; //area in z direction
+            public double iP, iN; //area in x direction
+            public double jP, jN; //area in y direction
+            public double kP, kN; //area in z direction
             public double totalArea;
 
+            public static readonly Vector3d[] FaceDirections =
+            {
+                Vector3d.right, Vector3d.left, Vector3d.up, Vector3d.down, Vector3d.forward, Vector3d.back
+            };
+
+            // since this is POD struct, use pointer casting for quick indexed access
+            public unsafe double this[int index]
+            {
+                get
+                {
+                    FARLogger.Assert(index < 7, "Index out of bounds");
+                    fixed (ProjectedArea* areas = &this)
+                    {
+                        return ((double*)areas)[index];
+                    }
+                }
+                set
+                {
+                    FARLogger.Assert(index < 7, "Index out of bounds");
+                    fixed (ProjectedArea* areas = &this)
+                    {
+                        ((double*)areas)[index] = value;
+                    }
+                }
+            }
 
             public static ProjectedArea operator +(ProjectedArea a, ProjectedArea b)
             {
