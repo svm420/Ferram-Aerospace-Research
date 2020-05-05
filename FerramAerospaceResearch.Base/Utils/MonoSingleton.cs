@@ -1,4 +1,3 @@
-using System.Threading;
 using UnityEngine;
 
 // ReSharper disable StaticMemberInGenericType -
@@ -14,10 +13,8 @@ namespace FerramAerospaceResearch
         // Check to see if we're about to be destroyed.
         private static bool shuttingDown;
 
-        private static readonly ReaderWriterLockSlim rwLock =
-            new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-
-        private static volatile T instance;
+        private static bool created;
+        private static T instance;
         private bool destroyingDuplicate;
 
         /// <summary>
@@ -33,38 +30,18 @@ namespace FerramAerospaceResearch
                     return null;
                 }
 
-                if (!rwLock.TryEnterUpgradeableReadLock(50))
-                {
-                    // already entered so the timeout should be enough to have the instance setup
+                if (created)
                     return instance;
-                }
 
-                try
-                {
-                    if (instance != null)
-                        return instance;
+                // Need to create a new GameObject to attach the singleton to.
+                var singletonObject = new GameObject($"{typeof(T).ToString()} (MonoSingleton)");
+                singletonObject.AddComponent<T>();
 
-                    rwLock.EnterWriteLock();
-                    try
-                    {
-                        // Need to create a new GameObject to attach the singleton to.
-                        var singletonObject = new GameObject($"{typeof(T).ToString()} (MonoSingleton)");
-                        singletonObject.AddComponent<T>();
+                // Make instance persistent.
+                DontDestroyOnLoad(singletonObject);
+                created = true;
 
-                        // Make instance persistent.
-                        DontDestroyOnLoad(singletonObject);
-
-                        return instance;
-                    }
-                    finally
-                    {
-                        rwLock.ExitWriteLock();
-                    }
-                }
-                finally
-                {
-                    rwLock.ExitUpgradeableReadLock();
-                }
+                return instance;
             }
         }
 

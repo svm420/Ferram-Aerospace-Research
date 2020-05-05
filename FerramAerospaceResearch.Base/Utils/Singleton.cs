@@ -10,7 +10,7 @@ namespace FerramAerospaceResearch
     public class Singleton<T> where T : class
     {
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
+        private static readonly object locker = new object();
         private static volatile T instance;
 
         protected Singleton()
@@ -18,7 +18,6 @@ namespace FerramAerospaceResearch
             if (instance == null)
             {
                 FARLogger.DebugFormat("Singleton {0} is created", this);
-                instance = this as T;
             }
             else
             {
@@ -33,30 +32,12 @@ namespace FerramAerospaceResearch
         {
             get
             {
-                rwLock.EnterUpgradeableReadLock();
-                try
+                if (instance != null)
+                    return instance;
+
+                lock (locker)
                 {
-                    if (instance != null)
-                        return instance;
-
-                    rwLock.EnterWriteLock();
-                    try
-                    {
-                        Activator.CreateInstance(typeof(T), true);
-
-                        if (instance == null)
-                            FARLogger.Error($"Error instantiating Singleton with type {typeof(T).ToString()}");
-
-                        return instance;
-                    }
-                    finally
-                    {
-                        rwLock.ExitWriteLock();
-                    }
-                }
-                finally
-                {
-                    rwLock.ExitUpgradeableReadLock();
+                    return instance ??= Activator.CreateInstance(typeof(T), true) as T;
                 }
             }
         }
