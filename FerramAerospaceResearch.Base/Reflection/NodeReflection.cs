@@ -13,6 +13,38 @@ namespace FerramAerospaceResearch.Reflection
         private const BindingFlags PrivateFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic;
         private const BindingFlags AllFlags = PublicFlags | PrivateFlags;
 
+        private static Dictionary<Type, List<Type>> children;
+
+        public static Dictionary<Type, List<Type>> Children
+        {
+            get
+            {
+                if (children != null)
+                    return children;
+
+                children = new Dictionary<Type, List<Type>>();
+
+                foreach (Pair<ConfigNodeAttribute, Type> pair in ReflectionUtils.FindAttribute<ConfigNodeAttribute>())
+                {
+                    // FARLogger.TraceFormat("{0} parent: {1}", pair.Second.Name, pair.First.Parent?.Name);
+                    if (pair.First.Parent is null)
+                        continue;
+
+                    if (!children.TryGetValue(pair.First.Parent, out List<Type> list))
+                    {
+                        list = new List<Type>();
+                        children.Add(pair.First.Parent, list);
+                    }
+
+                    FARLogger.Assert(pair.Second.IsStatic() || ReflectionUtils.FindInstance(pair.Second) != null,
+                                     "Can only attach static types and singletons");
+                    list.Add(pair.Second);
+                }
+
+                return children;
+            }
+        }
+
         /// <summary>
         /// All the created <see cref="NodeReflection"/> for each type
         /// </summary>
@@ -141,17 +173,22 @@ namespace FerramAerospaceResearch.Reflection
 
             foreach (PropertyInfo pi in properties)
                 SetupType(pi, pi.PropertyType);
+
+            if (!Children.TryGetValue(type, out List<Type> list))
+                return;
+            foreach (Type subnode in list)
+                SetupType(null, subnode);
         }
 
         private void SetupType(MemberInfo mi, Type memberType)
         {
             // if ignored, nothing to do
-            if (mi.GetCustomAttribute<ConfigValueIgnoreAttribute>() != null)
+            if (mi?.GetCustomAttribute<ConfigValueIgnoreAttribute>() != null)
                 return;
 
             // check if the type is a node and contains ConfigValueAttribute
             ConfigNodeAttribute node = memberType.GetCustomAttribute<ConfigNodeAttribute>();
-            ConfigValueAttribute value = mi.GetCustomAttribute<ConfigValueAttribute>();
+            ConfigValueAttribute value = mi?.GetCustomAttribute<ConfigValueAttribute>();
 
             // try to get the list value type
             Type listValueType = ReflectionUtils.ListType(ReflectionUtils.ConfigValueType(memberType) ?? memberType);
@@ -386,7 +423,7 @@ namespace FerramAerospaceResearch.Reflection
             /// <inheritdoc />
             public override void VisitNode(object owner, NodeReflection reflection)
             {
-                if (Loader.OnNode(reflection.GetMember(owner), reflection, out object value))
+                if (Loader.OnNode(reflection.GetMember(owner), reflection, out object value) && value != null)
                     reflection.SetMember(owner, value, true);
             }
         }

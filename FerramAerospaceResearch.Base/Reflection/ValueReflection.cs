@@ -114,7 +114,10 @@ namespace FerramAerospaceResearch.Reflection
             where T : ValueReflection
         {
             // mi may be null when reflected value is not a member of a type
-            reflection.Info = mi is null ? null : SetupInfo(mi);
+            if (mi is null)
+                reflection.Info = reflection.ValueType is null ? null : new SingletonMember(reflection.ValueType);
+            else
+                reflection.Info = SetupInfo(mi);
 
             // this involves a virtual call so cannot be used in constructors
             // if mi is null, use existing value type
@@ -131,8 +134,7 @@ namespace FerramAerospaceResearch.Reflection
         private void Setup(MemberInfo mi, Type type, ConfigValueAttribute attribute = null)
         {
             // try and get the attribute since it will override some of the options
-            if (attribute == null)
-                attribute = type?.GetCustomAttribute<ConfigValueAttribute>();
+            attribute ??= type?.GetCustomAttribute<ConfigValueAttribute>();
 
             DeclaringType = mi?.DeclaringType;
 
@@ -287,6 +289,29 @@ namespace FerramAerospaceResearch.Reflection
             {
                 object v = Info.GetValue(instance);
                 return ((IConfigValue)v).Get();
+            }
+        }
+
+        private class SingletonMember : GetterSetter
+        {
+            public readonly object Singleton;
+
+            public SingletonMember(Type type)
+            {
+                ValueType = type;
+                Singleton = type.IsStatic() ? null : ReflectionUtils.FindInstance(type);
+            }
+
+            public override Type ValueType { get; }
+
+            public override void Set(object instance, object value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override object Get(object instance)
+            {
+                return Singleton;
             }
         }
     }

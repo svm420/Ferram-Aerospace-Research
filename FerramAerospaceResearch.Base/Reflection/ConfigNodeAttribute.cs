@@ -25,12 +25,18 @@ namespace FerramAerospaceResearch.Reflection
         /// </summary>
         public readonly bool IsRoot;
 
-        public ConfigNodeAttribute(string id, bool isRoot = false, bool allowMultiple = false, bool shouldSave = true)
+        /// <summary>
+        ///     If not null attaches this config node as a child to Parent
+        /// </summary>
+        public readonly Type Parent;
+
+        public ConfigNodeAttribute(string id, bool isRoot = false, bool allowMultiple = false, bool shouldSave = true, Type parent = null)
         {
             Id = id;
             IsRoot = isRoot;
             AllowMultiple = allowMultiple;
             ShouldSave = shouldSave;
+            Parent = parent;
         }
     }
 }
