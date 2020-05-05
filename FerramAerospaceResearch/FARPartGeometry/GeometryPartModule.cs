@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -43,6 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -210,13 +211,48 @@ namespace FerramAerospaceResearch.FARPartGeometry
             _sceneSetup = true; //this exists only to ensure that OnStart has occurred first
             if (ignoreLayer0 < 0)
                 ignoreLayer0 = LayerMask.NameToLayer("TransparentFX");
+
+            if (part.collider == null &&
+                !part.Modules.Contains<ModuleWheelBase>() &&
+                !part.Modules.Contains<KerbalEVA>() &&
+                !part.Modules.Contains<FlagSite>())
+                return;
+
+            if (HighLogic.LoadedSceneIsEditor)
+                StartCoroutine(DoRebuildMeshEditor());
+            else if (HighLogic.LoadedSceneIsFlight)
+                StartCoroutine(DoRebuildMeshFlight());
+        }
+
+        private IEnumerator DoRebuildMeshFlight()
+        {
+            var waiter = new WaitForFixedUpdate();
+
+            while (!FlightGlobals.ready)
+                yield return waiter;
+
+            // have to wait for the vessel to be loaded fully so that unused model transforms are disabled before
+            // gathering meshes for voxelization
+            while (part.vessel.HoldPhysics)
+                yield return waiter;
+
+            RebuildAllMeshData();
+        }
+
+        private IEnumerator DoRebuildMeshEditor()
+        {
+            var waiter = new WaitForFixedUpdate();
+
+            while (!ApplicationLauncher.Ready)
+                yield return waiter;
+
+            // TODO: on ship loading all model transforms are enabled same as in flight, need to wait for something
+
+            RebuildAllMeshData();
         }
 
         private void FixedUpdate()
         {
-            //waiting prevents changes in physics in flight or in predictions because the voxel switches to colliders rather than meshes
-            if (ReadyToBuildMesh())
-                RebuildAllMeshData();
             if (!_ready && _meshesToUpdate == 0)
             {
                 overallMeshBounds = SetBoundsFromMeshes();
@@ -225,21 +261,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (animStates != null && animStates.Count > 0)
                 CheckAnimations();
-        }
-
-        private bool ReadyToBuildMesh()
-        {
-            bool returnVal = !_started && _sceneSetup;
-
-            returnVal &= HighLogic.LoadedSceneIsFlight && FlightGlobals.ready ||
-                         HighLogic.LoadedSceneIsEditor && ApplicationLauncher.Ready;
-
-            returnVal &= part.collider != null ||
-                         part.Modules.Contains<ModuleWheelBase>() ||
-                         part.Modules.Contains<KerbalEVA>() ||
-                         part.Modules.Contains<FlagSite>();
-
-            return returnVal;
         }
 
         public void ClearMeshData()
