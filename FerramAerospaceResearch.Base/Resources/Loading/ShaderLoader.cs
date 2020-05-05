@@ -13,13 +13,13 @@ namespace FerramAerospaceResearch.Resources.Loading
 
             if (shader == null)
             {
-                FARLogger.TraceFormat("Could not find shader {0}", assetRequest.Url);
+                FARLogger.DebugFormat("Could not find shader {0}", assetRequest.Url);
                 assetRequest.State = Progress.Error;
                 assetRequest.OnError();
             }
             else
             {
-                FARLogger.TraceFormat("Found shader {0}", assetRequest.Url);
+                FARLogger.DebugFormat("Found shader {0}", assetRequest.Url);
                 assetRequest.State = Progress.Completed;
                 assetRequest.OnLoad(shader);
             }
