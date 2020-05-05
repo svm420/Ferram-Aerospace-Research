@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.15.11.4 "Mach"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -44,7 +44,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -84,23 +83,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private int _sendUpdateTick;
         private int _meshesToUpdate = -1;
 
-        [SerializeField]
-        private bool forceUseColliders;
+        [SerializeField] private bool forceUseColliders;
 
-        [SerializeField]
-        private bool forceUseMeshes;
+        [SerializeField] private bool forceUseMeshes;
 
-        [SerializeField]
-        private bool ignoreForMainAxis;
+        [SerializeField] private bool ignoreForMainAxis;
 
-        [SerializeField]
-        private List<string> ignoredTransforms, unignoredTransforms;
+        [SerializeField] private List<string> ignoredTransforms, unignoredTransforms;
 
-        [SerializeField]
-        private bool ignoreIfNoRenderer;
+        [SerializeField] private bool ignoreIfNoRenderer;
 
-        [SerializeField]
-        private bool rebuildOnAnimation;
+        [SerializeField] private bool rebuildOnAnimation;
 
         public bool HasCrossSectionAdjusters
         {
@@ -154,44 +147,34 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Rescale(factor.absolute.linear * Vector3.one);
         }
 
-        [Conditional("DEBUG")]
         private void DebugAddMesh(Transform t)
         {
-#if DEBUG
-            debugInfo.meshes.Add(t.name);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.meshes.Add(t.name);
         }
 
-        [Conditional("DEBUG")]
         private void DebugAddCollider(Transform t)
         {
-#if DEBUG
-            debugInfo.colliders.Add(t.name);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.colliders.Add(t.name);
         }
 
-        [Conditional("DEBUG")]
         private void DebugAddNoRenderer(Transform t)
         {
-#if DEBUG
-            debugInfo.noRenderer.Add(t.name);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.noRenderer.Add(t.name);
         }
 
-        [Conditional("DEBUG")]
         private void DebugClear()
         {
-#if DEBUG
-            debugInfo.Clear();
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.Clear();
         }
 
-        [Conditional("DEBUG")]
         private void DebugPrint()
         {
-#if DEBUG
-            debugInfo.Print(part);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.Print(part);
         }
 
         public override void OnAwake()
@@ -710,14 +693,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         return null;
                     }
                 }
-#if DEBUG
-                else
-                {
-                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
-                    if (mr == null)
-                        DebugAddNoRenderer(t);
-                }
-#endif
 
                 m = mf.sharedMesh;
 
@@ -770,8 +745,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if ((forceUseColliders ||
                  isFairing ||
                  isDrill ||
-                 rendererBounds.size.x * rendererBounds.size.z <
-                 colliderBounds.size.x * colliderBounds.size.z * 1.6f &&
+                 rendererBounds.size.x * rendererBounds.size.z < colliderBounds.size.x * colliderBounds.size.z * 1.6f &&
                  rendererBounds.size.y < colliderBounds.size.y * 1.2f &&
                  (rendererBounds.center - colliderBounds.center).magnitude < 0.3f) &&
                 !forceUseMeshes)
@@ -994,7 +968,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             _ready = false;
         }
 
-#if DEBUG
         private class DebugInfoBuilder
         {
             public readonly List<string> meshes;
@@ -1017,7 +990,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             public void Print(Part p)
             {
-                var sb = new StringBuilder();
+                StringBuilder sb = StringBuilderCache.Acquire();
                 sb.Append($"{p.name} - mesh build info:");
                 if (meshes.Count > 0)
                 {
@@ -1042,6 +1015,5 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         private readonly DebugInfoBuilder debugInfo = new DebugInfoBuilder();
-#endif
     }
 }
