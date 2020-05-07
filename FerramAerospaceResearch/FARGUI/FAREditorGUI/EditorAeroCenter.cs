@@ -107,6 +107,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             float mass = 0;
             foreach (Part p in EditorLogic.SortedShipList)
             {
+                if (FARAeroUtil.IsNonphysical(p))
+                    continue;
                 float tmpMass = p.mass + p.GetResourceMass();
                 mass += tmpMass;
                 pos += p.partTransform.position * tmpMass;

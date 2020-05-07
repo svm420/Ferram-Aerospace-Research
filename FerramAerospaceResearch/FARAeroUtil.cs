@@ -350,6 +350,7 @@ namespace FerramAerospaceResearch
         public static bool IsNonphysical(Part p)
         {
             return p.physicalSignificance == Part.PhysicalSignificance.NONE ||
+                   p.Modules.Contains<LaunchClamp>() ||
                    HighLogic.LoadedSceneIsEditor &&
                    p != EditorLogic.RootPart &&
                    p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE;
@@ -670,8 +671,7 @@ namespace FerramAerospaceResearch
         // ReSharper disable once UnusedMember.Global
         public static double CalculateOswaldsEfficiency(double AR, double CosSweepAngle, double Cd0)
         {
-            double e = 1 -
-                       0.02 * FARMathUtil.PowApprox(AR, 0.7) * FARMathUtil.PowApprox(Math.Acos(CosSweepAngle), 2.2);
+            double e = 1 - 0.02 * FARMathUtil.PowApprox(AR, 0.7) * FARMathUtil.PowApprox(Math.Acos(CosSweepAngle), 2.2);
             double tmp = AR * Cd0 * Mathf.PI + 1;
             e /= tmp;
 
