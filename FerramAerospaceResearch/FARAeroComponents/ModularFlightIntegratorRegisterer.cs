@@ -76,6 +76,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
 
+                // make sure drag cube areas are correct based on voxelization
+                if (!part.DragCubes.None && aeroModule)
+                    for (int j = 0; j < 6; j++)
+                        part.DragCubes.AreaOccluded[FARAeroPartModule.ProjectedArea.FaceMap[j]] =
+                            (float)aeroModule.ProjectedAreas[j];
+
                 part.radiativeArea = CalculateAreaRadiative(fi, part, aeroModule);
                 part.exposedArea =
                     part.machNumber > 0 ? CalculateAreaExposed(fi, part, aeroModule) : part.radiativeArea;
@@ -120,12 +126,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (part.DragCubes.None)
                     return;
 
-                // make sure drag cube areas are correct based on voxelization
-                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
-                if (aeroModule)
-                    for (int i = 0; i < 6; i++)
-                        part.DragCubes.AreaOccluded[FARAeroPartModule.ProjectedArea.FaceMap[i]] =
-                            (float)aeroModule.ProjectedAreas[i];
                 part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
             }
         }

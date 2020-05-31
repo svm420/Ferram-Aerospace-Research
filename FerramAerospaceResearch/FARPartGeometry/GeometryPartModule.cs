@@ -256,6 +256,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (!_ready && _meshesToUpdate == 0)
             {
                 overallMeshBounds = SetBoundsFromMeshes();
+
+                // @DRVeyl: Force all cubes to have the same bounds.  Do this any time you recalculate a mesh
+                // (ie when handling animations since this breaks the cubes for anything other than the *current* cube.)
+                foreach (DragCube cube in part.DragCubes.Cubes)
+                {
+                    cube.Size = overallMeshBounds.size;
+                    cube.Center = overallMeshBounds.center;
+                }
+
+                part.DragCubes.ForceUpdate(true, true);
+
                 _ready = true;
             }
 
