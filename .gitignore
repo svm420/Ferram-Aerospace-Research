@@ -98,3 +98,6 @@ Unity/FerramAerospaceResearch*/[Aa]ssets/Editor/*
 # Rider generated files in Unity directory
 Unity/FerramAerospaceResearch*/[Aa]ssets/Plugins/Editor*
 Unity/FerramAerospaceResearch*/.idea
+
+# burst compiler
+Logs/*
