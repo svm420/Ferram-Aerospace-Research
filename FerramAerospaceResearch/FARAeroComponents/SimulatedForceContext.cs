@@ -1,7 +1,7 @@
 /*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
-Copyright 2019, Benjamin Chung, aka BenChung
+Copyright 2020, Benjamin Chung, aka BenChung
 
    This file is part of Ferram Aerospace Research.
 

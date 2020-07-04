@@ -1,8 +1,8 @@
 <Project>
- <PropertyGroup>
-   <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.9\</KSP_DIR_BUILD>
-   <PostBuildCommand>
+  <PropertyGroup>
+    <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.10\</KSP_DIR_BUILD>
+    <PostBuildCommand>
       cd "$(SolutionDir)""
       python -m buildtools postbuild -f "$(SolutionDir)config.json" -c "$(Configuration)" -t</PostBuildCommand>
- </PropertyGroup>
+  </PropertyGroup>
 </Project>

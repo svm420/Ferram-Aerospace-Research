@@ -9,10 +9,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 //[assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("FerramAerospaceResearch")]
-[assembly: AssemblyCopyright("Copyright © Michael Ferrara et al. 2019")]
+[assembly: AssemblyCopyright("Copyright © Michael Ferrara et al. 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: KSPAssembly("FerramAerospaceResearch", 0, 15)]
+[assembly: KSPAssembly("FerramAerospaceResearch", 0, 16)]
 //[assembly: KSPAssemblyDependency("KerbalGraph", 1, 3)]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -34,6 +34,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.15.11.4")]
-[assembly: AssemblyFileVersion("0.15.11.4")]
+[assembly: AssemblyVersion("0.16.0.0")]
+[assembly: AssemblyFileVersion("0.16.0.0")]
 [assembly: KSPAssemblyDependency("ModularFlightIntegrator", 1, 0)]
