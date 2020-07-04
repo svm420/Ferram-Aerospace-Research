@@ -42,6 +42,7 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
+using System;
 using System.Collections.Generic;
 using FerramAerospaceResearch.Geometry;
 using UnityEngine;
@@ -51,7 +52,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
     internal class VoxelChunk
     {
         private readonly PartSizePair[] voxelPoints;
-        private HashSet<Part> overridingParts;
+        private Dictionary<Part, int> partPriorities;
 
         private double _size;
 
@@ -64,7 +65,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             int iOffset,
             int jOffset,
             int kOffset,
-            HashSet<Part> overridingParts,
+            Dictionary<Part, int> partPriorities,
             bool usePartSize256
         )
         {
@@ -80,7 +81,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
 
             this.lowerCorner = lowerCorner;
-            this.overridingParts = overridingParts;
+            this.partPriorities = partPriorities;
         }
 
         // ReSharper disable ParameterHidesMember -> update member values
@@ -90,13 +91,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             int iOffset,
             int jOffset,
             int kOffset,
-            HashSet<Part> overridingParts
+            Dictionary<Part, int> partPriorities
         )
         {
             _size = size;
             offset = iOffset + 8 * jOffset + 64 * kOffset;
             this.lowerCorner = lowerCorner;
-            this.overridingParts = overridingParts;
+            this.partPriorities = partPriorities;
             // ReSharper restore ParameterHidesMember
         }
 
@@ -108,7 +109,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             foreach (PartSizePair voxelPoint in voxelPoints)
                 voxelPoint.Clear();
 
-            overridingParts = null;
+            partPriorities = null;
         }
 
         //Use when locking is unnecessary and only to change size, not part
@@ -203,10 +204,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Part currentPart = pair.part;
             //if we update the plane location with this, then we can consider replacing the part here.  Otherwise, we don't
             bool largerThanLast = pair.SetPlaneLocation(plane, location);
-            if (currentPart is null ||
-                overridingParts.Contains(p) ||
-                largerThanLast && !overridingParts.Contains(currentPart))
+            int currentPriority = PartPriority(currentPart);
+            int newPriority = PartPriority(p);
+
+            if (newPriority > currentPriority ||
+                largerThanLast && currentPriority <= 0)
                 pair.part = p;
+        }
+
+        private int PartPriority(Part p)
+        {
+            return (!(p is null) && partPriorities.TryGetValue(p, out int v)) ? v : int.MinValue;
         }
 
         // ReSharper disable once UnusedMember.Global
