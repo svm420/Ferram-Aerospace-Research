@@ -296,15 +296,14 @@ namespace FerramAerospaceResearch
                 return false;
 
             newValue = new List<object>();
-            for (int i = 0; i < values.Count; i++)
+            foreach (string str in values)
             {
-                string str = values[i];
                 if (!Serialization.TryGetValue(str, out object v, reflection.ValueType))
                     continue;
 
-                FARLogger.DebugFormat("Parsed {0}.{1}[{3}] = {2}", Node.name, reflection.Name, v, i.ToString());
                 newValue.Add(v);
             }
+            FARLogger.DebugFormat("Parsed {0}.{1} with {2} values", Node.name, reflection.Name, newValue.Count);
 
             return true;
         }

@@ -120,6 +120,7 @@
     <Compile Include="FARPartGeometry\PartSizePair.cs" />
     <Compile Include="FARPartGeometry\PartSizePair4Bit.cs" />
     <Compile Include="FARPartGeometry\PartSizePair8Bit.cs" />
+    <Compile Include="FARPartGeometry\PartTint.cs" />
     <Compile Include="FARPartGeometry\PartTransformInfo.cs" />
     <Compile Include="FARSettingsScenarioModule.cs" />
     <Compile Include="FARThreading\ThreadSafeDebugLogger.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Settings\FARAeroStress.cs" />
     <Compile Include="Settings\FARAnimOverrides.cs" />
     <Compile Include="Settings\FARPartModuleTransformExceptions.cs" />
+    <Compile Include="Settings\VoxelizationSettings.cs" />
     <Compile Include="ToolbarWrapper.cs" />
     <Compile Include="Utils\ConfigAdapter.cs" />
     <Compile Include="Utils\GameDatabaseTextureLoader.cs" />

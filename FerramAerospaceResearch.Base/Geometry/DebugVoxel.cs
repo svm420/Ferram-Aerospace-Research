@@ -7,11 +7,13 @@ namespace FerramAerospaceResearch.Geometry
     {
         public float Scale;
         public Vector3 Position;
+        public Color Color;
 
-        public DebugVoxel(Vector3 pos, float elementScale)
+        public DebugVoxel(Vector3 pos, float elementScale, Color color)
         {
             Scale = elementScale;
             Position = pos;
+            Color = color;
         }
 
         public Vector3 BottomLeft
@@ -45,7 +47,7 @@ namespace FerramAerospaceResearch.Geometry
             /// <inheritdoc />
             public bool HasColor
             {
-                get { return false; }
+                get { return true; }
             }
 
             /// <inheritdoc />
@@ -91,15 +93,19 @@ namespace FerramAerospaceResearch.Geometry
                 int counter = buildData.Vertices.Count - offset;
 
                 buildData.Vertices.Add(voxel.BottomLeft);
+                buildData.Colors.Add(voxel.Color);
                 buildData.Uvs[0].Add(new Vector2(0, 0));
 
                 buildData.Vertices.Add(voxel.TopLeft);
+                buildData.Colors.Add(voxel.Color);
                 buildData.Uvs[0].Add(new Vector2(0, 1));
 
                 buildData.Vertices.Add(voxel.TopRight);
+                buildData.Colors.Add(voxel.Color);
                 buildData.Uvs[0].Add(new Vector2(1, 1));
 
                 buildData.Vertices.Add(voxel.BottomRight);
+                buildData.Colors.Add(voxel.Color);
                 buildData.Uvs[0].Add(new Vector2(1, 0));
 
                 // left-handed triangles

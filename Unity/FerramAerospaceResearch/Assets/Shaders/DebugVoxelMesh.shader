@@ -56,6 +56,7 @@ Shader "FerramAerospaceResearch/Debug Voxel Mesh" {
 
         struct Input {
             float2 uv_MainTex;
+            fixed4 color : COLOR;
         };
 
         fixed4 _Color;
@@ -63,7 +64,7 @@ Shader "FerramAerospaceResearch/Debug Voxel Mesh" {
 
         void surf(Input IN, inout SurfaceOutput o) {
             // Albedo comes from a texture tinted by color
-            fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
+            fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color * IN.color;
             o.Albedo = c.rgb;
             o.Alpha = c.a;
 

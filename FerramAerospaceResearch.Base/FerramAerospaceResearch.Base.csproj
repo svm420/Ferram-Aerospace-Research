@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build"
+    xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -64,10 +65,10 @@
             <HintPath>$(KSP_DIR_BUILD)KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UnityWebRequestModule">
-          <HintPath>$(KSP_DIR_BUILD)KSP_x64_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+            <HintPath>$(KSP_DIR_BUILD)KSP_x64_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UnityWebRequestTextureModule">
-          <HintPath>$(KSP_DIR_BUILD)KSP_x64_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+            <HintPath>$(KSP_DIR_BUILD)KSP_x64_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -136,7 +137,7 @@
     <PropertyGroup>
         <PostBuildEvent>$(PostBuildCommand) "$(TargetPath)"</PostBuildEvent>
     </PropertyGroup>
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
     </Target>

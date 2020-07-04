@@ -14,11 +14,11 @@
    viewBox="0 0 4.2333332 4.2333335"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="sprite_debug_voxel.svg"
-   inkscape:export-filename="D:\git\Ferram-Aerospace-Research\Resources\sprite_debug_voxel.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
+   inkscape:export-filename="D:\git\Ferram-Aerospace-Research\GameData\FerramAerospaceResearch\Textures\sprite_debug_voxel.png"
+   inkscape:export-xdpi="576"
+   inkscape:export-ydpi="576">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -29,17 +29,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="44.8"
-     inkscape:cx="4.0285846"
-     inkscape:cy="7.9346478"
+     inkscape:cx="7.470738"
+     inkscape:cy="7.4722082"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g4565"
      showgrid="true"
      units="px"
-     inkscape:window-width="2560"
-     inkscape:window-height="1417"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1278"
+     inkscape:window-height="1408"
+     inkscape:window-x="-7"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      inkscape:pagecheckerboard="true">
     <inkscape:grid
        type="axonomgrid"
@@ -74,17 +74,17 @@
          inkscape:connector-curvature="0"
          id="path4556"
          d="m 0.8660254,294.49998 1.7320508,-1 1.7320507,1 v 2 l -1.7320507,1 -1.7320508,-1 z"
-         style="fill:#9a005c;fill-opacity:0.39560439;stroke:#2e001b;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:9.69999981;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#ffffff;fill-opacity:0.39195979;stroke:#aaaaaa;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:9.69999981;stroke-dasharray:none;stroke-opacity:1" />
       <path
          inkscape:connector-curvature="0"
          id="path4558"
          d="m 0.8660254,294.49998 1.7320508,1 v 2"
-         style="fill:none;stroke:#2e001b;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:9.69999981;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:none;stroke:#aaaaaa;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:9.69999981;stroke-dasharray:none;stroke-opacity:1" />
       <path
          inkscape:connector-curvature="0"
          id="path4560"
          d="m 2.5980762,295.49998 1.7320507,-1"
-         style="fill:none;stroke:#2e001b;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:9.69999981;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:none;stroke:#aaaaaa;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:9.69999981;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
 </svg>

@@ -45,6 +45,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using ferram4;
 using FerramAerospaceResearch.FARThreading;
@@ -409,7 +410,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             var sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero,
                                                             Quaternion.FromToRotation(new Vector3(0, 0, 1),
-                                                                                      orientationVector),
+                                                                orientationVector),
                                                             Vector3.one);
             Matrix4x4 vesselToSectionNormal = sectionNormalToVesselCoords.inverse;
 
@@ -421,8 +422,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             //Check y first, since it is most likely to be the flow direction
             if (y >= z && y >= x)
             {
-                int sectionCount =
-                    yCellLength + (int)(xCellLength * x / y + 1) + (int)(zCellLength * z / y + 1);
+                int sectionCount = yCellLength + (int)(xCellLength * x / y + 1) + (int)(zCellLength * z / y + 1);
                 sectionCount = Math.Min(sectionCount, crossSections.Length);
                 double angleSizeIncreaseFactor = Math.Sqrt((x + y + z) / y);
                 //account for different angles effects on voxel cube's projected area
@@ -684,8 +684,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else if (x > y && x > z)
             {
-                int sectionCount =
-                    xCellLength + (int)(yCellLength * y / x + 1) + (int)(zCellLength * z / x + 1);
+                int sectionCount = xCellLength + (int)(yCellLength * y / x + 1) + (int)(zCellLength * z / x + 1);
                 sectionCount = Math.Min(sectionCount, crossSections.Length);
                 double angleSizeIncreaseFactor = Math.Sqrt((x + y + z) / x);
                 //account for different angles effects on voxel cube's projected area
@@ -726,8 +725,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (plane.y * plane.z > 0)
                             {
                                 iSect1 = (int)(-(plane.y * jOverall + plane.z * kOverall + plane.w) + 0.5);
-                                iSect3 = (int)(-(plane.y * (jOverall + 7) + plane.z * (kOverall + 7) + plane.w) +
-                                               0.5);
+                                iSect3 = (int)(-(plane.y * (jOverall + 7) + plane.z * (kOverall + 7) + plane.w) + 0.5);
                             }
                             else
                             {
@@ -942,8 +940,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else
             {
-                int sectionCount =
-                    zCellLength + (int)(xCellLength * x / z + 1) + (int)(yCellLength * y / z + 1);
+                int sectionCount = zCellLength + (int)(xCellLength * x / z + 1) + (int)(yCellLength * y / z + 1);
                 sectionCount = Math.Min(sectionCount, crossSections.Length);
                 //account for different angles effects on voxel cube's projected area
                 double angleSizeIncreaseFactor = Math.Sqrt((x + y + z) / z);
@@ -987,8 +984,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                             if (plane.x * plane.y > 0)
                             {
                                 kSect1 = (int)(-(plane.x * iOverall + plane.y * jOverall + plane.w) + 0.5);
-                                kSect3 = (int)(-(plane.x * (iOverall + 7) + plane.y * (jOverall + 7) + plane.w) +
-                                               0.5);
+                                kSect3 = (int)(-(plane.x * (iOverall + 7) + plane.y * (jOverall + 7) + plane.w) + 0.5);
                             }
                             else
                             {
@@ -1368,14 +1364,33 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             FARLogger.Debug("Creating visual voxels");
             var builder = new DebugVoxel.Builder();
+            var tintMap = new PartTint();
             voxelMesh.Clear(builder, xLength * yLength * zLength * 128, false);
             for (int i = 0; i < xLength; i++)
             {
                 for (int j = 0; j < yLength; j++)
                 {
                     for (int k = 0; k < zLength; k++)
-                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, voxelMesh, builder);
+                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, tintMap, voxelMesh, builder);
                 }
+            }
+
+            // TODO: should be a list view in GUI
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+            {
+                StringBuilder sb = StringBuilderCache.Acquire();
+                sb.AppendLine("Tints applied:");
+                foreach (KeyValuePair<Part, Color> pair in tintMap)
+                {
+                    sb.Append(pair.Key.name)
+                      .Append(" (")
+                      .Append(pair.Key.persistentId)
+                      .Append(") = ")
+                      .AppendLine(pair.Value.ToString());
+                }
+
+                FARLogger.Debug(sb);
+                sb.Release();
             }
 
             VoxelizationThreadpool.Instance.RunOnMainThread(() =>

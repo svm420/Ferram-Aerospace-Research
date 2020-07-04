@@ -265,8 +265,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return voxelPoints[index];
         }
 
-        public void VisualizeVoxels<T>(Matrix4x4 vesselLocalToWorldMatrix, DebugVoxelMesh voxelMesh, T builder)
-            where T : IDebugVoxelMeshBuilder<DebugVoxel>
+        public void VisualizeVoxels<T>(
+            Matrix4x4 vesselLocalToWorldMatrix,
+            PartTint tint,
+            DebugVoxelMesh voxelMesh,
+            T builder
+        ) where T : IDebugVoxelMeshBuilder<DebugVoxel>
         {
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++)
@@ -282,8 +286,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         elementSize *= _size * 0.5f;
                         var vx =
                             new DebugVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner +
-                                                                                     new Vector3d(i, j, k) * _size),
-                                           (float)elementSize);
+                                               new Vector3d(i, j, k) * _size),
+                                           (float)elementSize,
+                                           tint.GetOrAdd(pair.part));
                         voxelMesh.Add(builder, vx);
                     }
         }
