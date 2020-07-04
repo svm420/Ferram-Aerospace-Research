@@ -226,8 +226,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                                  vessel.srfSpeed,
                                                                  MachNumber,
                                                                  FlightGlobals.getExternalTemperature((float)vessel
-                                                                                                          .altitude,
-                                                                                                      vessel.mainBody),
+                                                                         .altitude,
+                                                                     vessel.mainBody),
                                                                  vessel.mainBody.atmosphereAdiabaticIndex);
             float skinFrictionDragCoefficient = (float)FARAeroUtil.SkinFrictionDrag(ReynoldsNumber, MachNumber);
 
@@ -307,7 +307,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                               center);
 
                 foreach (FARWingAerodynamicModel curWing in _legacyWingModels)
-                    if (!(curWing is null))
+                    if (curWing != null)
                         center.AddForce(curWing.transform.position,
                                         curWing.PrecomputeCenterOfLift(velocityWorldVector,
                                                                        machNumber,
