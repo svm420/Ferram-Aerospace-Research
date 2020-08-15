@@ -87,7 +87,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private readonly List<IDesignConcern> _customDesignConcerns = new List<IDesignConcern>();
 
         private int _updateRateLimiter;
-        private bool _updateQueued = true;
+        public bool VoxelizationUpdateQueued { get; private set; } = true;
         private Rect guiRect;
 
         private VehicleAerodynamics _vehicleAero;
@@ -383,7 +383,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 {
                     _updateRateLimiter++;
                 }
-                else if (_updateQueued)
+                else if (VoxelizationUpdateQueued)
                 {
                     string shipname = EditorLogic.fetch.ship.shipName ?? "unknown ship";
                     FARLogger.Info("Updating " + shipname);
@@ -392,7 +392,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             }
             else
             {
-                _updateQueued = true;
+                VoxelizationUpdateQueued = true;
                 _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
             }
         }
@@ -401,7 +401,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             if (Instance._updateRateLimiter > FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)
                 Instance._updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
-            Instance._updateQueued = true;
+            Instance.VoxelizationUpdateQueued = true;
         }
 
         private void RecalculateVoxel()
@@ -409,12 +409,12 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //this has been updated recently in the past; queue an update and return
             if (_updateRateLimiter < FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate)
             {
-                _updateQueued = true;
+                VoxelizationUpdateQueued = true;
                 return;
             }
 
             _updateRateLimiter = 0;
-            _updateQueued = false;
+            VoxelizationUpdateQueued = false;
             List<Part> partList = EditorLogic.SortedShipList;
 
             _currentGeometryModules.Clear();
@@ -433,7 +433,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 else
                 {
                     _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
-                    _updateQueued = true;
+                    VoxelizationUpdateQueued = true;
                     return;
                 }
             }
@@ -453,7 +453,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             voxelWatch.Stop();
             voxelWatch.Reset();
             _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
-            _updateQueued = true;
+            VoxelizationUpdateQueued = true;
         }
 
         private void TriggerIGeometryUpdaters()
