@@ -571,6 +571,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private void DebugVisualizationGUI()
         {
             GUILayout.BeginHorizontal();
+            GUI.enabled = !Instance.VoxelizationUpdateQueued;
             if (GUILayout.Button(Localizer.Format("FARDebugVoxels")))
             {
                 Matrix4x4? localToWorldMatrix = null;
@@ -588,6 +589,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                     _vehicleAero.DebugVisualizeVoxels((Matrix4x4)localToWorldMatrix);
             }
 
+            GUI.enabled = true;
             GUILayout.EndHorizontal();
         }
 

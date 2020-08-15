@@ -229,6 +229,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                             GUILayout.Height(25.0F));
             input.otherInput = GUILayout.TextField(input.otherInput, GUILayout.ExpandWidth(true));
 
+            GUI.enabled = !EditorGUI.Instance.VoxelizationUpdateQueued;
             if (GUILayout.Button(isMachMode
                                      ? Localizer.Format("FAREditorStaticSweepMach")
                                      : Localizer.Format("FAREditorStaticSweepAoA"),
@@ -298,6 +299,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 }
             }
 
+            GUI.enabled = true;
             GUILayout.EndHorizontal();
         }
 
