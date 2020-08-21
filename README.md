@@ -2,7 +2,7 @@ Ferram Aerospace Research Continued v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-   Serious thanks:
+   Serious thanks:  
 				* a.g., for tons of bugfixes and code-refactorings   
 				* stupid_chris, for the RealChuteLite implementation  
             			* Taverius, for correcting a ton of incorrect values  
