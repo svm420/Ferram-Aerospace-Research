@@ -2,11 +2,11 @@ Ferram Aerospace Research Continued v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-   Serious thanks:
+   Serious thanks:  
 				* a.g., for tons of bugfixes and code-refactorings   
-				* stupid_chris, for the RealChuteLite implementation
+				* stupid_chris, for the RealChuteLite implementation  
             			* Taverius, for correcting a ton of incorrect values  
-				* Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts
+				* Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts  
             			* sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
             			* ialdabaoth (who is awesome), who originally created Module Manager  
                         	* Regex, for adding RPM support  
