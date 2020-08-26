@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -92,7 +92,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         [SerializeField] private List<string> ignoredTransforms, unignoredTransforms;
 
-        [SerializeField] private bool ignoreIfNoRenderer;
+        [SerializeField] private bool ignoreIfNoRenderer = true;
 
         [SerializeField] private bool rebuildOnAnimation;
 
