@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
@@ -243,10 +243,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             var waiter = new WaitForFixedUpdate();
 
+            // skip a physics frame to allow part setup to complete
+            yield return waiter;
+
             while (!ApplicationLauncher.Ready)
                 yield return waiter;
 
-            // TODO: on ship loading all model transforms are enabled same as in flight, need to wait for something
+            // don't voxelize until the part is placed
+            while (EditorLogic.SelectedPart == part)
+                yield return waiter;
 
             RebuildAllMeshData();
         }
