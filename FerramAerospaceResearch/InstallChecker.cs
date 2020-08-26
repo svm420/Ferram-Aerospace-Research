@@ -9,11 +9,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using FerramAerospaceResearch.FARUtils;
+
+// ReSharper disable PossibleMultipleEnumeration
 
 namespace FerramAerospaceResearch
 {
-    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    [FARAddon(800)]
     internal class InstallChecker : MonoBehaviour
     {
         protected void Start()

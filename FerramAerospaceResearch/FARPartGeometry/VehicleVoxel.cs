@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -45,10 +45,11 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using ferram4;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Geometry;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -68,12 +69,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private static double maxLocation = 255;
         private static byte maxLocationByte = 255;
         private static bool useHigherResVoxels;
-        private DebugVoxelMesh voxelMesh;
         private readonly object _locker = new object();
+        private DebugVoxelMesh voxelMesh;
 
         private double invElementSize;
         private VoxelChunk[,,] voxelChunks;
-        private HashSet<Part> overridingParts;
+        private Dictionary<Part, int> partPriorities;
         private int xLength, yLength, zLength;
         private int xCellLength, yCellLength, zCellLength;
         private int threadsQueued;
@@ -171,7 +172,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             var min = new Vector3d(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity);
             var max = new Vector3d(double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity);
 
-            overridingParts = new HashSet<Part>(ObjectReferenceEqualityComparer<Part>.Default);
+            partPriorities = new Dictionary<Part, int>(ObjectReferenceEqualityComparer<Part>.Default);
             //Determine bounds and "overriding parts" from geoModules
             foreach (GeometryPartModule m in geoModules)
             {
@@ -203,8 +204,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 min = Vector3d.Min(min, minBounds);
                 max = Vector3d.Max(max, maxBounds);
 
-                if (CheckPartForOverridingPartList(m))
-                    overridingParts.Add(m.part);
+                if (!(m.part is null))
+                    partPriorities.Add(m.part, PartPriorityLevel(m));
             }
 
             Vector3d size = max - min;
@@ -267,23 +268,25 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private static bool CheckPartForOverridingPartList(GeometryPartModule g)
+        private static int PartPriorityLevel(GeometryPartModule g)
         {
             if (g.part is null)
-                return false;
+                return int.MinValue;
 
             PartModuleList modules = g.part.Modules;
-            bool returnVal = modules.Contains<FARControllableSurface>() ||
-                             modules.Contains<ModuleRCS>() ||
-                             modules.Contains<ModuleEngines>() ||
-                             modules.Contains<ModuleProceduralFairing>() ||
-                             modules.Contains("ProceduralFairingBase") ||
-                             modules.Contains("ProceduralFairingSide");
 
-            if (g.HasCrossSectionAdjusters)
-                returnVal |= g.MaxCrossSectionAdjusterArea > 0;
+            if (g.HasCrossSectionAdjusters && g.MaxCrossSectionAdjusterArea > 0)
+                return int.MaxValue;
+            if (modules.Contains("ProceduralFairingSide") || modules.Contains<ModuleProceduralFairing>())
+                return 3;
+            if (modules.Contains("ProceduralFairingBase"))
+                return 2;
+            if (modules.Contains<FARControllableSurface>() ||
+                modules.Contains<ModuleRCS>() ||
+                modules.Contains<ModuleEngines>())
+                return 1;
 
-            return returnVal;
+            return -1;
         }
 
         private void BuildVoxel(List<GeometryPartModule> geoModules, bool multiThreaded, bool solidify)
@@ -407,10 +410,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             sectionThickness = ElementSize;
 
-            Matrix4x4 sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero,
-                                                                  Quaternion.FromToRotation(new Vector3(0, 0, 1),
-                                                                                            orientationVector),
-                                                                  Vector3.one);
+            var sectionNormalToVesselCoords = Matrix4x4.TRS(Vector3.zero,
+                                                            Quaternion.FromToRotation(new Vector3(0, 0, 1),
+                                                                orientationVector),
+                                                            Vector3.one);
             Matrix4x4 vesselToSectionNormal = sectionNormalToVesselCoords.inverse;
 
             //Code has multiple optimizations to take advantage of the limited range of values that are included.  They are listed below
@@ -482,7 +485,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             jSect1 = jMin >> 3;
                             jSect2 >>= 3;
-                            jSect3 = (jMax - 1) >> 3;
+                            jSect3 = jMax - 1 >> 3;
 
                             if (jSect1 >= yLength) //if the smallest sect is above the limit, they all are
                                 continue;
@@ -739,7 +742,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             iSect1 = iMin >> 3;
                             iSect2 >>= 3;
-                            iSect3 = (iMax - 1) >> 3;
+                            iSect3 = iMax - 1 >> 3;
 
                             if (iSect1 >= xLength) //if the smallest sect is above the limit, they all are
                                 continue;
@@ -998,7 +1001,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                             kSect1 = kMin >> 3;
                             kSect2 >>= 3;
-                            kSect3 = (kMax - 1) >> 3;
+                            kSect3 = kMax - 1 >> 3;
 
                             if (kSect1 >= zLength) //if the smallest sect is above the limit, they all are
                                 continue;
@@ -1246,7 +1249,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         )
         {
             // ReSharper disable BitwiseOperatorOnEnumWithoutFlags
-            var filledPlanes = VoxelOrientationPlane.NONE;
+            VoxelOrientationPlane filledPlanes = VoxelOrientationPlane.NONE;
             bool partGetsForces = true;
 
             Part p = voxel.part;
@@ -1363,14 +1366,33 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             FARLogger.Debug("Creating visual voxels");
             var builder = new DebugVoxel.Builder();
+            var tintMap = new PartTint();
             voxelMesh.Clear(builder, xLength * yLength * zLength * 128, false);
             for (int i = 0; i < xLength; i++)
             {
                 for (int j = 0; j < yLength; j++)
                 {
                     for (int k = 0; k < zLength; k++)
-                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, voxelMesh, builder);
+                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, tintMap, voxelMesh, builder);
                 }
+            }
+
+            // TODO: should be a list view in GUI
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+            {
+                StringBuilder sb = StringBuilderCache.Acquire();
+                sb.AppendLine("Tints applied:");
+                foreach (KeyValuePair<Part, Color> pair in tintMap)
+                {
+                    sb.Append(pair.Key.name)
+                      .Append(" (")
+                      .Append(pair.Key.persistentId)
+                      .Append(") = ")
+                      .AppendLine(pair.Value.ToString());
+                }
+
+                FARLogger.Debug(sb);
+                sb.Release();
             }
 
             VoxelizationThreadpool.Instance.RunOnMainThread(() =>
@@ -1404,7 +1426,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                              iSec * 8,
                                              jSec * 8,
                                              kSec * 8,
-                                             overridingParts,
+                                             partPriorities,
                                              useHigherResVoxels);
                 else
                     section.SetChunk(ElementSize,
@@ -1412,7 +1434,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                      iSec * 8,
                                      jSec * 8,
                                      kSec * 8,
-                                     overridingParts);
+                                     partPriorities);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1445,7 +1467,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                              iSec * 8,
                                              jSec * 8,
                                              kSec * 8,
-                                             overridingParts,
+                                             partPriorities,
                                              useHigherResVoxels);
                 else
                     section.SetChunk(ElementSize,
@@ -1453,7 +1475,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                      iSec * 8,
                                      jSec * 8,
                                      kSec * 8,
-                                     overridingParts);
+                                     partPriorities);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1485,7 +1507,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                              iSec * 8,
                                              jSec * 8,
                                              kSec * 8,
-                                             overridingParts,
+                                             partPriorities,
                                              useHigherResVoxels);
                 else
                     section.SetChunk(ElementSize,
@@ -1493,7 +1515,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                      iSec * 8,
                                      jSec * 8,
                                      kSec * 8,
-                                     overridingParts);
+                                     partPriorities);
 
                 voxelChunks[iSec, jSec, kSec] = section;
             }
@@ -1529,7 +1551,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                                  iSec * 8,
                                                  jSec * 8,
                                                  kSec * 8,
-                                                 overridingParts,
+                                                 partPriorities,
                                                  useHigherResVoxels);
                     else
                         section.SetChunk(ElementSize,
@@ -1537,7 +1559,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                          iSec * 8,
                                          jSec * 8,
                                          kSec * 8,
-                                         overridingParts);
+                                         partPriorities);
 
                     voxelChunks[iSec, jSec, kSec] = section;
                 }
@@ -2186,7 +2208,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Vector3d p1p2 = pt2 - pt1;
             Vector3d p1p3 = pt3 - pt1;
 
-            Vector3d tmp = Vector3d.Cross(p1p2, p1p3);
+            var tmp = Vector3d.Cross(p1p2, p1p3);
 
             var result = new Vector4d(tmp.x, tmp.y, tmp.z);
 
@@ -2205,7 +2227,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Vector3d p1p2 = pt2 - pt1;
             Vector3d p1p3 = pt3 - pt1;
 
-            Vector3d tmp = Vector3d.Cross(p1p2, p1p3);
+            var tmp = Vector3d.Cross(p1p2, p1p3);
 
             var result = new Vector4d(tmp.x, tmp.y, tmp.z);
 

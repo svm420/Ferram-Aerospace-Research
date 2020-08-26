@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -46,7 +46,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using ferram4;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
@@ -116,7 +115,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                 // If you want to use GetModuleMass, you need to start from p.partInfo.mass, not p.mass
                 CoM += partMass * (Vector3d)p.transform.TransformPoint(p.CoMOffset);
                 mass += partMass;
-                var w = p.GetComponent<FARWingAerodynamicModel>();
+                FARWingAerodynamicModel w = p.GetComponent<FARWingAerodynamicModel>();
                 if (w == null)
                     continue;
                 if (w.isShielded)
@@ -192,16 +191,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                                 2 * (prncInertRot.x * prncInertRot.z - prncInertRot.y * prncInertRot.w));
 
                 var Row2 = new Vector3(2 * (prncInertRot.x * prncInertRot.y - prncInertRot.z * prncInertRot.w),
-                                       -prncInertRot.x * prncInertRot.x +
-                                       prncInertRot.y * prncInertRot.y -
+                                       -prncInertRot.x * prncInertRot.x + prncInertRot.y * prncInertRot.y -
                                        prncInertRot.z * prncInertRot.z +
                                        prncInertRot.w * prncInertRot.w,
                                        2 * (prncInertRot.y * prncInertRot.z + prncInertRot.x * prncInertRot.w));
 
                 var Row3 = new Vector3(2 * (prncInertRot.x * prncInertRot.z + prncInertRot.y * prncInertRot.w),
                                        2 * (prncInertRot.y * prncInertRot.z - prncInertRot.x * prncInertRot.w),
-                                       -prncInertRot.x * prncInertRot.x -
-                                       prncInertRot.y * prncInertRot.y +
+                                       -prncInertRot.x * prncInertRot.x - prncInertRot.y * prncInertRot.y +
                                        prncInertRot.z * prncInertRot.z +
                                        prncInertRot.w * prncInertRot.w);
 

@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -43,14 +43,14 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARPartGeometry.GeometryModification;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Settings;
 using KSP.UI.Screens;
 using TweakScale;
 using UnityEngine;
@@ -84,23 +84,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private int _sendUpdateTick;
         private int _meshesToUpdate = -1;
 
-        [SerializeField]
-        private bool forceUseColliders;
+        [SerializeField] private bool forceUseColliders;
 
-        [SerializeField]
-        private bool forceUseMeshes;
+        [SerializeField] private bool forceUseMeshes;
 
-        [SerializeField]
-        private bool ignoreForMainAxis;
+        [SerializeField] private bool ignoreForMainAxis;
 
-        [SerializeField]
-        private List<string> ignoredTransforms, unignoredTransforms;
+        [SerializeField] private List<string> ignoredTransforms, unignoredTransforms;
 
-        [SerializeField]
-        private bool ignoreIfNoRenderer;
+        [SerializeField] private bool ignoreIfNoRenderer = true;
 
-        [SerializeField]
-        private bool rebuildOnAnimation;
+        [SerializeField] private bool rebuildOnAnimation;
 
         public bool HasCrossSectionAdjusters
         {
@@ -154,44 +148,34 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Rescale(factor.absolute.linear * Vector3.one);
         }
 
-        [Conditional("DEBUG")]
         private void DebugAddMesh(Transform t)
         {
-#if DEBUG
-            debugInfo.meshes.Add(t.name);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.meshes.Add(t.name);
         }
 
-        [Conditional("DEBUG")]
         private void DebugAddCollider(Transform t)
         {
-#if DEBUG
-            debugInfo.colliders.Add(t.name);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.colliders.Add(t.name);
         }
 
-        [Conditional("DEBUG")]
         private void DebugAddNoRenderer(Transform t)
         {
-#if DEBUG
-            debugInfo.noRenderer.Add(t.name);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.noRenderer.Add(t.name);
         }
 
-        [Conditional("DEBUG")]
         private void DebugClear()
         {
-#if DEBUG
-            debugInfo.Clear();
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.Clear();
         }
 
-        [Conditional("DEBUG")]
         private void DebugPrint()
         {
-#if DEBUG
-            debugInfo.Print(part);
-#endif
+            if (FARLogger.IsEnabledFor(LogLevel.Debug))
+                debugInfo.Print(part);
         }
 
         public override void OnAwake()
@@ -227,36 +211,72 @@ namespace FerramAerospaceResearch.FARPartGeometry
             _sceneSetup = true; //this exists only to ensure that OnStart has occurred first
             if (ignoreLayer0 < 0)
                 ignoreLayer0 = LayerMask.NameToLayer("TransparentFX");
+
+            if (part.collider == null &&
+                !part.Modules.Contains<ModuleWheelBase>() &&
+                !part.Modules.Contains<KerbalEVA>() &&
+                !part.Modules.Contains<FlagSite>())
+                return;
+
+            if (HighLogic.LoadedSceneIsEditor)
+                StartCoroutine(DoRebuildMeshEditor());
+            else if (HighLogic.LoadedSceneIsFlight)
+                StartCoroutine(DoRebuildMeshFlight());
+        }
+
+        private IEnumerator DoRebuildMeshFlight()
+        {
+            var waiter = new WaitForFixedUpdate();
+
+            while (!FlightGlobals.ready)
+                yield return waiter;
+
+            // have to wait for the vessel to be loaded fully so that unused model transforms are disabled before
+            // gathering meshes for voxelization
+            while (part.vessel.HoldPhysics)
+                yield return waiter;
+
+            RebuildAllMeshData();
+        }
+
+        private IEnumerator DoRebuildMeshEditor()
+        {
+            var waiter = new WaitForFixedUpdate();
+
+            // skip a physics frame to allow part setup to complete
+            yield return waiter;
+
+            while (!ApplicationLauncher.Ready)
+                yield return waiter;
+
+            // don't voxelize until the part is placed
+            while (EditorLogic.SelectedPart == part)
+                yield return waiter;
+
+            RebuildAllMeshData();
         }
 
         private void FixedUpdate()
         {
-            //waiting prevents changes in physics in flight or in predictions because the voxel switches to colliders rather than meshes
-            if (ReadyToBuildMesh())
-                RebuildAllMeshData();
             if (!_ready && _meshesToUpdate == 0)
             {
                 overallMeshBounds = SetBoundsFromMeshes();
+
+                // @DRVeyl: Force all cubes to have the same bounds.  Do this any time you recalculate a mesh
+                // (ie when handling animations since this breaks the cubes for anything other than the *current* cube.)
+                foreach (DragCube cube in part.DragCubes.Cubes)
+                {
+                    cube.Size = overallMeshBounds.size;
+                    cube.Center = overallMeshBounds.center;
+                }
+
+                part.DragCubes.ForceUpdate(true, true);
+
                 _ready = true;
             }
 
             if (animStates != null && animStates.Count > 0)
                 CheckAnimations();
-        }
-
-        private bool ReadyToBuildMesh()
-        {
-            bool returnVal = !_started && _sceneSetup;
-
-            returnVal &= HighLogic.LoadedSceneIsFlight && FlightGlobals.ready ||
-                         HighLogic.LoadedSceneIsEditor && ApplicationLauncher.Ready;
-
-            returnVal &= part.collider != null ||
-                         part.Modules.Contains<ModuleWheelBase>() ||
-                         part.Modules.Contains<KerbalEVA>() ||
-                         part.Modules.Contains<FlagSite>();
-
-            return returnVal;
         }
 
         public void ClearMeshData()
@@ -455,13 +475,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (module is ModuleResourceIntake intake)
                 {
-                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster =
+                    var intakeAdjuster =
                         IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
                 else
                 {
-                    IntegratedIntakeEngineCrossSectionAdjuster intakeAdjuster =
+                    var intakeAdjuster =
                         IntegratedIntakeEngineCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
@@ -475,14 +495,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (module is ModuleResourceIntake intake)
                 {
-                    IntakeCrossSectionAdjuster intakeAdjuster =
-                        IntakeCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
+                    var intakeAdjuster = IntakeCrossSectionAdjuster.CreateAdjuster(intake, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
                 else
                 {
-                    IntakeCrossSectionAdjuster intakeAdjuster =
-                        IntakeCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
+                    var intakeAdjuster = IntakeCrossSectionAdjuster.CreateAdjuster(module, worldToVesselMatrix);
                     crossSectionAdjusters.Add(intakeAdjuster);
                 }
 
@@ -659,13 +677,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private static MeshData GetColliderMeshData(Transform t)
         {
-            var mc = t.GetComponent<MeshCollider>();
+            MeshCollider mc = t.GetComponent<MeshCollider>();
             if (mc != null)
             {
                 //we can't used mc.sharedMesh because it does not contain all the triangles or verts for some reason
                 //must instead get the mesh filter and use its shared mesh
 
-                var mf = t.GetComponent<MeshFilter>();
+                MeshFilter mf = t.GetComponent<MeshFilter>();
                 if (mf != null)
                 {
                     Mesh m = mf.sharedMesh;
@@ -684,7 +702,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             else
             {
-                var bc = t.GetComponent<BoxCollider>();
+                BoxCollider bc = t.GetComponent<BoxCollider>();
                 if (bc != null)
                     return CreateBoxMeshFromBoxCollider(bc.size, bc.center);
             }
@@ -695,7 +713,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private MeshData GetVisibleMeshData(Transform t, bool skipIfNoRenderer, bool onlyMeshes)
         {
             Mesh m;
-            var mf = t.GetComponent<MeshFilter>();
+            MeshFilter mf = t.GetComponent<MeshFilter>();
 
             //if we've decided to force use of meshes, we don't want colliders
             if (onlyMeshes && t.GetComponent<MeshCollider>() != null)
@@ -705,21 +723,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 if (skipIfNoRenderer && !unignoredTransforms.Contains(t.name))
                 {
-                    var mr = t.GetComponent<MeshRenderer>();
+                    MeshRenderer mr = t.GetComponent<MeshRenderer>();
                     if (mr == null)
                     {
                         DebugAddNoRenderer(t);
                         return null;
                     }
                 }
-#if DEBUG
-                else
-                {
-                    var mr = t.GetComponent<MeshRenderer>();
-                    if (mr == null)
-                        DebugAddNoRenderer(t);
-                }
-#endif
 
                 m = mf.sharedMesh;
 
@@ -732,7 +742,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 return new MeshData(m.vertices, m.triangles, m.bounds);
             }
 
-            var smr = t.GetComponent<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
             if (smr == null)
                 return null;
             m = new Mesh();
@@ -995,7 +1005,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             _ready = false;
         }
 
-#if DEBUG
         private class DebugInfoBuilder
         {
             public readonly List<string> meshes;
@@ -1018,7 +1027,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             public void Print(Part p)
             {
-                var sb = new StringBuilder();
+                StringBuilder sb = StringBuilderCache.Acquire();
                 sb.Append($"{p.name} - mesh build info:");
                 if (meshes.Count > 0)
                 {
@@ -1043,6 +1052,5 @@ namespace FerramAerospaceResearch.FARPartGeometry
         }
 
         private readonly DebugInfoBuilder debugInfo = new DebugInfoBuilder();
-#endif
     }
 }

@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -47,7 +47,7 @@ using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Geometry;
 using UnityEngine;
 
 namespace FerramAerospaceResearch
@@ -128,7 +128,7 @@ namespace FerramAerospaceResearch
             node.AddValue("numVoxelsDebrisVessel", voxelSettings.numVoxelsDebrisVessel);
             node.AddValue("minPhysTicksPerUpdate", voxelSettings.minPhysTicksPerUpdate);
             node.AddValue("useHigherResVoxelPoints", voxelSettings.useHigherResVoxelPoints);
-            node.AddValue("use32BitIndices", voxelSettings.use32BitIndices);
+            node.AddValue("use32BitIndices", DebugVoxelMesh.Use32BitIndices);
             node.AddValue("index", settings.index);
 
             FlightGUI.SaveActiveData();
@@ -166,7 +166,7 @@ namespace FerramAerospaceResearch
             if (node.HasValue("useHigherResVoxelPoints"))
                 voxelSettings.useHigherResVoxelPoints = bool.Parse(node.GetValue("useHigherResVoxelPoints"));
             if (node.HasValue("use32BitIndices"))
-                voxelSettings.use32BitIndices = bool.Parse(node.GetValue("use32BitIndices"));
+                DebugVoxelMesh.Use32BitIndices = bool.Parse(node.GetValue("use32BitIndices"));
 
             if (index == -1)
             {
@@ -311,10 +311,10 @@ namespace FerramAerospaceResearch
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Mesh: use 32 bit indices: ");
-            voxelSettings.use32BitIndices = GUILayout.Toggle(voxelSettings.use32BitIndices,
-                                                             voxelSettings.use32BitIndices
-                                                                 ? "32 bit indices"
-                                                                 : "16 bit indices");
+            DebugVoxelMesh.Use32BitIndices = GUILayout.Toggle(DebugVoxelMesh.Use32BitIndices,
+                                                              DebugVoxelMesh.Use32BitIndices
+                                                                  ? "32 bit indices"
+                                                                  : "16 bit indices");
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -359,25 +359,17 @@ namespace FerramAerospaceResearch
         public int numVoxelsDebrisVessel;
         public int minPhysTicksPerUpdate;
         public bool useHigherResVoxelPoints;
-        public bool use32BitIndices;
 
         public FARVoxelSettings() : this(250000, 20000, 80, true)
         {
         }
 
-        public FARVoxelSettings(
-            int vesselCount,
-            int debrisCount,
-            int minPhysTicks,
-            bool higherResVoxPoints,
-            bool use32BitIndices = false
-        )
+        public FARVoxelSettings(int vesselCount, int debrisCount, int minPhysTicks, bool higherResVoxPoints)
         {
             numVoxelsControllableVessel = vesselCount;
             numVoxelsDebrisVessel = debrisCount;
             minPhysTicksPerUpdate = minPhysTicks;
             useHigherResVoxelPoints = higherResVoxPoints;
-            this.use32BitIndices = use32BitIndices;
         }
     }
 }

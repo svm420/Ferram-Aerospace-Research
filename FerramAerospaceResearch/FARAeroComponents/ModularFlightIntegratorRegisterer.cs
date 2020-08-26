@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -43,7 +43,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
  */
 
 using System;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Settings;
 using ModularFI;
 using UnityEngine;
 
@@ -57,7 +57,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             FARLogger.Info("Modular Flight Integrator function registration started");
             ModularFlightIntegrator.RegisterUpdateAerodynamicsOverride(UpdateAerodynamics);
             ModularFlightIntegrator.RegisterUpdateThermodynamicsPre(UpdateThermodynamicsPre);
-            ModularFlightIntegrator.RegisterCalculateAreaExposedOverride(CalculateAreaRadiative);
+            ModularFlightIntegrator.RegisterCalculateAreaExposedOverride(CalculateAreaExposed);
             ModularFlightIntegrator.RegisterCalculateAreaRadiativeOverride(CalculateAreaRadiative);
             ModularFlightIntegrator.RegisterGetSunAreaOverride(CalculateSunArea);
             ModularFlightIntegrator.RegisterGetBodyAreaOverride(CalculateBodyArea);
@@ -74,13 +74,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 if (!part.Modules.Contains<FARAeroPartModule>())
                     continue;
 
-                var aeroModule = part.Modules.GetModule<FARAeroPartModule>();
+                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
+
+                // make sure drag cube areas are correct based on voxelization
+                if (!part.DragCubes.None && aeroModule)
+                    for (int j = 0; j < 6; j++)
+                        part.DragCubes.AreaOccluded[FARAeroPartModule.ProjectedArea.FaceMap[j]] =
+                            (float)aeroModule.ProjectedAreas[j];
 
                 part.radiativeArea = CalculateAreaRadiative(fi, part, aeroModule);
                 part.exposedArea =
                     part.machNumber > 0 ? CalculateAreaExposed(fi, part, aeroModule) : part.radiativeArea;
 
-                if (part.exposedArea > part.radiativeArea)
+                if (FARSettings.ExposedAreaLimited && part.exposedArea > part.radiativeArea)
                     part.exposedArea = part.radiativeArea; //sanity check just in case
             }
         }
@@ -117,8 +123,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     CalculateLocalDynPresAndAngularDrag(fi, part);
                 }
 
-                if (!part.DragCubes.None)
-                    part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
+                if (part.DragCubes.None)
+                    return;
+
+                part.DragCubes.SetDrag(part.dragVectorDirLocal, (float)fi.mach);
             }
         }
 
@@ -179,8 +187,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             return radArea > 0 ? radArea : fi.BaseFICalculateAreaRadiative(part);
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private double CalculateAreaExposed(ModularFlightIntegrator fi, Part part)
+        private static double CalculateAreaExposed(ModularFlightIntegrator fi, Part part)
         {
             FARAeroPartModule module = null;
             if (part.Modules.Contains<FARAeroPartModule>())
@@ -193,7 +200,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             if (aeroModule is null)
                 return fi.BaseFICalculateAreaExposed(part);
-            double exposedArea = aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
+
+            // Apparently stock exposed area is actually weighted by some function of mach number...
+            // otherwise heating is much lower
+            double exposedArea = FARSettings.ExposedAreaUsesKSPHack
+                                     ? part.DragCubes.ExposedArea
+                                     : aeroModule.ProjectedAreaLocal(-part.dragVectorDirLocal);
 
             return exposedArea > 0 ? exposedArea : fi.BaseFICalculateAreaExposed(part);
         }

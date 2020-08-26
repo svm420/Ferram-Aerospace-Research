@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -44,7 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Collections.Generic;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Resources;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -105,7 +105,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             //Based on Kronal Vessel Viewer CoM axes rendering
             if (_rendererMaterial == null)
             {
-                Material lineMaterial = FARAssets.ShaderCache.LineRenderer.Material;
+                Material lineMaterial = FARAssets.Instance.Shaders.LineRenderer;
 
                 _rendererMaterial = new Material(lineMaterial)
                 {
@@ -160,7 +160,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         {
             var o = new GameObject();
 
-            var renderer = o.gameObject.AddComponent<LineRenderer>();
+            LineRenderer renderer = o.gameObject.AddComponent<LineRenderer>();
 
             // need to copy the material properties so the same material is not
             // reused between renderers
@@ -280,7 +280,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             for (int i = 0; i < xCoords.Length; i++)
             {
-                Vector3 vec = Vector3.up * (float)xCoords[i] - Vector3.forward * (float)(yCoords[i] * yScalingFactor);
+                Vector3 vec = Vector3.up * (float)xCoords[i] -
+                              Vector3.forward * (float)(yCoords[i] * yScalingFactor);
                 vec = transformMatrix.MultiplyVector(vec);
                 renderer.SetPosition(i, vec);
             }

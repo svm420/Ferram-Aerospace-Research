@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -54,7 +53,7 @@ namespace FerramAerospaceResearch
 {
     public static class FARAPI
     {
-        public static FARVersion Version { get; } = new FARVersion();
+        public static Version Version { get; } = new Version();
 
         /// <summary>
         ///     Toggle or enable/disable FAR speed display.
@@ -224,7 +223,7 @@ namespace FerramAerospaceResearch
             {
                 if (!p.Modules.Contains<FARControllableSurface>())
                     continue;
-                var surface = p.Modules.GetModule<FARControllableSurface>();
+                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 surface.SetDeflection(surface.flapDeflectionLevel + 1);
             }
         }
@@ -238,7 +237,7 @@ namespace FerramAerospaceResearch
             {
                 if (!p.Modules.Contains<FARControllableSurface>())
                     continue;
-                var surface = p.Modules.GetModule<FARControllableSurface>();
+                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 surface.SetDeflection(surface.flapDeflectionLevel - 1);
             }
         }
@@ -254,7 +253,7 @@ namespace FerramAerospaceResearch
             {
                 if (!p.Modules.Contains<FARControllableSurface>())
                     continue;
-                var surface = p.Modules.GetModule<FARControllableSurface>();
+                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 if (surface.isFlap)
                     return surface.flapDeflectionLevel;
             }
@@ -271,7 +270,7 @@ namespace FerramAerospaceResearch
             {
                 if (!p.Modules.Contains<FARControllableSurface>())
                     continue;
-                var surface = p.Modules.GetModule<FARControllableSurface>();
+                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 surface.brake = spoilerActive;
             }
         }
@@ -287,7 +286,7 @@ namespace FerramAerospaceResearch
             {
                 if (!p.Modules.Contains<FARControllableSurface>())
                     continue;
-                var surface = p.Modules.GetModule<FARControllableSurface>();
+                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 if (surface.isSpoiler)
                     return surface.brake;
             }
@@ -359,7 +358,7 @@ namespace FerramAerospaceResearch
                 return;
             }
 
-            var vesselAero = vessel.GetComponent<FARVesselAero>();
+            FARVesselAero vesselAero = vessel.GetComponent<FARVesselAero>();
 
             if (vesselAero == null)
             {

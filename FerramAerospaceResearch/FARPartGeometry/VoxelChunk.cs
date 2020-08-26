@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -42,7 +42,9 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
+using System;
 using System.Collections.Generic;
+using FerramAerospaceResearch.Geometry;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -50,7 +52,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
     internal class VoxelChunk
     {
         private readonly PartSizePair[] voxelPoints;
-        private HashSet<Part> overridingParts;
+        private Dictionary<Part, int> partPriorities;
 
         private double _size;
 
@@ -63,7 +65,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             int iOffset,
             int jOffset,
             int kOffset,
-            HashSet<Part> overridingParts,
+            Dictionary<Part, int> partPriorities,
             bool usePartSize256
         )
         {
@@ -79,7 +81,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
 
             this.lowerCorner = lowerCorner;
-            this.overridingParts = overridingParts;
+            this.partPriorities = partPriorities;
         }
 
         // ReSharper disable ParameterHidesMember -> update member values
@@ -89,13 +91,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
             int iOffset,
             int jOffset,
             int kOffset,
-            HashSet<Part> overridingParts
+            Dictionary<Part, int> partPriorities
         )
         {
             _size = size;
             offset = iOffset + 8 * jOffset + 64 * kOffset;
             this.lowerCorner = lowerCorner;
-            this.overridingParts = overridingParts;
+            this.partPriorities = partPriorities;
             // ReSharper restore ParameterHidesMember
         }
 
@@ -107,7 +109,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             foreach (PartSizePair voxelPoint in voxelPoints)
                 voxelPoint.Clear();
 
-            overridingParts = null;
+            partPriorities = null;
         }
 
         //Use when locking is unnecessary and only to change size, not part
@@ -202,10 +204,17 @@ namespace FerramAerospaceResearch.FARPartGeometry
             Part currentPart = pair.part;
             //if we update the plane location with this, then we can consider replacing the part here.  Otherwise, we don't
             bool largerThanLast = pair.SetPlaneLocation(plane, location);
-            if (currentPart is null ||
-                overridingParts.Contains(p) ||
-                largerThanLast && !overridingParts.Contains(currentPart))
+            int currentPriority = PartPriority(currentPart);
+            int newPriority = PartPriority(p);
+
+            if (newPriority > currentPriority ||
+                largerThanLast && currentPriority <= 0)
                 pair.part = p;
+        }
+
+        private int PartPriority(Part p)
+        {
+            return (!(p is null) && partPriorities.TryGetValue(p, out int v)) ? v : int.MinValue;
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -264,8 +273,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return voxelPoints[index];
         }
 
-        public void VisualizeVoxels<T>(Matrix4x4 vesselLocalToWorldMatrix, DebugVoxelMesh voxelMesh, T builder)
-            where T : IDebugVoxelMeshBuilder<DebugVoxel>
+        public void VisualizeVoxels<T>(
+            Matrix4x4 vesselLocalToWorldMatrix,
+            PartTint tint,
+            DebugVoxelMesh voxelMesh,
+            T builder
+        ) where T : IDebugVoxelMeshBuilder<DebugVoxel>
         {
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++)
@@ -281,8 +294,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
                         elementSize *= _size * 0.5f;
                         var vx =
                             new DebugVoxel(vesselLocalToWorldMatrix.MultiplyPoint3x4(lowerCorner +
-                                                                                     new Vector3d(i, j, k) * _size),
-                                           (float)elementSize);
+                                               new Vector3d(i, j, k) * _size),
+                                           (float)elementSize,
+                                           tint.GetOrAdd(pair.part));
                         voxelMesh.Add(builder, vx);
                     }
         }

@@ -6,6 +6,7 @@ obj
 /Ships
 /GameData/FerramAerospaceResearch/Custom*.cfg
 /GameData/FerramAerospaceResearch/FARForceDataUpdate.cfg
+GameData/FerramAerospaceResearch/Plugins/FARLogger_*
 *.suo
 *.DotSettings
 *.user
@@ -20,9 +21,6 @@ releases
 .pytest_cache
 *.pyc
 
-// unignore Debug build DLLs
-!bin/[Dd]ebug/[Ff]erram*.dll
-
 // Rider
 .idea
 
@@ -35,6 +33,7 @@ Unity/FerramAerospaceResearch*/[Oo]bj/
 Unity/FerramAerospaceResearch*/[Bb]uild/
 Unity/FerramAerospaceResearch*/[Bb]uilds/
 Unity/FerramAerospaceResearch*/[Ll]ogs/
+Unity/[Bb]uild/
 
 # Never ignore Asset meta data
 !Unity/FerramAerospaceResearch*/[Aa]ssets/**/*.meta
@@ -91,10 +90,14 @@ Unity/FerramAerospaceResearch*/[Aa]ssets/PartTools
 Unity/FerramAerospaceResearch*/[Aa]ssets/SquadCore
 
 # External editor scripts
-Unity/FerramAerospaceResearch*/[Aa]ssets/Editor/**/*
+Unity/FerramAerospaceResearch*/[Aa]ssets/Editor/*
 !Unity/FerramAerospaceResearch*/[Aa]ssets/Editor/Bundle.cs
 !Unity/FerramAerospaceResearch*/[Aa]ssets/Editor/Assets.cs
+!Unity/FerramAerospaceResearch*/[Aa]ssets/Editor/Tests/
 
 # Rider generated files in Unity directory
 Unity/FerramAerospaceResearch*/[Aa]ssets/Plugins/Editor*
 Unity/FerramAerospaceResearch*/.idea
+
+# burst compiler
+Logs/*

@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -45,11 +45,11 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using ferram4;
-using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARGUI.FAREditorGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.RealChuteLite;
+using FerramAerospaceResearch.Settings;
 using KSP.Localization;
 using UnityEngine;
 
@@ -88,22 +88,24 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private ArrowPointer dragArrow;
         private ArrowPointer momentArrow;
 
+        private DummyAirstreamShield shield;
+
         private bool fieldsVisible;
 
         // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
-            guiActive = false,
-            guiActiveEditor = false,
-            guiFormat = "F3",
-            guiUnits = "FARUnitKN")]
+                  guiActive = false,
+                  guiActiveEditor = false,
+                  guiFormat = "F3",
+                  guiUnits = "FARUnitKN")]
         public float dragForce;
 
         // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
-            guiActive = false,
-            guiActiveEditor = false,
-            guiFormat = "F3",
-            guiUnits = "FARUnitKN")]
+                  guiActive = false,
+                  guiActiveEditor = false,
+                  guiFormat = "F3",
+                  guiUnits = "FARUnitKN")]
         public float liftForce;
 
         private Transform partTransform;
@@ -144,7 +146,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
         {
             part.ShieldedFromAirstream = value;
             if (!value)
+            {
+                part.RemoveShield(shield);
                 return;
+            }
+
+            part.AddShield(shield);
             worldSpaceAeroForce = Vector3.zero;
             worldSpaceTorque = Vector3.zero;
 
@@ -180,12 +187,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Matrix4x4 transformMatrix = part.partTransform.worldToLocalMatrix * vesselToWorldMatrix;
 
-            IncrementAreas(ref transformedArea, (float)areas.iP * Vector3.right, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.iN * -Vector3.right, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.jP * Vector3.up, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.jN * -Vector3.up, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.kP * Vector3.forward, transformMatrix);
-            IncrementAreas(ref transformedArea, (float)areas.kN * -Vector3.forward, transformMatrix);
+            for (int i = 0; i < 6; i++)
+                IncrementAreas(ref transformedArea, (float)areas[i] * ProjectedArea.FaceDirections[i], transformMatrix);
 
             projectedArea = transformedArea;
             projectedArea.totalArea = projectedArea.iN +
@@ -198,6 +201,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (projectedArea.totalArea <= 0)
             {
                 part.ShieldedFromAirstream = true;
+                part.AddShield(shield);
                 if (fieldsVisible)
                 {
                     Fields["dragForce"].guiActive = false;
@@ -226,6 +230,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             else
             {
                 part.ShieldedFromAirstream = false;
+                part.RemoveShield(shield);
             }
 
             double areaForStress = projectedArea.totalArea / 6;
@@ -265,6 +270,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private void Start()
         {
+            shield = new DummyAirstreamShield {part = part};
+
             if (waterSlowDragNew < 0)
             {
                 waterSlowDragNew = PhysicsGlobals.BuoyancyWaterDragSlow;
@@ -287,8 +294,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (FARDebugValues.allowStructuralFailures && !partStressOverride)
             {
                 FARPartStressTemplate template = FARAeroStress.DetermineStressTemplate(part);
-                partStressMaxY = template.YmaxStress;
-                partStressMaxXZ = template.XZmaxStress;
+                partStressMaxY = template.YMaxStress;
+                partStressMaxXZ = template.XZMaxStress;
             }
 
             partTransform = part.partTransform;
@@ -574,7 +581,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             bool failureOccured = false;
             if (part.Modules.Contains<ModuleProceduralFairing>())
             {
-                var fairing = part.Modules.GetModule<ModuleProceduralFairing>();
+                ModuleProceduralFairing fairing = part.Modules.GetModule<ModuleProceduralFairing>();
                 fairing.ejectionForce = 0.5f;
 
                 fairing.DeployFairing();
@@ -629,7 +636,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                     worldLiftArrow,
                                                     worldLiftArrow.magnitude *
                                                     FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(0),
+                                                    FARConfig.GUIColors.ClColor,
                                                     true);
                 }
                 else
@@ -645,7 +652,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                     worldDragArrow,
                                                     worldDragArrow.magnitude *
                                                     FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(1),
+                                                    FARConfig.GUIColors.CdColor,
                                                     true);
                 }
                 else
@@ -663,7 +670,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                           worldSpaceTorque,
                                                           worldSpaceTorque.magnitude *
                                                           FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                          GUIColors.GetColor(2),
+                                                          FARConfig.GUIColors.CmColor,
                                                           true);
                     }
                     else
@@ -725,11 +732,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
             FARPartStressTemplate defaultTemplate = FARAeroStress.DetermineStressTemplate(part);
             if (stressTemplate.HasValue("YmaxStress"))
                 if (!double.TryParse(stressTemplate.GetValue("YmaxStress"), out partStressMaxY))
-                    partStressMaxY = defaultTemplate.YmaxStress;
+                    partStressMaxY = defaultTemplate.YMaxStress;
             // ReSharper disable once InvertIf
             if (stressTemplate.HasValue("XZmaxStress"))
                 if (!double.TryParse(stressTemplate.GetValue("XZmaxStress"), out partStressMaxXZ))
-                    partStressMaxXZ = defaultTemplate.XZmaxStress;
+                    partStressMaxXZ = defaultTemplate.XZMaxStress;
         }
 
         private void OnDestroy()
@@ -758,11 +765,47 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public struct ProjectedArea
         {
-            public double iN, iP; //area in x direction
-            public double jN, jP; //area in y direction
-            public double kN, kP; //area in z direction
+            public double iP, iN; //area in x direction
+            public double jP, jN; //area in y direction
+            public double kP, kN; //area in z direction
             public double totalArea;
 
+            public static readonly Vector3d[] FaceDirections =
+            {
+                Vector3d.right, Vector3d.left, Vector3d.up, Vector3d.down, Vector3d.forward, Vector3d.back
+            };
+
+            // a map onto stock cube faces, adds a bit of robustness when mapping from ProjectedAreas to drag cubes faces arrays
+            public static readonly int[] FaceMap =
+            {
+                (int)DragCube.DragFace.XP,
+                (int)DragCube.DragFace.XN,
+                (int)DragCube.DragFace.YP,
+                (int)DragCube.DragFace.YN,
+                (int)DragCube.DragFace.ZP,
+                (int)DragCube.DragFace.ZN
+            };
+
+            // since this is POD struct, use pointer casting for quick indexed access
+            public unsafe double this[int index]
+            {
+                get
+                {
+                    FARLogger.Assert(index < 7, "Index out of bounds");
+                    fixed (ProjectedArea* areas = &this)
+                    {
+                        return ((double*)areas)[index];
+                    }
+                }
+                set
+                {
+                    FARLogger.Assert(index < 7, "Index out of bounds");
+                    fixed (ProjectedArea* areas = &this)
+                    {
+                        ((double*)areas)[index] = value;
+                    }
+                }
+            }
 
             public static ProjectedArea operator +(ProjectedArea a, ProjectedArea b)
             {

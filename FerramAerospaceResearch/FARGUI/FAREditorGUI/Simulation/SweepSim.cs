@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -99,10 +99,10 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             }
 
             var data = new GraphData {xValues = AlphaValues};
-            data.AddData(ClValues, GUIColors.GetColor(0), Localizer.Format("FARAbbrevCl"), true);
-            data.AddData(CdValues, GUIColors.GetColor(1), Localizer.Format("FARAbbrevCd"), true);
-            data.AddData(CmValues, GUIColors.GetColor(2), Localizer.Format("FARAbbrevCm"), true);
-            data.AddData(LDValues, GUIColors.GetColor(3), Localizer.Format("FARAbbrevL_D"), true);
+            data.AddData(ClValues, FARConfig.GUIColors.ClColor, Localizer.Format("FARAbbrevCl"), true);
+            data.AddData(CdValues, FARConfig.GUIColors.CdColor, Localizer.Format("FARAbbrevCd"), true);
+            data.AddData(CmValues, FARConfig.GUIColors.CmColor, Localizer.Format("FARAbbrevCm"), true);
+            data.AddData(LDValues, FARConfig.GUIColors.LdColor, Localizer.Format("FARAbbrevL_D"), true);
 
             return data;
         }
@@ -168,17 +168,17 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             }
 
             var data = new GraphData {xValues = AlphaValues};
-            data.AddData(ClValues2, GUIColors.GetColor(0) * 0.5f, "Cl2", false);
-            data.AddData(ClValues, GUIColors.GetColor(0), Localizer.Format("FARAbbrevCl"), true);
+            data.AddData(ClValues2, FARConfig.GUIColors.ClColor * 0.5f, "Cl2", false);
+            data.AddData(ClValues, FARConfig.GUIColors.ClColor, Localizer.Format("FARAbbrevCl"), true);
 
-            data.AddData(CdValues2, GUIColors.GetColor(1) * 0.5f, "Cd2", false);
-            data.AddData(CdValues, GUIColors.GetColor(1), Localizer.Format("FARAbbrevCd"), true);
+            data.AddData(CdValues2, FARConfig.GUIColors.CdColor * 0.5f, "Cd2", false);
+            data.AddData(CdValues, FARConfig.GUIColors.CdColor, Localizer.Format("FARAbbrevCd"), true);
 
-            data.AddData(CmValues2, GUIColors.GetColor(2) * 0.5f, "Cm2", false);
-            data.AddData(CmValues, GUIColors.GetColor(2), Localizer.Format("FARAbbrevCm"), true);
+            data.AddData(CmValues2, FARConfig.GUIColors.CmColor * 0.5f, "Cm2", false);
+            data.AddData(CmValues, FARConfig.GUIColors.CmColor, Localizer.Format("FARAbbrevCm"), true);
 
-            data.AddData(LDValues2, GUIColors.GetColor(3) * 0.5f, "L/D2", false);
-            data.AddData(LDValues, GUIColors.GetColor(3), Localizer.Format("FARAbbrevL_D"), true);
+            data.AddData(LDValues2, FARConfig.GUIColors.LdColor * 0.5f, "L/D2", false);
+            data.AddData(LDValues, FARConfig.GUIColors.LdColor, Localizer.Format("FARAbbrevL_D"), true);
 
 
             return data;

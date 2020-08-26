@@ -1,5 +1,4 @@
 using System;
-using FerramAerospaceResearch.FARUtils;
 using UnityEngine;
 
 /* RealChuteLite is the work of Christophe Savard (stupid_chris), and is licensed the same way than the rest of FAR is.
@@ -20,7 +19,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 if (prefab == null || !prefab.Modules.Contains<RealChuteFAR>())
                     continue;
                 //Updates the part's GetInfo.
-                var module = prefab.Modules.GetModule<RealChuteFAR>();
+                RealChuteFAR module = prefab.Modules.GetModule<RealChuteFAR>();
                 DragCubeSystem.Instance.LoadDragCubes(prefab);
                 DragCube semi = prefab.DragCubes.Cubes.Find(c => c.Name == "SEMIDEPLOYED"),
                          deployed = prefab.DragCubes.Cubes.Find(c => c.Name == "DEPLOYED");

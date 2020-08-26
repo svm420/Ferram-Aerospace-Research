@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -46,8 +46,7 @@ using System;
 using System.Collections.Generic;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.FARAeroComponents;
-using FerramAerospaceResearch.FARGUI;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Settings;
 using KSP.Localization;
 using TweakScale;
 using UnityEngine;
@@ -81,15 +80,19 @@ namespace ferram4
 
         public float oldMassMultiplier = -1f;
 
-        [KSPField(isPersistant = false)] public double MAC;
+        [KSPField(isPersistant = false)]
+        public double MAC;
 
         public double MAC_actual;
 
-        [KSPField(isPersistant = false)] public double e;
+        [KSPField(isPersistant = false)]
+        public double e;
 
-        [KSPField(isPersistant = false)] public int nonSideAttach; //This is for ailerons and the small ctrl surf
+        [KSPField(isPersistant = false)]
+        public int nonSideAttach; //This is for ailerons and the small ctrl surf
 
-        [KSPField(isPersistant = false)] public double TaperRatio;
+        [KSPField(isPersistant = false)]
+        public double TaperRatio;
 
         [KSPField(isPersistant = false, guiActive = true, guiName = "FARWingStalled")]
         protected double stall;
@@ -98,11 +101,14 @@ namespace ferram4
 
         private double piARe = 1; //induced drag factor
 
-        [KSPField(isPersistant = false)] public double b_2; //span
+        [KSPField(isPersistant = false)]
+        public double b_2; //span
 
         public double b_2_actual; //span
 
-        [KSPField(isPersistant = false)] public double MidChordSweep;
+        [KSPField(isPersistant = false)]
+        public double MidChordSweep;
+
         private double MidChordSweepSideways;
 
         private double cosSweepAngle;
@@ -120,18 +126,18 @@ namespace ferram4
 
         // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
-            guiActive = false,
-            guiActiveEditor = false,
-            guiFormat = "F3",
-            guiUnits = "FARUnitKN")]
+                  guiActive = false,
+                  guiActiveEditor = false,
+                  guiFormat = "F3",
+                  guiUnits = "FARUnitKN")]
         public float dragForceWing;
 
         // ReSharper disable once NotAccessedField.Global -> unity
         [KSPField(isPersistant = false,
-            guiActive = false,
-            guiActiveEditor = false,
-            guiFormat = "F3",
-            guiUnits = "FARUnitKN")]
+                  guiActive = false,
+                  guiActiveEditor = false,
+                  guiFormat = "F3",
+                  guiUnits = "FARUnitKN")]
         public float liftForceWing;
 
         private double rawLiftSlope;
@@ -146,7 +152,8 @@ namespace ferram4
         private Vector3d perp = Vector3d.zero;
         private Vector3d liftDirection = Vector3d.zero;
 
-        [KSPField(isPersistant = false)] public Vector3 rootMidChordOffsetFromOrig;
+        [KSPField(isPersistant = false)]
+        public Vector3 rootMidChordOffsetFromOrig;
 
         // in local coordinates
         private Vector3d localWingCentroid = Vector3d.zero;
@@ -212,7 +219,7 @@ namespace ferram4
 
         public void NUFAR_CalculateExposedAreaFactor()
         {
-            var a = part.Modules.GetModule<FARAeroPartModule>();
+            FARAeroPartModule a = part.Modules.GetModule<FARAeroPartModule>();
 
             NUFAR_areaExposedFactor = Math.Min(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
             NUFAR_totalExposedAreaFactor = Math.Max(a.ProjectedAreas.kN, a.ProjectedAreas.kP);
@@ -383,10 +390,7 @@ namespace ferram4
         {
             Vector3d WC = rootMidChordOffsetFromOrig;
             if (nonSideAttach <= 0)
-                WC += -b_2_actual /
-                      3 *
-                      (1 + TaperRatio * 2) /
-                      (1 + TaperRatio) *
+                WC += -b_2_actual / 3 * (1 + TaperRatio * 2) / (1 + TaperRatio) *
                       (Vector3d.right * srfAttachNegative +
                        Vector3d.up * Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
             else
@@ -488,8 +492,8 @@ namespace ferram4
 
             MidChordSweepSideways =
                 (Math.PI * 0.5 -
-                 Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) + MidChordSweepSideways * 4 / transformed_AR)
-                ) *
+                 Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) +
+                           MidChordSweepSideways * 4 / transformed_AR)) *
                 MidChordSweepSideways *
                 0.5;
 
@@ -507,14 +511,14 @@ namespace ferram4
             if (!FARDebugValues.allowStructuralFailures)
                 return;
             foreach (FARPartStressTemplate temp in FARAeroStress.StressTemplates)
-                if (temp.name == "wingStress")
+                if (temp.Name == "wingStress")
                 {
                     FARPartStressTemplate template = temp;
 
-                    YmaxForce = template.YmaxStress; //in MPa
+                    YmaxForce = template.YMaxStress; //in MPa
                     YmaxForce *= S;
 
-                    XZmaxForce = template.XZmaxStress;
+                    XZmaxForce = template.XZMaxStress;
                     XZmaxForce *= S;
                     break;
                 }
@@ -556,8 +560,7 @@ namespace ferram4
                 {
                     CurWingCentroid = WingCentroid();
 
-                    Vector3d velocity = rb.GetPointVelocity(CurWingCentroid) +
-                                        Krakensbane.GetFrameVelocity() -
+                    Vector3d velocity = rb.GetPointVelocity(CurWingCentroid) + Krakensbane.GetFrameVelocity() -
                                         FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
 
                     double v_scalar = velocity.magnitude;
@@ -881,7 +884,7 @@ namespace ferram4
 
             foreach (Part p in part.children)
             {
-                var childWing = p.GetComponent<FARWingAerodynamicModel>();
+                FARWingAerodynamicModel childWing = p.GetComponent<FARWingAerodynamicModel>();
                 if (childWing is null)
                     continue;
 
@@ -1478,7 +1481,7 @@ namespace ferram4
                                                     localWingCentroid,
                                                     lift,
                                                     lift.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(0),
+                                                    FARConfig.GUIColors.ClColor,
                                                     true);
                 }
                 else
@@ -1493,7 +1496,7 @@ namespace ferram4
                                                     localWingCentroid,
                                                     drag,
                                                     drag.magnitude * FARKSPAddonFlightScene.FARAeroForceDisplayScale,
-                                                    GUIColors.GetColor(1),
+                                                    FARConfig.GUIColors.CdColor,
                                                     true);
                 }
                 else

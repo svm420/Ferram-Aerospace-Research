@@ -21,7 +21,7 @@
     <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;ASSERT;LOG_TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -86,18 +86,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FARAeroComponents\DummyAirstreamShield.cs" />
     <Compile Include="FARAeroComponents\FlightForceContext.cs" />
     <Compile Include="FARAeroComponents\ModularFlightIntegratorRegisterer.cs" />
     <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />
     <Compile Include="FARAeroComponents\VesselIntakeRamDrag.cs" />
     <Compile Include="FARAPI.cs" />
-    <Compile Include="FARAssets.cs" />
     <Compile Include="FARDebugAndSettings.cs" />
     <Compile Include="FARFloatCurve.cs" />
     <Compile Include="FARGUI\FAREditorGUI\DesignConcerns\AreaRulingConcern.cs" />
     <Compile Include="FARGUI\FAREditorGUI\DesignConcerns\AeroStabilityConcern.cs" />
     <Compile Include="FARGUI\FARFlightGUI\AeroVisualizationGUI.cs" />
     <Compile Include="FARGUI\FARFlightGUI\AirspeedSettingsGUI.cs" />
+    <Compile Include="FARGUI\FARFlightGUI\FlightDataLogger.cs" />
     <Compile Include="FARGUI\FARFlightGUI\FlightStatusGUI.cs" />
     <Compile Include="FARGUI\FARFlightGUI\FlightGUIDrawer.cs" />
     <Compile Include="FARGUI\FARFlightGUI\FlightDataGUI.cs" />
@@ -106,39 +107,34 @@
     <Compile Include="FARGUI\FARFlightGUI\VesselFlightInfo.cs" />
     <Compile Include="FARGUI\FARFlightGUI\PhysicsCalcs.cs" />
     <Compile Include="FARGUI\FARFlightGUI\StringBuilderExtNumeric.cs" />
+    <Compile Include="FARKSPAdapter.cs" />
     <Compile Include="FARKSPAddonMainMenuSetup.cs" />
     <Compile Include="FARKSPAddonSpaceCenterScene.cs" />
     <Compile Include="FARPartExtensions.cs" />
-    <Compile Include="FARPartGeometry\DebugVoxel.cs" />
-    <Compile Include="FARPartGeometry\DebugVoxelMesh.cs" />
-    <Compile Include="FARPartGeometry\FARAnimOverrides.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\AirbreathingEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\CompoundPartGeoUpdater.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\ICrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\IntakeCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\IntegratedIntakeEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\StockProcAsteroidGeoUpdater.cs" />
-    <Compile Include="FARPartGeometry\IDebugVoxelMeshBuilder.cs" />
     <Compile Include="FARPartGeometry\PartSizePair.cs" />
     <Compile Include="FARPartGeometry\PartSizePair4Bit.cs" />
     <Compile Include="FARPartGeometry\PartSizePair8Bit.cs" />
+    <Compile Include="FARPartGeometry\PartTint.cs" />
     <Compile Include="FARPartGeometry\PartTransformInfo.cs" />
     <Compile Include="FARSettingsScenarioModule.cs" />
     <Compile Include="FARThreading\ThreadSafeDebugLogger.cs" />
     <Compile Include="FARThreading\VoxelizationThreadpool.cs" />
-    <Compile Include="FARUtils\ShaderPropertyIds.cs" />
     <Compile Include="LEGACYferram4\FARAction.cs" />
     <Compile Include="FARGUI\FAREditorGUI\EditorAeroCenter.cs" />
     <Compile Include="FARAeroComponents\FARAeroPartModule.cs" />
     <Compile Include="FARAeroComponents\FARAeroSection.cs" />
     <Compile Include="FARAeroComponents\FARVesselAero.cs" />
     <Compile Include="FARAeroComponents\VehicleAerodynamics.cs" />
-    <Compile Include="LEGACYferram4\FARAeroStress.cs" />
     <Compile Include="FARAeroUtil.cs" />
     <Compile Include="LEGACYferram4\FARBaseAerodynamics.cs" />
     <Compile Include="LEGACYferram4\FARCenterQuery.cs" />
     <Compile Include="LEGACYferram4\FARControllableSurface.cs" />
-    <Compile Include="FARGUI\GUIColors.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\EditorSimManager.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\EquationSystem.cs" />
     <Compile Include="FARGUI\FAREditorGUI\Simulation\RungeKutta.cs" />
@@ -182,14 +178,27 @@
     <Compile Include="RealChuteLite\ChuteCalculator.cs" />
     <Compile Include="RealChuteLite\PhysicsWatch.cs" />
     <Compile Include="RealChuteLite\RealChuteFAR.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Settings\FARAeroData.cs" />
+    <Compile Include="Settings\FARAeroStress.cs" />
+    <Compile Include="Settings\FARAnimOverrides.cs" />
+    <Compile Include="Settings\FARPartModuleTransformExceptions.cs" />
+    <Compile Include="Settings\VoxelizationSettings.cs" />
     <Compile Include="ToolbarWrapper.cs" />
-    <Compile Include="FARUtils\FARLogger.cs" />
-    <Compile Include="FARUtils\FARVersion.cs" />
+    <Compile Include="Utils\ConfigAdapter.cs" />
+    <Compile Include="Utils\GameDatabaseTextureLoader.cs" />
+    <Compile Include="Utils\KSPUtils.cs" />
+    <Compile Include="Utils\ModuleControlSurfaceUpgradeFix.cs" />
+    <Compile Include="Utils\Serialization.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FerramAerospaceResearch.Base\FerramAerospaceResearch.Base.csproj">
+      <Project>{8e4e9138-a949-4ded-a08c-4ce3442887b4}</Project>
+      <Name>FerramAerospaceResearch.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ferramGraph\ferramGraph.csproj">
       <Project>{0ccfed24-728c-432b-9fdc-30bef1116ede}</Project>
       <Name>ferramGraph</Name>

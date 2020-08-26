@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -44,6 +44,7 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 
 using System.Collections.Generic;
 using System.Reflection;
+using FerramAerospaceResearch.Settings;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -74,7 +75,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 Matrix4x4 matrix = worldToBasisMatrix * t.localToWorldMatrix;
 
-                var mc = t.GetComponent<MeshCollider>();
+                MeshCollider mc = t.GetComponent<MeshCollider>();
                 Mesh m = null;
                 if (mc != null)
                 {
@@ -84,7 +85,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
 
 
-                var mf = t.GetComponent<MeshFilter>();
+                MeshFilter mf = t.GetComponent<MeshFilter>();
                 if (mf != null)
                 {
                     m = mf.sharedMesh;
@@ -93,7 +94,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 }
                 else
                 {
-                    var smr = t.GetComponent<SkinnedMeshRenderer>();
+                    SkinnedMeshRenderer smr = t.GetComponent<SkinnedMeshRenderer>();
                     if (smr != null)
                     {
                         m = new Mesh();
@@ -150,12 +151,12 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 Transform t = transforms[i];
 
-                var mc = t.GetComponent<MeshCollider>();
+                MeshCollider mc = t.GetComponent<MeshCollider>();
                 Matrix4x4 matrix = worldToBasisMatrix * t.localToWorldMatrix;
 
                 if (mc == null)
                 {
-                    var bc = t.GetComponent<BoxCollider>();
+                    BoxCollider bc = t.GetComponent<BoxCollider>();
                     if (bc != null)
                     {
                         bounds.Encapsulate(matrix.MultiplyPoint3x4(bc.bounds.min));
@@ -181,7 +182,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             var returnList = new List<Transform>();
 
-            List<Transform> ignoredModelTransforms = IgnoreModelTransformList(p);
+            List<Transform> ignoredModelTransforms = FARPartModuleTransformExceptions.IgnoreModelTransformList(p);
 
             returnList.AddRange(p.FindModelComponents<Transform>());
 
@@ -192,48 +193,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 returnList.Remove(t);
 
             return returnList;
-        }
-
-        private static List<Transform> IgnoreModelTransformList(this Part p)
-        {
-            var Transform = new List<Transform>();
-            if (ignorePartModuleTransforms == null)
-                LoadPartModuleTransformStrings();
-
-            // ReSharper disable once PossibleNullReferenceException
-            foreach (List<string> currentPartModuleTransforms in ignorePartModuleTransforms)
-            {
-                //The first index of each list is the name of the part module; the rest are the transforms
-                if (!p.Modules.Contains(currentPartModuleTransforms[0]))
-                    continue;
-                PartModule module = p.Modules[currentPartModuleTransforms[0]];
-
-                for (int j = 1; j < currentPartModuleTransforms.Count; ++j)
-                {
-                    string transformString =
-                        (string)module.GetType().GetField(currentPartModuleTransforms[j]).GetValue(module);
-                    Transform.AddRange(string.IsNullOrEmpty(transformString)
-                                           ? p.FindModelComponents<Transform>(currentPartModuleTransforms[j])
-                                           : p.FindModelComponents<Transform>(transformString));
-                }
-            }
-
-            foreach (Transform t in p.FindModelComponents<Transform>())
-            {
-                if (Transform.Contains(t))
-                    continue;
-                if (!t.gameObject.activeInHierarchy)
-                {
-                    Transform.Add(t);
-                    continue;
-                }
-
-                string tag = t.tag.ToLowerInvariant();
-                if (tag == "ladder" || tag == "airlock")
-                    Transform.Add(t);
-            }
-
-            return Transform;
         }
 
         private static void ProceduralAsteroidTransforms(Part p, List<Transform> transformList)
@@ -252,22 +211,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             transformList.Add(parent);
             for (int i = 0; i < parent.childCount; ++i)
                 GetChildTransforms(transformList, parent.GetChild(i));
-        }
-
-        private static void LoadPartModuleTransformStrings()
-        {
-            ignorePartModuleTransforms = new List<List<string>>();
-            foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("FARPartModuleTransformExceptions"))
-                if (node != null)
-                    foreach (ConfigNode template in node.GetNodes("FARPartModuleException"))
-                    {
-                        if (!template.HasValue("PartModuleName"))
-                            continue;
-                        var transformExceptions = new List<string> {template.GetValue("PartModuleName")};
-                        transformExceptions.AddRange(template.GetValues("TransformException"));
-
-                        ignorePartModuleTransforms.Add(transformExceptions);
-                    }
         }
     }
 }

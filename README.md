@@ -1,12 +1,12 @@
-Ferram Aerospace Research Continued v0.15.11.4 "Mach"
+Ferram Aerospace Research Continued v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-   Serious thanks:
+   Serious thanks:  
 				* a.g., for tons of bugfixes and code-refactorings   
-				* stupid_chris, for the RealChuteLite implementation
+				* stupid_chris, for the RealChuteLite implementation  
             			* Taverius, for correcting a ton of incorrect values  
-				* Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts
+				* Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts  
             			* sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
             			* ialdabaoth (who is awesome), who originally created Module Manager  
                         	* Regex, for adding RPM support  
@@ -64,6 +64,33 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.16.0.0V "Mader"------------------------------------ 
+
+Update to MM 4.1.4  
+Update to KSP 1.10  
+
+Added more config options (see `FARConfig.cfg`):
+
+* Additional log messages can be enabled  
+* Log FAR flight variables to text file  
+* Debug voxels are now colored by part (customizable)  
+* Removed `FARGUIColors.cfg` and integrated it into `FARConfig.cfg`  
+
+Added new DLL `FerramAerospaceResearch.Base.dll` which is independent of KSP  
+Unchanged configs should no longer be saved to new files  
+Update Chinese localization (thanks [@tinygrox](https://github.com/tinygrox), [#88](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/88))  
+Workaround for `KSPUpgradePipeline` with removed stock control surface modules  
+Fix KSP resetting shielded state on decouple  
+Heating should now be closer (and higher) to stock values, KSP applies magic scaling to areas which made FAR calculated exposed areas significantly smaller than stock (can be reverted with MM patch)  
+Meshes used for voxelization are now displayed in log with `debug` FAR log level  
+Fix inconsistent voxelization when changing from VAB/SPH to Flight scene and reverting ([#89](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/89))  
+Fix voxelization starting before part is set up in editor  
+Ignore launch clamps in editor simulations  
+Fix NRE with MechJeb on destruction ([#93](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/93))  
+Resized stock button image to 36x36 px  
+Simulation buttons are now disabled while voxelization is active  
+Invisible meshes are ignored for voxelization by default  
+
 0.15.11.4V "Mach"------------------------------------  
 
 Update to MM 4.1.3  

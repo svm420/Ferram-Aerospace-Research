@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -46,7 +46,7 @@ using System.Collections.Generic;
 using System.Text;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
-using FerramAerospaceResearch.FARUtils;
+using FerramAerospaceResearch.Resources;
 using KSP.IO;
 using KSP.Localization;
 using StringLeakTest;
@@ -79,6 +79,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private FlightStatusGUI _flightStatusGUI;
         private StabilityAugmentation _stabilityAugmentation;
         private FlightDataGUI _flightDataGUI;
+        private FlightDataLogger flightDataLogger;
 
         private bool showFlightDataWindow;
         private bool showSettingsWindow;
@@ -129,6 +130,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 vesselFlightGUI[_vessel] = this;
             else
                 vesselFlightGUI.Add(_vessel, this);
+            flightDataLogger = FlightDataLogger.CreateLogger(_vessel);
 
             enabled = true;
 
@@ -164,6 +166,12 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             airSpeedGUI = null;
 
             AeroVizGUI?.SaveSettings();
+
+            if (flightDataLogger)
+            {
+                flightDataLogger.StopLogging();
+                flightDataLogger = null;
+            }
 
             _flightStatusGUI = null;
             settingsWindow = null;
@@ -282,7 +290,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             mainGuiRect = GUILayout.Window(GetHashCode(),
                                            mainGuiRect,
                                            MainFlightGUIWindow,
-                                           "FAR, " + FARVersion.VersionString,
+                                           "FAR, " + Version.LongString,
                                            GUILayout.MinWidth(230));
             GUIUtils.ClampToScreen(mainGuiRect);
 
@@ -336,6 +344,25 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                                                   buttonStyle,
                                                   GUILayout.ExpandWidth(true));
 
+            bool logging = GUILayout.Toggle(flightDataLogger.IsActive,
+                                            Localizer.Format("FARFlightGUIFltLogging"),
+                                            buttonStyle,
+                                            GUILayout.ExpandWidth(true));
+            if (logging != flightDataLogger.IsActive)
+            {
+                if (!flightDataLogger.IsActive)
+                    flightDataLogger.StartLogging();
+                else
+                    flightDataLogger.StopLogging();
+            }
+
+            flightDataLogger.Period =
+                GUIUtils.TextEntryForInt(Localizer.Format("FARFlightGUIFltLogPeriod"), 150, flightDataLogger.Period);
+            flightDataLogger.FlushPeriod =
+                GUIUtils.TextEntryForInt(Localizer.Format("FARFlightGUIFltLogFlushPeriod"),
+                                         150,
+                                         flightDataLogger.FlushPeriod);
+
             GUILayout.Label(Localizer.Format("FARFlightGUIFltAssistance"));
 
             _stabilityAugmentation.Display();
@@ -386,7 +413,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (blizzyFlightGUIButton != null)
                 return;
             blizzyFlightGUIButton = ToolbarManager.Instance.add("FerramAerospaceResearch", "FARFlightButtonBlizzy");
-            blizzyFlightGUIButton.TexturePath = "FerramAerospaceResearch/Textures/icon_button_blizzy";
+            blizzyFlightGUIButton.TexturePath = FARAssets.Instance.Textures.IconSmall.Url;
             blizzyFlightGUIButton.ToolTip = "FAR Flight Sys";
             blizzyFlightGUIButton.OnClick += e => showGUI = !showGUI;
         }

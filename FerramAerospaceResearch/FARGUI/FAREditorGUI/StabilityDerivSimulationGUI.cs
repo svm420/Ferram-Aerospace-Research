@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -319,6 +319,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             inits.maxTime = GUILayout.TextField(inits.maxTime, GUILayout.ExpandWidth(true));
             GUILayout.Label(Localizer.Format("FAREditorSimTimestep"));
             inits.dt = GUILayout.TextField(inits.dt, GUILayout.ExpandWidth(true));
+            GUI.enabled = !EditorGUI.Instance.VoxelizationUpdateQueued;
             if (GUILayout.Button(Localizer.Format("FAREditorSimRunButton"),
                                  GUILayout.Width(150.0F),
                                  GUILayout.Height(25.0F)))
@@ -352,6 +353,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                             50);
             }
 
+            GUI.enabled = true;
             GUILayout.EndHorizontal();
         }
 

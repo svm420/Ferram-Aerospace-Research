@@ -1,9 +1,9 @@
 ﻿/*
-Ferram Aerospace Research v0.15.11.4 "Mach"
+Ferram Aerospace Research v0.16.0.0 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2019, Michael Ferrara, aka Ferram4
+Copyright 2020, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -45,7 +45,6 @@ Copyright 2019, Michael Ferrara, aka Ferram4
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FerramAerospaceResearch.FARUtils;
 using KSP.Localization;
 using StringLeakTest;
 using UnityEngine;
