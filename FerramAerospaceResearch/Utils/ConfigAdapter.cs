@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FerramAerospaceResearch.Interfaces;
 using FerramAerospaceResearch.Reflection;
@@ -10,6 +12,68 @@ namespace FerramAerospaceResearch
     [FARAddon(700, true)]
     public class ConfigAdapter : MonoSingleton<ConfigAdapter>, IWaitForAddon, IReloadable
     {
+        private enum Operation
+        {
+            None,
+            Loading,
+            Saving
+        }
+
+        private struct LoadGuard : IDisposable
+        {
+            public Operation operation;
+            // cannot override default ctor...
+            public LoadGuard(Operation op)
+            {
+                operation = op;
+                switch (op)
+                {
+                    case Operation.Loading:
+                        FARLogger.Debug("ConfigAdapter started loading");
+                        FARConfig.IsLoading = true;
+                        Instance.loading = true;
+                        break;
+                    case Operation.Saving:
+                        FARLogger.Debug("ConfigAdapter started saving");
+                        Instance.saving = true;
+                        break;
+                    case Operation.None:
+                        FARLogger.Debug("ConfigAdapter started task");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(op), op, null);
+                }
+            }
+
+            public void Dispose()
+            {
+                switch (operation)
+                {
+                    case Operation.Loading:
+                        FARLogger.Debug("ConfigAdapter finished loading");
+                        FARConfig.IsLoading = false;
+                        Instance.loading = false;
+                        break;
+                    case Operation.Saving:
+                        FARLogger.Debug("ConfigAdapter finished saving");
+                        Instance.saving = false;
+                        break;
+                    case Operation.None:
+                        FARLogger.Debug("ConfigAdapter finished task");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(operation), operation, null);
+                }
+
+                Instance.Completed = !(Instance.saving || Instance.loading);
+            }
+        }
+
+        private static LoadGuard Guard(Operation op)
+        {
+            return new LoadGuard(op);
+        }
+
         private static readonly Dictionary<string, string> lastConfigs = new Dictionary<string, string>();
         public int Priority { get; set; } = 999;
 
@@ -20,109 +84,96 @@ namespace FerramAerospaceResearch
 
         public bool Completed { get; set; }
 
+        private volatile bool loading;
+        private volatile bool saving;
+
         private void Start()
         {
             StartCoroutine(DoSetup());
         }
 
-        private IEnumerator DoSetup()
+        private static IEnumerator DoSetup()
         {
-            try
-            {
-                Task task = Task.Factory.StartNew(() => ConfigReflection.Instance.Initialize());
+            using LoadGuard guard = Guard(Operation.None);
 
-                while (!task.IsCompleted)
-                    yield return null;
+            Task task = Task.Factory.StartNew(() => ConfigReflection.Instance.Initialize());
 
-                if (task.Exception != null)
-                    FARLogger.Exception(task.Exception, "Exception while setting up config");
-            }
-            finally
-            {
-                Completed = true;
-            }
+            while (!task.IsCompleted)
+                yield return null;
+
+            if (task.Exception != null)
+                FARLogger.Exception(task.Exception, "Exception while setting up config");
         }
 
-        public static void LoadConfigs()
+        private static void LoadConfigs()
         {
-            FARConfig.IsLoading = true;
-
             // clear config cache so it can be rebuilt
             lastConfigs.Clear();
 
             var load = new LoadVisitor();
-            try
+            foreach (KeyValuePair<string, ReflectedConfig> pair in ConfigReflection.Instance.Configs)
             {
-                foreach (KeyValuePair<string, ReflectedConfig> pair in ConfigReflection.Instance.Configs)
+                ConfigNode[] nodes = GameDatabase.Instance.GetConfigNodes(pair.Key);
+                if (pair.Value.Reflection.AllowMultiple)
                 {
-                    ConfigNode[] nodes = GameDatabase.Instance.GetConfigNodes(pair.Key);
-                    if (pair.Value.Reflection.AllowMultiple)
-                    {
-                        var root = new ConfigNode();
-                        foreach (ConfigNode configNode in nodes)
-                            root.AddNode(configNode);
+                    var root = new ConfigNode();
+                    foreach (ConfigNode configNode in nodes)
+                        root.AddNode(configNode);
 
-                        load.Node = root;
+                    load.Node = root;
+                    object instance = pair.Value.Instance;
+                    int errors = pair.Value.Reflection.Load(load, ref instance);
+
+                    if (errors > 0)
+                        FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), pair.Key);
+                }
+                else
+                {
+                    if (nodes.Length == 0)
+                    {
+                        FARLogger.Warning($"Could not find config nodes {pair.Key}");
+                        continue;
+                    }
+
+                    if (nodes.Length > 1)
+                        FARLogger.Warning($"Found {nodes.Length.ToString()} {pair.Key} nodes");
+
+                    foreach (ConfigNode node in nodes)
+                    {
+                        load.Node = node;
                         object instance = pair.Value.Instance;
                         int errors = pair.Value.Reflection.Load(load, ref instance);
 
                         if (errors > 0)
-                            FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), pair.Key);
-                    }
-                    else
-                    {
-                        if (nodes.Length == 0)
-                        {
-                            FARLogger.Warning($"Could not find config nodes {pair.Key}");
-                            continue;
-                        }
-
-                        if (nodes.Length > 1)
-                            FARLogger.Warning($"Found {nodes.Length.ToString()} {pair.Key} nodes");
-
-                        foreach (ConfigNode node in nodes)
-                        {
-                            load.Node = node;
-                            object instance = pair.Value.Instance;
-                            int errors = pair.Value.Reflection.Load(load, ref instance);
-
-                            if (errors > 0)
-                                FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), node.name);
-                        }
+                            FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), node.name);
                     }
                 }
+            }
 
-                SaveConfigs("Custom", true, ".cfg.far", FARConfig.Debug.DumpOnLoad);
-            }
-            finally
-            {
-                FARConfig.IsLoading = false;
-            }
+            using LoadGuard guard = Guard(Operation.Saving);
+            SaveConfigs("Custom", true, ".cfg.far", FARConfig.Debug.DumpOnLoad);
         }
 
         public static IEnumerator SaveAll()
         {
-            if (FARConfig.IsLoading)
+            if (Instance.saving)
                 yield break;
 
-            FARConfig.IsLoading = true;
+            while (Instance.loading)
+                yield return null;
 
-            try
-            {
-                Task task = Task.Factory.StartNew(Save);
-                yield return new WaitUntil(() => task.IsCompleted);
+            using LoadGuard guard = Guard(Operation.Saving);
 
-                if (task.Exception != null)
-                    FARLogger.Exception(task.Exception, "Exception while saving up configs");
-            }
-            finally
-            {
-                FARConfig.IsLoading = false;
-            }
+            Task task = Task.Factory.StartNew(Save);
+            yield return new WaitUntil(() => task.IsCompleted);
+
+            if (task.Exception != null)
+                FARLogger.Exception(task.Exception, "Exception while saving up configs");
         }
 
         public static void Save()
         {
+            using LoadGuard guard = Guard(Operation.Saving);
             SaveConfigs("Custom");
         }
 
@@ -186,14 +237,25 @@ namespace FerramAerospaceResearch
 
         private IEnumerator DoLoadConfig()
         {
+            if (loading)
+                yield break;
+
+            while (saving)
+                yield return null;
+
+            using LoadGuard guard = Guard(Operation.Loading);
             Task task = Task.Factory.StartNew(LoadConfigs);
 
             yield return new WaitWhile(() => !task.IsCompleted);
 
             if (task.Exception != null)
                 FARLogger.Exception(task.Exception, "Exception while loading config");
+        }
 
-            Completed = true;
+        protected override void OnDestruct()
+        {
+            while (loading || saving)
+                Thread.Sleep(1);
         }
     }
 
@@ -303,6 +365,7 @@ namespace FerramAerospaceResearch
 
                 newValue.Add(v);
             }
+
             FARLogger.DebugFormat("Parsed {0}.{1} with {2} values", Node.name, reflection.Name, newValue.Count);
 
             return true;
