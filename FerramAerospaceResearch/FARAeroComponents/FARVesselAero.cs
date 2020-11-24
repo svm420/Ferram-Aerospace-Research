@@ -72,6 +72,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private VehicleAerodynamics _vehicleAero;
         private VesselIntakeRamDrag _vesselIntakeRamDrag;
 
+        internal VehicleAerodynamics VehicleAero
+        {
+            get { return _vehicleAero; }
+        }
+
         public double Length
         {
             get { return _vehicleAero.Length; }
@@ -447,7 +452,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                              _voxelCount,
                                              vessel.Parts,
                                              _currentGeoModules,
-                                             !setup))
+                                             !setup,
+                                             vessel))
             {
                 _updateRateLimiter = FARSettingsScenarioModule.VoxelSettings.minPhysTicksPerUpdate - 2;
                 _updateQueued = true;

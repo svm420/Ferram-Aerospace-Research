@@ -11,8 +11,7 @@ namespace FerramAerospaceResearch.Settings
     [ConfigNode("ColorMap")]
     public class ColorMap
     {
-        [ConfigValueIgnore]
-        public static readonly ColorMap Default = new ColorMap
+        [ConfigValueIgnore] public static readonly ColorMap Default = new ColorMap
         {
             Name = "default",
             Colors = {new Color(0.18f, 0f, 0.106f)}
@@ -41,10 +40,13 @@ namespace FerramAerospaceResearch.Settings
 
         [ConfigValue("ColorMap")] public static List<ColorMap> ColorMaps { get; } = new List<ColorMap>();
 
+        [ConfigValue("debugInFlight")] public static bool DebugInFlight { get; set; } = false;
+
         public static ColorMap FirstOrDefault()
         {
             return FirstOrDefault(Default);
         }
+
         public static ColorMap FirstOrDefault(string name)
         {
             if (string.IsNullOrEmpty(name))

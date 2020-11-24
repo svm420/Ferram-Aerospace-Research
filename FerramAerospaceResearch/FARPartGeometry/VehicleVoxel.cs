@@ -79,11 +79,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private int xCellLength, yCellLength, zCellLength;
         private int threadsQueued;
 
-        private VehicleVoxel()
+        private VehicleVoxel(Vessel vessel)
         {
             VoxelizationThreadpool.Instance.RunOnMainThread(() =>
             {
-                voxelMesh = DebugVoxelMesh.Create();
+                voxelMesh = DebugVoxelMesh.Create(vessel == null ? null : vessel.vesselTransform);
                 voxelMesh.gameObject.SetActive(false);
             });
         }
@@ -152,10 +152,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
             List<GeometryPartModule> geoModules,
             int elementCount,
             bool multiThreaded = true,
-            bool solidify = true
+            bool solidify = true,
+            Vessel vessel = null
         )
         {
-            var newVoxel = new VehicleVoxel();
+            var newVoxel = new VehicleVoxel(vessel);
 
             newVoxel.CreateVoxel(geoModules, elementCount, multiThreaded, solidify);
 
@@ -1365,6 +1366,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public void VisualizeVoxel(Matrix4x4 vesselLocalToWorldMatrix)
         {
             FARLogger.Debug("Creating visual voxels");
+            // Unity's <from>to<to> matrix naming is confusing, would be better to use <to>from<from> to actually
+            // correspond with multiplication order...
+            Matrix4x4 vesselLocalToVoxelMeshMatrix = voxelMesh.transform.worldToLocalMatrix * vesselLocalToWorldMatrix;
             var builder = new DebugVoxel.Builder();
             var tintMap = new PartTint();
             voxelMesh.Clear(builder, xLength * yLength * zLength * 128, false);
@@ -1373,7 +1377,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 for (int j = 0; j < yLength; j++)
                 {
                     for (int k = 0; k < zLength; k++)
-                        voxelChunks[i, j, k]?.VisualizeVoxels(vesselLocalToWorldMatrix, tintMap, voxelMesh, builder);
+                        voxelChunks[i, j, k]
+                            ?.VisualizeVoxels(vesselLocalToVoxelMeshMatrix, tintMap, voxelMesh, builder);
                 }
             }
 

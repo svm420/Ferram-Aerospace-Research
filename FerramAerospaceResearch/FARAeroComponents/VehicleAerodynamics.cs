@@ -49,6 +49,7 @@ using ferram4;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARPartGeometry.GeometryModification;
 using FerramAerospaceResearch.FARThreading;
+using FerramAerospaceResearch.Settings;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
@@ -105,7 +106,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private int firstSection;
 
         private bool visualizing;
-        private bool voxelizing;
+        public bool Voxelizing { get; private set; }
 
         public VehicleAerodynamics()
         {
@@ -335,12 +336,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             int voxelCount,
             List<Part> vehiclePartList,
             List<GeometryPartModule> currentGeoModules,
-            bool updateGeometryPartModules = true
+            bool updateGeometryPartModules = true,
+            Vessel vessel = null
         )
         {
             //set to true when this function ends; only continue to voxelizing if the voxelization thread has not been queued
             //this should catch conditions where this function is called again before the voxelization thread starts
-            if (voxelizing)
+            if (Voxelizing)
                 return false;
             //only continue if the voxelizing thread has not locked this object
             if (!Monitor.TryEnter(this, 0))
@@ -373,8 +375,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 _voxel?.CleanupVoxel();
 
                 //set flag so that this function can't run again before voxelizing completes and queue voxelizing thread
-                voxelizing = true;
-                VoxelizationThreadpool.Instance.QueueVoxelization(CreateVoxel);
+                Voxelizing = true;
+                VoxelizationThreadpool.Instance.QueueVoxelization(() => CreateVoxel(vessel));
                 return true;
             }
             finally
@@ -384,14 +386,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
         }
 
         //And this actually creates the voxel and then begins the aero properties determination
-        private void CreateVoxel()
+        private void CreateVoxel(Vessel vessel = null)
         {
             lock (this) //lock this object to prevent race with main thread
             {
                 try
                 {
                     //Actually voxelize it
-                    _voxel = VehicleVoxel.CreateNewVoxel(_currentGeoModules, _voxelCount);
+                    _voxel = VehicleVoxel.CreateNewVoxel(_currentGeoModules, _voxelCount, vessel: vessel);
                     if (_vehicleCrossSection.Length < _voxel.MaxArrayLength)
                         _vehicleCrossSection = _voxel.EmptyCrossSectionArray;
 
@@ -408,14 +410,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 finally
                 {
                     //Always, when we finish up, if we're in flight, cleanup the voxel
-                    if (HighLogic.LoadedSceneIsFlight && _voxel != null)
+                    if (HighLogic.LoadedSceneIsFlight && !VoxelizationSettings.DebugInFlight && _voxel != null)
                     {
                         _voxel.CleanupVoxel();
                         _voxel = null;
                     }
 
                     //And unset the flag so that the main thread can queue it again
-                    voxelizing = false;
+                    Voxelizing = false;
                 }
             }
         }
@@ -1029,8 +1031,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
             for (int i = front; i <= back; i++)
             {
                 if (double.IsNaN(_vehicleCrossSection[i].area))
-                    ThreadSafeDebugLogger
-                        .Instance.RegisterMessage("FAR VOXEL ERROR: Voxel CrossSection Area is NaN at section " + i);
+                    ThreadSafeDebugLogger.Instance
+                                         .RegisterMessage("FAR VOXEL ERROR: Voxel CrossSection Area is NaN at section " +
+                                                          i);
 
                 filledVolume += _vehicleCrossSection[i].area;
             }

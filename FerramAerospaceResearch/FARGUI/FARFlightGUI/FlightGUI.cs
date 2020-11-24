@@ -47,6 +47,7 @@ using System.Text;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.Resources;
+using FerramAerospaceResearch.Settings;
 using KSP.IO;
 using KSP.Localization;
 using StringLeakTest;
@@ -362,6 +363,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 GUIUtils.TextEntryForInt(Localizer.Format("FARFlightGUIFltLogFlushPeriod"),
                                          150,
                                          flightDataLogger.FlushPeriod);
+            DebugVisualizationGUI();
 
             GUILayout.Label(Localizer.Format("FARFlightGUIFltAssistance"));
 
@@ -369,6 +371,21 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             GUILayout.EndVertical();
             GUI.DragWindow();
+        }
+
+        private void DebugVisualizationGUI()
+        {
+            if (!VoxelizationSettings.DebugInFlight)
+                return;
+            GUILayout.BeginHorizontal();
+            GUI.enabled = !_vesselAero.VehicleAero.Voxelizing;
+            if (GUILayout.Button(Localizer.Format("FARDebugVoxels")))
+            {
+                _vesselAero.VehicleAero.DebugVisualizeVoxels(vessel.transform.localToWorldMatrix);
+            }
+
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
         }
 
         private void FlightDataWindow(int windowId)
