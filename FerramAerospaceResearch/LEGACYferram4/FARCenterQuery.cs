@@ -1,5 +1,5 @@
-﻿/*
-Ferram Aerospace Research v0.16.0.0 "Mader"
+/*
+Ferram Aerospace Research v0.16.0.1 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 

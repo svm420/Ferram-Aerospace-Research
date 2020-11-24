@@ -17,8 +17,8 @@
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="icon_button.svg"
    inkscape:export-filename="D:\git\Ferram-Aerospace-Research\GameData\FerramAerospaceResearch\Textures\icon_button_stock.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
+   inkscape:export-xdpi="161.6842"
+   inkscape:export-ydpi="161.6842">
   <defs
      id="defs4567" />
   <sodipodi:namedview
@@ -29,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="-4.2916163"
+     inkscape:cx="-18.800545"
      inkscape:cy="4.5603423"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -38,7 +38,7 @@
      inkscape:pagecheckerboard="true"
      inkscape:window-width="2560"
      inkscape:window-height="1417"
-     inkscape:window-x="-8"
+     inkscape:window-x="2552"
      inkscape:window-y="-8"
      inkscape:window-maximized="1" />
   <metadata
@@ -49,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>

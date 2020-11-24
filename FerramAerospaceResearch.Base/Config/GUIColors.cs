@@ -1,4 +1,4 @@
-﻿using FerramAerospaceResearch.Reflection;
+using FerramAerospaceResearch.Reflection;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.Config

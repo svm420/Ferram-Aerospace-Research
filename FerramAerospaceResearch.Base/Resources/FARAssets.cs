@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using FerramAerospaceResearch.Interfaces;
 using FerramAerospaceResearch.Resources.Loading;
 using FerramAerospaceResearch.Threading;

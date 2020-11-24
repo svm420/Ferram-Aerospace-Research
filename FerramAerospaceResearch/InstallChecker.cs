@@ -1,4 +1,4 @@
-﻿/*
+/*
  * InstallChecker, originally by Majiir
  * Released into the public domain using a CC0 Public Domain Dedication: http://creativecommons.org/publicdomain/zero/1.0/
  */

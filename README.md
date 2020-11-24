@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.16.0.0 "Mader"
+Ferram Aerospace Research Continued v0.16.0.1 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,7 +64,22 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
-0.16.0.0V "Mader"------------------------------------ 
+0.16.0.1V "Mader"------------------------------------  
+
+Resized (again) toolbar icon to 64x64  
+All meshes in `TransparentFX` layer are ignored for voxelization, previously only visible non-skinned meshes had this check ([f6a005d](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/f6a005d6759e9de97434ef75d2da336c45931aad))  
+Improve async config loading and saving ([9e67b32](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/9e67b32878c9fb872515b3f8ea41135ac23a5718))  
+Enable debug voxels in flight mode ([5560079](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/5560079e6682e762dfff53ee4422979b90998b69)) with:  
+
+```
+@FARConfig:FINAL {
+    @Voxelization {
+        %debugInFlight = true
+    }
+}
+```
+
+0.16.0.0V "Mader"------------------------------------  
 
 Update to MM 4.1.4  
 Update to KSP 1.10  
