@@ -334,7 +334,18 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private bool IgnoredPredicate(Transform t)
         {
-            return ignoredTransforms.Contains(t.name);
+            if (ignoredTransforms.Contains(t.name))
+                return true;
+
+            if (t.gameObject.layer != ignoreLayer0)
+            {
+                Transform prefabTransform = part.partInfo.partPrefab.FindModelTransform(t.gameObject.name);
+                if (prefabTransform is null || prefabTransform.gameObject.layer != ignoreLayer0)
+                    return false;
+            }
+
+            FARLogger.DebugFormat("Ignoring {0}.{1} for voxelization: layer is ignored", part.name, t.gameObject.name);
+            return true;
         }
 
         private Bounds SetBoundsFromMeshes()
@@ -735,9 +746,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 if (part.Modules.Contains<ModuleProceduralFairing>() || part.Modules.Contains<ModuleAsteroid>())
                     return new MeshData(m.vertices, m.triangles, m.bounds);
-                Transform prefabTransform = part.partInfo.partPrefab.FindModelTransform(t.gameObject.name);
-                if (!(prefabTransform is null) && prefabTransform.gameObject.layer == ignoreLayer0)
-                    return null;
 
                 return new MeshData(m.vertices, m.triangles, m.bounds);
             }
