@@ -22,6 +22,7 @@ namespace FerramAerospaceResearch
         private struct LoadGuard : IDisposable
         {
             public Operation operation;
+
             // cannot override default ctor...
             public LoadGuard(Operation op)
             {
@@ -184,7 +185,6 @@ namespace FerramAerospaceResearch
             bool force = false
         )
         {
-            var topNode = new ConfigNode();
             var node = new ConfigNode();
             var save = new SaveVisitor
             {
@@ -202,17 +202,13 @@ namespace FerramAerospaceResearch
                     continue;
 
                 string path = PathUtil.Combine(KSPUtils.GameDataPath, $"{prefix}_{pair.Key}{extension}");
-                string nodeStr;
 
                 if (!pair.Value.Reflection.AllowMultiple)
                 {
-                    Serialization.MakeTopNode(topNode, node, pair.Key, null, isPatch);
-                    nodeStr = topNode.ToString();
+                    Serialization.MakeTopNode(node, pair.Key, null, isPatch);
                 }
-                else
-                {
-                    nodeStr = node.ToString();
-                }
+
+                string nodeStr = node.ToString();
 
                 if (lastConfigs.TryGetValue(pair.Key, out string oldStr))
                     lastConfigs[pair.Key] = nodeStr;
@@ -222,7 +218,7 @@ namespace FerramAerospaceResearch
                 // only write if requested or if the node has been modified, first time oldStr should be null so can be skipped
                 if (force || (!string.IsNullOrEmpty(oldStr) && nodeStr != oldStr))
                 {
-                    FARLogger.DebugFormat("Saving {0} config to {1}", pair.Key, path);
+                    FARLogger.DebugFormat("Saving {0} config to {1}:\n{2}\n\n{3}", pair.Key, path, oldStr, nodeStr);
                     System.IO.File.WriteAllText(path, nodeStr);
                 }
                 else
@@ -230,7 +226,6 @@ namespace FerramAerospaceResearch
                     FARLogger.DebugFormat("{0} does not require saving", pair.Key);
                 }
 
-                topNode.ClearData();
                 node.ClearData();
             }
         }

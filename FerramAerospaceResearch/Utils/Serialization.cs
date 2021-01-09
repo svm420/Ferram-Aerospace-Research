@@ -293,7 +293,6 @@ namespace FerramAerospaceResearch
         }
 
         public static void MakeTopNode(
-            ConfigNode node,
             ConfigNode child,
             string id,
             string name = null,
@@ -315,7 +314,7 @@ namespace FerramAerospaceResearch
                 nodeName = id;
             }
 
-            node.AddNode(nodeName, child);
+            child.name = nodeName;
         }
 
         public static void AddNode(
