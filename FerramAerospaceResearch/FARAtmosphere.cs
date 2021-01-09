@@ -52,7 +52,7 @@ namespace FerramAerospaceResearch
     ///     The rest of the simulation uses this class to get the wind and includes it in the
     ///     total airspeed for the simulation.
     /// </summary>
-    public static class FARWind
+    public static class FARAtmosphere
     {
         /// <summary>
         ///     A WindFunction takes the current celestial body and a position (should be the position of the part)

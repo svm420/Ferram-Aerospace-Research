@@ -560,8 +560,9 @@ namespace ferram4
                 {
                     CurWingCentroid = WingCentroid();
 
-                    Vector3d velocity = rb.GetPointVelocity(CurWingCentroid) + Krakensbane.GetFrameVelocity() -
-                                        FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
+                    Vector3d velocity = rb.GetPointVelocity(CurWingCentroid) +
+                                        Krakensbane.GetFrameVelocity() -
+                                        FARAtmosphere.GetWind(FlightGlobals.currentMainBody, part, rb.position);
 
                     double v_scalar = velocity.magnitude;
 

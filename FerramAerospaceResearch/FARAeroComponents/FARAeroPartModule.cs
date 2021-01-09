@@ -557,7 +557,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 return;
 
             //world velocity
-            partLocalVel = rb.velocity + frameVel - FARWind.GetWind(FARAeroUtil.CurrentBody, part, rb.position);
+            partLocalVel = rb.velocity + frameVel - FARAtmosphere.GetWind(FARAeroUtil.CurrentBody, part, rb.position);
 
             worldSpaceVelNorm = partLocalVel.normalized;
             partLocalVel = partTransform.InverseTransformDirection(partLocalVel);

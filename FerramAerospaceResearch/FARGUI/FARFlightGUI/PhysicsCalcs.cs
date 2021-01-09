@@ -107,7 +107,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return vesselInfo;
 
             Vector3d velVector = _vessel.srf_velocity -
-                                 FARWind.GetWind(_vessel.mainBody,
+                                 FARAtmosphere.GetWind(_vessel.mainBody,
                                                  _vessel.rootPart,
                                                  _vessel.ReferenceTransform.position);
             Vector3d velVectorNorm = velVector.normalized;

@@ -168,7 +168,7 @@
     <Compile Include="LEGACYferram4\FARPartModule.cs" />
     <Compile Include="FARPM.cs" />
     <Compile Include="FARThreading\ThreadBarrier.cs" />
-    <Compile Include="FARWind.cs" />
+    <Compile Include="FARAtmosphere.cs" />
     <Compile Include="LEGACYferram4\FARWingAerodynamicModel.cs" />
     <Compile Include="LEGACYferram4\FARWingInteraction.cs" />
     <Compile Include="FARKSPAddonFlightScene.cs" />

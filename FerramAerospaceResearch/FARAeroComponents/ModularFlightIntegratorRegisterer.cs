@@ -106,7 +106,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     return;
                 part.dragVector = rb.velocity +
                                   Krakensbane.GetFrameVelocity() -
-                                  FARWind.GetWind(FlightGlobals.currentMainBody, part, rb.position);
+                                  FARAtmosphere.GetWind(FlightGlobals.currentMainBody, part, rb.position);
                 part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
                 if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
                 {
@@ -132,15 +132,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static void CalculateLocalDynPresAndAngularDrag(ModularFlightIntegrator fi, Part p)
         {
+            p.dynamicPressurekPa = p.atmDensity;
             if (fi.CurrentMainBody.ocean && p.submergedPortion > 0)
             {
                 p.submergedDynamicPressurekPa = fi.CurrentMainBody.oceanDensity * 1000;
-                p.dynamicPressurekPa = p.atmDensity;
             }
             else
             {
                 p.submergedDynamicPressurekPa = 0;
-                p.dynamicPressurekPa = p.atmDensity;
             }
 
             double tmp = 0.0005 * p.dragVectorSqrMag;
