@@ -38,7 +38,7 @@ namespace FerramAerospaceResearch.Settings
     {
         [ConfigValue("default")] public static string Default { get; set; }
 
-        [ConfigValue("ColorMap")] public static List<ColorMap> ColorMaps { get; } = new List<ColorMap>();
+        [ConfigValue] public static List<ColorMap> ColorMaps { get; } = new List<ColorMap>();
 
         [ConfigValue("debugInFlight")] public static bool DebugInFlight { get; set; } = false;
 
