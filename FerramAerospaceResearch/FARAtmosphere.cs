@@ -168,7 +168,7 @@ namespace FerramAerospaceResearch
         ///     Simulation gas constant function
         /// </summary>
         private static readonly PropertyDispatcher gasConstantFunction =
-            new(((body, latLonAltitude, ut) => body.atmosphereMolarMass / PhysicsGlobals.IdealGasConstant),
+            new(((body, latLonAltitude, ut) => PhysicsGlobals.IdealGasConstant / body.atmosphereMolarMass),
                 "GasConstant");
 
         /// <summary>
