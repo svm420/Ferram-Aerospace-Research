@@ -67,6 +67,7 @@ CHANGELOG
 0.16.0.2V "Mader"------------------------------------ 
 
 Updated KSP version 1.11  
+Reduced submerged lift and drag, multipliers are controlled by `FARConfig/Settings/submerged[Drag|Lift]Multiplier` with default value of 0.25  
 Renamed FARWind to FARAtmosphere and added overrides for gas properties  
 
 0.16.0.1V "Mader"------------------------------------  
