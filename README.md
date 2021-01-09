@@ -1,4 +1,4 @@
-Ferram Aerospace Research Continued v0.16.0.1 "Mader"
+Ferram Aerospace Research Continued v0.16.0.2 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
@@ -64,6 +64,11 @@ Set all the other winglet/control surface values to zero
 
 CHANGELOG
 =======================================================
+0.16.0.2V "Mader"------------------------------------ 
+
+Updated KSP version 1.11  
+Renamed FARWind to FARAtmosphere and added overrides for gas properties  
+
 0.16.0.1V "Mader"------------------------------------  
 
 Resized (again) toolbar icon to 64x64  

@@ -13,7 +13,7 @@
         "VersionMajor": 0,
         "VersionMinor": 16,
         "VersionBuild": 0,
-        "VersionRevision": 1,
+        "VersionRevision": 2,
         "VersionName": "Mader",
         "Year": 2020,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
