@@ -1,70 +1,67 @@
-Ferram Aerospace Research Continued v0.16.0.2 "Mader"
-=========================
+# Ferram Aerospace Research Continued v0.16.0.2 "Mader"
+
+=========================  
 Aerodynamics model for Kerbal Space Program
 
-   Serious thanks:  
-				* a.g., for tons of bugfixes and code-refactorings   
-				* stupid_chris, for the RealChuteLite implementation  
-            			* Taverius, for correcting a ton of incorrect values  
-				* Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts  
-            			* sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
-            			* ialdabaoth (who is awesome), who originally created Module Manager  
-                        	* Regex, for adding RPM support  
-				* DaMichel, for some ferramGraph updates and some control surface-related features  
-            			* Duxwing, for copy editing the readme  
-   
-   CompatibilityChecker by Majiir, BSD 2-clause http://opensource.org/licenses/BSD-2-Clause
+Serious thanks:  
 
-   Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission  
-	http://forum.kerbalspaceprogram.com/threads/55219
+* a.g., for tons of bugfixes and code-refactorings  
+* stupid_chris, for the RealChuteLite implementation  
+* Taverius, for correcting a ton of incorrect values  
+* Tetryds, for finding lots of bugs and issues and not letting me get away with them, and work on example crafts  
+* sarbian, for refactoring code for working with MechJeb, and the Module Manager updates  
+* ialdabaoth (who is awesome), who originally created Module Manager  
+* Regex, for adding RPM support  
+* DaMichel, for some ferramGraph updates and some control surface-related features  
+* Duxwing, for copy editing the readme  
 
-   ModularFLightIntegrator by Sarbian, Starwaster and Ferram4, MIT: http://opensource.org/licenses/MIT
-	http://forum.kerbalspaceprogram.com/threads/118088
+CompatibilityChecker by Majiir, BSD 2-clause [http://opensource.org/licenses/BSD-2-Clause](http://opensource.org/licenses/BSD-2-Clause)
 
-   Toolbar integration powered by blizzy78's Toolbar plugin; used with permission  
-	http://forum.kerbalspaceprogram.com/threads/60863
+Part.cfg changes powered by sarbian & ialdabaoth's ModuleManager plugin; used with permission  
+[http://forum.kerbalspaceprogram.com/threads/55219](http://forum.kerbalspaceprogram.com/threads/55219)
 
-Source available at: https://github.com/ferram4/Ferram-Aerospace-Research
+ModularFLightIntegrator by Sarbian, Starwaster and Ferram4, MIT: [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)  
+[http://forum.kerbalspaceprogram.com/threads/118088](http://forum.kerbalspaceprogram.com/threads/118088)
 
-----------------------------------------------
----------------- INSTALLATION ----------------
-----------------------------------------------
+Toolbar integration powered by blizzy78's Toolbar plugin; used with permission  
+[http://forum.kerbalspaceprogram.com/threads/60863](http://forum.kerbalspaceprogram.com/threads/60863)
+
+Source available at: [https://github.com/dkavolis/Ferram-Aerospace-Research](https://github.com/dkavolis/Ferram-Aerospace-Research)
+
+## Installation
 
 Install by merging the GameData folder in the zip with the GameData folder in your KSP install
 
 ModuleManager and ModularFlightIntegrator are REQUIRED for FAR to work properly.  Failing to copy this over will result in strange errors.
 
------------------------------------------------------
----------------- LEGACY WING CONFIGS ----------------
------------------------------------------------------
+## Legacy wing configs
 
 Sample Part.cfg:
 
 For wings
------------------------------------
-```
+
+```cfg
 MODULE  
 {  
-	name = FARControllableSurface / FARWingAerodynamicModel  
-	b_2 = 0.5				//distance from wing root to tip; semi-span  
-	MAC = 0.5				//Mean Aerodynamic Chord  
-	nonSideAttach = 0			//0 for canard-like / normal wing pieces, 1 for ctrlsurfaces attached to the back of other wing parts  
-	TaperRatio = 0.7			//Ratio of tip chord to root chord generally < 1, must be > 0  
-	MidChordSweep = 25			//Sweep angle in degrees; measured down the center of the span / midchord position  
-	maxdeflect = 15				//Default maximum deflection value; only used by FARControlableSurface  
-	controlSurfacePivot = 1, 0, 0;		//Local vector that obj_ctrlSrf pivots about; defaults to 1, 0, 0 (right)  
-	ctrlSurfFrac = 0.2			//Value from 0-1, percentage of the part that is a flap; only used by FARControlableSurface  
+    name = FARControllableSurface / FARWingAerodynamicModel  
+    b_2 = 0.5                       // distance from wing root to tip; semi-span  
+    MAC = 0.5                       // Mean Aerodynamic Chord  
+    nonSideAttach = 0               // 0 for canard-like / normal wing pieces, 1 for ctrlsurfaces attached to the back of other wing parts  
+    TaperRatio = 0.7                // Ratio of tip chord to root chord generally < 1, must be > 0  
+    MidChordSweep = 25              // Sweep angle in degrees; measured down the center of the span / midchord position  
+    maxdeflect = 15                 // Default maximum deflection value; only used by FARControlableSurface  
+    controlSurfacePivot = 1, 0, 0;  // Local vector that obj_ctrlSrf pivots about; defaults to 1, 0, 0 (right)  
+    ctrlSurfFrac = 0.2              // Value from 0-1, percentage of the part that is a flap; only used by FARControlableSurface  
 }
 ```
 
-For control surfaces, use above but replace FARWingAerodynamicModel with FARControllableSurface and add maxdeflect value
+For control surfaces, use above but replace `FARWingAerodynamicModel` with `FARControllableSurface` and add `maxdeflect` value
 
 Set all the other winglet/control surface values to zero
 
+## CHANGELOG
 
-CHANGELOG
-=======================================================
-0.16.0.2V "Mader"------------------------------------ 
+0.16.0.2V "Mader"------------------------------------  
 
 Updated KSP version 1.11  
 Rotor blades are no longer voxelized  
@@ -78,7 +75,7 @@ All meshes in `TransparentFX` layer are ignored for voxelization, previously onl
 Improve async config loading and saving ([9e67b32](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/9e67b32878c9fb872515b3f8ea41135ac23a5718))  
 Enable debug voxels in flight mode ([5560079](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/5560079e6682e762dfff53ee4422979b90998b69)) with:  
 
-```
+```cfg
 @FARConfig:FINAL {
     @Voxelization {
         %debugInFlight = true
@@ -164,7 +161,7 @@ Fix NRE spam on EVA [#43](https://github.com/dkavolis/Ferram-Aerospace-Research/
 
 0.15.10.0V "Lundgren"------------------------------------
 
-**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
+**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version.**
 
 Recompiled for KSP 1.7
 
@@ -174,12 +171,14 @@ Voxelization correctly handles jettison transforms with part variants ([#39](htt
 Fix voxelization of `InflatableHeatShield` ([#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39))  
 Fixed voxelization of simple heat shields ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37))  
 Added additional nodes to `GeometryPartModule` ([#37](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/37), [#39](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/39), see PRs for more details). The new nodes should allow parts to be voxelized much closer to what is visible and handle animations better:
+
 * `ignoreTransform` (string)
 * `ignoreIfNoRenderer` (bool)
 * `unignoreTransform` (string)
 * `rebuildOnAnimation` (bool)
 
 NRE fixes ([#36](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/36)):  
+
 * Trying to display debug voxels with no parts in the editor
 * Occasional  NRE when voxelizing vehicle (due to race conditions?)
 * When force closing the game from the editor with debug voxels displayed
@@ -190,7 +189,7 @@ Enable/disable FAR speed display on the navball from FARAPI ([#33](https://githu
 
 0.15.9.7V "Lumley"------------------------------------
 
-**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
+**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version.**
 
 Update to MM 4.0.2
 
@@ -201,7 +200,7 @@ Enlarged debug voxel texture for higher fidelity ([#18](https://github.com/dkavo
 
 0.15.9.6V "Lin"------------------------------------
 
-**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version**
+**Note for Kopernicus users: DO NOT overwrite MFI that comes with Kopernicus since it is locked to that particular version.**
 
 Update for KSP 1.6  
 Update to MM 3.1.2  
@@ -232,7 +231,7 @@ material (source is in Assets)
 Fixed curve colors in transonic design defaulting to purple  
 Moved asset bundle from shaders to Assets  
 Replaced icons with new ones (source is in icons, feel free to submit better ones)
- 
+
 Removed all All Rights Reserved files  
 
 0.15.9.1V "Liepmann"------------------------------------  
@@ -369,7 +368,6 @@ Change units for specific excess power in the Flight Data readout to be W/kg on 
 
 Fix a critical error that prevented voxelizations of Kerbals or any vehicles that had Kerbals riding in a command seat  
 
-
 0.15.5.6V "Jacobs"------------------------------------  
 
 Update to MM 2.6.18
@@ -380,7 +378,6 @@ Fix failure to load saved FAR data in flight
 Fix unrealistically high numbers in indicated airspeed at higher Mach numbers  
 
 Lower critical Mach number for slender vehicles with sudden bulges and waviness in their cross-section  
-
 
 0.15.5.5V "Hugoniot"------------------------------------  
 
@@ -395,14 +392,12 @@ Fix overheat interaction on load with ModuleCoreHeat
 Fix FAR breaking on attempts to load Training or Scenario scenes  
 Fix spoilers and flaps not updating with settings in the editor  
 
-
 0.15.5.4V "Hoerner"------------------------------------  
 
 Adjust water drag for better splashdown performance  
 Fix a serious voxelization issue with ModuleJettison, most notable in leading to no-drag reentries  
 Fix an issue where 3rd-party voxelization updates could sometimes break the editor GUI and CoL  
 Fix a serious issue that could lead to spontaneous crashes on aero initialization (either VAB / SPH CoL, editor GUI, or going to flight)  
-
 
 0.15.5.3V "von Helmholtz"------------------------------------  
 
@@ -419,7 +414,6 @@ Fix some other control surface in-flight changes oddities
 
 Fix Firehound MS example craft action groups not acting in symmetry  
 Added E42 example craft by tetryds  
-
 
 0.15.5.2V "Helmbold"------------------------------------  
 
@@ -449,7 +443,6 @@ Fix for vehicle aerodynamics breaking under certain vessel-part configurations
 
 Updated FAR Firehound MS, FAR SkyEye, FAR Montauk Shuttle to be more useful in KSP 1.0.5
 
-
 0.15.5.1V "Hayes"------------------------------------  
 
 Upgrade to MM 2.6.8  
@@ -461,7 +454,6 @@ Fix in-flight control surface tweaks not applying to symmetry counterparts
 Fix KerbalEVAs working with Vanguard Parachutes  
 
 Fix for a critical error where detached boosters, weapons, debris, etc. would not have drag properties  
-
 
 0.15.5V "Haack"------------------------------------  
 
@@ -490,7 +482,6 @@ Tweaked subsonic drag downwards to get more accurate results with fixed AJE prop
 Tweaked wing mass downwards slightly  
 Tweaked wing strength power to result in greater strength from lower-mass wings  
 
-
 0.15.4.1V "Goldstein"------------------------------------  
 
 Re-implementation of aero viz coloration, thanks to mjn33  
@@ -510,10 +501,11 @@ Update to MFI 1.1.1, fixes gimbaling bug below 750 m/s on short vehicles
 Update win64 check code to MM method  
 
 Added internal ducted area feature:  
-	* Area ducted through a vehicle from intakes to airbreathing engines will be removed from cross-section  
-	* Adjusts area ruling to properly model air that flows through the vehicle as opposed to around it  
-	* Does not count for airflow through switch-backing or reversing ducts; no benefits for intakes that feed upstream engines  
-	* Supports stock intake part + airbreathing engine part setups, AJE intake part + airbreathing engine part setups, and combined intake + engine part setups  
+
+* Area ducted through a vehicle from intakes to airbreathing engines will be removed from cross-section  
+* Adjusts area ruling to properly model air that flows through the vehicle as opposed to around it  
+* Does not count for airflow through switch-backing or reversing ducts; no benefits for intakes that feed upstream engines  
+* Supports stock intake part + airbreathing engine part setups, AJE intake part + airbreathing engine part setups, and combined intake + engine part setups  
 
 Slight improvement to Flight Data readouts from mjn33  
 Toggle gear button now states "Raise" or "Lower" gear for clarity  
@@ -531,7 +523,6 @@ Added ability to read and set flap and spoiler states from FARAPI
 Fixed Firespitter gear not responding to Toggle Gear button  
 Added support for adjustable landing gear in Toggle Gear button  
 Stopgap fix to unintended voxelization of USI Warp Drive bubbles  
-
 
 0.15.3.1V "Garabedian"------------------------------------  
 
@@ -595,7 +586,6 @@ Disable control surfaces auto-response below 5 m/s to prevent wacky flailing dur
 Change compatibility settings to reject KSP 1.0.0, which is not compatible with RealChuteLite  
 Updated save-load method to save more reliably and not throw exceptions  
 
-
 0.15V "Euler"------------------------------------  
 
 Compatibility with KSP 1.0, 1.0.1, and 1.0.2  
@@ -603,29 +593,31 @@ Upgraded to MM 2.6.3
 Introduction of ModularFlightIntegrator for interfacing with KSP drag / heating systems without interference with other mods
 
 Replaced previous part-based drag model with new vessel-centered, voxel-powered model:  
-	* Generates voxel model of vehicle using part meshes, accounting for part clipping  
-	* Drag is calculated for vehicle as a whole, rather than linear combination of parts  
-	* Payload fairings and cargo bays are emergent from code and do not require special treatment with configs  
-	* Area ruling of vehicles is accounted for; unsmooth area distributions will result in very high drag at and above Mach 1  
-	* Body lift accounts for vehicle shape in determining potential and viscous flow contributions  
-	* Areas exposed to outside used for stock heating calculations  
+
+* Generates voxel model of vehicle using part meshes, accounting for part clipping  
+* Drag is calculated for vehicle as a whole, rather than linear combination of parts  
+* Payload fairings and cargo bays are emergent from code and do not require special treatment with configs  
+* Area ruling of vehicles is accounted for; unsmooth area distributions will result in very high drag at and above Mach 1  
+* Body lift accounts for vehicle shape in determining potential and viscous flow contributions  
+* Areas exposed to outside used for stock heating calculations  
 
 Performance optimizations in legacy wing model  
 Jet engine windmilling drag accounted for at intakes  
 
 Editor GUI improvements including:  
-	* Greater clarity in AoA / Mach sweep tab  
-	* Stability deriv GUI math modified for improved accuracy  
-	* Stability deriv simulation tweaked to fix some minor issues in displaying and calculating response  
-	* Addition of a Transonic Design tab that displays cross-section distribution and drag at Mach 1 for area ruling purposes  
+
+* Greater clarity in AoA / Mach sweep tab  
+* Stability deriv GUI math modified for improved accuracy  
+* Stability deriv simulation tweaked to fix some minor issues in displaying and calculating response  
+* Addition of a Transonic Design tab that displays cross-section distribution and drag at Mach 1 for area ruling purposes  
 
 Parachute methods have been replaced with RealChuteLite implementation by stupid_chris:  
-	* Less severe parachute deployment  
-	* Parachutes melt / break in high Mach number flows  
-	* No interference with RealChute  
+    * Less severe parachute deployment  
+    * Parachutes melt / break in high Mach number flows  
+    * No interference with RealChute  
 
 Changes to FARAPI to get information faster  
-	
+
 FARBasicDragModel, FARPayloadFairingModule, FARCargoBayModule are now obsolete and removed from the codebase  
 Extensive reorganizing of source to reduce spaghetti and improve maintainability  
 
@@ -656,7 +648,6 @@ Included FAR Colibri, a VTOL by Tetryds as an example craft
 Bugfixes:  
 Fixed an issue preventing loading custom-defined FARBasicDragModels
 
-
 0.14.6V------------------------------------  
 Features:  
 Modified skin friction variation with M and Re to closer to that expected by using the Knudsen number  
@@ -684,7 +675,6 @@ Bugfixes:
 Fix Stab Deriv GUI from breaking for altitudes above atmosphere  
 Fix flaps and spoilers not functioning with negative deflections
 
-
 0.14.5V------------------------------------  
 Features:  
 Skin friction drag now varies with Reynolds number; this means much higher skin friction drags at higher altitudes  
@@ -709,28 +699,25 @@ Stability Deriv tab now takes entry in terms of planet, altitude and Mach Number
 Stability Deriv tab now accounts for reduced gravity due to high speeds
 
 Contributed by HoneyFox:  
-	Pitch damper now has an additional gain for greater tuning  
-	Control surfaces can now be set to deflect in response to local AoA changes  
-	Control surfaces are not On/Off for a given control direction; can be scaled from -100% to 100% for each  
+    Pitch damper now has an additional gain for greater tuning  
+    Control surfaces can now be set to deflect in response to local AoA changes  
+    Control surfaces are not On/Off for a given control direction; can be scaled from -100% to 100% for each  
 
 Contributed by Bitronic:  
-	Full Tweakscale Support
+    Full Tweakscale Support
 
 BugFixes:  
 Fixed no shielding with some payload fairings (particularly resized procedural fairings)  
 Fixed aero tinting blocking tinting from other mods
-	
-
 
 0.14.3.2v------------------------------------  
 Features:  
 Contributed by Da Michel:  
-	Airspeed settings change readouts in cockpits  
+    Airspeed settings change readouts in cockpits  
 
 Bugfixes:  
 Fixed serious issues with the wing interaction code  
 Fixed an issue where wind velocity was applied in the opposite direction that was expected  
-
 
 0.14.3.1v------------------------------------  
 Features:  
@@ -741,16 +728,15 @@ Bugfixes:
 Fixed neverending stall resulting from wing interactions with sudden changes in velocity vector direction  
 Fixed flight GUI issues when passing another vehicle  
 
-
 0.14.3v------------------------------------
 Features:
 Refactored wing interaction code:  
-	Wing interactions should be smoother  
-	Code should be less processor intensive  
+    Wing interactions should be smoother  
+    Code should be less processor intensive  
 
 Upgrade to ModuleManager v2.5.1  
 Added stall visualization to aero force visualization  
-Added ability to scale wing mass up or down for additional strength / weight savings (addedby NathanKell)   
+Added ability to scale wing mass up or down for additional strength / weight savings (addedby NathanKell)  
 Improved cargo bay and payload fairing detection algorithm  
 
 Tweaks:  
@@ -776,16 +762,15 @@ See and dump FAR module data in the VAB / SPH using the Editor GUI
 Some runtime optimizations  
 
 Contributed by Da Michel:  
-	Implement separate deflection speeds for flaps / spoilers  
-	Allow preferred default action groups for spoilers / flaps  
+    Implement separate deflection speeds for flaps / spoilers  
+    Allow preferred default action groups for spoilers / flaps  
 Contributed by regex:  
-	Add some RPM integration  
+    Add some RPM integration  
 Contributed by Ippo:  
-	FARWind class for 3rd-party wind implementation
-
+    FARWind class for 3rd-party wind implementation
 
 Bugfixes:
 Fixed some vessel-switching FAR GUI issues  
 Fixed control surface reversal on undocking or backwards root part selection  
 Fixed some issues involving CoL position with wings when dealing with parts that have multiple colliders  
-Fixed some payload fairing and cargo bay part detection issues 
+Fixed some payload fairing and cargo bay part detection issues  
