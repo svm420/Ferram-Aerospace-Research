@@ -230,10 +230,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                                  Length,
                                                                  vessel.srfSpeed,
                                                                  MachNumber,
-                                                                 FlightGlobals.getExternalTemperature((float)vessel
-                                                                         .altitude,
-                                                                     vessel.mainBody),
-                                                                 vessel.mainBody.atmosphereAdiabaticIndex);
+                                                                 FARAtmosphere.GetTemperature(vessel),
+                                                                 FARAtmosphere.GetAdiabaticIndex(vessel));
             float skinFrictionDragCoefficient = (float)FARAeroUtil.SkinFrictionDrag(ReynoldsNumber, MachNumber);
 
             float pseudoKnudsenNumber = (float)(MachNumber / (ReynoldsNumber + MachNumber));
@@ -272,13 +270,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             var center = new FARCenterQuery();
             var dummy = new FARCenterQuery();
 
-            CelestialBody body = vessel.mainBody; //Calculate main gas properties
-            float pressure = (float)body.GetPressure(altitude);
-            float temperature = (float)body.GetTemperature(altitude);
-            float density = (float)body.GetDensity(pressure, temperature);
-            float speedOfSound = (float)body.GetSpeedOfSound(pressure, density);
+            //Calculate main gas properties
+            GasProperties properties = FARAtmosphere.GetGasProperties(vessel);
 
-            if (pressure <= 0 || temperature <= 0 || density <= 0 || speedOfSound <= 0)
+            if (properties.Pressure <= 0 || properties.Temperature <= 0)
             {
                 aeroForce = Vector3.zero;
                 aeroTorque = Vector3.zero;
@@ -286,14 +281,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
 
             float velocityMag = velocityWorldVector.magnitude;
-            float machNumber = velocityMag / speedOfSound;
-            float reynoldsNumber =
-                (float)FARAeroUtil.CalculateReynoldsNumber(density,
-                                                           Length,
-                                                           velocityMag,
-                                                           machNumber,
-                                                           temperature,
-                                                           body.atmosphereAdiabaticIndex);
+            float machNumber = (float)(velocityMag / properties.SpeedOfSound);
+            float reynoldsNumber = (float)FARAeroUtil.CalculateReynoldsNumber(properties.Density,
+                                                                              Length,
+                                                                              velocityMag,
+                                                                              machNumber,
+                                                                              properties.Temperature,
+                                                                              properties.AdiabaticIndex);
 
             float reynoldsPerLength = reynoldsNumber / (float)Length;
             float skinFriction = (float)FARAeroUtil.SkinFrictionDrag(reynoldsNumber, machNumber);
@@ -303,7 +297,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (_currentAeroSections != null)
             {
                 foreach (FARAeroSection curSection in _currentAeroSections)
-                    curSection?.PredictionCalculateAeroForces(density,
+                    curSection?.PredictionCalculateAeroForces((float)properties.Density,
                                                               machNumber,
                                                               reynoldsPerLength,
                                                               pseudoKnudsenNumber,
@@ -316,7 +310,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                         center.AddForce(curWing.transform.position,
                                         curWing.PrecomputeCenterOfLift(velocityWorldVector,
                                                                        machNumber,
-                                                                       density,
+                                                                       properties.Density,
                                                                        dummy));
             }
 

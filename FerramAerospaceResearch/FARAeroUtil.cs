@@ -105,6 +105,17 @@ namespace FerramAerospaceResearch
             }
         }
 
+        public static double CurrentAdiabaticIndex
+        {
+            get
+            {
+                Vessel vessel = FlightGlobals.ActiveVessel;
+                return FARAtmosphere.GetAdiabaticIndex(CurrentBody,
+                                                       new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude),
+                                                       Planetarium.GetUniversalTime());
+            }
+        }
+
         public static FloatCurve PrandtlMeyerMach
         {
             get
@@ -115,7 +126,7 @@ namespace FerramAerospaceResearch
                 prandtlMeyerMach = new FloatCurve();
                 prandtlMeyerAngle = new FloatCurve();
                 double M = 1;
-                double gamma = CurrentBody.atmosphereAdiabaticIndex;
+                double gamma = CurrentAdiabaticIndex;
 
                 double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
 
@@ -166,7 +177,7 @@ namespace FerramAerospaceResearch
                 prandtlMeyerMach = new FloatCurve();
                 prandtlMeyerAngle = new FloatCurve();
                 double M = 1;
-                double gamma = CurrentBody.atmosphereAdiabaticIndex;
+                double gamma = CurrentAdiabaticIndex;
                 double gamma_ = Math.Sqrt((gamma + 1) / (gamma - 1));
 
                 while (M < 250)
@@ -277,7 +288,7 @@ namespace FerramAerospaceResearch
         // ReSharper disable once UnusedMember.Global
         public static double MaxPressureCoefficientCalc(double M)
         {
-            double gamma = CurrentBody.atmosphereAdiabaticIndex;
+            double gamma = CurrentAdiabaticIndex;
 
             if (M <= 0)
                 return 1;
@@ -291,7 +302,7 @@ namespace FerramAerospaceResearch
 
         public static double StagnationPressureCalc(double M)
         {
-            double gamma = CurrentBody.atmosphereAdiabaticIndex;
+            double gamma = CurrentAdiabaticIndex;
 
             double ratio = M * M;
             ratio *= gamma - 1;
@@ -307,7 +318,7 @@ namespace FerramAerospaceResearch
             if (M <= 1)
                 return StagnationPressureCalc(M);
 
-            double gamma = CurrentBody.atmosphereAdiabaticIndex;
+            double gamma = CurrentAdiabaticIndex;
             //Rayleigh Pitot Tube Formula; gives max stagnation pressure behind shock
             double value = (gamma + 1) * M;
             value *= value;
@@ -322,7 +333,7 @@ namespace FerramAerospaceResearch
 
         public static double PressureBehindShockCalc(double M)
         {
-            double gamma = CurrentBody.atmosphereAdiabaticIndex;
+            double gamma = CurrentAdiabaticIndex;
 
             double ratio = M * M;
             ratio *= 2 * gamma;
@@ -334,7 +345,7 @@ namespace FerramAerospaceResearch
 
         public static double MachBehindShockCalc(double M)
         {
-            double gamma = CurrentBody.atmosphereAdiabaticIndex;
+            double gamma = CurrentAdiabaticIndex;
 
             double ratio = gamma - 1;
             ratio *= M * M;

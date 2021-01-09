@@ -391,7 +391,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             int flapsettingInt = _flapSettingDropdown.ActiveSelection;
             bool spoilersDeployedBool = spoilersDeployed;
 
-            if (body.GetPressure(altitudeDouble) > 0)
+            if (FARAtmosphere.GetPressure(body, new Vector3d(0, 0, altitudeDouble), Planetarium.GetUniversalTime()) > 0)
             {
                 stabDerivOutput =
                     simManager.StabDerivCalculator.CalculateStabilityDerivs(body,

@@ -70,10 +70,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
             double phi
         )
         {
-            double pressure = body.GetPressure(alt);
-            double temperature = body.GetTemperature(alt);
-            double density = body.GetDensity(pressure, temperature);
-            double sspeed = body.GetSpeedOfSound(pressure, density);
+            GasProperties properties = FARAtmosphere.GetGasProperties(body,
+                                                                      new Vector3d(0, 0, alt),
+                                                                      Planetarium.GetUniversalTime());
+
+            double pressure = properties.Pressure;
+            double temperature = properties.Temperature;
+            double density = properties.Density;
+            double sspeed = properties.SpeedOfSound;
             double u0 = sspeed * machNumber;
             double q = u0 * u0 * density * 0.5f;
 
@@ -191,14 +195,16 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                                 2 * (prncInertRot.x * prncInertRot.z - prncInertRot.y * prncInertRot.w));
 
                 var Row2 = new Vector3(2 * (prncInertRot.x * prncInertRot.y - prncInertRot.z * prncInertRot.w),
-                                       -prncInertRot.x * prncInertRot.x + prncInertRot.y * prncInertRot.y -
+                                       -prncInertRot.x * prncInertRot.x +
+                                       prncInertRot.y * prncInertRot.y -
                                        prncInertRot.z * prncInertRot.z +
                                        prncInertRot.w * prncInertRot.w,
                                        2 * (prncInertRot.y * prncInertRot.z + prncInertRot.x * prncInertRot.w));
 
                 var Row3 = new Vector3(2 * (prncInertRot.x * prncInertRot.z + prncInertRot.y * prncInertRot.w),
                                        2 * (prncInertRot.y * prncInertRot.z - prncInertRot.x * prncInertRot.w),
-                                       -prncInertRot.x * prncInertRot.x - prncInertRot.y * prncInertRot.y +
+                                       -prncInertRot.x * prncInertRot.x -
+                                       prncInertRot.y * prncInertRot.y +
                                        prncInertRot.z * prncInertRot.z +
                                        prncInertRot.w * prncInertRot.w);
 

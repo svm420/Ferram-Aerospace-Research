@@ -80,19 +80,15 @@ namespace ferram4
 
         public float oldMassMultiplier = -1f;
 
-        [KSPField(isPersistant = false)]
-        public double MAC;
+        [KSPField(isPersistant = false)] public double MAC;
 
         public double MAC_actual;
 
-        [KSPField(isPersistant = false)]
-        public double e;
+        [KSPField(isPersistant = false)] public double e;
 
-        [KSPField(isPersistant = false)]
-        public int nonSideAttach; //This is for ailerons and the small ctrl surf
+        [KSPField(isPersistant = false)] public int nonSideAttach; //This is for ailerons and the small ctrl surf
 
-        [KSPField(isPersistant = false)]
-        public double TaperRatio;
+        [KSPField(isPersistant = false)] public double TaperRatio;
 
         [KSPField(isPersistant = false, guiActive = true, guiName = "FARWingStalled")]
         protected double stall;
@@ -101,13 +97,11 @@ namespace ferram4
 
         private double piARe = 1; //induced drag factor
 
-        [KSPField(isPersistant = false)]
-        public double b_2; //span
+        [KSPField(isPersistant = false)] public double b_2; //span
 
         public double b_2_actual; //span
 
-        [KSPField(isPersistant = false)]
-        public double MidChordSweep;
+        [KSPField(isPersistant = false)] public double MidChordSweep;
 
         private double MidChordSweepSideways;
 
@@ -152,8 +146,7 @@ namespace ferram4
         private Vector3d perp = Vector3d.zero;
         private Vector3d liftDirection = Vector3d.zero;
 
-        [KSPField(isPersistant = false)]
-        public Vector3 rootMidChordOffsetFromOrig;
+        [KSPField(isPersistant = false)] public Vector3 rootMidChordOffsetFromOrig;
 
         // in local coordinates
         private Vector3d localWingCentroid = Vector3d.zero;
@@ -390,7 +383,10 @@ namespace ferram4
         {
             Vector3d WC = rootMidChordOffsetFromOrig;
             if (nonSideAttach <= 0)
-                WC += -b_2_actual / 3 * (1 + TaperRatio * 2) / (1 + TaperRatio) *
+                WC += -b_2_actual /
+                      3 *
+                      (1 + TaperRatio * 2) /
+                      (1 + TaperRatio) *
                       (Vector3d.right * srfAttachNegative +
                        Vector3d.up * Math.Tan(MidChordSweep * FARMathUtil.deg2rad));
             else
@@ -492,8 +488,8 @@ namespace ferram4
 
             MidChordSweepSideways =
                 (Math.PI * 0.5 -
-                 Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) +
-                           MidChordSweepSideways * 4 / transformed_AR)) *
+                 Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) + MidChordSweepSideways * 4 / transformed_AR)
+                ) *
                 MidChordSweepSideways *
                 0.5;
 
@@ -767,7 +763,7 @@ namespace ferram4
                                                                          v_scalar,
                                                                          MachNumber,
                                                                          vessel.externalTemperature,
-                                                                         vessel.mainBody.atmosphereAdiabaticIndex)
+                                                                         FARAtmosphere.GetAdiabaticIndex(vessel))
                                           : 0.005;
 
 
@@ -1032,7 +1028,7 @@ namespace ferram4
              */
             else if (MachNumber > 1.4)
             {
-                double coefMult = 2 / (FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex * MachNumber * MachNumber);
+                double coefMult = 2 / (FARAeroUtil.CurrentAdiabaticIndex * MachNumber * MachNumber);
 
                 double supersonicLENormalForceFactor = CalculateSupersonicLEFactor(beta, TanSweep, beta_TanSweep);
 
@@ -1075,7 +1071,7 @@ namespace ferram4
 
                 double M = MachNumber.Clamp(1.2, double.PositiveInfinity);
 
-                double coefMult = 2 / (FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex * M * M);
+                double coefMult = 2 / (FARAeroUtil.CurrentAdiabaticIndex * M * M);
 
                 double supersonicLENormalForceFactor = CalculateSupersonicLEFactor(beta, TanSweep, beta_TanSweep);
 
@@ -1160,8 +1156,7 @@ namespace ferram4
 
         private static double GetSupersonicPressureDifference(double M, double AoA)
         {
-            double maxSinBeta =
-                FARAeroUtil.CalculateSinMaxShockAngle(M, FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex);
+            double maxSinBeta = FARAeroUtil.CalculateSinMaxShockAngle(M, FARAeroUtil.CurrentAdiabaticIndex);
             double minSinBeta = 1 / M;
 
             //In radians, Corresponds to ~2.8 degrees or approximately what you would get from a ~4.8% thick diamond airfoil
@@ -1203,9 +1198,7 @@ namespace ferram4
         )
         {
             double sinBeta =
-                FARAeroUtil.CalculateSinWeakObliqueShockAngle(inM,
-                                                              FARAeroUtil.CurrentBody.atmosphereAdiabaticIndex,
-                                                              angle);
+                FARAeroUtil.CalculateSinWeakObliqueShockAngle(inM, FARAeroUtil.CurrentAdiabaticIndex, angle);
             if (double.IsNaN(sinBeta))
                 sinBeta = maxSinBeta;
 

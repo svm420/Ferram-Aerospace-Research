@@ -136,7 +136,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             double pressureRatio = FARAeroUtil.RayleighPitotTubeStagPressure(_vessel.mach);
 
             double velocity = pressureRatio - 1;
-            velocity *= _vessel.staticPressurekPa * 1000 * 2;
+            velocity *= FARAtmosphere.GetPressure(_vessel) * 2;
             velocity /= 1.225;
             velocity = Math.Sqrt(velocity);
 
