@@ -141,14 +141,13 @@ namespace FerramAerospaceResearch
 
                     prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
 
-                    if (M < 3)
-                        M += 0.1f;
-                    else if (M < 10)
-                        M += 0.5f;
-                    else if (M < 25)
-                        M += 2;
-                    else
-                        M += 25;
+                    M += M switch
+                    {
+                        < 3 => 0.1f,
+                        < 10 => 0.5f,
+                        < 25 => 2,
+                        _ => 25
+                    };
                 }
 
                 maxPrandtlMeyerTurnAngle = gamma_ - 1;
@@ -192,14 +191,13 @@ namespace FerramAerospaceResearch
 
                     prandtlMeyerAngle.Add((float)nu, (float)M, (float)nu_mach, (float)nu_mach);
 
-                    if (M < 3)
-                        M += 0.1;
-                    else if (M < 10)
-                        M += 0.5;
-                    else if (M < 25)
-                        M += 2;
-                    else
-                        M += 25;
+                    M += M switch
+                    {
+                        < 3 => 0.1,
+                        < 10 => 0.5,
+                        < 25 => 2,
+                        _ => 25
+                    };
                 }
 
                 maxPrandtlMeyerTurnAngle = gamma_ - 1;
