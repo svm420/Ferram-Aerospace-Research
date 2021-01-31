@@ -46,6 +46,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using KSP.Localization;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
@@ -247,7 +248,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private string GetFilename()
         {
             if (Vessel != null)
-                replacements[VesselNameKey] = Vessel.vesselName;
+                replacements[VesselNameKey] = Localizer.Format(Vessel.vesselName);
             replacements[DatetimeKey] = DateTime.Now.ToString(FARConfig.FlightLog.DatetimeFormat);
             string filename = Path.Combine(FARConfig.FlightLog.Directory,
                                            FARConfig.FlightLog.NameFormat.ToString(replacements));
