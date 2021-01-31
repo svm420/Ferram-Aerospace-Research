@@ -43,6 +43,7 @@ Copyright 2020, Michael Ferrara, aka Ferram4
  */
 
 using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace FerramAerospaceResearch
@@ -75,7 +76,12 @@ namespace FerramAerospaceResearch
                     }
                     else
                     {
-                        FARLogger.InfoFormat("FARAtmosphere.{0}: setting function to {1}", Name, value.Method.Name);
+                        MethodInfo method = value.Method;
+                        FARLogger.InfoFormat("FARAtmosphere.{0}: setting function to {1}.{2} from {3}",
+                                             Name,
+                                             method.DeclaringType?.Name ?? "(global)",
+                                             method.Name,
+                                             method.Module.Name);
                         function = value;
                     }
                 }
