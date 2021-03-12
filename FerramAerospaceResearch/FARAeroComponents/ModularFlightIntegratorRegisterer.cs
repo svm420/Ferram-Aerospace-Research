@@ -67,24 +67,35 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static void UpdateThermodynamicsPre(ModularFlightIntegrator fi)
         {
+            bool voxelizationCompleted =
+                fi.Vessel.FindVesselModuleImplementing<FARVesselAero>().HasEverValidVoxelization();
+
             for (int i = 0; i < fi.PartThermalDataCount; i++)
             {
                 PartThermalData ptd = fi.partThermalDataList[i];
                 Part part = ptd.part;
-                if (!part.Modules.Contains<FARAeroPartModule>())
+                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
+                if (aeroModule is null)
                     continue;
 
-                FARAeroPartModule aeroModule = part.Modules.GetModule<FARAeroPartModule>();
-
                 // make sure drag cube areas are correct based on voxelization
-                if (!part.DragCubes.None && aeroModule)
-                    for (int j = 0; j < 6; j++)
-                        part.DragCubes.AreaOccluded[FARAeroPartModule.ProjectedArea.FaceMap[j]] =
-                            (float)aeroModule.ProjectedAreas[j];
+                if (voxelizationCompleted)
+                {
+                    if (!part.DragCubes.None && aeroModule)
+                        for (int j = 0; j < 6; j++)
+                            part.DragCubes.AreaOccluded[FARAeroPartModule.ProjectedArea.FaceMap[j]] =
+                                (float)aeroModule.ProjectedAreas[j];
 
-                part.radiativeArea = CalculateAreaRadiative(fi, part, aeroModule);
-                part.exposedArea =
-                    part.machNumber > 0 ? CalculateAreaExposed(fi, part, aeroModule) : part.radiativeArea;
+                    part.radiativeArea = CalculateAreaRadiative(fi, part, aeroModule);
+                    part.exposedArea = part.machNumber > 0
+                                           ? CalculateAreaExposed(fi, part, aeroModule)
+                                           : part.radiativeArea;
+                }
+                else
+                {
+                    part.radiativeArea = fi.BaseFICalculateAreaRadiative(part);
+                    part.exposedArea = fi.BaseFICalculateAreaExposed(part);
+                }
 
                 if (FARSettings.ExposedAreaLimited && part.exposedArea > part.radiativeArea)
                     part.exposedArea = part.radiativeArea; //sanity check just in case
@@ -171,10 +182,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static double CalculateAreaRadiative(ModularFlightIntegrator fi, Part part)
         {
-            FARAeroPartModule module = null;
-            if (part.Modules.Contains<FARAeroPartModule>())
-                module = part.Modules.GetModule<FARAeroPartModule>();
-
+            FARAeroPartModule module = part.Modules.GetModule<FARAeroPartModule>();
             return CalculateAreaRadiative(fi, part, module);
         }
 
@@ -193,10 +201,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static double CalculateAreaExposed(ModularFlightIntegrator fi, Part part)
         {
-            FARAeroPartModule module = null;
-            if (part.Modules.Contains<FARAeroPartModule>())
-                module = part.Modules.GetModule<FARAeroPartModule>();
-
+            FARAeroPartModule module = part.Modules.GetModule<FARAeroPartModule>();
             return CalculateAreaExposed(fi, part, module);
         }
 
@@ -216,9 +221,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static double CalculateSunArea(ModularFlightIntegrator fi, PartThermalData ptd)
         {
-            FARAeroPartModule module = null;
-            if (ptd.part.Modules.Contains<FARAeroPartModule>())
-                module = ptd.part.Modules.GetModule<FARAeroPartModule>();
+            FARAeroPartModule module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
             if (module is null)
                 return fi.BaseFIGetSunArea(ptd);
@@ -229,9 +232,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private static double CalculateBodyArea(ModularFlightIntegrator fi, PartThermalData ptd)
         {
-            FARAeroPartModule module = null;
-            if (ptd.part.Modules.Contains<FARAeroPartModule>())
-                module = ptd.part.Modules.GetModule<FARAeroPartModule>();
+            FARAeroPartModule module = ptd.part.Modules.GetModule<FARAeroPartModule>();
 
             if (module is null)
                 return fi.BaseFIBodyArea(ptd);
