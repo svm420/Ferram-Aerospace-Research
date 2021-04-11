@@ -68,7 +68,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private static void UpdateThermodynamicsPre(ModularFlightIntegrator fi)
         {
             bool voxelizationCompleted =
-                fi.Vessel.FindVesselModuleImplementing<FARVesselAero>().HasEverValidVoxelization();
+                (fi.Vessel.vesselModules.Find(module => module is FARVesselAero) as FARVesselAero)?
+                .HasEverValidVoxelization() ?? false;
 
             for (int i = 0; i < fi.PartThermalDataCount; i++)
             {
