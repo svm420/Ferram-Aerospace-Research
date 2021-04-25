@@ -176,6 +176,45 @@ namespace ferram4
                        stepIncrement = 0.5f)]
         public float maxdeflectFlap = 15;
 
+        [KSPField(guiName = "FARCtrlShowDynamicDeflection", guiActiveEditor = true, guiActive = true),
+           UI_Toggle(affectSymCounterparts = UI_Scene.All,
+           scene = UI_Scene.All,
+           disabledText = "FARCtrlSurfStdText",
+           enabledText = "FARCtrlSurfStdText")]
+        private bool showDynamicDeflection = false;
+
+        [KSPField(guiName = "FARCtrlDynamicDeflection", isPersistant = true, guiActiveEditor = false, guiActive = false),
+         UI_Toggle(affectSymCounterparts = UI_Scene.All,
+                    enabledText = "FARCtrlSurfFlapActive",
+                    scene = UI_Scene.All,
+                    disabledText = "FARCtrlSurfFlapInActive")]
+        public bool isDynamicDeflection = false;
+        public bool isPrevDynamicDeflection = true;
+
+        [KSPField(guiName = "FARCtrlDynamicStartSpeed", isPersistant = true, guiActiveEditor = true, guiActive = true),
+         UI_FloatRange(affectSymCounterparts = UI_Scene.All,
+                       maxValue = 1000.0f,
+                       minValue = 0f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 10f)]
+        public float dynamicControlStartSpeed = 200.0f;
+
+        [KSPField(guiName = "FARCtrlDynamicExponent", isPersistant = true, guiActiveEditor = true, guiActive = true),
+         UI_FloatRange(affectSymCounterparts = UI_Scene.All,
+               maxValue = 4.0f,
+               minValue = 0.0f,
+               scene = UI_Scene.All,
+               stepIncrement = 0.1f)]
+        public float exponent = 2f;
+
+        [KSPField(guiName = "FARCtrlDynamicMinControl", isPersistant = true, guiActiveEditor = true, guiActive = true),
+         UI_FloatRange(affectSymCounterparts = UI_Scene.All,
+                maxValue = 1f,
+                minValue = 0f,
+                scene = UI_Scene.All,
+                stepIncrement = 0.05f)]
+        public float minControl = 0.1f;
+
         protected double PitchLocation;
         protected double YawLocation;
         protected double RollLocation;
@@ -324,6 +363,20 @@ namespace ferram4
                 Fields["brakeRudder"].guiActive = showStdCtrl;
                 Fields["maxdeflect"].guiActive = showStdCtrl;
                 prevStdCtrl = showStdCtrl;
+            }
+
+            if (showDynamicDeflection != isPrevDynamicDeflection)
+            {
+                Fields["dynamicControlStartSpeed"].guiActiveEditor = showDynamicDeflection;
+                Fields["exponent"].guiActiveEditor = showDynamicDeflection;
+                Fields["minControl"].guiActiveEditor = showDynamicDeflection;
+                Fields["isDynamicDeflection"].guiActiveEditor = showDynamicDeflection;
+
+                Fields["dynamicControlStartSpeed"].guiActive = showDynamicDeflection;
+                Fields["exponent"].guiActive = showDynamicDeflection;
+                Fields["minControl"].guiActive = showDynamicDeflection;
+                Fields["isDynamicDeflection"].guiActive = showDynamicDeflection;
+                isPrevDynamicDeflection = showDynamicDeflection;
             }
 
             if (showFlpCtrl != prevFlpCtrl)
@@ -571,7 +624,19 @@ namespace ferram4
             }
 
             AoAdesiredControl *= AoAsign;
+            AoAdesiredControl *= CalculateDynamicControlFactor();
             AoAdesiredControl = AoAdesiredControl.Clamp(-Math.Abs(maxdeflect), Math.Abs(maxdeflect));
+        }
+
+        private double CalculateDynamicControlFactor()
+        {
+            double factor = 1;
+            if (vessel.atmDensity > 0.01 && isDynamicDeflection)
+            {
+                 factor = Math.Pow(dynamicControlStartSpeed / vessel.srfSpeed, exponent) / (vessel.atmDensity / vessel.lastBody.atmDensityASL);
+            }
+
+            return factor.Clamp(minControl,1);
         }
 
         public override double CalculateAoA(Vector3d velocity)
@@ -603,7 +668,7 @@ namespace ferram4
         )
         {
             double error = desired - current;
-            if (!forceSetToDesired && Math.Abs(error) >= 0.1
+            if (!forceSetToDesired && Math.Abs(error) >= 0.01
             ) // DaMichel: i changed the threshold since i noticed a "bump" at max deflection
             {
                 double tmp1 = error / blendTimeConstant;
