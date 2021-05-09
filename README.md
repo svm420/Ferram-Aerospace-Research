@@ -64,9 +64,10 @@ Set all the other winglet/control surface values to zero
 0.16.0.2V "Mader"------------------------------------  
 
 Updated KSP version 1.11  
-Update to MFI 1.2.9
+Update to MFI 1.2.10
 
-Fixed Mk1pod.v2 voxelization by switching to mesh voxelization, colliders are missing top and bottom planes resulting in shell-only voxelization  
+Added Dynamic Deflection for Control Surfaces Option [#110](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/110), [@Alioth81](https://github.com/Alioth81)  
+Fixed Mk1pod.v2 voxelization by switching to mesh voxelization, colliders were missing top and bottom planes resulting in shell-only voxelization  
 Rotor blades are no longer voxelized  
 Reduced submerged lift and drag, multipliers are controlled by `FARConfig/Settings/submerged[Drag|Lift]Multiplier` with default value of 0.25  
 Renamed FARWind to FARAtmosphere and added overrides for gas properties  
