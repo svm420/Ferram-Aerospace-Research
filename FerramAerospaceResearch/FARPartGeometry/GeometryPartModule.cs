@@ -178,11 +178,22 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 debugInfo.Print(part);
         }
 
+        private void OnEditorAttach()
+        {
+            if (meshDataList is null || meshDataList.Count == 0)
+            {
+                RebuildAllMeshData();
+            }
+        }
+
         public override void OnAwake()
         {
             base.OnAwake();
             ignoredTransforms = new List<string>();
             unignoredTransforms = new List<string>();
+
+            // Part has connected member that would work but it is not public...
+            part.OnEditorAttach += OnEditorAttach;
         }
 
         private void Start()
@@ -203,6 +214,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             animStates = null;
             animStateTime = null;
             destroyed = true;
+
+            part.OnEditorAttach -= OnEditorAttach;
         }
 
         public override void OnStart(StartState state)
@@ -252,6 +265,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
             // don't voxelize until the part is placed
             while (EditorLogic.SelectedPart == part)
                 yield return waiter;
+
+            // skip if not the root part, OnEditorAttach will rebuild the mesh data
+            if (EditorLogic.RootPart != part)
+                yield break;
 
             RebuildAllMeshData();
         }
@@ -350,6 +367,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private Bounds SetBoundsFromMeshes()
         {
+            if (meshDataList.Count == 0)
+            {
+                // If the mesh is empty, try rebuilding it. This can happen when a part was added to the editor but not
+                // the ship before adding it to the ship
+                RebuildAllMeshData();
+            }
+
             Vector3 upper = Vector3.one * float.NegativeInfinity, lower = Vector3.one * float.PositiveInfinity;
             foreach (GeometryMesh geoMesh in meshDataList)
             {
