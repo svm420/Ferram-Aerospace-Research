@@ -74,8 +74,6 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI.Simulation
                                                                       new Vector3d(0, 0, alt),
                                                                       Planetarium.GetUniversalTime());
 
-            double pressure = properties.Pressure;
-            double temperature = properties.Temperature;
             double density = properties.Density;
             double sspeed = properties.SpeedOfSound;
             double u0 = sspeed * machNumber;

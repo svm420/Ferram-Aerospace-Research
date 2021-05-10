@@ -156,7 +156,8 @@ namespace FerramAerospaceResearch
         ///     Simulation pressure function
         /// </summary>
         private static readonly PropertyDispatcher pressureFunction =
-            new(((body, latLonAltitude, ut) => body.GetPressure(latLonAltitude.z)), "Pressure");
+            // KSP returns pressure in kPa
+            new(((body, latLonAltitude, ut) => body.GetPressure(latLonAltitude.z) * 1000), "Pressure");
 
         /// <summary>
         ///     Simulation temperature function
