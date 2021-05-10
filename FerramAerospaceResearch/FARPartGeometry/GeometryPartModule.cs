@@ -266,8 +266,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             while (EditorLogic.SelectedPart == part)
                 yield return waiter;
 
-            // skip if not the root part, OnEditorAttach will rebuild the mesh data
-            if (EditorLogic.RootPart != part)
+            // skip if not in the ship, OnEditorAttach will rebuild the mesh data
+            if (!EditorLogic.SortedShipList.Contains(part))
                 yield break;
 
             RebuildAllMeshData();
