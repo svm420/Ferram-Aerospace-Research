@@ -61,6 +61,12 @@ Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
 
+master------------------------------------  
+
+Fixed navball displaying wrong speed after switching back and forth from IVA view [#112](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/112)  
+Added back missing `altitude` parameter to simulations [#111](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/111)  
+Fixed voxelization error when a part is placed in the editor but not attached to a ship  
+
 0.16.0.2V "Mader"------------------------------------  
 
 Updated KSP version 1.11  
@@ -76,7 +82,10 @@ Renamed FARWind to FARAtmosphere and added overrides for gas properties
 
 Resized (again) toolbar icon to 64x64  
 All meshes in `TransparentFX` layer are ignored for voxelization, previously only visible non-skinned meshes had this check ([f6a005d](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/f6a005d6759e9de97434ef75d2da336c45931aad))  
-Improve async config loading and saving ([9e67b32](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/9e67b32878c9fb872515b3f8ea41135ac23a5718))  
+Improve async config loading and s
+
+
+aving ([9e67b32](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/9e67b32878c9fb872515b3f8ea41135ac23a5718))  
 Enable debug voxels in flight mode ([5560079](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/5560079e6682e762dfff53ee4422979b90998b69)) with:  
 
 ```cfg
