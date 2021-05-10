@@ -55,6 +55,7 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 {
+    [DefaultExecutionOrder(1)]
     public class FlightGUI : VesselModule
     {
         private static bool showGUI;
