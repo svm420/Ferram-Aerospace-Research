@@ -271,7 +271,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             var dummy = new FARCenterQuery();
 
             //Calculate main gas properties
-            GasProperties properties = FARAtmosphere.GetGasProperties(vessel);
+            GasProperties properties = FARAtmosphere.GetGasProperties(vessel, altitude, Planetarium.GetUniversalTime());
 
             if (properties.Pressure <= 0 || properties.Temperature <= 0)
             {

@@ -350,6 +350,13 @@ namespace FerramAerospaceResearch
                        gasConstant: GetGasConstant(body, latLonAltitude, ut));
         }
 
+        public static GasProperties GetGasProperties(Vessel vessel, double altitude, double ut)
+        {
+            return GetGasProperties(vessel.mainBody,
+                                    new Vector3d(vessel.latitude, vessel.longitude, altitude),
+                                    ut);
+        }
+
         public static GasProperties GetGasProperties(Vessel vessel, double ut)
         {
             return GetGasProperties(vessel.mainBody,
