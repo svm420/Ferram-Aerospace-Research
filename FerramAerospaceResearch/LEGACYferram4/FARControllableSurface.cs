@@ -631,7 +631,7 @@ namespace ferram4
         private double CalculateDynamicControlFactor()
         {
             double factor = 1;
-            if (vessel.atmDensity > 0.01 && isDynamicDeflection)
+            if (vessel.atmDensity > 0.01 && isDynamicDeflection && vessel.srfSpeed > 0)
             {
                  factor = Math.Pow(dynamicControlStartSpeed / vessel.srfSpeed, exponent) / (vessel.atmDensity / vessel.lastBody.atmDensityASL);
             }
