@@ -191,7 +191,7 @@ namespace ferram4
         public bool isDynamicDeflection = false;
         public bool isPrevDynamicDeflection = true;
 
-        [KSPField(guiName = "FARCtrlDynamicStartSpeed", isPersistant = true, guiActiveEditor = true, guiActive = true),
+        [KSPField(guiName = "FARCtrlDynamicStartSpeed", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
                        maxValue = 1000.0f,
                        minValue = 0f,
@@ -199,7 +199,7 @@ namespace ferram4
                        stepIncrement = 10f)]
         public float dynamicControlStartSpeed = 200.0f;
 
-        [KSPField(guiName = "FARCtrlDynamicExponent", isPersistant = true, guiActiveEditor = true, guiActive = true),
+        [KSPField(guiName = "FARCtrlDynamicExponent", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
                maxValue = 4.0f,
                minValue = 0.0f,
@@ -207,7 +207,7 @@ namespace ferram4
                stepIncrement = 0.1f)]
         public float exponent = 2f;
 
-        [KSPField(guiName = "FARCtrlDynamicMinControl", isPersistant = true, guiActiveEditor = true, guiActive = true),
+        [KSPField(guiName = "FARCtrlDynamicMinControl", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
                 maxValue = 1f,
                 minValue = 0f,
