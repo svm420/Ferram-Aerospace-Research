@@ -49,10 +49,9 @@ namespace FerramAerospaceResearch.Settings
             // ReSharper disable once PossibleNullReferenceException
             foreach (KeyValuePair<string, FARPartModuleException> pair in Exceptions)
             {
-                //The first index of each list is the name of the part module; the rest are the transforms
-                if (!p.Modules.Contains(pair.Value.Transforms[0]))
+                PartModule module = p.Modules.GetModule(pair.Value.PartModuleName);
+                if (module is null)
                     continue;
-                PartModule module = p.Modules[pair.Value.Transforms[0]];
 
                 for (int j = 1; j < pair.Value.Transforms.Count; ++j)
                 {
