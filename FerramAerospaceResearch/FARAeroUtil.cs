@@ -109,10 +109,17 @@ namespace FerramAerospaceResearch
         {
             get
             {
+                double ut = Planetarium.fetch.time;
+                if (HighLogic.LoadedSceneIsEditor)
+                {
+                    // vessels don't exist in editor
+                    return FARAtmosphere.GetAdiabaticIndex(CurrentBody, Vector3d.zero, ut);
+                }
+
                 Vessel vessel = FlightGlobals.ActiveVessel;
                 return FARAtmosphere.GetAdiabaticIndex(CurrentBody,
                                                        new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude),
-                                                       Planetarium.GetUniversalTime());
+                                                       ut);
             }
         }
 
