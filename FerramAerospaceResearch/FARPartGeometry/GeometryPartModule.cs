@@ -189,8 +189,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public override void OnAwake()
         {
             base.OnAwake();
-            ignoredTransforms = new List<string>();
-            unignoredTransforms = new List<string>();
+            if (ignoredTransforms == null)
+                ignoredTransforms = new List<string>();
+            if (unignoredTransforms == null)
+                unignoredTransforms = new List<string>();
 
             // Part has connected member that would work but it is not public...
             part.OnEditorAttach += OnEditorAttach;
