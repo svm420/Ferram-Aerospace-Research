@@ -192,8 +192,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             GameEvents.onEditorShipModified.Add(ResetEditorEvent);
             GameEvents.onEditorLoad.Add(ResetEditorEvent);
 
-            GameEvents.onGUI
-            sReportReady.Add(AddDesignConcerns);
+            GameEvents.onGUIEngineersReportReady.Add(AddDesignConcerns);
             GameEvents.onGUIEngineersReportDestroy.Add(RemoveDesignConcerns);
 
             RequestUpdateVoxel();
