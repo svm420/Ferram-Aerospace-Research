@@ -201,7 +201,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
         private void AddDesignConcerns()
         {
             editorReportUpdate = EngineersReport.Instance.GetType()
-                                                .GetMethod("OnCraftModified",
+                                                .GetMethod("UpdateDesignConcern",
                                                            BindingFlags.Instance | BindingFlags.NonPublic,
                                                            null,
                                                            Type.EmptyTypes,
@@ -376,6 +376,9 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
                     _simManager.UpdateAeroData(_vehicleAero, _wingAerodynamicModel);
                     UpdateCrossSections();
+                    
+                    foreach (IDesignConcern designConcern in _customDesignConcerns)
+                        designConcern.Test();
                     editorReportUpdate.Invoke(EngineersReport.Instance, null);
                 }
 
