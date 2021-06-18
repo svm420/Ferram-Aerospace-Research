@@ -69,6 +69,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public Rigidbody partRigidBody;
 
         public Bounds overallMeshBounds;
+        public Bounds localMeshBounds;
 
         public List<GeometryMesh> meshDataList;
         private List<IGeometryUpdater> geometryUpdaters;
@@ -279,14 +280,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             if (!_ready && _meshesToUpdate == 0)
             {
-                overallMeshBounds = SetBoundsFromMeshes();
+                (localMeshBounds, overallMeshBounds) = SetBoundsFromMeshes();
 
                 // @DRVeyl: Force all cubes to have the same bounds.  Do this any time you recalculate a mesh
                 // (ie when handling animations since this breaks the cubes for anything other than the *current* cube.)
                 foreach (DragCube cube in part.DragCubes.Cubes)
                 {
-                    cube.Size = overallMeshBounds.size;
-                    cube.Center = overallMeshBounds.center;
+                    cube.Size = localMeshBounds.size;
+                    cube.Center = localMeshBounds.center;
                 }
 
                 part.DragCubes.ForceUpdate(true, true);
@@ -367,7 +368,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             return true;
         }
 
-        private Bounds SetBoundsFromMeshes()
+        private (Bounds, Bounds) SetBoundsFromMeshes()
         {
             if (meshDataList.Count == 0)
             {
@@ -377,6 +378,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
 
             Vector3 upper = Vector3.one * float.NegativeInfinity, lower = Vector3.one * float.PositiveInfinity;
+            Vector3 upperLocal = Vector3.one * float.NegativeInfinity, lowerLocal = Vector3.one * float.PositiveInfinity;
             foreach (GeometryMesh geoMesh in meshDataList)
             {
                 if (!geoMesh.valid)
@@ -384,9 +386,14 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 upper = Vector3.Max(upper, geoMesh.bounds.max);
                 lower = Vector3.Min(lower, geoMesh.bounds.min);
+
+                Bounds meshBounds = GeometryMesh.TransformBounds(geoMesh.meshLocalBounds, geoMesh.meshLocalToPart);
+                upperLocal = Vector3.Max(upperLocal, meshBounds.max);
+                lowerLocal = Vector3.Min(lowerLocal, meshBounds.min);
             }
 
             var overallBounds = new Bounds((upper + lower) * 0.5f, upper - lower);
+            var localBounds = new Bounds((upperLocal + lowerLocal) * 0.5f, upperLocal - lowerLocal);
 
             float tmpTestBounds = overallBounds.center.x +
                                   overallBounds.center.y +
@@ -404,7 +411,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 Valid = true;
             }
 
-            return overallBounds;
+            return (localBounds, overallBounds);
         }
 
         private void GetAnimations()

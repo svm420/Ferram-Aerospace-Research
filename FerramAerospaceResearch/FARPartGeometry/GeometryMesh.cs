@@ -54,9 +54,11 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private readonly Vector3[] meshLocalVerts;
         public readonly int[] triangles;
         public readonly Transform meshTransform;
+        public readonly Transform partTransform;
         public readonly Part part;
         private readonly GeometryPartModule module;
         public readonly bool isSkinned;
+        public readonly Bounds meshLocalBounds;
 
         public readonly int invertXYZ;
 
@@ -65,6 +67,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public Matrix4x4 thisToVesselMatrix;
         public Matrix4x4 meshLocalToWorld;
+        public Matrix4x4 meshLocalToPart;
         public Bounds bounds;
         public bool valid;
 
@@ -75,6 +78,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             GeometryPartModule module
         )
         {
+            this.module = module;
+            part = module.part;
             meshLocalVerts = meshData.vertices;
             triangles = meshData.triangles;
             isSkinned = meshData.isSkinned;
@@ -82,6 +87,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             vertices = new Vector3[meshLocalVerts.Length];
             this.meshTransform = meshTransform;
+            partTransform = part.transform;
             UpdateLocalToWorldMatrix();
             thisToVesselMatrix = worldToVesselMatrix * meshLocalToWorld;
 
@@ -110,6 +116,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             gameObjectActiveInHierarchy = meshTransform.gameObject.activeInHierarchy;
 
+            meshLocalBounds = meshBounds;
             bounds = TransformBounds(meshBounds, thisToVesselMatrix);
 
             float tmpTestBounds = bounds.center.x +
@@ -127,9 +134,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 valid = true;
             }
-
-            this.module = module;
-            part = module.part;
 
             if (!module.part.isMirrored)
                 invertXYZ = 1;
@@ -154,6 +158,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             meshLocalToWorld = !isSkinned
                                    ? meshTransform.localToWorldMatrix
                                    : Matrix4x4.TRS(meshTransform.position, meshTransform.rotation, Vector3.one);
+            meshLocalToPart = partTransform.worldToLocalMatrix * meshLocalToWorld;
         }
 
         public void TransformBasis(Matrix4x4 newThisToVesselMatrix)
@@ -208,7 +213,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
         }
 
-        private static Bounds TransformBounds(Bounds oldBounds, Matrix4x4 matrix)
+        public static Bounds TransformBounds(Bounds oldBounds, Matrix4x4 matrix)
         {
             Vector3 center = oldBounds.center;
             Vector3 extents = oldBounds.extents;
