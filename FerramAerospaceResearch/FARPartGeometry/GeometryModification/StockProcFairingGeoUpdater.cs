@@ -82,7 +82,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
                 return;
 
             //if bounds count doesn't equal panels count, the number of panels changed
-            bool rebuildMesh = prevPanelBounds.Count == panels.Count;
+            bool rebuildMesh = prevPanelBounds.Count != panels.Count;
 
             if (rebuildMesh)
                 prevPanelBounds.Clear();
