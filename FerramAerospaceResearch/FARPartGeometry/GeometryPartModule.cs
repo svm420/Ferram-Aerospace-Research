@@ -354,6 +354,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         private bool IgnoredPredicate(Transform t)
         {
+            if (unignoredTransforms.Contains(t.name))
+                return false;
+
             if (ignoredTransforms.Contains(t.name))
                 return true;
 
