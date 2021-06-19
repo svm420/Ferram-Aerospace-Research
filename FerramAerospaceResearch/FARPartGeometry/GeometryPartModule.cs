@@ -367,7 +367,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     return false;
             }
 
-            FARLogger.DebugFormat("Ignoring {0}.{1} for voxelization: layer is ignored", part.name, t.gameObject.name);
+            FARLogger.DebugFormat("Ignoring {2} ({0}::{1}) for voxelization: layer is ignored",
+                                  part.name,
+                                  t.gameObject.name,
+                                  t.name);
             return true;
         }
 
@@ -381,7 +384,8 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
 
             Vector3 upper = Vector3.one * float.NegativeInfinity, lower = Vector3.one * float.PositiveInfinity;
-            Vector3 upperLocal = Vector3.one * float.NegativeInfinity, lowerLocal = Vector3.one * float.PositiveInfinity;
+            Vector3 upperLocal = Vector3.one * float.NegativeInfinity,
+                    lowerLocal = Vector3.one * float.PositiveInfinity;
             foreach (GeometryMesh geoMesh in meshDataList)
             {
                 if (!geoMesh.valid)
