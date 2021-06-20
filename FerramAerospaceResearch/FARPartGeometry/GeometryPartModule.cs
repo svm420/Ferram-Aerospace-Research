@@ -307,6 +307,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
         public void GeometryPartModuleRebuildMeshData()
         {
+            // skip parts that have been picked up, picking up should not invalidate previous voxelization
+            if (part.gameObject.layer == ignoreLayer0)
+                return;
+
             RebuildAllMeshData();
             UpdateVoxelShape();
         }
