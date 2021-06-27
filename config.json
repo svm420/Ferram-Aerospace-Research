@@ -7,13 +7,13 @@
         "ModDir": "$(SolutionDir)$(ModDirRelative)",
         "PluginDir": "$(ModDir)Plugins/",
         "AssetDir": "$(ModDir)Assets/",
-        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.11/",
+        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.12/",
         "KSPGameData": "$(KSP_DIR_INSTALL)GameData/",
         "GameDir": "$(KSPGameData)$(ModName)/",
         "VersionMajor": 0,
         "VersionMinor": 16,
         "VersionBuild": 0,
-        "VersionRevision": 2,
+        "VersionRevision": 3,
         "VersionName": "Mader",
         "Year": 2020,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
@@ -22,7 +22,7 @@
         "KSPMajorMin": 1,
         "KSPMajorMax": 1,
         "KSPMinorMin": 8,
-        "KSPMinorMax": 11,
+        "KSPMinorMax": 12,
         "UnityDir": "$(SolutionDir)Unity/$(ModName)/",
         "AssetBundleDir": "$(UnityDir)AssetBundles/",
         "UnityAssetsDir": "$(UnityDir)Assets/",
@@ -164,7 +164,8 @@
         "exclude": [
             "$(ModDirRelative)**/*db",
             "$(ModDirRelative)**/*.in",
-            "$(ModDirRelative)**/*.dll.*"
+            "$(ModDirRelative)**/*.dll.*",
+            "$(ModDirRelative)**/FARLogger_*"
         ],
         "map": [
             {

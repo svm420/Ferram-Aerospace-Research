@@ -1,4 +1,4 @@
-# Ferram Aerospace Research Continued v0.16.0.2 "Mader"
+# Ferram Aerospace Research Continued v0.16.0.3 "Mader"
 
 =========================  
 Aerodynamics model for Kerbal Space Program
@@ -61,10 +61,12 @@ Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
 
-master------------------------------------  
+0.16.0.3V "Mader"------------------------------------  
 
+Updated version file for KSP 1.12 max  
+Fixed picking up fairing would invalidate voxelization until reopening VAB/SPH  
+Fixed aerodynamic simulations  
 Fixed navball displaying wrong speed after switching back and forth from IVA view [#112](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/112)  
-Added back missing `altitude` parameter to simulations [#111](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/111)  
 Fixed voxelization error when a part is placed in the editor but not attached to a ship  
 
 0.16.0.2V "Mader"------------------------------------  
