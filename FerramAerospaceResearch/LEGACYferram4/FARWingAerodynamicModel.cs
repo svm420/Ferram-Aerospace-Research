@@ -161,7 +161,7 @@ namespace ferram4
 
         private FARWingAerodynamicModel parentWing;
         private bool updateMassNextFrame;
-        [SerializeField] private float? massOverride;
+        [KSPField(isPersistant = true)] private float? massOverride;
 
         public float? MassOverride
         {
