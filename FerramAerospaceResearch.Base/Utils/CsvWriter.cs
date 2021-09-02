@@ -39,6 +39,9 @@ namespace FerramAerospaceResearch
             Writer = File.AppendText(filename);
             Writer.AutoFlush = false;
 
+            // don't write sep= to an existing file
+            if (Appending)
+                return;
             // excel needs "sep=..." as the first line to recognize this as csv
             Writer.Write("sep=");
             Writer.WriteLine(Separator);
