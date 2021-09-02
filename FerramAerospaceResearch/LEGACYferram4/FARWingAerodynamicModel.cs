@@ -161,7 +161,17 @@ namespace ferram4
 
         private FARWingAerodynamicModel parentWing;
         private bool updateMassNextFrame;
-        public float? massOverride;
+        [SerializeField] private float? massOverride;
+
+        public float? MassOverride
+        {
+            get { return massOverride; }
+            set
+            {
+                massOverride = value;
+                Fields[nameof(massMultiplier)].guiActiveEditor = value is null;
+            }
+        }
 
         protected double ClIncrementFromRear;
 
@@ -178,8 +188,8 @@ namespace ferram4
 
         public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
         {
-            if (massOverride is not null)
-                return (float)massOverride;
+            if (MassOverride is not null)
+                return (float)MassOverride;
             if (massScaleReady)
                 return desiredMass - baseMass;
             return 0;
@@ -1467,7 +1477,7 @@ namespace ferram4
             if (node.HasValue("MidChordSweep"))
                 double.TryParse(node.GetValue("MidChordSweep"), out MidChordSweep);
             if (node.HasValue("MassOverride") && float.TryParse(node.GetValue("MassOverride"), out float mass))
-                massOverride = mass;
+                MassOverride = mass;
         }
 
         private void UpdateAeroDisplay(Vector3 lift, Vector3 drag)
