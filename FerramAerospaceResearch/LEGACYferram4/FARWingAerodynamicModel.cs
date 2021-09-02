@@ -161,6 +161,7 @@ namespace ferram4
 
         private FARWingAerodynamicModel parentWing;
         private bool updateMassNextFrame;
+        public float? massOverride;
 
         protected double ClIncrementFromRear;
 
@@ -177,6 +178,8 @@ namespace ferram4
 
         public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
         {
+            if (massOverride is not null)
+                return (float)massOverride;
             if (massScaleReady)
                 return desiredMass - baseMass;
             return 0;
@@ -488,8 +491,8 @@ namespace ferram4
 
             MidChordSweepSideways =
                 (Math.PI * 0.5 -
-                 Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) + MidChordSweepSideways * 4 / transformed_AR)
-                ) *
+                 Math.Atan(Math.Tan(MidChordSweep * FARMathUtil.deg2rad) +
+                           MidChordSweepSideways * 4 / transformed_AR)) *
                 MidChordSweepSideways *
                 0.5;
 
@@ -1463,6 +1466,8 @@ namespace ferram4
                 int.TryParse(node.GetValue("nonSideAttach"), out nonSideAttach);
             if (node.HasValue("MidChordSweep"))
                 double.TryParse(node.GetValue("MidChordSweep"), out MidChordSweep);
+            if (node.HasValue("MassOverride") && float.TryParse(node.GetValue("MassOverride"), out float mass))
+                massOverride = mass;
         }
 
         private void UpdateAeroDisplay(Vector3 lift, Vector3 drag)
