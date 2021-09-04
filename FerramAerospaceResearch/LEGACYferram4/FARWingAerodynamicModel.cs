@@ -161,7 +161,7 @@ namespace ferram4
 
         private FARWingAerodynamicModel parentWing;
         private bool updateMassNextFrame;
-        [KSPField(isPersistant = false)] public float massOverride = float.MinValue;
+        [KSPField(isPersistant = true)] public float massOverride = float.MinValue;
 
         public float? MassOverride
         {
@@ -185,11 +185,7 @@ namespace ferram4
         public float GetModuleMass(float defaultMass, ModifierStagingSituation sit)
         {
             if (MassOverride is not null)
-            {
-                Fields[nameof(curWingMass)].guiActiveEditor = false;
-                Fields[nameof(massMultiplier)].guiActiveEditor = false;
                 return (float)MassOverride;
-            }
             if (massScaleReady)
                 return desiredMass - baseMass;
             return 0;
@@ -472,6 +468,11 @@ namespace ferram4
 
 
             OnVesselPartsChange += UpdateThisWingInteractions;
+            if (MassOverride is not null)
+            {
+                Fields[nameof(curWingMass)].guiActiveEditor = false;
+                Fields[nameof(massMultiplier)].guiActiveEditor = false;
+            }
         }
 
         public void StartInitialization()
