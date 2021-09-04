@@ -161,15 +161,16 @@ namespace ferram4
 
         private FARWingAerodynamicModel parentWing;
         private bool updateMassNextFrame;
-        [KSPField(isPersistant = true)] private float? massOverride;
+        [KSPField(isPersistant = true)] public float massOverride = float.MinValue;
 
         public float? MassOverride
         {
-            get { return massOverride; }
+            get { return (massOverride > float.MinValue) ? massOverride : null; }
             set
             {
-                massOverride = value;
-                Fields[nameof(massMultiplier)].guiActiveEditor = value is null;
+                Fields[nameof(curWingMass)].guiActiveEditor = value is not null;
+                Fields[nameof(massMultiplier)].guiActiveEditor = value is not null;
+                massOverride = value ?? float.MinValue;
             }
         }
 
@@ -472,6 +473,11 @@ namespace ferram4
 
 
             OnVesselPartsChange += UpdateThisWingInteractions;
+            if (MassOverride is not null)
+            {
+                Fields[nameof(curWingMass)].guiActiveEditor = false;
+                Fields[nameof(massMultiplier)].guiActiveEditor = false;
+            }
         }
 
         public void StartInitialization()
@@ -1476,7 +1482,7 @@ namespace ferram4
                 int.TryParse(node.GetValue("nonSideAttach"), out nonSideAttach);
             if (node.HasValue("MidChordSweep"))
                 double.TryParse(node.GetValue("MidChordSweep"), out MidChordSweep);
-            if (node.HasValue("MassOverride") && float.TryParse(node.GetValue("MassOverride"), out float mass))
+            if (node.HasValue("massOverride") && float.TryParse(node.GetValue("massOverride"), out float mass))
                 MassOverride = mass;
         }
 
