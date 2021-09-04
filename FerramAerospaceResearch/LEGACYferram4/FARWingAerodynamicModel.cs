@@ -166,7 +166,12 @@ namespace ferram4
         public float? MassOverride
         {
             get { return (massOverride > float.MinValue) ? massOverride : null; }
-            set { massOverride = value ?? float.MinValue; }
+            set
+            {
+                Fields[nameof(curWingMass)].guiActiveEditor = value is not null;
+                Fields[nameof(massMultiplier)].guiActiveEditor = value is not null;
+                massOverride = value ?? float.MinValue;
+            }
         }
 
         protected double ClIncrementFromRear;
