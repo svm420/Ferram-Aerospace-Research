@@ -366,7 +366,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (t.gameObject.layer != ignoreLayer0)
             {
-                Transform prefabTransform = part.partInfo.partPrefab.FindModelTransform(t.gameObject.name);
+                Transform prefabTransform = part.partInfo.partPrefab?.FindModelTransform(t.gameObject.name);
                 if (prefabTransform is null || prefabTransform.gameObject.layer != ignoreLayer0)
                     return false;
             }
