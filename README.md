@@ -1,4 +1,4 @@
-# Ferram Aerospace Research Continued v0.16.0.3 "Mader"
+# Ferram Aerospace Research Continued v0.16.0.4 "Mader"
 
 =========================  
 Aerodynamics model for Kerbal Space Program
@@ -60,6 +60,11 @@ For control surfaces, use above but replace `FARWingAerodynamicModel` with `FARC
 Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
+
+0.16.0.4V "Mader"------------------------------------  
+
+Fixed NREs with potatoroids, thanks [@simmav](https://github.com/siimav) [#127](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/127)  
+Added `massOverride` to `FARWingAerodynamicModel` that fixes the module mass to the set value, with thanks to [@StoneSmile](https://github.com/StonesmileGit) [#126](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/126)  
 
 0.16.0.3V "Mader"------------------------------------  
 
