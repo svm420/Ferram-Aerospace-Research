@@ -140,7 +140,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 MAX_CHUNKS_IN_QUEUE = chunksForQueue;
                 MAX_CHUNKS_ALLOWED = (int)Math.Ceiling(1.5 * MAX_CHUNKS_IN_QUEUE);
 
-                FARLogger.Info("" + MAX_CHUNKS_IN_QUEUE + " " + MAX_CHUNKS_ALLOWED);
+                ThreadSafeDebugLogger.Info("" + MAX_CHUNKS_IN_QUEUE + " " + MAX_CHUNKS_ALLOWED);
                 for (int i = 0; i < MAX_CHUNKS_IN_QUEUE; i++)
                     clearedChunks.Push(new VoxelChunk(0, Vector3.zero, 0, 0, 0, null, useHigherResVoxels));
 
@@ -215,7 +215,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (double.IsInfinity(Volume)) //...if something broke, get out of here
             {
-                FARLogger.Error("Voxel Volume was infinity; ending voxelization");
+                ThreadSafeDebugLogger.Error("Voxel Volume was infinity; ending voxelization");
                 return;
             }
 
@@ -233,7 +233,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 while (chunksInUse >= MAX_CHUNKS_ALLOWED)
                 {
-                    ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel waiting for chunks to be released");
+                    ThreadSafeDebugLogger.Info("Voxel waiting for chunks to be released");
                     Monitor.Wait(clearedChunks);
                 }
 
@@ -265,7 +265,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
         }
 
@@ -431,7 +431,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //account for different angles effects on voxel cube's projected area
                 elementArea *= angleSizeIncreaseFactor;
 
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel Element CrossSection Area: " + elementArea);
+                ThreadSafeDebugLogger.Info("Voxel Element CrossSection Area: " + elementArea);
 
                 double invMag = 1 / Math.Sqrt(x * x + y * y + z * z);
 
@@ -675,8 +675,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
-                                                                       m);
+                        ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: areacount is NaN at section " + m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -693,7 +692,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //account for different angles effects on voxel cube's projected area
                 elementArea *= angleSizeIncreaseFactor;
 
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel Element CrossSection Area: " + elementArea);
+                ThreadSafeDebugLogger.Info("Voxel Element CrossSection Area: " + elementArea);
 
                 double invMag = 1 / Math.Sqrt(x * x + y * y + z * z);
 
@@ -931,8 +930,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
-                                                                       m);
+                        ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: areacount is NaN at section " + m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -950,7 +948,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //account for different angles effects on voxel cube's projected area
                 elementArea *= angleSizeIncreaseFactor;
 
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel Element CrossSection Area: " + elementArea);
+                ThreadSafeDebugLogger.Info("Voxel Element CrossSection Area: " + elementArea);
 
                 double invMag = 1 / Math.Sqrt(x * x + y * y + z * z);
 
@@ -1193,8 +1191,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
-                                                                       m);
+                        ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: areacount is NaN at section " + m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -1668,7 +1665,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
             finally
             {
@@ -2267,7 +2264,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
             finally
             {
@@ -2310,7 +2307,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
             finally
             {
@@ -2357,7 +2354,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         if (p is null)
                             continue;
-                        pt = new SweepPlanePoint(p, i, k) {jLastInactive = j};
+                        pt = new SweepPlanePoint(p, i, k) { jLastInactive = j };
                         sweepPlane[i, k] = pt;
                     }
                     else

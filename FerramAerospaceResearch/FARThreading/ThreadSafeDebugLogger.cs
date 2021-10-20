@@ -45,7 +45,6 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARThreading
@@ -53,77 +52,81 @@ namespace FerramAerospaceResearch.FARThreading
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     internal class ThreadSafeDebugLogger : MonoBehaviour
     {
-        private List<Exception> _exceptionsThrown;
-        private List<string> _infoMessages;
-        private List<string> _debugMessages;
+        private struct LogMessage
+        {
+            public LogLevel level;
+            public string message;
+            public Exception exception;
+        }
+
+        private object mutex = new();
+        private readonly List<LogMessage> messages = new();
         public static ThreadSafeDebugLogger Instance { get; private set; }
 
         private void Awake()
         {
             Instance = this;
-            _exceptionsThrown = new List<Exception>();
-            _infoMessages = new List<string>();
-            _debugMessages = new List<string>();
             DontDestroyOnLoad(gameObject);
         }
 
         private void Update()
         {
-            if (_exceptionsThrown.Count > 0)
+            lock (mutex)
             {
-                foreach (Exception exception in _exceptionsThrown)
-                    FARLogger.Exception(exception);
+                foreach (LogMessage message in messages)
+                {
+                    if (message.exception is not null)
+                        FARLogger.Exception(message.exception, message.message);
+                    else
+                        FARLogger.Log(message.level, message.message);
+                }
 
-                _exceptionsThrown.Clear();
+                messages.Clear();
             }
-
-            UpdateInfo();
-            UpdateDebug();
         }
 
-        [Conditional("DEBUG"), Conditional("INFO")]
-        private void UpdateInfo()
+        public static void Log(LogLevel level, string message, Exception exception = null)
         {
-            if (_infoMessages.Count <= 0)
-                return;
-            var sB = new StringBuilder();
-            foreach (string message in _infoMessages)
-                sB.AppendLine(message);
-
-            _infoMessages.Clear();
-
-            FARLogger.Info("" + sB);
+            lock (Instance.mutex)
+            {
+                Instance.messages.Add(new LogMessage
+                {
+                    exception = exception,
+                    level = level,
+                    message = message
+                });
+            }
         }
 
-        [Conditional("DEBUG")]
-        private void UpdateDebug()
+        [Conditional("LOG_TRACE")]
+        public static void Trace(string message)
         {
-            if (_debugMessages.Count <= 0)
-                return;
-            var sB = new StringBuilder();
-            foreach (string message in _debugMessages)
-                sB.AppendLine(message);
-
-            _debugMessages.Clear();
-
-            FARLogger.Debug("" + sB);
+            Log(LogLevel.Trace, message);
         }
 
-        [Conditional("DEBUG"), Conditional("INFO")]
-        public void RegisterMessage(string s)
+        public static void Debug(string message)
         {
-            _infoMessages.Add(s);
+            Log(LogLevel.Debug, message);
         }
 
-        [Conditional("DEBUG")]
-        public void RegisterDebugMessage(string s)
+        public static void Info(string message)
         {
-            _debugMessages.Add(s);
+            Log(LogLevel.Info, message);
         }
 
-        public void RegisterException(Exception e)
+        public static void Warning(string message)
         {
-            _exceptionsThrown.Add(e);
+            Log(LogLevel.Warning, message);
+        }
+
+        public static void Error(string message)
+        {
+            Log(LogLevel.Error, message);
+        }
+
+        public static void Exception(Exception exception, string message = null)
+        {
+            Log(LogLevel.Exception, message, exception);
         }
     }
 }

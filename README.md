@@ -61,6 +61,10 @@ Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
 
+master------------------------------------  
+
+Fix crash due to log messages from voxelization worker threads  
+
 0.16.0.4V "Mader"------------------------------------  
 
 Fixed NREs with potatoroids, thanks [@simmav](https://github.com/siimav) [#127](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/127)  

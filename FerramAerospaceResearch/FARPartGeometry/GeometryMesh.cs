@@ -110,7 +110,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 float tmpTestVert = vert.x + vert.y + vert.z;
                 if (float.IsNaN(tmpTestVert) || float.IsInfinity(tmpTestVert))
-                    ThreadSafeDebugLogger.Instance.RegisterMessage("Mesh error in " + module.part.partInfo.title);
+                    ThreadSafeDebugLogger.Error("Mesh error in " + module.part.partInfo.title);
                 vertices[i] = vert;
             }
 
@@ -127,7 +127,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                   bounds.extents.z;
             if (float.IsNaN(tmpTestBounds) || float.IsInfinity(tmpTestBounds))
             {
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Bounds error in " + module.part.partInfo.title);
+                ThreadSafeDebugLogger.Error("Bounds error in " + module.part.partInfo.title);
                 valid = false;
             }
             else
@@ -178,8 +178,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     float tmpTestVert = vert.x + vert.y + vert.z;
                     if (float.IsNaN(tmpTestVert) || float.IsInfinity(tmpTestVert))
                     {
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("Transform error in " +
-                                                                       module.part.partInfo.title);
+                        ThreadSafeDebugLogger.Error("Transform error in " + module.part.partInfo.title);
                         valid = false;
                     }
                     else

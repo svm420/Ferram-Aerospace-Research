@@ -405,7 +405,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 catch (Exception e)
                 {
-                    ThreadSafeDebugLogger.Instance.RegisterException(e);
+                    ThreadSafeDebugLogger.Exception(e);
                 }
                 finally
                 {
@@ -707,12 +707,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (oneSidedFilterLength < 2)
             {
                 oneSidedFilterLength = 2;
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Needed to adjust filter length up");
+                ThreadSafeDebugLogger.Info("Needed to adjust filter length up");
             }
             else if (oneSidedFilterLength > 40)
             {
                 oneSidedFilterLength = 40;
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Reducing filter length to prevent overflow");
+                ThreadSafeDebugLogger.Info("Reducing filter length to prevent overflow");
             }
 
             int M = oneSidedFilterLength;
@@ -1031,9 +1031,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             for (int i = front; i <= back; i++)
             {
                 if (double.IsNaN(_vehicleCrossSection[i].area))
-                    ThreadSafeDebugLogger.Instance
-                                         .RegisterMessage("FAR VOXEL ERROR: Voxel CrossSection Area is NaN at section " +
-                                                          i);
+                    ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: Voxel CrossSection Area is NaN at section " + i);
 
                 filledVolume += _vehicleCrossSection[i].area;
             }
@@ -1066,12 +1064,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 extraAreaSmoothingPasses = 0;
 
 
-            ThreadSafeDebugLogger.Instance.RegisterMessage("Std dev for smoothing: " +
-                                                           stdDevCutoff +
-                                                           " voxel total vol: " +
-                                                           voxelVolume +
-                                                           " filled vol: " +
-                                                           filledVolume);
+            ThreadSafeDebugLogger.Info("Std dev for smoothing: " +
+                                       stdDevCutoff +
+                                       " voxel total vol: " +
+                                       voxelVolume +
+                                       " filled vol: " +
+                                       filledVolume);
 
             AdjustCrossSectionForAirDucting(_vehicleCrossSection,
                                             _currentGeoModules,
@@ -1287,8 +1285,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     xForcePressureAoA0.SetPoint(0,
                                                 new Vector3d(CriticalMach,
                                                              (sonicBaseDrag * 0.2f +
-                                                              0.325f * hypersonicDragForward * hypersonicDragForwardFrac
-                                                             ) *
+                                                              0.325f *
+                                                              hypersonicDragForward *
+                                                              hypersonicDragForwardFrac) *
                                                              lowFinenessRatioFactor,
                                                              0));
                     xForcePressureAoA180.SetPoint(0,

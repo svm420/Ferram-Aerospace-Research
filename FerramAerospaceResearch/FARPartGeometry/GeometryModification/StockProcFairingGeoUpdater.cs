@@ -127,7 +127,7 @@ namespace FerramAerospaceResearch.FARPartGeometry.GeometryModification
         // ReSharper disable once MemberCanBeMadeStatic.Local
         private void FairingDeployGeometryUpdate(Part p)
         {
-            ThreadSafeDebugLogger.Instance.RegisterMessage("Fairing Geometry Update");
+            ThreadSafeDebugLogger.Info("Fairing Geometry Update");
             validParts[p].GeometryPartModuleRebuildMeshData();
         }
     }
