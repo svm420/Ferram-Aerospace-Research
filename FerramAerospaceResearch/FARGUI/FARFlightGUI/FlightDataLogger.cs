@@ -251,7 +251,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 replacements[VesselNameKey] = Localizer.Format(Vessel.vesselName);
             replacements[DatetimeKey] = DateTime.Now.ToString(FARConfig.FlightLog.DatetimeFormat);
             string filename = Path.Combine(FARConfig.FlightLog.Directory,
-                                           FARConfig.FlightLog.NameFormat.ToString(replacements));
+                                           KSPUtil.SanitizeFilename(FARConfig.FlightLog.NameFormat.ToString(replacements)));
 
             return filename;
         }
