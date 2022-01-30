@@ -44,6 +44,7 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Globalization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
@@ -68,6 +69,11 @@ namespace FerramAerospaceResearch
             // use relative error
             return diff / (Math.Abs(a) + Math.Abs(b)) < epsilon;
             // ReSharper restore CompareOfFloatsByEqualityOperator
+        }
+
+        public static bool NearlyEqual(this Vector3 a, Vector3 b, float epsilon = 1e-6f)
+        {
+            return a.x.NearlyEqual(b.x, epsilon) && a.y.NearlyEqual(b.y, epsilon) && a.z.NearlyEqual(b.z, epsilon);
         }
 
         public static bool NearlyEqual(this float a, float b, float epsilon = 1e-6f)

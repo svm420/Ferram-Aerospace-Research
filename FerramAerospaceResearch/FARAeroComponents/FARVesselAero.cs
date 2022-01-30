@@ -51,6 +51,22 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
 {
+    internal readonly struct CachedSimResults
+    {
+        public readonly Vector3 VelocityVector;
+        public readonly double Altitude;
+        public readonly Vector3 Force;
+        public readonly Vector3 Torque;
+
+        public CachedSimResults(Vector3 velocityVector, double altitude, Vector3 force, Vector3 torque)
+        {
+            VelocityVector = velocityVector;
+            Altitude = altitude;
+            Force = force;
+            Torque = torque;
+        }
+    }
+
     public class FARVesselAero : VesselModule
     {
         private FlightGUI _flightGUI;
@@ -71,6 +87,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private VehicleAerodynamics _vehicleAero;
         private VesselIntakeRamDrag _vesselIntakeRamDrag;
+        private CachedSimResults lastSimResults;
 
         internal VehicleAerodynamics VehicleAero
         {
@@ -267,6 +284,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
             double altitude
         )
         {
+            if (velocityWorldVector.NearlyEqual(lastSimResults.VelocityVector) &&
+                altitude.NearlyEqual(lastSimResults.Altitude))
+            {
+                aeroForce = lastSimResults.Force;
+                aeroTorque = lastSimResults.Torque;
+                return;
+            }
+
             var center = new FARCenterQuery();
             var dummy = new FARCenterQuery();
 
@@ -316,6 +341,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             aeroForce = center.force;
             aeroTorque = center.TorqueAt(vessel.CoM);
+
+            lastSimResults = new CachedSimResults(velocityWorldVector, altitude, aeroForce, aeroTorque);
         }
 
 
