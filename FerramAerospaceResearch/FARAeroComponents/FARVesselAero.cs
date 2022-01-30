@@ -54,14 +54,14 @@ namespace FerramAerospaceResearch.FARAeroComponents
     internal readonly struct CachedSimResults
     {
         public readonly Vector3 VelocityVector;
-        public readonly double Altitude;
+        public readonly Vector3d Position;
         public readonly Vector3 Force;
         public readonly Vector3 Torque;
 
-        public CachedSimResults(Vector3 velocityVector, double altitude, Vector3 force, Vector3 torque)
+        public CachedSimResults(Vector3 velocityVector, Vector3d position, Vector3 force, Vector3 torque)
         {
             VelocityVector = velocityVector;
-            Altitude = altitude;
+            Position = position;
             Force = force;
             Torque = torque;
         }
@@ -284,8 +284,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             double altitude
         )
         {
+            Vector3d position = vessel.CurrentPosition(altitude);
+
             if (velocityWorldVector.NearlyEqual(lastSimResults.VelocityVector) &&
-                altitude.NearlyEqual(lastSimResults.Altitude))
+                (FARAtmosphere.IsCustom
+                 // Custom atmospheres are not guaranteed to be independent of latitude and longitude
+                     ? position.NearlyEqual(lastSimResults.Position)
+                     : altitude.NearlyEqual(lastSimResults.Position.z)))
             {
                 aeroForce = lastSimResults.Force;
                 aeroTorque = lastSimResults.Torque;
@@ -296,7 +301,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             var dummy = new FARCenterQuery();
 
             //Calculate main gas properties
-            GasProperties properties = FARAtmosphere.GetGasProperties(vessel, altitude, Planetarium.GetUniversalTime());
+            GasProperties properties = FARAtmosphere.GetGasProperties(vessel.mainBody, position, Planetarium.GetUniversalTime());
 
             if (properties.Pressure <= 0 || properties.Temperature <= 0)
             {
@@ -342,7 +347,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             aeroForce = center.force;
             aeroTorque = center.TorqueAt(vessel.CoM);
 
-            lastSimResults = new CachedSimResults(velocityWorldVector, altitude, aeroForce, aeroTorque);
+            lastSimResults = new CachedSimResults(velocityWorldVector, position, aeroForce, aeroTorque);
         }
 
 
