@@ -13,9 +13,9 @@
         "VersionMajor": 0,
         "VersionMinor": 16,
         "VersionBuild": 0,
-        "VersionRevision": 4,
+        "VersionRevision": 5,
         "VersionName": "Mader",
-        "Year": 2020,
+        "Year": 2022,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
         "VersionString": "$(NumericalVersion) \"$(VersionName)\"",
         "VersionRegex": "\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?\\s*\"\\w+\"",
@@ -203,7 +203,7 @@
         ]
     },
     "burst_compile": {
-        "bcl": "$(UnityDir)Library/PackageCache/com.unity.burst@1.3.1/.Runtime/bcl.exe",
+        "bcl": "$(UnityDir)Library/PackageCache/com.unity.burst@1.5.0/.Runtime/bcl.exe",
         "debug": true,
         "targets": [
             {

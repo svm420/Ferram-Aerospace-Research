@@ -1,4 +1,4 @@
-# Ferram Aerospace Research Continued v0.16.0.4 "Mader"
+# Ferram Aerospace Research Continued v0.16.0.5 "Mader"
 
 =========================  
 Aerodynamics model for Kerbal Space Program
@@ -61,8 +61,13 @@ Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
 
-master------------------------------------  
+0.16.0.5V "Mader"------------------------------------  
 
+Fix cfg syntax errors, thanks [@HebaruSan](https://github.com/HebaruSan) [#132](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/132)  
+Sanitize vessel filenames, thanks [@HebaruSan](https://github.com/HebaruSan) [#131](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/131)  
+FAR aerodynamic are now presets MM-configurable [#130](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/130)  
+`_FARPartModule` also recognizes `ModuleRestockLaunchClamp`, thanks [@Gordon-Dry](https://github.com/Gordon-Dry) [#129](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/129)  
+Improve `KSPWheel` support for the toggle gear button, thanks [@simmav](https://github.com/siimav) [#128](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/128)  
 Fix crash due to log messages from voxelization worker threads  
 
 0.16.0.4V "Mader"------------------------------------  

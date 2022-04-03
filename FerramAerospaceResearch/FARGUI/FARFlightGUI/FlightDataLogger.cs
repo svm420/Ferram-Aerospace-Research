@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.4 "Mader"
+Ferram Aerospace Research v0.16.0.5 "Mader"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Daumantas Kavolis, aka dkavolis
+Copyright 2022, Daumantas Kavolis, aka dkavolis
 
    This file is part of Ferram Aerospace Research.
 

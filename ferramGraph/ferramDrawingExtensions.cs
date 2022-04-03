@@ -1,6 +1,6 @@
 /* Name:    FerramGraph (Graph GUI Plugin)
  * Version: 1.3   (KSP 0.22+)
-Copyright 2020, Daumantas Kavolis, aka dkavolis
+Copyright 2022, Daumantas Kavolis, aka dkavolis
 
     This file is part of FerramGraph.
 
