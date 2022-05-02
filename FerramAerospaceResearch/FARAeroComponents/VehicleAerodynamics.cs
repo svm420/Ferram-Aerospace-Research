@@ -71,7 +71,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private readonly List<float> weighting = new List<float>();
 
         private VehicleVoxel _voxel;
-        private VoxelCrossSection[] _vehicleCrossSection = new VoxelCrossSection[1];
+        private VoxelCrossSection[] _vehicleCrossSection = Array.Empty<VoxelCrossSection>();
         private double[] _ductedAreaAdjustment = new double[1];
 
         private int _voxelCount;
