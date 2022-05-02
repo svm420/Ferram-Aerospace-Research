@@ -548,8 +548,6 @@ namespace ferram4
             UpdateShipPartsList();
             foreach (Part p in VesselPartList)
             {
-                if (p == null)
-                    continue;
                 CoM += p.transform.position * p.mass;
                 mass += p.mass;
             }
