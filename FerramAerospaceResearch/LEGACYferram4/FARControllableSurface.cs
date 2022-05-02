@@ -545,6 +545,7 @@ namespace ferram4
 
             Vector3 CoM = Vector3.zero;
             float mass = 0;
+            UpdateShipPartsList();
             foreach (Part p in VesselPartList)
             {
                 if (p == null)
