@@ -547,6 +547,8 @@ namespace ferram4
             float mass = 0;
             foreach (Part p in VesselPartList)
             {
+                if (p == null)
+                    continue;
                 CoM += p.transform.position * p.mass;
                 mass += p.mass;
             }
