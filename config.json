@@ -227,10 +227,10 @@
                 "log_timings": true,
                 "root_assemblies": [
                     "$(PluginDir)*.dll",
-                    "$(KSP_DIR_INSTALL)KSP_x64_Data/Managed/*.dll"
+                    "$(KSP_DIR_INSTALL)$(KSP_DATA_DIRNAME)/Managed/*.dll"
                 ],
                 "assembly_folders": [
-                    "$(KSP_DIR_INSTALL)KSP_x64_Data/Managed",
+                    "$(KSP_DIR_INSTALL)$(KSP_DATA_DIRNAME)/Managed",
                     "$(PluginDir)"
                 ],
                 "include_root_assembly_references": true

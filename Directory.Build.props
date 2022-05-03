@@ -1,8 +1,10 @@
 <Project>
   <PropertyGroup>
-    <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.11\</KSP_DIR_BUILD>
+    <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.12\</KSP_DIR_BUILD>
+    <KSP_DATA_DIRNAME>KSP_x64_Data</KSP_DATA_DIRNAME>
     <PostBuildCommand>
       cd "$(SolutionDir)""
       python -m buildtools postbuild -f "$(SolutionDir)config.json" -c "$(Configuration)" -t</PostBuildCommand>
   </PropertyGroup>
+  <Import Project="Directory.Build.props.user" Condition=" Exists('Directory.Build.props.user') "/>
 </Project>
