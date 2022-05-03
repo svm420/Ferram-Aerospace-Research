@@ -1651,7 +1651,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     }
                     else if (i == back)
                     {
-                        firstDerivArea = vehicleCrossSection[i].area - vehicleCrossSection[i + 1].area;
+                        firstDerivArea = vehicleCrossSection[i - 1].area - vehicleCrossSection[i].area;
                         firstDerivArea /= sectionThickness;
                     }
                     else
@@ -1692,7 +1692,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     }
                     else if (i == back)
                     {
-                        firstDerivArea = vehicleCrossSection[i].area - vehicleCrossSection[i + 1].area;
+                        firstDerivArea = vehicleCrossSection[i - 1].area - vehicleCrossSection[i].area;
                         firstDerivArea /= -sectionThickness;
                     }
                     else
