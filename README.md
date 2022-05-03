@@ -63,6 +63,7 @@ Set all the other winglet/control surface values to zero
 
 master------------------------------------  
 
+Find latest binaries in [GitHub Actions](https://github.com/dkavolis/Ferram-Aerospace-Research/actions)  
 NRE fixes, thanks [@BrettRyland](https://github.com/BrettRyland) [#133](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/133)  
 
 0.16.0.5V "Mader"------------------------------------  
