@@ -1,0 +1,19 @@
+name: validate cfg files
+
+on:
+  push:
+  # paths:
+  # - "GameData/**.cfg"
+  pull_request:
+    # paths:
+    # - "GameData/**.cfg"
+
+jobs:
+  validate-cfg-files:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[skip cfg]')"
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Validate config files
+        uses: KSP-CKAN/KSPMMCfgParser@master
