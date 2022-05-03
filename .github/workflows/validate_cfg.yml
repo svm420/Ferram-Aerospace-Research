@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - "GameData/**.cfg"
+      - ".github/workflows/validate_cfg.yml"
   pull_request:
     paths:
       - "GameData/**.cfg"
+      - ".github/workflows/validate_cfg.yml"
 
 jobs:
   validate-cfg-files:
