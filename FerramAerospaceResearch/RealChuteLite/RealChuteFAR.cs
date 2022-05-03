@@ -443,21 +443,21 @@ namespace FerramAerospaceResearch.RealChuteLite
                 case "STOWED":
                 {
                     parachute.gameObject.SetActive(false);
-                    cap.gameObject.SetActive(true);
+                    cap?.gameObject.SetActive(true);
                     break;
                 }
 
                 case "RCDEPLOYED": //This is not a predeployed state, no touchy
                 {
                     parachute.gameObject.SetActive(false);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                     break;
                 }
 
                 case "SEMIDEPLOYED": //  stock
                 {
                     parachute.gameObject.SetActive(true);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                     // to the end of the animation
                     part.SkipToAnimationTime(semiDeployedAnimation, 0, 1);
                     break;
@@ -466,7 +466,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 case "DEPLOYED": //  stock
                 {
                     parachute.gameObject.SetActive(true);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                     // to the end of the animation
                     part.SkipToAnimationTime(fullyDeployedAnimation, 0, 1);
                     break;
@@ -580,7 +580,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             DeploymentState = DeploymentStates.STOWED;
             randomTimer.Reset();
             time = 0;
-            cap.gameObject.SetActive(true);
+            cap?.gameObject.SetActive(true);
             part.DragCubes.SetCubeWeight("PACKED", 1);
             part.DragCubes.SetCubeWeight("RCDEPLOYED", 0);
         }
@@ -727,7 +727,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             part.Effect("rcpredeploy");
             DeploymentState = DeploymentStates.PREDEPLOYED;
             parachute.gameObject.SetActive(true);
-            cap.gameObject.SetActive(false);
+            cap?.gameObject.SetActive(false);
             part.PlayAnimation(semiDeployedAnimation, semiDeploymentSpeed);
             dragTimer.Start();
             part.DragCubes.SetCubeWeight("PACKED", 0);
@@ -1184,7 +1184,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 initiated = true;
                 armed = false;
                 chuteCount = maxSpares;
-                cap.gameObject.SetActive(true);
+                cap?.gameObject.SetActive(true);
             }
 
             float tmpPartMass = TotalMass;
@@ -1213,7 +1213,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 if (DeploymentState != DeploymentStates.STOWED)
                 {
                     part.stackIcon.SetIconColor(XKCDColors.Red);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                 }
 
                 if (staged && IsDeployed)

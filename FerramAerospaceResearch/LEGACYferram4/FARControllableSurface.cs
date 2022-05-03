@@ -467,7 +467,10 @@ namespace ferram4
         public override void FixedUpdate()
         {
             if (justStarted)
+            {
+                UpdateShipPartsList();
                 CalculateSurfaceFunctions();
+            }
 
             if (HighLogic.LoadedSceneIsFlight && !(part is null) && !(vessel is null))
             {

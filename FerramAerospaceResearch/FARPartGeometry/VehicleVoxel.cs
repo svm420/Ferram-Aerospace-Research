@@ -295,7 +295,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             threadsQueued = Environment.ProcessorCount - 1;
 
             if (!multiThreaded)
-                //Go through it backwards; this ensures that children (and so interior to cargo bay parts) are handled first
+            //Go through it backwards; this ensures that children (and so interior to cargo bay parts) are handled first
             {
                 foreach (GeometryPartModule m in geoModules)
                 {
@@ -1354,6 +1354,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 return;
             VoxelizationThreadpool.Instance.RunOnMainThread(() =>
             {
+                if (voxelMesh == null) { FARLogger.Debug($"Visual voxel has disappeared!"); return; }
                 FARLogger.Debug("Clearing visual voxels");
                 voxelMesh.gameObject.SetActive(false);
                 voxelMesh.Clear();

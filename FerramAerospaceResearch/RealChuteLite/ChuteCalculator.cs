@@ -24,7 +24,10 @@ namespace FerramAerospaceResearch.RealChuteLite
                 DragCube semi = prefab.DragCubes.Cubes.Find(c => c.Name == "SEMIDEPLOYED"),
                          deployed = prefab.DragCubes.Cubes.Find(c => c.Name == "DEPLOYED");
                 if (semi == null || deployed == null)
+                {
                     FARLogger.Info("" + part.title + " cannot find drag cube for RealChuteLite");
+                    continue;
+                }
                 module.preDeployedDiameter = GetApparentDiameter(semi);
                 module.deployedDiameter = GetApparentDiameter(deployed);
                 part.moduleInfos.Find(m => m.moduleName == "RealChute").info = module.GetInfo();
