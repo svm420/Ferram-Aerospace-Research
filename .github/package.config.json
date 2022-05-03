@@ -1,5 +1,8 @@
 {
     "variables": {
         "KSP_DIR_INSTALL": "$(KSP_DIR_BUILD)"
+    },
+    "package": {
+        "compression": null
     }
 }
