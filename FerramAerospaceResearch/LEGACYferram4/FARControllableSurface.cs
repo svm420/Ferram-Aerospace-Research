@@ -467,7 +467,10 @@ namespace ferram4
         public override void FixedUpdate()
         {
             if (justStarted)
+            {
+                UpdateShipPartsList();
                 CalculateSurfaceFunctions();
+            }
 
             if (HighLogic.LoadedSceneIsFlight && !(part is null) && !(vessel is null))
             {
@@ -545,7 +548,6 @@ namespace ferram4
 
             Vector3 CoM = Vector3.zero;
             float mass = 0;
-            UpdateShipPartsList();
             foreach (Part p in VesselPartList)
             {
                 CoM += p.transform.position * p.mass;
