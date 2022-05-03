@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.12\</KSP_DIR_BUILD>
+    <KSP_DIR_BUILD>C:\Zaidimai\KSP 1.12</KSP_DIR_BUILD>
     <KSP_DATA_DIRNAME>KSP_x64_Data</KSP_DATA_DIRNAME>
     <PostBuildCommand>
       cd "$(SolutionDir)""
