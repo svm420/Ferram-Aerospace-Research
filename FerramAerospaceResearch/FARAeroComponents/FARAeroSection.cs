@@ -143,12 +143,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             Vector3 worldSpaceAvgPos = Vector3.zero;
             float totalDragFactor = 0;
+            PartTransformInfo partTransformInfo;
             for (int i = 0; i < moduleList.Count; i++)
             {
                 Part p = moduleList[i].part;
-                if (!partWorldToLocalMatrixDict.ContainsKey(p))
+                if (!partWorldToLocalMatrixDict.TryGetValue(p, out partTransformInfo))
                     continue;
-                worldSpaceAvgPos += partWorldToLocalMatrixDict[p].worldPosition * dragFactor[i];
+                worldSpaceAvgPos += partTransformInfo.worldPosition * dragFactor[i];
                 totalDragFactor += dragFactor[i];
             }
 
@@ -160,8 +161,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             for (int i = 0; i < moduleList.Count; i++)
             {
-                var data = new PartData {aeroModule = moduleList[i]};
-                Matrix4x4 transformMatrix = partWorldToLocalMatrixDict[data.aeroModule.part].worldToLocalMatrix;
+                var data = new PartData { aeroModule = moduleList[i] };
+                if (!partWorldToLocalMatrixDict.TryGetValue(data.aeroModule.part, out partTransformInfo))
+                    continue;
+                Matrix4x4 transformMatrix = partTransformInfo.worldToLocalMatrix;
 
                 Vector3 forceCenterWorldSpace = centroidLocationAlongxRef +
                                                 Vector3.ProjectOnPlane(partWorldToLocalMatrixDict[data.aeroModule.part]

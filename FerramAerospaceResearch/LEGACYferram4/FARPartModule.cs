@@ -68,6 +68,7 @@ namespace ferram4
 
         public void ForceOnVesselPartsChange()
         {
+            UpdateShipPartsList();
             OnVesselPartsChange?.Invoke();
         }
 
@@ -78,7 +79,6 @@ namespace ferram4
 
         public virtual void Initialization()
         {
-            OnVesselPartsChange = UpdateShipPartsList;
             UpdateShipPartsList();
         }
 
