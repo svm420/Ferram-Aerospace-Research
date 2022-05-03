@@ -1,6 +1,6 @@
 {
     "root": ".",
-    "build_props": "Directory.Build.Props",
+    "build_props": "Directory.Build.props",
     "variables": {
         "ModName": "FerramAerospaceResearch",
         "ModDirRelative": "GameData/$(ModName)",
