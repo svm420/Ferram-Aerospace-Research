@@ -2,11 +2,11 @@ name: validate cfg files
 
 on:
   push:
-  # paths:
-  # - "GameData/**.cfg"
+    paths:
+      - "GameData/**.cfg"
   pull_request:
-    # paths:
-    # - "GameData/**.cfg"
+    paths:
+      - "GameData/**.cfg"
 
 jobs:
   validate-cfg-files:
