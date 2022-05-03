@@ -61,6 +61,10 @@ Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
 
+master------------------------------------  
+
+NRE fixes, thanks [@BrettRyland](https://github.com/BrettRyland) [#133](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/133)  
+
 0.16.0.5V "Mader"------------------------------------  
 
 Fix cfg syntax errors, thanks [@HebaruSan](https://github.com/HebaruSan) [#132](https://github.com/dkavolis/Ferram-Aerospace-Research/issues/132)  
