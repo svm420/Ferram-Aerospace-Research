@@ -1,6 +1,6 @@
 # Ferram Aerospace Research Continued v0.16.0.5 "Mader"
 
-[![Build](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml/badge.svg)](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml)
+[![Build](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml/badge.svg?branch=master)](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml)  
 
 =========================  
 Aerodynamics model for Kerbal Space Program
