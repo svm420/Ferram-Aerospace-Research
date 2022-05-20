@@ -188,6 +188,16 @@
                 ]
             },
             {
+                "path": "$(KSPGameData)/000_KSPBurst",
+                "destination": "GameData/000_KSPBurst",
+                "include": [
+                    "**/*"
+                ],
+                "exclude": [
+                    "*.zip"
+                ]
+            },
+            {
                 "path": "$(KSPGameData)",
                 "destination": "GameData",
                 "include": [
