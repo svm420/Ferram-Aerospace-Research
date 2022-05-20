@@ -330,8 +330,6 @@ namespace FerramAerospaceResearch.Geometry
                 CurrentRenderRenderJob.jobType = ProcessingJobType.Mapped;
             }
 
-            camera.enabled = true;
-
             UpdateIds();
             camera.Render();
             Profiler.EndSample();
