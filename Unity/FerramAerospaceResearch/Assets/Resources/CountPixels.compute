@@ -1,0 +1,50 @@
+﻿#pragma kernel CountPixelsMain
+
+Texture2D<float4> InputTexture; // input texture
+StructuredBuffer<uint> SortedIds; // sorted
+int IdCount;
+
+RWStructuredBuffer<int> OutputBuffer;
+
+
+int LowerBound(uint id)
+{
+    int count = IdCount;
+    int first = 0;
+
+    while (count > 0)
+    {
+        int step = count >> 1; // divide by 2
+        int mid = first + step;
+        if (SortedIds[mid] < id)
+        {
+            first = mid + 1;
+            count -= step + 1;
+        }
+        else
+            count = step;
+    }
+
+    return first;
+}
+
+uint touint(float4 c) {
+    const uint mask = 0xFF;
+    c *= 255;
+    uint4 u = c.abgr; // little-endian
+    u &= mask;
+    u <<= int4(24, 16, 8, 0);
+    return u.x | u.y | u.z | u.w;
+}
+
+[numthreads(8,8,1)]
+void CountPixelsMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 input = InputTexture.Load(id);
+    uint color = touint(input);
+
+    if (color == 0) return;
+
+    int index = LowerBound(color);
+    InterlockedAdd(OutputBuffer[index], 1);
+}

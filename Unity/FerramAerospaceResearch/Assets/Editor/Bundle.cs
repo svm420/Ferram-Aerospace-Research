@@ -98,7 +98,7 @@ namespace Editor
             foreach (var asset in assets)
             {
                 var type = asset.asset.GetType();
-                if (type.IsAssignableFrom(typeof(Shader)))
+                if (type.IsAssignableFrom(typeof(Shader)) || type.IsAssignableFrom(typeof(ComputeShader)))
                     shaders.Add(new Assets.AssetDefinition(asset));
                 else if (type.IsAssignableFrom(typeof(Material)))
                     materials.Add(new Assets.AssetDefinition(asset));

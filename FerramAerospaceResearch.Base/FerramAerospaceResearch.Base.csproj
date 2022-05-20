@@ -97,6 +97,7 @@
         <Compile Include="FARConfig.cs" />
         <Compile Include="Geometry\DebugVoxel.cs" />
         <Compile Include="Geometry\DebugVoxelMesh.cs" />
+        <Compile Include="Geometry\ExposedSurfaceEvaluator.cs" />
         <Compile Include="Geometry\IDebugVoxelMeshBuilder.cs" />
         <Compile Include="Geometry\MeshBuildData.cs" />
         <Compile Include="Interfaces\IConfigNode.cs" />

@@ -1,16 +1,21 @@
 ManifestFileVersion: 0
-CRC: 1597964080
+CRC: 637808813
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: b2dcc0766f16a1f4cfd92f86b022e53d
+    Hash: b9b5f629f2b7bab1becf792e27609c4d
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 677a1d6a6e8c5d2da1d9d0fadde392d8
+    Hash: d6617f579a21db6914d356f34a6c9a37
 HashAppended: 0
 ClassTypes:
 - Class: 48
   Script: {instanceID: 0}
+- Class: 72
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/Shaders/DebugVoxelMesh.shader
+- Assets/Shaders/ExposedSurface.shader
+- Assets/Resources/CountPixels.compute
 Dependencies: []

@@ -34,8 +34,11 @@ namespace FerramAerospaceResearch.Resources
 
     public class FARComputeShaderCache : FARAssetDictionary<ComputeShader>
     {
+        public readonly ComputeShaderAssetRequest CountPixels;
+
         public FARComputeShaderCache()
         {
+            CountPixels = MakeAsset(FARConfig.Shaders.CountColors, "countPixels");
         }
 
         private ComputeShaderAssetRequest MakeAsset(ComputeShaderNode node, string name)
