@@ -11,10 +11,12 @@ namespace FerramAerospaceResearch.Resources
     {
         private bool loaded;
         public FARShaderCache Shaders { get; private set; }
+        public FARComputeShaderCache ComputeShaders { get; private set; }
         public FARTextureCache Textures { get; private set; }
         public LoaderCache Loaders { get; private set; }
 
         public ShaderBundleLoader ShaderLoader { get; private set; }
+        public ComputeShaderBundleLoader ComputeShaderLoader { get; private set; }
 
         public int Priority { get; set; }
         public bool Completed { get; set; }
@@ -31,16 +33,20 @@ namespace FerramAerospaceResearch.Resources
         {
             // first setup bundle loaders
             ShaderLoader = new ShaderBundleLoader();
+            ComputeShaderLoader = new ComputeShaderBundleLoader();
 
             // then setup loader caches and add loaders
             Loaders = new LoaderCache();
             Loaders.Shaders.Add(new AssetBundleAssetLoader<Shader> {BundleLoader = ShaderLoader});
             Loaders.Textures.Add(new TextureLoader());
             Loaders.Shaders.Add(new ShaderLoader());
+            Loaders.ComputeShaders.Add(new ComputeShaderLoader());
+            Loaders.ComputeShaders.Add(new AssetBundleAssetLoader<ComputeShader> {BundleLoader = ComputeShaderLoader});
 
             // finally, setup asset caches
             Shaders = new FARShaderCache();
             Textures = new FARTextureCache();
+            ComputeShaders = new FARComputeShaderCache();
         }
 
         protected override void OnDestruct()
@@ -48,6 +54,7 @@ namespace FerramAerospaceResearch.Resources
             Textures.Unsubscribe();
             Shaders.Unsubscribe();
             ShaderLoader.Unsubscribe();
+            ComputeShaderLoader.Unsubscribe();
         }
 
         public void ReloadAssets()
@@ -73,6 +80,7 @@ namespace FerramAerospaceResearch.Resources
         private IEnumerator DoReloadAssets()
         {
             yield return Shaders.Load();
+            yield return ComputeShaders.Load();
             yield return Textures.Load();
         }
     }

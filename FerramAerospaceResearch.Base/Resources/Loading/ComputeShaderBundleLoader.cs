@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.Resources.Loading
 {
-    public class ShaderBundleLoader : ShaderBundleLoaderBase<Shader>
+    public class ComputeShaderBundleLoader : ShaderBundleLoaderBase<ComputeShader>
     {
         protected override string BundleType
         {
-            get { return "shaders";  }
+            get { return "compute shaders";  }
         }
 
-        public ShaderBundleLoader()
+        public ComputeShaderBundleLoader()
         {
         }
     }

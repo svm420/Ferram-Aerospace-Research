@@ -49,4 +49,15 @@ namespace FerramAerospaceResearch.Config
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global - reflection
         public float Cutoff { get; set; } = 0.45f;
     }
+
+    [ConfigNode("COMPUTE_SHADER")]
+    public class ComputeShaderNode : ResourceNode
+    {
+        public ComputeShaderNode(string url = "", string loader = "default") : base(url, loader)
+        {
+        }
+
+        [ConfigValue("initializeKernel")] public string InitializeKernel { get; set; } = string.Empty;
+        [ConfigValue("mainKernel")] public string MainKernel { get; set; } = string.Empty;
+    }
 }
