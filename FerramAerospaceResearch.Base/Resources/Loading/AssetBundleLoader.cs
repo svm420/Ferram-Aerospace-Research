@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.Resources.Loading
 {
+    internal static class AssetBundleCache
+    {
+        public static readonly Dictionary<string, AssetBundle> LoadedBundles = new();
+    }
+
     public class AssetBundleLoader<T> : IAssetBundleLoader<T> where T : Object
     {
         private string url;
@@ -13,7 +18,7 @@ namespace FerramAerospaceResearch.Resources.Loading
             url = path;
         }
 
-        public Dictionary<string, T> LoadedAssets { get; } = new Dictionary<string, T>();
+        public Dictionary<string, T> LoadedAssets { get; } = new();
 
         public bool TryGetAsset(string name, out T asset)
         {
@@ -53,15 +58,20 @@ namespace FerramAerospaceResearch.Resources.Loading
 
             string path = Url;
             FARLogger.DebugFormat("Loading asset bundle from {0}", path);
-            AssetBundleCreateRequest createRequest = AssetBundle.LoadFromFileAsync(path);
-            yield return createRequest;
-
-            AssetBundle assetBundle = createRequest.assetBundle;
-            if (assetBundle == null)
+            if (!AssetBundleCache.LoadedBundles.TryGetValue(path, out AssetBundle assetBundle))
             {
-                FARLogger.Error($"Could not load asset bundle from {path}");
-                State = Progress.Error;
-                yield break;
+                AssetBundleCreateRequest createRequest = AssetBundle.LoadFromFileAsync(path);
+                yield return createRequest;
+
+                assetBundle = createRequest.assetBundle;
+                if (assetBundle == null)
+                {
+                    FARLogger.Error($"Could not load asset bundle from {path}");
+                    State = Progress.Error;
+                    yield break;
+                }
+
+                AssetBundleCache.LoadedBundles.Add(path, assetBundle);
             }
 
             AssetBundleRequest loadRequest = assetBundle.LoadAllAssetsAsync<T>();
