@@ -60,18 +60,41 @@ namespace FerramAerospaceResearch.Resources.Loading
             FARLogger.DebugFormat("Loading asset bundle from {0}", path);
             if (!AssetBundleCache.LoadedBundles.TryGetValue(path, out AssetBundle assetBundle))
             {
+                AssetBundleCache.LoadedBundles[path] = null; // make sure only one is loaded
                 AssetBundleCreateRequest createRequest = AssetBundle.LoadFromFileAsync(path);
                 yield return createRequest;
 
                 assetBundle = createRequest.assetBundle;
                 if (assetBundle == null)
                 {
+                    AssetBundleCache.LoadedBundles.Remove(path);
                     FARLogger.Error($"Could not load asset bundle from {path}");
                     State = Progress.Error;
                     yield break;
                 }
 
-                AssetBundleCache.LoadedBundles.Add(path, assetBundle);
+                AssetBundleCache.LoadedBundles[path] = assetBundle;
+            } else if (assetBundle is null)
+            {
+                // currently loading this bundle
+                while (true)
+                {
+                    if (!AssetBundleCache.LoadedBundles.TryGetValue(path, out assetBundle))
+                    {
+                        // failed to load
+                        State = Progress.Error;
+                        yield break;
+                    }
+
+                    if (assetBundle is not null)
+                    {
+                        // loaded
+                        break;
+                    }
+
+                    // still loading
+                    yield return null;
+                }
             }
 
             AssetBundleRequest loadRequest = assetBundle.LoadAllAssetsAsync<T>();
