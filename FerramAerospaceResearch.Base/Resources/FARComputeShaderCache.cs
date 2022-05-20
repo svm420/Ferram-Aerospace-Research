@@ -1,32 +1,34 @@
+using System;
 using FerramAerospaceResearch.Config;
 using Unity.Mathematics;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.Resources
 {
-    public readonly struct Kernel
+    [Serializable]
+    public struct Kernel
     {
-        public readonly string Name;
-        public readonly int Index;
-        public readonly uint3 ThreadGroupSizes;
+        public string name;
+        public int index;
+        public uint3 threadGroupSizes;
 
         public bool IsValid
         {
-            get { return Index >= 0 && !string.IsNullOrEmpty(Name); }
+            get { return index >= 0 && !string.IsNullOrEmpty(name); }
         }
 
         public Kernel(ComputeShader shader, string name)
         {
-            Name = name;
-            Index = shader.FindKernel(name);
-            if (Index < 0)
+            this.name = name;
+            index = shader.FindKernel(name);
+            if (index < 0)
                 // kernel not found
-                ThreadGroupSizes = default;
+                threadGroupSizes = default;
             else
-                shader.GetKernelThreadGroupSizes(Index,
-                                                 out ThreadGroupSizes.x,
-                                                 out ThreadGroupSizes.y,
-                                                 out ThreadGroupSizes.z);
+                shader.GetKernelThreadGroupSizes(index,
+                                                 out threadGroupSizes.x,
+                                                 out threadGroupSizes.y,
+                                                 out threadGroupSizes.z);
         }
     }
 
@@ -50,9 +52,7 @@ namespace FerramAerospaceResearch.Resources
 
         public class ComputeShaderAssetRequest : LoadableAsset<ComputeShader>
         {
-            public Kernel InitializeKernel { get; private set; }
-
-            public Kernel MainKernel { get; private set; }
+            public Kernel Kernel { get; private set; }
 
             /// <inheritdoc />
             protected override void AssetLoaded()
@@ -60,8 +60,7 @@ namespace FerramAerospaceResearch.Resources
                 base.AssetLoaded();
                 if (Node is not ComputeShaderNode node)
                     return;
-                InitializeKernel = new Kernel(Asset, node.InitializeKernel);
-                MainKernel = new Kernel(Asset, node.MainKernel);
+                Kernel = new Kernel(Asset, node.Kernel);
             }
         }
     }

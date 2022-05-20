@@ -57,7 +57,6 @@ namespace FerramAerospaceResearch.Config
         {
         }
 
-        [ConfigValue("initializeKernel")] public string InitializeKernel { get; set; } = string.Empty;
-        [ConfigValue("mainKernel")] public string MainKernel { get; set; } = string.Empty;
+        [ConfigValue("kernel")] public string Kernel { get; set; } = string.Empty;
     }
 }
