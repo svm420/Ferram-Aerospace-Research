@@ -23,7 +23,6 @@ namespace FerramAerospaceResearch.Editor {
 
         public Shader exposedSurfaceShader;
         public ComputeShader pixelCountShader;
-        public Kernel pixelCountInit;
         public Kernel pixelCountMain;
 
         private void Start() {
@@ -31,11 +30,10 @@ namespace FerramAerospaceResearch.Editor {
             FARLogger.InfoFormat("Level: {0}", FARLogger.Level);
 
             if (pixelCountShader != null) {
-                pixelCountInit = new Kernel(pixelCountShader, pixelCountInit.name);
                 pixelCountMain = new Kernel(pixelCountShader, pixelCountMain.name);
             }
 
-            Initialize(exposedSurfaceShader, pixelCountShader, pixelCountInit, pixelCountMain);
+            Initialize(exposedSurfaceShader, pixelCountShader, pixelCountMain);
 
             foreach (GameObject obj in objects) {
                 SetupRenderers(obj, obj.GetComponentsInChildren<Renderer>(false));
