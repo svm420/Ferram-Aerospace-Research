@@ -1,5 +1,7 @@
 # Ferram Aerospace Research Continued v0.16.0.5 "Mader"
 
+[![Build](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml/badge.svg?branch=master)](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml)  
+
 =========================  
 Aerodynamics model for Kerbal Space Program
 
@@ -63,7 +65,7 @@ Set all the other winglet/control surface values to zero
 
 master------------------------------------  
 
-Find latest binaries in [GitHub Actions](https://github.com/dkavolis/Ferram-Aerospace-Research/actions)  
+Find latest binaries in [GitHub Actions](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml)  
 NRE fixes, thanks [@BrettRyland](https://github.com/BrettRyland) [#133](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/133)  
 
 0.16.0.5V "Mader"------------------------------------  
