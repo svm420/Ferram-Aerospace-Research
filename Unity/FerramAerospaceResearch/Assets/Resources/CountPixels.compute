@@ -31,6 +31,7 @@ int LowerBound(uint id)
 uint touint(float4 c) {
     const uint mask = 0xFF;
     c *= 255;
+    // no builtin char-types...
     uint4 u = c.abgr; // little-endian
     u &= mask;
     u <<= int4(24, 16, 8, 0);
@@ -46,5 +47,5 @@ void CountPixelsMain (uint3 id : SV_DispatchThreadID)
     if (color == 0) return;
 
     int index = LowerBound(color);
-    InterlockedAdd(OutputBuffer[index], 1);
+    if (index < IdCount && SortedIds[index] == color) InterlockedAdd(OutputBuffer[index], 1);
 }

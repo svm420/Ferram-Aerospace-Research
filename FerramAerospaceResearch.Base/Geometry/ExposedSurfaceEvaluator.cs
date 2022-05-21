@@ -603,6 +603,9 @@ namespace FerramAerospaceResearch.Geometry
                     return;
 
                 int partIndex = LowerBound(ids, color);
+                if (Hint.Unlikely(index >= ids.Length || ids[index] != color))
+                    return;
+
                 unsafe
                 {
                     int* pixelBegin = (int*)pixels.GetUnsafePtr();
