@@ -181,6 +181,7 @@ namespace FerramAerospaceResearch.Geometry
         private static bool computeWarningIssued;
         public ObjectTagger Tagger;
         public Camera camera;
+
         public Vector2Int renderSize = new()
         {
             x = 512,
@@ -321,7 +322,7 @@ namespace FerramAerospaceResearch.Geometry
 
         public int ActiveJobs
         {
-            get { return activeJobs.Count;  }
+            get { return activeJobs.Count; }
         }
 
         public bool RenderPending
@@ -331,7 +332,8 @@ namespace FerramAerospaceResearch.Geometry
 
         public void CancelPendingJobs()
         {
-            if (CurrentRenderRenderJob != null) CurrentRenderRenderJob.active = false;
+            if (CurrentRenderRenderJob != null)
+                CurrentRenderRenderJob.active = false;
             foreach (RenderJob job in activeJobs)
                 job.active = false;
         }
@@ -452,33 +454,39 @@ namespace FerramAerospaceResearch.Geometry
 
         private void OnPostRender()
         {
-            if (!RenderPending || !gameObject.activeSelf || !CurrentRenderRenderJob.active)
+            if (!RenderPending)
+                return;
+
+            RenderJob job = CurrentRenderRenderJob;
+            CurrentRenderRenderJob = null;
+
+            if (!gameObject.activeSelf || !job.active)
                 return;
 
             Profiler.BeginSample("ExposedAreaEvaluator.ReadbackSetup");
-            CurrentRenderRenderJob.renderPending = false;
-            RenderTexture renderTexture = CurrentRenderRenderJob.Result.renderTexture;
+            job.renderPending = false;
+            RenderTexture renderTexture = job.Result.renderTexture;
             // only persistent works here as the readback may take too long resulting in the array getting deallocated
             int pixelCount = renderTexture.width * renderTexture.height;
-            CurrentRenderRenderJob.tex = new NativeArray<uint>(pixelCount, Allocator.Persistent);
+            job.tex = new NativeArray<uint>(pixelCount, Allocator.Persistent);
             // ref is not really needed here as Unity takes saves the pointer and size
 
             // TODO: try readback through a command buffer as that is not bugged
             // https://forum.unity.com/threads/asyncgpureadback-requestintonativearray-causes-invalidoperationexception-on-nativearray.1011955/
             // https://forum.unity.com/threads/asyncgpureadback-requestintonativearray-causes-invalidoperationexception-on-nativearray.1011955/#post-7347623
             AsyncGPUReadbackRequest readbackRequest;
-            if (CurrentRenderRenderJob.device is ProcessingDevice.GPU)
+            if (job.device is ProcessingDevice.GPU)
             {
                 int count = Tagger.Count;
 
                 // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
-                CurrentRenderRenderJob.UpdateComputeShader(PixelCountShader, count, MainKernel);
+                job.UpdateComputeShader(PixelCountShader, count, MainKernel);
 
-                ComputeShader shader = CurrentRenderRenderJob.computeShader;
-                ComputeBuffer outputBuffer = CurrentRenderRenderJob.outputBuffer;
+                ComputeShader shader = job.computeShader;
+                ComputeBuffer outputBuffer = job.outputBuffer;
 
-                CurrentRenderRenderJob.pixels = new NativeArray<int>(count, Allocator.Persistent);
-                outputBuffer.SetData(CurrentRenderRenderJob.pixels);
+                job.pixels = new NativeArray<int>(count, Allocator.Persistent);
+                outputBuffer.SetData(job.pixels);
                 shader.SetTexture(MainKernel.index,
                                   ShaderPropertyIds.InputTexture,
                                   renderTexture,
@@ -493,21 +501,17 @@ namespace FerramAerospaceResearch.Geometry
                                 (int)MainKernel.threadGroupSizes.y,
                                 1);
                 readbackRequest =
-                    AsyncGPUReadback.RequestIntoNativeArray(ref CurrentRenderRenderJob.pixels,
-                                                            outputBuffer,
-                                                            sizeof(int) * count,
-                                                            0);
+                    AsyncGPUReadback.RequestIntoNativeArray(ref job.pixels, outputBuffer, sizeof(int) * count, 0);
             }
             else
             {
-                readbackRequest =
-                    AsyncGPUReadback.RequestIntoNativeArray(ref CurrentRenderRenderJob.tex, renderTexture);
+                readbackRequest = AsyncGPUReadback.RequestIntoNativeArray(ref job.tex, renderTexture);
             }
 
-            CurrentRenderRenderJob.gpuReadbackRequest = readbackRequest;
+            job.gpuReadbackRequest = readbackRequest;
 
-            StartCoroutine(CompleteRequestAsync(CurrentRenderRenderJob));
-            activeJobs.Add(CurrentRenderRenderJob);
+            StartCoroutine(CompleteRequestAsync(job));
+            activeJobs.Add(job);
             Profiler.EndSample();
         }
 
@@ -609,7 +613,8 @@ namespace FerramAerospaceResearch.Geometry
             while (!renderJob.handle.IsCompleted && renderJob.active)
                 yield return null;
 
-            if (!renderJob.active) yield break;
+            if (!renderJob.active)
+                yield break;
             renderJob.handle.Complete();
             CompleteTextureProcessing(Gather(renderJob));
             renderJob.callback?.Invoke();
