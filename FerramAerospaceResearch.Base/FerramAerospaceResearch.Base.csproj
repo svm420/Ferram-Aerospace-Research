@@ -92,6 +92,7 @@
         <Compile Include="Config\ResourceNode.cs" />
         <Compile Include="Config\ShaderConfig.cs" />
         <Compile Include="Config\TextureConfig.cs" />
+        <Compile Include="Config\VoxelizationConfig.cs" />
         <Compile Include="FARAddonAttribute.cs" />
         <Compile Include="FARAddonLoader.cs" />
         <Compile Include="FARConfig.cs" />

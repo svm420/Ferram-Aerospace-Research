@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using FerramAerospaceResearch.Settings;
+using FerramAerospaceResearch.Config;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -10,16 +10,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private readonly ColorMap map;
         private int count;
 
-        private readonly Dictionary<Part, Color> tints =
-            new Dictionary<Part, Color>(ObjectReferenceEqualityComparer<Part>.Default);
+        private readonly Dictionary<Part, Color> tints = new(ObjectReferenceEqualityComparer<Part>.Default);
 
-        public PartTint() : this(VoxelizationSettings.Default)
+        public PartTint() : this(FARConfig.Voxelization.Default)
         {
         }
 
         public PartTint(string mapName)
         {
-            map = VoxelizationSettings.FirstOrDefault(mapName);
+            map = FARConfig.Voxelization.FirstOrDefault(mapName);
         }
 
         public Color this[Part part]

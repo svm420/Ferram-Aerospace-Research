@@ -410,7 +410,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 finally
                 {
                     //Always, when we finish up, if we're in flight, cleanup the voxel
-                    if (HighLogic.LoadedSceneIsFlight && !VoxelizationSettings.DebugInFlight && _voxel != null)
+                    if (HighLogic.LoadedSceneIsFlight && !FARConfig.Voxelization.DebugInFlight && _voxel != null)
                     {
                         _voxel.CleanupVoxel();
                         _voxel = null;

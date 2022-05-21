@@ -376,7 +376,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void DebugVisualizationGUI()
         {
-            if (!VoxelizationSettings.DebugInFlight)
+            if (!FARConfig.Voxelization.DebugInFlight)
                 return;
             GUILayout.BeginHorizontal();
             GUI.enabled = !_vesselAero.VehicleAero.Voxelizing;

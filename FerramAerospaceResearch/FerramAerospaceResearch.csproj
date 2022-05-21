@@ -182,7 +182,6 @@
     <Compile Include="Settings\FARAeroStress.cs" />
     <Compile Include="Settings\FARAnimOverrides.cs" />
     <Compile Include="Settings\FARPartModuleTransformExceptions.cs" />
-    <Compile Include="Settings\VoxelizationSettings.cs" />
     <Compile Include="ToolbarWrapper.cs" />
     <Compile Include="Utils\ConfigAdapter.cs" />
     <Compile Include="Utils\GameDatabaseTextureLoader.cs" />
