@@ -242,6 +242,7 @@ namespace FerramAerospaceResearch.Geometry
             public NativeArray<int> pixels;
             public AsyncGPUReadbackRequest gpuReadbackRequest;
             public readonly Result Result = new();
+            public bool active = true;
 
             public ComputeShader computeShader;
             public ComputeBuffer outputBuffer;
@@ -281,6 +282,7 @@ namespace FerramAerospaceResearch.Geometry
 
             private void Dispose(bool disposing)
             {
+                active = false;
                 if (!disposing && (tex.IsCreated || pixels.IsCreated))
                     FARLogger.Warning("Garbage collecting native arrays, use Request.Dispose() or Request.ReleaseNative() to manually release the native buffers.");
                 else
@@ -317,9 +319,21 @@ namespace FerramAerospaceResearch.Geometry
         private RenderJob CurrentRenderRenderJob { get; set; }
         private readonly HashSet<RenderJob> activeJobs = new(ObjectReferenceEqualityComparer<RenderJob>.Default);
 
+        public int ActiveJobs
+        {
+            get { return activeJobs.Count;  }
+        }
+
         public bool RenderPending
         {
             get { return CurrentRenderRenderJob is { renderPending: true }; }
+        }
+
+        public void CancelPendingJobs()
+        {
+            if (CurrentRenderRenderJob != null) CurrentRenderRenderJob.active = false;
+            foreach (RenderJob job in activeJobs)
+                job.active = false;
         }
 
         public static T Create<T>(
@@ -398,6 +412,7 @@ namespace FerramAerospaceResearch.Geometry
             CurrentRenderRenderJob.renderPending = true;
             CurrentRenderRenderJob.callback = request.callback;
             CurrentRenderRenderJob.device = request.device;
+            CurrentRenderRenderJob.active = true;
             if (request.device is ProcessingDevice.GPU && !SystemInfo.supportsComputeShaders)
             {
                 if (!computeWarningIssued)
@@ -437,7 +452,7 @@ namespace FerramAerospaceResearch.Geometry
 
         private void OnPostRender()
         {
-            if (!RenderPending || !gameObject.activeSelf)
+            if (!RenderPending || !gameObject.activeSelf || !CurrentRenderRenderJob.active)
                 return;
 
             Profiler.BeginSample("ExposedAreaEvaluator.ReadbackSetup");
@@ -521,7 +536,7 @@ namespace FerramAerospaceResearch.Geometry
 
         private IEnumerator OnGPUReadback(RenderJob renderJob)
         {
-            if (renderJob.gpuReadbackRequest.hasError || !gameObject.activeSelf)
+            if (renderJob.gpuReadbackRequest.hasError || !gameObject.activeSelf || !renderJob.active)
             {
                 yield break;
             }
@@ -555,6 +570,7 @@ namespace FerramAerospaceResearch.Geometry
 
         protected virtual void OnDestroy()
         {
+            CancelPendingJobs();
             foreach (RenderJob request in requestPool)
                 request.Dispose();
 
@@ -590,9 +606,10 @@ namespace FerramAerospaceResearch.Geometry
 
         private IEnumerator WaitForTextureProcessing(RenderJob renderJob)
         {
-            while (!renderJob.handle.IsCompleted)
+            while (!renderJob.handle.IsCompleted && renderJob.active)
                 yield return null;
 
+            if (!renderJob.active) yield break;
             renderJob.handle.Complete();
             CompleteTextureProcessing(Gather(renderJob));
             renderJob.callback?.Invoke();
