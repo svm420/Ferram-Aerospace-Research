@@ -608,10 +608,8 @@ namespace FerramAerospaceResearch.Geometry
             public void Execute(int index)
             {
                 uint color = texture[index];
-                if (color == 0)
-                    return;
 
-                if (Hint.Unlikely(ObjectTagger.GetTag(color) != tag))
+                if (ObjectTagger.GetTag(color) != tag)
                     return;
 
                 int partIndex = ObjectTagger.GetIndex(color);
