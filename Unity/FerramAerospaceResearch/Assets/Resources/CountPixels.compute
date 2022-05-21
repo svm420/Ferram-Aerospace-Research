@@ -1,34 +1,26 @@
 ﻿#pragma kernel CountPixelsMain
 
+static const uint TagLength = 10;
+static const uint TagMask = (1 << TagLength) - 1;
+
 Texture2D<float4> InputTexture; // input texture
-StructuredBuffer<uint> SortedIds; // sorted
 int IdCount;
+uint Tag;
 
 RWStructuredBuffer<int> OutputBuffer;
 
-
-int LowerBound(uint id)
+inline uint get_tag(const uint value)
 {
-    int count = IdCount;
-    int first = 0;
-
-    while (count > 0)
-    {
-        int step = count >> 1; // divide by 2
-        int mid = first + step;
-        if (SortedIds[mid] < id)
-        {
-            first = mid + 1;
-            count -= step + 1;
-        }
-        else
-            count = step;
-    }
-
-    return first;
+    return value & TagMask;
 }
 
-uint touint(float4 c) {
+inline int get_index(const uint value)
+{
+    return value >> TagLength;
+}
+
+uint pack_uint(float4 c)
+{
     const uint mask = 0xFF;
     c *= 255;
     // no builtin char-types...
@@ -39,13 +31,12 @@ uint touint(float4 c) {
 }
 
 [numthreads(8,8,1)]
-void CountPixelsMain (uint3 id : SV_DispatchThreadID)
+void CountPixelsMain(const uint3 id : SV_DispatchThreadID)
 {
-    float4 input = InputTexture.Load(id);
-    uint color = touint(input);
+    const float4 input = InputTexture.Load(id);
+    const uint color = pack_uint(input);
 
-    if (color == 0) return;
-
-    int index = LowerBound(color);
-    if (index < IdCount && SortedIds[index] == color) InterlockedAdd(OutputBuffer[index], 1);
+    if (get_tag(color) != Tag) return;
+    const int index = get_index(color);
+    InterlockedAdd(OutputBuffer[index], 1);
 }

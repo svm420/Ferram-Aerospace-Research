@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using FerramAerospaceResearch.Resources;
@@ -15,47 +14,172 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
+using Random = System.Random;
 
 namespace FerramAerospaceResearch.Geometry
 {
-    public abstract class ExposedSurfaceEvaluator : MonoBehaviour
+    [StructLayout(LayoutKind.Explicit)]
+    public struct ColorUintConverter
     {
-        [StructLayout(LayoutKind.Explicit)]
-        private struct ColorUintConverter
-        {
-            [FieldOffset(0)] public uint u;
-            [FieldOffset(0)] public Color32 c;
-        }
+        [FieldOffset(0)] private uint u;
+        [FieldOffset(0)] private Color32 c;
 
-        public static Color32 UintToColor(uint value)
+        public static Color32 AsColor(uint value)
         {
             return new ColorUintConverter { u = value }.c;
         }
 
-        public static uint ColorToUint(Color32 color)
+        public static uint AsUint(Color32 color)
         {
             return new ColorUintConverter { c = color }.u;
         }
+    }
 
-        public Camera camera;
-        private readonly Dictionary<uint, Object> registeredObjects = new();
+    public class ObjectTagger : IDisposable, IReadOnlyDictionary<Object, uint>
+    {
+        private const int TagLength = 10;
+        private const uint TagMask = (1 << TagLength) - 1;
 
-        private NativeList<uint> sortedIds;
-        private NativeHashMap<uint, int> mappedIds;
+        public uint Tag { get; private set; }
+        private static readonly HashSet<uint> usedTags = new();
+        private static readonly Random random = new();
+        private readonly Dictionary<Object, uint> objectIds = new(ObjectReferenceEqualityComparer<Object>.Default);
+        private MaterialPropertyBlock block;
 
-        private void UpdateIds()
+        public Dictionary<Object, uint>.KeyCollection Keys
         {
-            if (registeredObjects.Count == sortedIds.Length)
-                // still valid
-                return;
-
-            uint[] keys = registeredObjects.Keys.ToArray();
-            sortedIds.CopyFrom(keys);
-            sortedIds.Sort();
-            for (int i = 0; i < sortedIds.Length; ++i)
-                mappedIds.TryAdd(sortedIds[i], i);
+            get { return objectIds.Keys; }
         }
 
+        public Dictionary<Object, uint>.ValueCollection Values
+        {
+            get { return objectIds.Values; }
+        }
+
+        private void SetUniqueTag()
+        {
+            do
+            {
+                Tag = (uint)random.Next(1, 1 << TagLength); // 0 tag would coincide with empty pixels so don't use it
+            } while (usedTags.Contains(Tag));
+
+            usedTags.Add(Tag);
+        }
+
+        public ObjectTagger()
+        {
+            SetUniqueTag();
+        }
+
+        public static uint GetTag(uint value)
+        {
+            return value & TagMask;
+        }
+
+        public static int GetIndex(uint value)
+        {
+            return (int)(value >> TagLength);
+        }
+
+        public uint Encode(int index)
+        {
+            return ((uint)(index) << TagLength) | Tag;
+        }
+
+        public void SetupRenderers<T>(Object obj, T renderers, MaterialPropertyBlock propertyBlock = null)
+            where T : IEnumerable<Renderer>
+        {
+            foreach (Renderer renderer in renderers)
+                SetupRenderer(obj, renderer, propertyBlock);
+        }
+
+        public void Reset(bool newTag = false)
+        {
+            objectIds.Clear();
+            if (!newTag)
+                return;
+            usedTags.Remove(Tag);
+            SetUniqueTag();
+        }
+
+        public void SetupRenderer(Object obj, Renderer renderer, MaterialPropertyBlock propertyBlock = null)
+        {
+            // unique per object, stability doesn't matter as renderers will have to be rebuilt when anything changes
+            if (!objectIds.TryGetValue(obj, out uint id))
+            {
+                id = Encode(objectIds.Count);
+                objectIds.Add(obj, id);
+            }
+
+            if (propertyBlock == null)
+            {
+                block ??= new MaterialPropertyBlock();
+                renderer.GetPropertyBlock(block); // always overwrites block in any case
+                propertyBlock = block;
+            }
+
+            Color c = ColorUintConverter.AsColor(id);
+            propertyBlock.SetColor(ShaderPropertyIds.ExposedColor, c);
+            FARLogger.DebugFormat("{0} ({1}): {2}", obj, id, c);
+            renderer.SetPropertyBlock(propertyBlock);
+        }
+
+        public Dictionary<Object, uint>.Enumerator GetEnumerator()
+        {
+            return objectIds.GetEnumerator();
+        }
+
+        IEnumerator<KeyValuePair<Object, uint>> IEnumerable<KeyValuePair<Object, uint>>.GetEnumerator()
+        {
+            return objectIds.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)objectIds).GetEnumerator();
+        }
+
+        public int Count
+        {
+            get { return objectIds.Count; }
+        }
+
+        public bool ContainsKey(Object key)
+        {
+            return objectIds.ContainsKey(key);
+        }
+
+        public bool TryGetValue(Object key, out uint value)
+        {
+            return objectIds.TryGetValue(key, out value);
+        }
+
+        public uint this[Object key]
+        {
+            get { return objectIds[key]; }
+        }
+
+        IEnumerable<Object> IReadOnlyDictionary<Object, uint>.Keys
+        {
+            get { return objectIds.Keys; }
+        }
+
+        IEnumerable<uint> IReadOnlyDictionary<Object, uint>.Values
+        {
+            get { return objectIds.Values; }
+        }
+
+        public void Dispose()
+        {
+            usedTags.Remove(Tag);
+        }
+    }
+
+    public abstract class ExposedSurfaceEvaluator : MonoBehaviour
+    {
+        private static bool computeWarningIssued;
+        public ObjectTagger Tagger;
+        public Camera camera;
         public Vector2Int renderSize = new()
         {
             x = 512,
@@ -78,17 +202,16 @@ namespace FerramAerospaceResearch.Geometry
         public Kernel MainKernel { get; private set; }
         public ComputeShader PixelCountShader { get; private set; }
 
-        public void SetComputeShader(ComputeShader shader, Kernel? init = default, Kernel? main = default)
+        public void SetComputeShader(ComputeShader shader, Kernel? main = default)
         {
             PixelCountShader = shader;
             MainKernel = main ?? new Kernel(shader, "CountPixelsMain");
         }
 
-        public enum ProcessingJobType
+        public enum ProcessingDevice
         {
-            Mapped,
-            Sorted,
-            Compute,
+            CPU,
+            GPU,
         }
 
         public struct Request
@@ -96,7 +219,7 @@ namespace FerramAerospaceResearch.Geometry
             public Bounds bounds;
             public Vector3 forward;
             public Action callback;
-            public ProcessingJobType jobType;
+            public ProcessingDevice device;
         }
 
         public class Result
@@ -111,7 +234,7 @@ namespace FerramAerospaceResearch.Geometry
         private record RenderJob : IDisposable
         {
             public bool renderPending;
-            public ProcessingJobType jobType = ProcessingJobType.Mapped;
+            public ProcessingDevice device = ProcessingDevice.CPU;
             public JobHandle handle;
             public Action callback;
             public NativeArray<uint> tex;
@@ -121,7 +244,6 @@ namespace FerramAerospaceResearch.Geometry
 
             public ComputeShader computeShader;
             public ComputeBuffer outputBuffer;
-            public ComputeBuffer idBuffer;
 
             ~RenderJob() => Dispose(false);
 
@@ -140,12 +262,11 @@ namespace FerramAerospaceResearch.Geometry
                     rebind = true;
                 }
 
-                if (outputBuffer == null || idBuffer == null || outputBuffer.count < count || idBuffer.count < count)
+                if (outputBuffer == null || outputBuffer.count < count)
                 {
                     ReleaseComputeBuffers();
                     count = math.max(count * 2, 1024);
                     outputBuffer = new ComputeBuffer(count, sizeof(int));
-                    idBuffer = new ComputeBuffer(count, sizeof(uint));
                     rebind = true;
                 }
 
@@ -155,7 +276,6 @@ namespace FerramAerospaceResearch.Geometry
                 if (!main.IsValid)
                     return;
                 computeShader.SetBuffer(main.index, ShaderPropertyIds.OutputBuffer, outputBuffer);
-                computeShader.SetBuffer(main.index, ShaderPropertyIds.SortedIds, idBuffer);
             }
 
             private void Dispose(bool disposing)
@@ -168,7 +288,7 @@ namespace FerramAerospaceResearch.Geometry
                 Result.hostTexture = default;
                 Result.pixelCounts = default;
 
-                if (outputBuffer == null && idBuffer == null)
+                if (outputBuffer == null)
                     return;
                 if (!disposing)
                     FARLogger.Warning("Garbage collecting ComputeBuffer. Use Request.Dispose() or Request.ReleaseComputeBuffers() to manually release it.");
@@ -185,23 +305,15 @@ namespace FerramAerospaceResearch.Geometry
 
             public void ReleaseComputeBuffers()
             {
-                if (outputBuffer != null)
-                {
-                    outputBuffer.Release();
-                    outputBuffer = null;
-                }
-
-                if (idBuffer == null)
+                if (outputBuffer == null)
                     return;
-                idBuffer.Release();
-                idBuffer = null;
+                outputBuffer.Release();
+                outputBuffer = null;
             }
         }
 
         private readonly Stack<RenderJob> requestPool = new();
         private RenderJob CurrentRenderRenderJob { get; set; }
-        private MaterialPropertyBlock block;
-
         private readonly HashSet<RenderJob> activeJobs = new(ObjectReferenceEqualityComparer<RenderJob>.Default);
 
         public bool RenderPending
@@ -225,14 +337,8 @@ namespace FerramAerospaceResearch.Geometry
             return self;
         }
 
-        protected virtual void Initialize(
-            Shader shader = null,
-            ComputeShader pixelCount = null,
-            Kernel? init = null,
-            Kernel? main = null
-        )
+        protected virtual void Initialize(Shader shader = null, ComputeShader pixelCount = null, Kernel? main = null)
         {
-            block = new MaterialPropertyBlock();
             camera = gameObject.AddComponent<Camera>();
             camera.enabled = false;
             camera.orthographic = true;
@@ -245,9 +351,6 @@ namespace FerramAerospaceResearch.Geometry
             camera.allowMSAA = false;
             camera.allowHDR = false;
             camera.depthTextureMode = DepthTextureMode.Depth;
-
-            mappedIds = new NativeHashMap<uint, int>(100, Allocator.Persistent);
-            sortedIds = new NativeList<uint>(100, Allocator.Persistent);
 
             if (shader == null)
                 shader = FARAssets.Instance.Shaders.ExposedSurface;
@@ -277,42 +380,12 @@ namespace FerramAerospaceResearch.Geometry
             return renderTexture;
         }
 
-        protected void SetupRenderers<T>(Object obj, T renderers, MaterialPropertyBlock propertyBlock = null)
-            where T : IEnumerable<Renderer>
-        {
-            foreach (Renderer renderer in renderers)
-                SetupRenderer(obj, renderer, propertyBlock);
-        }
-
-        protected void ResetCachedRenderers()
-        {
-            sortedIds.Clear();
-            mappedIds.Clear();
-            registeredObjects.Clear();
-        }
-
-        protected void SetupRenderer(Object obj, Renderer renderer, MaterialPropertyBlock propertyBlock = null)
-        {
-            // unique per object, stability doesn't matter as renderers will have to be rebuilt when anything changes
-            uint id = ~(uint)obj.GetInstanceID(); // alpha channels are often 0 using InstanceID only
-            registeredObjects[id] = obj;
-
-            if (propertyBlock == null)
-            {
-                renderer.GetPropertyBlock(block); // always overwrites block in any case
-                propertyBlock = block;
-            }
-
-            Color c = UintToColor(id);
-            propertyBlock.SetColor(ShaderPropertyIds.ExposedColor, c);
-            FARLogger.DebugFormat("{0} ({1}): {2}", obj, id, c);
-            renderer.SetPropertyBlock(propertyBlock);
-        }
-
         protected void Render(Request request)
         {
             if (RenderPending)
                 throw new MethodAccessException("Rendering is still ongoing!");
+            if (Tagger is null)
+                throw new NullReferenceException("Please set ExposedSurfaceEvaluator.Tagger before rendering");
 
             Profiler.BeginSample("ExposedAreaEvaluator.RenderRequest");
             CurrentRenderRenderJob = requestPool.Count == 0 ? new RenderJob() : requestPool.Pop();
@@ -323,14 +396,18 @@ namespace FerramAerospaceResearch.Geometry
             CurrentRenderRenderJob.Result.areaPerPixel = pixelSize.x * pixelSize.y;
             CurrentRenderRenderJob.renderPending = true;
             CurrentRenderRenderJob.callback = request.callback;
-            CurrentRenderRenderJob.jobType = request.jobType;
-            if (request.jobType is ProcessingJobType.Compute && !SystemInfo.supportsComputeShaders)
+            CurrentRenderRenderJob.device = request.device;
+            if (request.device is ProcessingDevice.GPU && !SystemInfo.supportsComputeShaders)
             {
-                FARLogger.Warning("Compute shaders are not supported on your system!");
-                CurrentRenderRenderJob.jobType = ProcessingJobType.Mapped;
+                if (!computeWarningIssued)
+                {
+                    FARLogger.Warning("Compute shaders are not supported on your system!");
+                    computeWarningIssued = true;
+                }
+
+                CurrentRenderRenderJob.device = ProcessingDevice.CPU;
             }
 
-            UpdateIds();
             camera.Render();
             Profiler.EndSample();
         }
@@ -374,29 +451,27 @@ namespace FerramAerospaceResearch.Geometry
             // https://forum.unity.com/threads/asyncgpureadback-requestintonativearray-causes-invalidoperationexception-on-nativearray.1011955/
             // https://forum.unity.com/threads/asyncgpureadback-requestintonativearray-causes-invalidoperationexception-on-nativearray.1011955/#post-7347623
             AsyncGPUReadbackRequest readbackRequest;
-            if (CurrentRenderRenderJob.jobType is ProcessingJobType.Compute)
+            if (CurrentRenderRenderJob.device is ProcessingDevice.GPU)
             {
-                int count = sortedIds.Length;
+                int count = Tagger.Count;
 
                 // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
-                if (CurrentRenderRenderJob.jobType is ProcessingJobType.Compute)
+                if (CurrentRenderRenderJob.device is ProcessingDevice.GPU)
                 {
                     CurrentRenderRenderJob.UpdateComputeShader(PixelCountShader, count, MainKernel);
                 }
 
                 ComputeShader shader = CurrentRenderRenderJob.computeShader;
                 ComputeBuffer outputBuffer = CurrentRenderRenderJob.outputBuffer;
-                ComputeBuffer idBuffer = CurrentRenderRenderJob.idBuffer;
 
-                CurrentRenderRenderJob.pixels = new NativeArray<int>(sortedIds.Length, Allocator.Persistent);
+                CurrentRenderRenderJob.pixels = new NativeArray<int>(count, Allocator.Persistent);
                 outputBuffer.SetData(CurrentRenderRenderJob.pixels);
-                idBuffer.SetData(sortedIds.AsArray());
                 shader.SetTexture(MainKernel.index,
                                   ShaderPropertyIds.InputTexture,
                                   renderTexture,
                                   0,
                                   RenderTextureSubElement.Color);
-                shader.SetInt(ShaderPropertyIds.IdCount, count);
+                shader.SetInt(ShaderPropertyIds.Tag, (int)Tagger.Tag);
 
                 shader.Dispatch(MainKernel.index,
                                 (renderTexture.width + (int)MainKernel.threadGroupSizes.x - 1) /
@@ -459,26 +534,17 @@ namespace FerramAerospaceResearch.Geometry
             NativeArray<uint> texture = renderJob.gpuReadbackRequest.GetData<uint>();
 
             renderJob.handle.Complete();
-            if (renderJob.jobType != ProcessingJobType.Compute)
-                renderJob.pixels = new NativeArray<int>(sortedIds.Length, Allocator.Persistent);
-            renderJob.handle = renderJob.jobType switch
+            if (renderJob.device != ProcessingDevice.GPU)
             {
-                ProcessingJobType.Mapped => new MappedPixelCountJob
+                // compute has already readback pixels
+                renderJob.pixels = new NativeArray<int>(Tagger.Count, Allocator.Persistent);
+                renderJob.handle = new TaggedPixelCountJob
                 {
-                    ids = mappedIds,
                     pixels = renderJob.pixels,
+                    tag = Tagger.Tag,
                     texture = texture
-                }.Schedule(texture.Length, 64),
-                // might be faster for small numbers of objects than HashMap, needs profiling
-                ProcessingJobType.Sorted => new SortedPixelCountJob
-                {
-                    ids = sortedIds.AsArray(),
-                    pixels = renderJob.pixels,
-                    texture = texture
-                }.Schedule(texture.Length, 64),
-                ProcessingJobType.Compute => default, // compute readback has finished directly into pixels array
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                }.Schedule(texture.Length, 64);
+            }
 
             Profiler.EndSample();
 
@@ -487,10 +553,6 @@ namespace FerramAerospaceResearch.Geometry
 
         protected virtual void CleanJobResources()
         {
-            if (mappedIds.IsCreated)
-                mappedIds.Dispose();
-            if (sortedIds.IsCreated)
-                sortedIds.Dispose();
         }
 
         protected virtual void OnDestroy()
@@ -519,12 +581,11 @@ namespace FerramAerospaceResearch.Geometry
             job.Result.hostTexture = job.tex;
             job.Result.pixelCounts = job.pixels;
             job.Result.areas.Clear();
-            for (int i = 0; i < job.pixels.Length; ++i)
+            foreach (KeyValuePair<Object, uint> objectId in Tagger)
             {
-                uint id = sortedIds[i];
-                double area = job.pixels[i] * job.Result.areaPerPixel;
-                if (registeredObjects.TryGetValue(id, out Object owner))
-                    job.Result.areas[owner] = area;
+                uint id = objectId.Value;
+                int index = ObjectTagger.GetIndex(id);
+                job.Result.areas[objectId.Key] = job.pixels[index] * job.Result.areaPerPixel;
             }
 
             return job.Result;
@@ -540,12 +601,11 @@ namespace FerramAerospaceResearch.Geometry
             renderJob.callback?.Invoke();
         }
 
-        // TODO: compare with compute shader and binary search in sorted id array
         [BurstCompile]
-        public struct MappedPixelCountJob : IJobParallelFor
+        public struct TaggedPixelCountJob : IJobParallelFor
         {
             [ReadOnly] public NativeSlice<uint> texture;
-            [ReadOnly] public NativeHashMap<uint, int> ids;
+            public uint tag;
             public NativeSlice<int> pixels;
 
             public void Execute(int index)
@@ -554,60 +614,13 @@ namespace FerramAerospaceResearch.Geometry
                 if (color == 0)
                     return;
 
-                if (Hint.Unlikely(!ids.TryGetValue(color, out int partIndex)))
+                if (Hint.Unlikely(ObjectTagger.GetTag(color) != tag))
                     return;
 
+                int partIndex = ObjectTagger.GetIndex(color);
                 unsafe
                 {
                     // [] returns a copy so cannot use ref with it, instead access from the buffer pointer directly
-                    int* pixelBegin = (int*)pixels.GetUnsafePtr();
-                    Interlocked.Increment(ref *(pixelBegin + partIndex));
-                }
-            }
-        }
-
-        private static int LowerBound(NativeSlice<uint> ids, uint id)
-        {
-            // binary search for id, ids must be in ascending order
-            // adapted from https://en.cppreference.com/w/cpp/algorithm/lower_bound
-            int count = ids.Length;
-            int first = 0;
-
-            while (count > 0)
-            {
-                int step = count / 2;
-                int mid = first + step;
-                if (ids[mid] < id)
-                {
-                    first = mid + 1;
-                    count -= step + 1;
-                }
-                else
-                    count = step;
-            }
-
-            return first;
-        }
-
-        [BurstCompile]
-        public struct SortedPixelCountJob : IJobParallelFor
-        {
-            [ReadOnly] public NativeSlice<uint> texture;
-            [ReadOnly] public NativeSlice<uint> ids;
-            public NativeSlice<int> pixels;
-
-            public void Execute(int index)
-            {
-                uint color = texture[index];
-                if (color == 0)
-                    return;
-
-                int partIndex = LowerBound(ids, color);
-                if (Hint.Unlikely(index >= ids.Length || ids[index] != color))
-                    return;
-
-                unsafe
-                {
                     int* pixelBegin = (int*)pixels.GetUnsafePtr();
                     Interlocked.Increment(ref *(pixelBegin + partIndex));
                 }

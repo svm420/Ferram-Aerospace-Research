@@ -1,24 +1,17 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using FerramAerospaceResearch.Geometry;
 using FerramAerospaceResearch.Resources;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch.Editor {
-    [Serializable]
-    public struct ColorObject {
-        public Color color;
-        public GameObject obj;
-    }
-
     class ExposedSurfaceEditor : ExposedSurfaceEvaluator {
         public List<GameObject> objects = new List<GameObject>();
         private Texture2D blackTexture;
 
         public Vector3 lookDir = Vector3.forward;
-        public Bounds bounds = new Bounds();
-        public ProcessingJobType jobType;
+        public Bounds bounds;
+        public ProcessingDevice device;
         private RenderTexture renderTexture;
 
         public Shader exposedSurfaceShader;
@@ -29,6 +22,8 @@ namespace FerramAerospaceResearch.Editor {
             FARLogger.Level = LogLevel.Trace;
             FARLogger.InfoFormat("Level: {0}", FARLogger.Level);
 
+            Tagger = new ObjectTagger();
+
             if (pixelCountShader != null) {
                 pixelCountMain = new Kernel(pixelCountShader, pixelCountMain.name);
             }
@@ -36,7 +31,7 @@ namespace FerramAerospaceResearch.Editor {
             Initialize(exposedSurfaceShader, pixelCountShader, pixelCountMain);
 
             foreach (GameObject obj in objects) {
-                SetupRenderers(obj, obj.GetComponentsInChildren<Renderer>(false));
+                Tagger.SetupRenderers(obj, obj.GetComponentsInChildren<Renderer>(false));
             }
 
             blackTexture = new Texture2D(renderSize.x, renderSize.y);
@@ -52,22 +47,14 @@ namespace FerramAerospaceResearch.Editor {
             Render(new Request(){
                 bounds=bounds,
                 forward=lookDir,
-                jobType=jobType,
+                device=device,
             });
 
             Camera c = Camera.main;
-            Transform t = c.transform;
-            t.position = camera.transform.position;
-            t.rotation = camera.transform.rotation;
-            t.localScale = camera.transform.localScale;
-            t.forward = camera.transform.forward;
-            c.farClipPlane = camera.farClipPlane;
-            c.orthographicSize = camera.orthographicSize;
-            c.orthographic = camera.orthographic;
-            c.cullingMask = camera.cullingMask;
-            c.nearClipPlane = camera.nearClipPlane;
-            c.clearFlags = camera.clearFlags;
-            c.depthTextureMode = camera.depthTextureMode;
+            if (c == null)
+                return;
+            c.CopyFrom(camera);
+            c.targetTexture = null;
         }
 
         protected override void CompleteTextureProcessing(Result result) {
@@ -75,7 +62,7 @@ namespace FerramAerospaceResearch.Editor {
             if (!Application.isEditor) return;
             int pixels = renderTexture.width * renderTexture.height;
             double area = pixels * result.areaPerPixel;
-            foreach (var pair in result.areas) {
+            foreach (KeyValuePair<Object, double> pair in result.areas) {
                 FARLogger.InfoFormat("{0}: {1} ({2}%)", pair.Key, pair.Value, 100 * pair.Value / area);
             }
         }
@@ -87,5 +74,11 @@ namespace FerramAerospaceResearch.Editor {
 			GUI.DrawTexture(new Rect(sz.xMax - renderSize.x, sz.yMax - renderSize.y, renderSize.x, renderSize.y), blackTexture);
 			GUI.DrawTexture(new Rect(sz.xMax - renderSize.x, sz.yMax - renderSize.y, renderSize.x, renderSize.y), renderTexture);
 		}
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Tagger.Dispose();
+        }
     }
 }

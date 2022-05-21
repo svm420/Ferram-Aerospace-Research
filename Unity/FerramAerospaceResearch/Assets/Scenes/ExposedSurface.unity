@@ -443,17 +443,10 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 1, y: 1, z: 1}
-  jobType: 2
+  jobType: 0
   exposedSurfaceShader: {fileID: 4800000, guid: 51db73e998a880c4bb095d4e2e284a63,
     type: 3}
   pixelCountShader: {fileID: 7200000, guid: 2d778c6f876fe3146a4ac9460f76baf9, type: 3}
-  pixelCountInit:
-    name: CountPixelsInitialize
-    index: 0
-    threadGroupSizes:
-      x: 0
-      y: 0
-      z: 0
   pixelCountMain:
     name: CountPixelsMain
     index: 0
