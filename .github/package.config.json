@@ -3,6 +3,15 @@
         "KSP_DIR_INSTALL": "$(KSP_DIR_BUILD)"
     },
     "package": {
-        "compression": null
+        "compression": null,
+        "+dependencies": [
+            {
+                "path": "$(KSP_DIR_BUILD)/Ships",
+                "destination": "Ships",
+                "include": [
+                    "**/*"
+                ]
+            }
+        ]
     }
 }
