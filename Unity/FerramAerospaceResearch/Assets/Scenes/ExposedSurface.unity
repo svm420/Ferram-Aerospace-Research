@@ -443,7 +443,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 1, y: 1, z: 1}
-  jobType: 0
+  device: 0
   exposedSurfaceShader: {fileID: 4800000, guid: 51db73e998a880c4bb095d4e2e284a63,
     type: 3}
   pixelCountShader: {fileID: 7200000, guid: 2d778c6f876fe3146a4ac9460f76baf9, type: 3}
@@ -454,6 +454,7 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 0
+  debugMaterial: {fileID: 2100000, guid: 4928ca41c6d0d6242bee0c4d1ce20329, type: 2}
 --- !u!4 &1077718239
 Transform:
   m_ObjectHideFlags: 0

@@ -7,7 +7,6 @@ using Object = UnityEngine.Object;
 namespace FerramAerospaceResearch.Editor {
     class ExposedSurfaceEditor : ExposedSurfaceEvaluator {
         public List<GameObject> objects = new List<GameObject>();
-        private Texture2D blackTexture;
 
         public Vector3 lookDir = Vector3.forward;
         public Bounds bounds;
@@ -17,6 +16,7 @@ namespace FerramAerospaceResearch.Editor {
         public Shader exposedSurfaceShader;
         public ComputeShader pixelCountShader;
         public Kernel pixelCountMain;
+        public Material debugMaterial;
 
         private void Start() {
             FARLogger.Level = LogLevel.Trace;
@@ -33,12 +33,6 @@ namespace FerramAerospaceResearch.Editor {
             foreach (GameObject obj in objects) {
                 Tagger.SetupRenderers(obj, obj.GetComponentsInChildren<Renderer>(false));
             }
-
-            blackTexture = new Texture2D(renderSize.x, renderSize.y);
-            Color[] pixels = blackTexture.GetPixels();
-            for (int i = 0; i < pixels.Length; ++i) pixels[i] = Color.black;
-            blackTexture.SetPixels(pixels);
-            blackTexture.Apply();
         }
 
         private void Update() {
@@ -71,8 +65,14 @@ namespace FerramAerospaceResearch.Editor {
 		{
             if (renderTexture == null) return;
             Rect sz = Screen.safeArea;
-			GUI.DrawTexture(new Rect(sz.xMax - renderSize.x, sz.yMax - renderSize.y, renderSize.x, renderSize.y), blackTexture);
-			GUI.DrawTexture(new Rect(sz.xMax - renderSize.x, sz.yMax - renderSize.y, renderSize.x, renderSize.y), renderTexture);
+            var render = new Rect(sz.xMax - renderSize.x, sz.yMax - renderSize.y, renderSize.x, renderSize.y);
+            if (debugMaterial != null)
+            {
+                debugMaterial.SetInt(ShaderPropertyIds._Tag, (int)Tagger.Tag);
+                if (Event.current.type == EventType.Repaint)
+                    Graphics.DrawTexture(render, renderTexture, debugMaterial);
+            } else
+			    GUI.DrawTexture(render, renderTexture);
 		}
 
         protected override void OnDestroy()
