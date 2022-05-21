@@ -456,10 +456,7 @@ namespace FerramAerospaceResearch.Geometry
                 int count = Tagger.Count;
 
                 // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
-                if (CurrentRenderRenderJob.device is ProcessingDevice.GPU)
-                {
-                    CurrentRenderRenderJob.UpdateComputeShader(PixelCountShader, count, MainKernel);
-                }
+                CurrentRenderRenderJob.UpdateComputeShader(PixelCountShader, count, MainKernel);
 
                 ComputeShader shader = CurrentRenderRenderJob.computeShader;
                 ComputeBuffer outputBuffer = CurrentRenderRenderJob.outputBuffer;
