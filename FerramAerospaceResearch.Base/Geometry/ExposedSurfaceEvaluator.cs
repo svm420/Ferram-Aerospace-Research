@@ -35,7 +35,7 @@ namespace FerramAerospaceResearch.Geometry
         }
     }
 
-    public class ObjectTagger : IDisposable, IReadOnlyDictionary<Object, uint>
+    public class ObjectTagger : IDisposable, IReadOnlyDictionary<Object, int>
     {
         private const int TagLength = 10;
         private const uint TagMask = (1 << TagLength) - 1;
@@ -43,15 +43,15 @@ namespace FerramAerospaceResearch.Geometry
         public uint Tag { get; private set; }
         private static readonly HashSet<uint> usedTags = new();
         private static readonly Random random = new();
-        private readonly Dictionary<Object, uint> objectIds = new(ObjectReferenceEqualityComparer<Object>.Default);
+        private readonly Dictionary<Object, int> objectIds = new(ObjectReferenceEqualityComparer<Object>.Default);
         private MaterialPropertyBlock block;
 
-        public Dictionary<Object, uint>.KeyCollection Keys
+        public Dictionary<Object, int>.KeyCollection Keys
         {
             get { return objectIds.Keys; }
         }
 
-        public Dictionary<Object, uint>.ValueCollection Values
+        public Dictionary<Object, int>.ValueCollection Values
         {
             get { return objectIds.Values; }
         }
@@ -105,10 +105,10 @@ namespace FerramAerospaceResearch.Geometry
         public void SetupRenderer(Object obj, Renderer renderer, MaterialPropertyBlock propertyBlock = null)
         {
             // unique per object, stability doesn't matter as renderers will have to be rebuilt when anything changes
-            if (!objectIds.TryGetValue(obj, out uint id))
+            if (!objectIds.TryGetValue(obj, out int index))
             {
-                id = Encode(objectIds.Count);
-                objectIds.Add(obj, id);
+                index = objectIds.Count;
+                objectIds.Add(obj, index);
             }
 
             if (propertyBlock == null)
@@ -118,18 +118,19 @@ namespace FerramAerospaceResearch.Geometry
                 propertyBlock = block;
             }
 
+            uint id = Encode(index);
             Color c = ColorUintConverter.AsColor(id);
             propertyBlock.SetColor(ShaderPropertyIds.ExposedColor, c);
             FARLogger.DebugFormat("{0} ({1}): {2}", obj, id, c);
             renderer.SetPropertyBlock(propertyBlock);
         }
 
-        public Dictionary<Object, uint>.Enumerator GetEnumerator()
+        public Dictionary<Object, int>.Enumerator GetEnumerator()
         {
             return objectIds.GetEnumerator();
         }
 
-        IEnumerator<KeyValuePair<Object, uint>> IEnumerable<KeyValuePair<Object, uint>>.GetEnumerator()
+        IEnumerator<KeyValuePair<Object, int>> IEnumerable<KeyValuePair<Object, int>>.GetEnumerator()
         {
             return objectIds.GetEnumerator();
         }
@@ -149,22 +150,22 @@ namespace FerramAerospaceResearch.Geometry
             return objectIds.ContainsKey(key);
         }
 
-        public bool TryGetValue(Object key, out uint value)
+        public bool TryGetValue(Object key, out int value)
         {
             return objectIds.TryGetValue(key, out value);
         }
 
-        public uint this[Object key]
+        public int this[Object key]
         {
             get { return objectIds[key]; }
         }
 
-        IEnumerable<Object> IReadOnlyDictionary<Object, uint>.Keys
+        IEnumerable<Object> IReadOnlyDictionary<Object, int>.Keys
         {
             get { return objectIds.Keys; }
         }
 
-        IEnumerable<uint> IReadOnlyDictionary<Object, uint>.Values
+        IEnumerable<int> IReadOnlyDictionary<Object, int>.Values
         {
             get { return objectIds.Values; }
         }
@@ -578,11 +579,10 @@ namespace FerramAerospaceResearch.Geometry
             job.Result.hostTexture = job.tex;
             job.Result.pixelCounts = job.pixels;
             job.Result.areas.Clear();
-            foreach (KeyValuePair<Object, uint> objectId in Tagger)
+            foreach (KeyValuePair<Object, int> objectIndex in Tagger)
             {
-                uint id = objectId.Value;
-                int index = ObjectTagger.GetIndex(id);
-                job.Result.areas[objectId.Key] = job.pixels[index] * job.Result.areaPerPixel;
+                int index = objectIndex.Value;
+                job.Result.areas[objectIndex.Key] = job.pixels[index] * job.Result.areaPerPixel;
             }
 
             return job.Result;
