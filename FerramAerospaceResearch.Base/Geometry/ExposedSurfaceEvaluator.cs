@@ -176,10 +176,11 @@ namespace FerramAerospaceResearch.Geometry
         }
     }
 
-    public abstract class ExposedSurfaceEvaluator : MonoBehaviour
+    public class ExposedSurfaceEvaluator : MonoBehaviour
     {
+        private static bool supportsComputeShaders;
         private static bool computeWarningIssued;
-        public ObjectTagger Tagger;
+        public ObjectTagger tagger;
         public Camera camera;
 
         public Vector2Int renderSize = new()
@@ -356,6 +357,7 @@ namespace FerramAerospaceResearch.Geometry
 
         protected virtual void Initialize(Shader shader = null, ComputeShader pixelCount = null, Kernel? main = null)
         {
+            supportsComputeShaders = SystemInfo.supportsComputeShaders;
             camera = gameObject.AddComponent<Camera>();
             camera.enabled = false;
             camera.orthographic = true;
@@ -397,12 +399,12 @@ namespace FerramAerospaceResearch.Geometry
             return renderTexture;
         }
 
-        protected void Render(Request request)
+        public void Render(Request request)
         {
             if (RenderPending)
                 throw new MethodAccessException("Rendering is still ongoing!");
-            if (Tagger is null)
-                throw new NullReferenceException("Please set ExposedSurfaceEvaluator.Tagger before rendering");
+            if (tagger is null)
+                throw new NullReferenceException("Please set ExposedSurfaceEvaluator.tagger before rendering");
 
             Profiler.BeginSample("ExposedAreaEvaluator.RenderRequest");
             CurrentRenderRenderJob = requestPool.Count == 0 ? new RenderJob() : requestPool.Pop();
@@ -415,7 +417,7 @@ namespace FerramAerospaceResearch.Geometry
             CurrentRenderRenderJob.callback = request.callback;
             CurrentRenderRenderJob.device = request.device;
             CurrentRenderRenderJob.active = true;
-            if (request.device is ProcessingDevice.GPU && !SystemInfo.supportsComputeShaders)
+            if (request.device is ProcessingDevice.GPU && !supportsComputeShaders)
             {
                 if (!computeWarningIssued)
                 {
@@ -477,7 +479,7 @@ namespace FerramAerospaceResearch.Geometry
             AsyncGPUReadbackRequest readbackRequest;
             if (job.device is ProcessingDevice.GPU)
             {
-                int count = Tagger.Count;
+                int count = tagger.Count;
 
                 // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
                 job.UpdateComputeShader(PixelCountShader, count, MainKernel);
@@ -492,7 +494,7 @@ namespace FerramAerospaceResearch.Geometry
                                   renderTexture,
                                   0,
                                   RenderTextureSubElement.Color);
-                shader.SetInt(ShaderPropertyIds.Tag, (int)Tagger.Tag);
+                shader.SetInt(ShaderPropertyIds.Tag, (int)tagger.Tag);
 
                 shader.Dispatch(MainKernel.index,
                                 (renderTexture.width + (int)MainKernel.threadGroupSizes.x - 1) /
@@ -554,11 +556,11 @@ namespace FerramAerospaceResearch.Geometry
             if (renderJob.device != ProcessingDevice.GPU)
             {
                 // compute has already readback pixels
-                renderJob.pixels = new NativeArray<int>(Tagger.Count, Allocator.Persistent);
+                renderJob.pixels = new NativeArray<int>(tagger.Count, Allocator.Persistent);
                 renderJob.handle = new TaggedPixelCountJob
                 {
                     pixels = renderJob.pixels,
-                    tag = Tagger.Tag,
+                    tag = tagger.Tag,
                     texture = texture
                 }.Schedule(texture.Length, 64);
             }
@@ -599,7 +601,7 @@ namespace FerramAerospaceResearch.Geometry
             job.Result.hostTexture = job.tex;
             job.Result.pixelCounts = job.pixels;
             job.Result.areas.Clear();
-            foreach (KeyValuePair<Object, int> objectIndex in Tagger)
+            foreach (KeyValuePair<Object, int> objectIndex in tagger)
             {
                 int index = objectIndex.Value;
                 job.Result.areas[objectIndex.Key] = job.pixels[index] * job.Result.areaPerPixel;
