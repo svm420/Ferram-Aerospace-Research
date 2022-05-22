@@ -11,7 +11,7 @@ namespace FerramAerospaceResearch.Resources
             DebugVoxel = MakeAsset(FARConfig.Shaders.DebugVoxel, "debug_voxel");
             DebugVoxelFallback = MakeAsset(FARConfig.Shaders.DebugVoxelFallback, "debug_voxel_fallback");
             ExposedSurface = MakeAsset(FARConfig.Shaders.ExposedSurface, "exposed_surface");
-            ExposedSurfaceDebug = MakeAsset(FARConfig.Shaders.ExposedSurface, "exposed_surface_debug");
+            ExposedSurfaceDebug = MakeAsset(FARConfig.Shaders.ExposedSurfaceDebug, "exposed_surface_debug");
         }
 
         public ShaderAssetRequest LineRenderer { get; }
