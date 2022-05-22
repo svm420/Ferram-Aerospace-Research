@@ -91,6 +91,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public double ElementSize { get; private set; }
 
         public Vector3d LocalLowerRightCorner { get; private set; }
+        public Bounds Bounds { get; private set; }
 
         public VoxelCrossSection[] EmptyCrossSectionArray
         {
@@ -256,6 +257,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             //This places the center of the voxel at the center of the vehicle to achieve maximum symmetry
             LocalLowerRightCorner = center - extents;
+            Bounds = new Bounds(center, extents);
 
             voxelChunks = new VoxelChunk[xLength, yLength, zLength];
 

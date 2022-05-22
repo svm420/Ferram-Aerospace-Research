@@ -108,6 +108,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private bool visualizing;
         public bool Voxelizing { get; private set; }
 
+        public Bounds VoxelBounds
+        {
+            get { return _voxel.Bounds; }
+        }
+
         public VehicleAerodynamics()
         {
             if (currentlyUnusedSections == null)
@@ -1540,7 +1545,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 VoxelizationThreadpool.Instance.RunOnMainThread(() =>
                 {
                     foreach (KeyValuePair<FARAeroPartModule, FARAeroPartModule.ProjectedArea> pair in
-                        _moduleAndAreasDict)
+                             _moduleAndAreasDict)
                         pair.Key.SetProjectedArea(pair.Value, _localToWorldMatrix);
                 });
 
