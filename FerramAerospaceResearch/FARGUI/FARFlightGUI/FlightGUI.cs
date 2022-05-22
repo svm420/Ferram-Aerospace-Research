@@ -121,10 +121,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
             settingsWindow = new GUIDropDown<int>(new[]
                                                   {
-                                                      Localizer.Format("FARFlightGUIWindowSelect0"),
-                                                      Localizer.Format("FARFlightGUIWindowSelect1"),
-                                                      Localizer.Format("FARFlightGUIWindowSelect2"),
-                                                      Localizer.Format("FARFlightGUIWindowSelect3")
+                                                      LocalizerExtensions.Get("FARFlightGUIWindowSelect0"),
+                                                      LocalizerExtensions.Get("FARFlightGUIWindowSelect1"),
+                                                      LocalizerExtensions.Get("FARFlightGUIWindowSelect2"),
+                                                      LocalizerExtensions.Get("FARFlightGUIWindowSelect3")
                                                   },
                                                   new[] {0, 1, 2, 3});
 
@@ -301,7 +301,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 dataGuiRect = GUILayout.Window(GetHashCode() + 1,
                                                dataGuiRect,
                                                FlightDataWindow,
-                                               Localizer.Format("FARFlightDataTitle"),
+                                               LocalizerExtensions.Get("FARFlightDataTitle"),
                                                GUILayout.MinWidth(150));
                 GUIUtils.ClampToScreen(dataGuiRect);
             }
@@ -312,7 +312,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 settingsGuiRect = GUILayout.Window(GetHashCode() + 2,
                                                    settingsGuiRect,
                                                    SettingsWindow,
-                                                   Localizer.Format("FARFlightSettings"),
+                                                   LocalizerExtensions.Get("FARFlightSettings"),
                                                    GUILayout.MinWidth(200));
                 GUIUtils.ClampToScreen(settingsGuiRect);
             }
@@ -323,31 +323,31 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GUILayout.BeginVertical(GUILayout.Height(100));
             GUILayout.BeginHorizontal();
             _strBuilder.Length = 0;
-            _strBuilder.Append(Localizer.Format("FARAbbrevMach"));
+            _strBuilder.Append(LocalizerExtensions.Get("FARAbbrevMach"));
             _strBuilder.Append(": ");
             _strBuilder.Concat((float)_vesselAero.MachNumber, 3).AppendLine();
-            _strBuilder.AppendFormat(Localizer.Format("FARFlightGUIReynolds"), _vesselAero.ReynoldsNumber);
+            _strBuilder.AppendFormat(LocalizerExtensions.Get("FARFlightGUIReynolds"), _vesselAero.ReynoldsNumber);
             GUILayout.Box(_strBuilder.ToString(), boxStyle, GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
 
             _strBuilder.Length = 0;
-            _strBuilder.Append(Localizer.Format("FARFlightGUIAtmDens"));
+            _strBuilder.Append(LocalizerExtensions.Get("FARFlightGUIAtmDens"));
             _strBuilder.Concat((float)vessel.atmDensity, 3);
 
             GUILayout.Box(_strBuilder.ToString(), boxStyle, GUILayout.ExpandWidth(true));
 
             _flightStatusGUI.Display();
             showFlightDataWindow = GUILayout.Toggle(showFlightDataWindow,
-                                                    Localizer.Format("FARFlightGUIFltDataBtn"),
+                                                    LocalizerExtensions.Get("FARFlightGUIFltDataBtn"),
                                                     buttonStyle,
                                                     GUILayout.ExpandWidth(true));
             showSettingsWindow = GUILayout.Toggle(showSettingsWindow,
-                                                  Localizer.Format("FARFlightGUIFltSettings"),
+                                                  LocalizerExtensions.Get("FARFlightGUIFltSettings"),
                                                   buttonStyle,
                                                   GUILayout.ExpandWidth(true));
 
             bool logging = GUILayout.Toggle(flightDataLogger.IsActive,
-                                            Localizer.Format("FARFlightGUIFltLogging"),
+                                            LocalizerExtensions.Get("FARFlightGUIFltLogging"),
                                             buttonStyle,
                                             GUILayout.ExpandWidth(true));
             if (logging != flightDataLogger.IsActive)
@@ -359,14 +359,14 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
 
             flightDataLogger.Period =
-                GUIUtils.TextEntryForInt(Localizer.Format("FARFlightGUIFltLogPeriod"), 150, flightDataLogger.Period);
+                GUIUtils.TextEntryForInt(LocalizerExtensions.Get("FARFlightGUIFltLogPeriod"), 150, flightDataLogger.Period);
             flightDataLogger.FlushPeriod =
-                GUIUtils.TextEntryForInt(Localizer.Format("FARFlightGUIFltLogFlushPeriod"),
+                GUIUtils.TextEntryForInt(LocalizerExtensions.Get("FARFlightGUIFltLogFlushPeriod"),
                                          150,
                                          flightDataLogger.FlushPeriod);
             DebugVisualizationGUI();
 
-            GUILayout.Label(Localizer.Format("FARFlightGUIFltAssistance"));
+            GUILayout.Label(LocalizerExtensions.Get("FARFlightGUIFltAssistance"));
 
             _stabilityAugmentation.Display();
 
@@ -380,7 +380,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 return;
             GUILayout.BeginHorizontal();
             GUI.enabled = !_vesselAero.VehicleAero.Voxelizing;
-            if (GUILayout.Button(Localizer.Format("FARDebugVoxels")))
+            if (GUILayout.Button(LocalizerExtensions.Get("FARDebugVoxels")))
             {
                 _vesselAero.VehicleAero.DebugVisualizeVoxels(vessel.transform.localToWorldMatrix);
             }
@@ -397,7 +397,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
         private void SettingsWindow(int windowId)
         {
-            GUILayout.Label(Localizer.Format("FARFlightSettingsLabel"));
+            GUILayout.Label(LocalizerExtensions.Get("FARFlightSettingsLabel"));
             settingsWindow.GUIDropDownDisplay();
             int selection = settingsWindow.ActiveSelection;
             switch (selection)
