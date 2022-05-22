@@ -67,5 +67,10 @@ namespace FerramAerospaceResearch.Config
             tex.SetPixels(map.Colors.ToArray());
             return tex;
         }
+
+        public Texture2D ColorMapTexture()
+        {
+            return ColorMapTexture(Default);
+        }
     }
 }
