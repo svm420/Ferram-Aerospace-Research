@@ -64,7 +64,9 @@ namespace FerramAerospaceResearch.Config
         {
             ColorMap map = FirstOrDefault(name);
             var tex = new Texture2D(map.Colors.Count, 1);
+            tex.filterMode = FilterMode.Point;
             tex.SetPixels(map.Colors.ToArray());
+            tex.Apply();
             return tex;
         }
 
