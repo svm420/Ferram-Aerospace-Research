@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using FerramAerospaceResearch.Resources;
 using Unity.Burst;
-using Unity.Burst.CompilerServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -86,11 +85,13 @@ namespace FerramAerospaceResearch.Geometry
             return ((uint)(index) << TagLength) | Tag;
         }
 
-        public void SetupRenderers<T>(Object obj, T renderers, MaterialPropertyBlock propertyBlock = null)
+        public Color SetupRenderers<T>(Object obj, T renderers, MaterialPropertyBlock propertyBlock = null)
             where T : IEnumerable<Renderer>
         {
+            Color color = GetObjColor(obj);
             foreach (Renderer renderer in renderers)
-                SetupRenderer(obj, renderer, propertyBlock);
+                SetupRenderer(renderer, color, propertyBlock);
+            return color;
         }
 
         public void Reset(bool newTag = false)
@@ -102,7 +103,7 @@ namespace FerramAerospaceResearch.Geometry
             SetUniqueTag();
         }
 
-        public void SetupRenderer(Object obj, Renderer renderer, MaterialPropertyBlock propertyBlock = null)
+        private Color GetObjColor(Object obj)
         {
             // unique per object, stability doesn't matter as renderers will have to be rebuilt when anything changes
             if (!objectIds.TryGetValue(obj, out int index))
@@ -111,6 +112,19 @@ namespace FerramAerospaceResearch.Geometry
                 objectIds.Add(obj, index);
             }
 
+            uint id = Encode(index);
+            return ColorUintConverter.AsColor(id);
+        }
+
+        public Color SetupRenderer(Object obj, Renderer renderer, MaterialPropertyBlock propertyBlock = null)
+        {
+            Color color = GetObjColor(obj);
+            SetupRenderer(renderer, color, propertyBlock);
+            return color;
+        }
+
+        private void SetupRenderer(Renderer renderer, Color color, MaterialPropertyBlock propertyBlock = null)
+        {
             if (propertyBlock == null)
             {
                 block ??= new MaterialPropertyBlock();
@@ -118,10 +132,7 @@ namespace FerramAerospaceResearch.Geometry
                 propertyBlock = block;
             }
 
-            uint id = Encode(index);
-            Color c = ColorUintConverter.AsColor(id);
-            propertyBlock.SetColor(ShaderPropertyIds.ExposedColor, c);
-            FARLogger.DebugFormat("{0} ({1}): {2}", obj, id, c);
+            propertyBlock.SetColor(ShaderPropertyIds.ExposedColor, color);
             renderer.SetPropertyBlock(propertyBlock);
         }
 
@@ -191,14 +202,18 @@ namespace FerramAerospaceResearch.Geometry
 
         public int depthBits = 24;
 
+        private Shader replacementShader;
+
         public Shader Shader
         {
+            get { return replacementShader; }
             set
             {
+                replacementShader = value;
                 if (value == null)
                     camera.ResetReplacementShader();
                 else
-                    camera.SetReplacementShader(value, string.Empty);
+                    camera.SetReplacementShader(value, null);
             }
         }
 
@@ -223,6 +238,7 @@ namespace FerramAerospaceResearch.Geometry
             public Vector3 forward;
             public Action callback;
             public ProcessingDevice device;
+            public float4x4? toWorldMatrix;
         }
 
         public class Result
@@ -348,9 +364,9 @@ namespace FerramAerospaceResearch.Geometry
         {
             // one per GO so that only 1 camera is ever attached with this behaviour
             var go = new GameObject($"ExposedArea ({typeof(T).Name})");
-            if (parent != null)
-                go.transform.SetParent(parent);
             T self = go.AddComponent<T>();
+            if (parent != null)
+                self.transform.SetParent(parent, false);
             self.Initialize(shader, pixelCount, main);
             return self;
         }
@@ -405,14 +421,16 @@ namespace FerramAerospaceResearch.Geometry
                 throw new MethodAccessException("Rendering is still ongoing!");
             if (tagger is null)
                 throw new NullReferenceException("Please set ExposedSurfaceEvaluator.tagger before rendering");
+            if (tagger.Count == 0)
+                return;
 
             Profiler.BeginSample("ExposedAreaEvaluator.RenderRequest");
             CurrentRenderRenderJob = requestPool.Count == 0 ? new RenderJob() : requestPool.Pop();
             CurrentRenderRenderJob.Result.renderTexture = GetRenderTexture();
 
-            FitCameraToVessel(request.bounds, request.forward);
-            double2 pixelSize = new double2(camera.orthographicSize * 2) / new double2(renderSize.x, renderSize.y);
-            CurrentRenderRenderJob.Result.areaPerPixel = pixelSize.x * pixelSize.y;
+            FitCameraToVessel(request.bounds, request.forward, request.toWorldMatrix);
+            double pixelSize = camera.orthographicSize * 2 / renderSize.y;
+            CurrentRenderRenderJob.Result.areaPerPixel = pixelSize * pixelSize;
             CurrentRenderRenderJob.renderPending = true;
             CurrentRenderRenderJob.callback = request.callback;
             CurrentRenderRenderJob.device = request.device;
@@ -428,14 +446,22 @@ namespace FerramAerospaceResearch.Geometry
                 CurrentRenderRenderJob.device = ProcessingDevice.CPU;
             }
 
+            // TODO: try with Graphics.DrawMesh since Camera.Render() has a non-negligible performance cost
             camera.Render();
             Profiler.EndSample();
         }
 
-        private void FitCameraToVessel(Bounds bounds, Vector3 lookDir)
+        private void FitCameraToVessel(Bounds bounds, Vector3 lookDir, float4x4? toWorldMatrix)
         {
             // size the camera viewport to fit the vessel
             float3 vesselSizes = bounds.max - bounds.min;
+            if (toWorldMatrix is not null)
+            {
+                var scales = new float3(math.length(toWorldMatrix.Value.c0.xyz),
+                                        math.length(toWorldMatrix.Value.c1.xyz),
+                                        math.length(toWorldMatrix.Value.c2.xyz));
+                vesselSizes *= scales;
+            }
             float vesselSize = math.max(math.cmax(vesselSizes), 0.1f); // make sure it is never zero
             float cameraSize = 0.55f * vesselSize; // slightly more than half-size to fit the vessel in
             camera.farClipPlane = 50f + vesselSize;
@@ -450,8 +476,15 @@ namespace FerramAerospaceResearch.Geometry
             distance += 0.5f * vesselSize; // Estimated offset from the center to the outside of the object
 
             Transform cameraTransform = camera.transform;
+            Vector3 position = bounds.center - distance * lookDir.normalized;
+            if (toWorldMatrix is not null)
+            {
+                position = math.transform(toWorldMatrix.Value, position);
+                lookDir = math.rotate(toWorldMatrix.Value, lookDir);
+            }
+
+            cameraTransform.position = position;
             cameraTransform.forward = lookDir;
-            cameraTransform.position = bounds.center - distance * lookDir.normalized;
         }
 
         private void OnPostRender()
@@ -468,10 +501,6 @@ namespace FerramAerospaceResearch.Geometry
             Profiler.BeginSample("ExposedAreaEvaluator.ReadbackSetup");
             job.renderPending = false;
             RenderTexture renderTexture = job.Result.renderTexture;
-            // only persistent works here as the readback may take too long resulting in the array getting deallocated
-            int pixelCount = renderTexture.width * renderTexture.height;
-            job.tex = new NativeArray<uint>(pixelCount, Allocator.Persistent);
-            // ref is not really needed here as Unity takes saves the pointer and size
 
             // TODO: try readback through a command buffer as that is not bugged
             // https://forum.unity.com/threads/asyncgpureadback-requestintonativearray-causes-invalidoperationexception-on-nativearray.1011955/
@@ -507,6 +536,10 @@ namespace FerramAerospaceResearch.Geometry
             }
             else
             {
+                // only persistent works here as the readback may take too long resulting in the array getting deallocated
+                int pixelCount = renderTexture.width * renderTexture.height;
+                job.tex = new NativeArray<uint>(pixelCount, Allocator.Persistent);
+                // ref is not really needed here as Unity takes saves the pointer and size
                 readbackRequest = AsyncGPUReadback.RequestIntoNativeArray(ref job.tex, renderTexture);
             }
 
