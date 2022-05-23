@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1904664456
+CRC: 551378938
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 73a6266402782743293bbc89d46aa154
+    Hash: 993ee4b27b965d90523d60a357a3a7f2
   TypeTreeHash:
     serializedVersion: 2
     Hash: d6617f579a21db6914d356f34a6c9a37
@@ -15,6 +15,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/Shaders/ExposedSurfaceCamera.shader
 - Assets/Shaders/ExposedSurfaceDebug.shader
 - Assets/Shaders/DebugVoxelMesh.shader
 - Assets/Shaders/ExposedSurface.shader
