@@ -9,12 +9,13 @@ RWStructuredBuffer<int> OutputBuffer;
 #include "Assets/Shaders/include/ExposedSurface.cginc"
 
 [numthreads(8,8,1)]
-void CountPixelsMain(const uint3 id : SV_DispatchThreadID)
+void CountPixelsMain(uint3 id : SV_DispatchThreadID)
 {
-    const float4 input = InputTexture.Load(id);
-    const uint color = pack_uint(input);
+    float4 input = InputTexture.Load(id);
+    uint color = pack_uint(input);
 
-    if (get_tag(color) != Tag) return;
-    const int index = get_index(color);
+    uint tag = get_tag(color);
+    if (tag != Tag) return;
+    int index = get_index(color);
     InterlockedAdd(OutputBuffer[index], 1);
 }
