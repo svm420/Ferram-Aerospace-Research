@@ -22,7 +22,7 @@ namespace FerramAerospaceResearch.Editor {
             FARLogger.Level = LogLevel.Trace;
             FARLogger.InfoFormat("Level: {0}", FARLogger.Level);
 
-            Tagger = new ObjectTagger();
+            tagger = new ObjectTagger();
 
             if (pixelCountShader != null) {
                 pixelCountMain = new Kernel(pixelCountShader, pixelCountMain.name);
@@ -31,7 +31,7 @@ namespace FerramAerospaceResearch.Editor {
             Initialize(exposedSurfaceShader, pixelCountShader, pixelCountMain);
 
             foreach (GameObject obj in objects) {
-                Tagger.SetupRenderers(obj, obj.GetComponentsInChildren<Renderer>(false));
+                tagger.SetupRenderers(obj, obj.GetComponentsInChildren<Renderer>(false));
             }
         }
 
@@ -49,6 +49,7 @@ namespace FerramAerospaceResearch.Editor {
                 return;
             c.CopyFrom(camera);
             c.targetTexture = null;
+            c.ResetReplacementShader();
         }
 
         protected override void CompleteTextureProcessing(Result result) {
@@ -68,9 +69,10 @@ namespace FerramAerospaceResearch.Editor {
             var render = new Rect(sz.xMax - renderSize.x, sz.yMax - renderSize.y, renderSize.x, renderSize.y);
             if (debugMaterial != null)
             {
-                debugMaterial.SetInt(ShaderPropertyIds._Tag, (int)Tagger.Tag);
-                if (Event.current.type == EventType.Repaint)
-                    Graphics.DrawTexture(render, renderTexture, debugMaterial);
+                if (Event.current.type != EventType.Repaint)
+                    return;
+                debugMaterial.SetInt(ShaderPropertyIds._Tag, (int)tagger.Tag);
+                Graphics.DrawTexture(render, renderTexture, debugMaterial);
             } else
 			    GUI.DrawTexture(render, renderTexture);
 		}
@@ -78,7 +80,7 @@ namespace FerramAerospaceResearch.Editor {
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            Tagger.Dispose();
+            tagger.Dispose();
         }
     }
 }
