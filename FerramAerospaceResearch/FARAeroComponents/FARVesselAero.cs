@@ -88,6 +88,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private VehicleAerodynamics _vehicleAero;
         private VesselIntakeRamDrag _vesselIntakeRamDrag;
         private CachedSimResults lastSimResults;
+        public VehicleExposure Exposure { get; private set; }
 
         internal VehicleAerodynamics VehicleAero
         {
@@ -125,6 +126,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
 
             _currentGeoModules = new List<GeometryPartModule>();
+
+            Exposure = gameObject.AddComponent<VehicleExposure>();
+            Exposure.transform.SetParent(transform, false);
+            Exposure.Vessel = vessel;
 
             foreach (Part p in vessel.parts)
             {
@@ -200,6 +205,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                             out _unusedAeroModules,
                                             out _currentAeroSections,
                                             out _legacyWingModels);
+
+                Exposure.VesselBounds = _vehicleAero.VoxelBounds;
 
                 if (_flightGUI is null)
                     _flightGUI = vessel.GetComponent<FlightGUI>();

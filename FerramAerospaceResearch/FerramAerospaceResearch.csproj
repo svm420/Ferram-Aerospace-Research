@@ -55,6 +55,9 @@
       <HintPath>..\GameData\FerramAerospaceResearch\Plugins\Scale_Redist.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="Unity.Mathematics">
+      <HintPath>C:\Zaidimai\KSP 1.12\GameData\000_KSPBurst\Plugins\Unity.Mathematics.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(KSP_DIR_BUILD)\$(KSP_DATA_DIRNAME)\Managed\UnityEngine.dll</HintPath>
@@ -90,6 +93,7 @@
     <Compile Include="FARAeroComponents\FlightForceContext.cs" />
     <Compile Include="FARAeroComponents\ModularFlightIntegratorRegisterer.cs" />
     <Compile Include="FARAeroComponents\SimulatedForceContext.cs" />
+    <Compile Include="FARAeroComponents\VehicleExposure.cs" />
     <Compile Include="FARAeroComponents\VesselIntakeRamDrag.cs" />
     <Compile Include="FARAPI.cs" />
     <Compile Include="FARDebugAndSettings.cs" />
@@ -123,6 +127,7 @@
     <Compile Include="FARPartGeometry\PartSizePair8Bit.cs" />
     <Compile Include="FARPartGeometry\PartTint.cs" />
     <Compile Include="FARPartGeometry\PartTransformInfo.cs" />
+    <Compile Include="FARPartGeometry\ExposedSurface.cs" />
     <Compile Include="FARSettingsScenarioModule.cs" />
     <Compile Include="FARThreading\ThreadSafeDebugLogger.cs" />
     <Compile Include="FARThreading\VoxelizationThreadpool.cs" />
