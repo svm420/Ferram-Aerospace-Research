@@ -12,6 +12,7 @@ namespace FerramAerospaceResearch.Resources
             DebugVoxelFallback = MakeAsset(FARConfig.Shaders.DebugVoxelFallback, "debug_voxel_fallback");
             ExposedSurface = MakeAsset(FARConfig.Shaders.ExposedSurface, "exposed_surface");
             ExposedSurfaceDebug = MakeAsset(FARConfig.Shaders.ExposedSurfaceDebug, "exposed_surface_debug");
+            ExposedSurfaceCamera = MakeAsset(FARConfig.Shaders.ExposedSurfaceCamera, "exposed_surface_camera");
         }
 
         public ShaderAssetRequest LineRenderer { get; }
@@ -19,6 +20,7 @@ namespace FerramAerospaceResearch.Resources
         public ShaderAssetRequest DebugVoxelFallback { get; }
         public ShaderAssetRequest ExposedSurface { get; }
         public ShaderAssetRequest ExposedSurfaceDebug { get; }
+        public ShaderAssetRequest ExposedSurfaceCamera { get; }
 
         private ShaderAssetRequest MakeAsset(ResourceNode node, string name)
         {
@@ -35,6 +37,11 @@ namespace FerramAerospaceResearch.Resources
         public class ShaderAssetRequest : LoadableAsset<Shader>
         {
             private ShaderMaterialPair Items { get; } = new();
+
+            public bool IsSupported
+            {
+                get { return Asset != null && Asset.isSupported; }
+            }
 
             public Material Material
             {

@@ -1,5 +1,7 @@
 using UnityEngine;
 
+// ReSharper disable InconsistentNaming
+
 namespace FerramAerospaceResearch.Resources
 {
     public static class ShaderPropertyIds
@@ -12,6 +14,6 @@ namespace FerramAerospaceResearch.Resources
         public static readonly int OutputBuffer = Shader.PropertyToID("OutputBuffer");
         public static readonly int _Tag = Shader.PropertyToID("_Tag");
         public static readonly int ColorTex = Shader.PropertyToID("_ColorTex");
-        public static readonly int BackgroundColor = Shader.PropertyToID("_BackgroundColor");
+        public static readonly int _BackgroundColor = Shader.PropertyToID("_BackgroundColor");
     }
 }

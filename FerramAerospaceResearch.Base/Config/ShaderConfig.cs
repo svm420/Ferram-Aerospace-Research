@@ -30,6 +30,9 @@ namespace FerramAerospaceResearch.Config
         [ConfigValue("exposedSurfaceDebug")]
         public ShaderNode ExposedSurfaceDebug { get; } = new("FerramAerospaceResearch/Exposed Surface Debug");
 
+        [ConfigValue("exposedSurfaceCamera")]
+        public ShaderNode ExposedSurfaceCamera { get; } = new("FerramAerospaceResearch/Exposed Surface Camera");
+
         [ConfigValue("countPixels")] public ComputeShaderNode CountColors { get; } = new("CountPixels");
     }
 }
