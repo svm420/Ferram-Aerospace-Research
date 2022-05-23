@@ -102,6 +102,7 @@
     <Compile Include="FARGUI\FAREditorGUI\DesignConcerns\AeroStabilityConcern.cs" />
     <Compile Include="FARGUI\FARFlightGUI\AeroVisualizationGUI.cs" />
     <Compile Include="FARGUI\FARFlightGUI\AirspeedSettingsGUI.cs" />
+    <Compile Include="FARGUI\FARFlightGUI\DebugGUI.cs" />
     <Compile Include="FARGUI\FARFlightGUI\FlightDataLogger.cs" />
     <Compile Include="FARGUI\FARFlightGUI\FlightStatusGUI.cs" />
     <Compile Include="FARGUI\FARFlightGUI\FlightGUIDrawer.cs" />

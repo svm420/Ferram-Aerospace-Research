@@ -64,6 +64,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private static Rect mainGuiRect;
         private static Rect dataGuiRect;
         private static Rect settingsGuiRect;
+        private static Rect debugGuiRect;
         private static IButton blizzyFlightGUIButton;
         private static int activeFlightGUICount;
         private static int frameCountForSaving;
@@ -82,9 +83,11 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private StabilityAugmentation _stabilityAugmentation;
         private FlightDataGUI _flightDataGUI;
         private FlightDataLogger flightDataLogger;
+        private DebugGUI debugGUI;
 
         private bool showFlightDataWindow;
         private bool showSettingsWindow;
+        private bool showDebugWindow;
 
         private GUIDropDown<int> settingsWindow;
         public VesselFlightInfo InfoParameters { get; private set; }
@@ -118,6 +121,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             _stabilityAugmentation = new StabilityAugmentation(_vessel);
             _flightDataGUI = new FlightDataGUI();
             AeroVizGUI = new AeroVisualizationGUI();
+            debugGUI = new DebugGUI();
 
             settingsWindow = new GUIDropDown<int>(new[]
                                                   {
@@ -306,7 +310,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 GUIUtils.ClampToScreen(dataGuiRect);
             }
 
-            // ReSharper disable once InvertIf
             if (showSettingsWindow)
             {
                 settingsGuiRect = GUILayout.Window(GetHashCode() + 2,
@@ -315,6 +318,17 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                                                    LocalizerExtensions.Get("FARFlightSettings"),
                                                    GUILayout.MinWidth(200));
                 GUIUtils.ClampToScreen(settingsGuiRect);
+            }
+
+            // ReSharper disable once InvertIf
+            if (showDebugWindow)
+            {
+                debugGuiRect = GUILayout.Window(GetHashCode() + 3,
+                                                debugGuiRect,
+                                                   DebugWindow,
+                                                   LocalizerExtensions.Get("FARDebugWindow"),
+                                                   GUILayout.MinWidth(200));
+                GUIUtils.ClampToScreen(debugGuiRect);
             }
         }
 
@@ -343,6 +357,10 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                                                     GUILayout.ExpandWidth(true));
             showSettingsWindow = GUILayout.Toggle(showSettingsWindow,
                                                   LocalizerExtensions.Get("FARFlightGUIFltSettings"),
+                                                  buttonStyle,
+                                                  GUILayout.ExpandWidth(true));
+            showDebugWindow = GUILayout.Toggle(showDebugWindow,
+                                                  LocalizerExtensions.Get("FARFlightGUIFltDebug"),
                                                   buttonStyle,
                                                   GUILayout.ExpandWidth(true));
 
@@ -420,6 +438,13 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GUI.DragWindow();
         }
 
+        private void DebugWindow(int windowId)
+        {
+            GUILayout.Label(LocalizerExtensions.Get("FARDebugWindowLabel"));
+            debugGUI.Display();
+            GUI.DragWindow();
+        }
+
         private static void ClearBlizzyToolbarButton()
         {
             blizzyFlightGUIButton.Destroy();
@@ -461,6 +486,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             config.SetValue("flight_mainGuiRect", mainGuiRect);
             config.SetValue("flight_dataGuiRect", dataGuiRect);
             config.SetValue("flight_settingsGuiRect", settingsGuiRect);
+            config.SetValue("flight_debugGuiRect", debugGuiRect);
         }
 
         private static void LoadConfigs()
@@ -469,6 +495,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             mainGuiRect = config.GetValue("flight_mainGuiRect", new Rect());
             dataGuiRect = config.GetValue("flight_dataGuiRect", new Rect());
             settingsGuiRect = config.GetValue("flight_settingsGuiRect", new Rect());
+            debugGuiRect = config.GetValue("flight_debugGuiRect", new Rect());
         }
     }
 }
