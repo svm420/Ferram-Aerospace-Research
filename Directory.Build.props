@@ -6,5 +6,5 @@
       cd "$(SolutionDir)""
       python -m buildtools postbuild -f "$(SolutionDir)config.json" -c "$(Configuration)" -t</PostBuildCommand>
   </PropertyGroup>
-  <Import Project="Directory.Build.props.user" Condition=" Exists('Directory.Build.props.user') "/>
+  <Import Project="Directory.Build.props.user" Condition=" Exists('Directory.Build.props.user') " />
 </Project>
