@@ -335,7 +335,6 @@ namespace FerramAerospaceResearch.Geometry
         }
 
         private readonly Stack<RenderJob> requestPool = new();
-        private RenderJob CurrentRenderRenderJob { get; set; }
         private readonly HashSet<RenderJob> activeJobs = new(ObjectReferenceEqualityComparer<RenderJob>.Default);
 
         public int ActiveJobs
@@ -345,8 +344,6 @@ namespace FerramAerospaceResearch.Geometry
 
         public void CancelPendingJobs()
         {
-            if (CurrentRenderRenderJob != null)
-                CurrentRenderRenderJob.active = false;
             foreach (RenderJob job in activeJobs)
                 job.active = false;
         }
@@ -420,15 +417,15 @@ namespace FerramAerospaceResearch.Geometry
                 return;
 
             Profiler.BeginSample("ExposedAreaEvaluator.RenderRequest");
-            CurrentRenderRenderJob = requestPool.Count == 0 ? new RenderJob() : requestPool.Pop();
-            CurrentRenderRenderJob.Result.renderTexture = GetRenderTexture();
+            RenderJob job = requestPool.Count == 0 ? new RenderJob() : requestPool.Pop();
+            job.Result.renderTexture = GetRenderTexture();
 
             FitCameraToVessel(request.bounds, request.forward, request.toWorldMatrix);
             double pixelSize = camera.orthographicSize * 2 / renderSize.y;
-            CurrentRenderRenderJob.Result.areaPerPixel = pixelSize * pixelSize;
-            CurrentRenderRenderJob.callback = request.callback;
-            CurrentRenderRenderJob.device = request.device;
-            CurrentRenderRenderJob.active = true;
+            job.Result.areaPerPixel = pixelSize * pixelSize;
+            job.callback = request.callback;
+            job.device = request.device;
+            job.active = true;
             if (request.device is ProcessingDevice.GPU && !supportsComputeShaders)
             {
                 if (!computeWarningIssued)
@@ -437,11 +434,10 @@ namespace FerramAerospaceResearch.Geometry
                     computeWarningIssued = true;
                 }
 
-                CurrentRenderRenderJob.device = ProcessingDevice.CPU;
+                job.device = ProcessingDevice.CPU;
             }
 
-            CurrentRenderRenderJob.commandBuffer ??= new CommandBuffer();
-            CommandBuffer commandBuffer = CurrentRenderRenderJob.commandBuffer;
+            CommandBuffer commandBuffer = job.commandBuffer ??= new CommandBuffer();
             commandBuffer.name = "ExposedSurface";
             commandBuffer.Clear();
 
@@ -451,7 +447,7 @@ namespace FerramAerospaceResearch.Geometry
             commandBuffer.SetViewMatrix(camera.worldToCameraMatrix);
 
             // render the selected objects
-            commandBuffer.SetRenderTarget(new RenderTargetIdentifier(CurrentRenderRenderJob.Result.renderTexture),
+            commandBuffer.SetRenderTarget(new RenderTargetIdentifier(job.Result.renderTexture),
                                           RenderBufferLoadAction.DontCare,
                                           // TODO: add request option to store/discard the texture with debug shader
                                           RenderBufferStoreAction.Store,
@@ -464,9 +460,8 @@ namespace FerramAerospaceResearch.Geometry
             commandBuffer.EndSample("ExposedSurfaceEvaluator.Render");
 
             // dispatch compute in the same buffer
-            if (CurrentRenderRenderJob.device is ProcessingDevice.GPU)
+            if (job.device is ProcessingDevice.GPU)
             {
-                RenderJob job = CurrentRenderRenderJob;
                 int count = tagger.Count;
 
                 // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
@@ -477,7 +472,7 @@ namespace FerramAerospaceResearch.Geometry
 
                 job.pixels = new NativeArray<int>(count, Allocator.Persistent);
                 outputBuffer.SetData(job.pixels);
-                shader.SetTexture(MainKernel.index,
+                commandBuffer.SetComputeTextureParam(shader, MainKernel.index,
                                   ShaderPropertyIds.InputTexture,
                                   job.Result.renderTexture,
                                   0,
@@ -503,7 +498,7 @@ namespace FerramAerospaceResearch.Geometry
 
             Profiler.EndSample();
 
-            OnPostRender();
+            FinalizeJob(job);
         }
 
         private void FitCameraToVessel(Bounds bounds, Vector3 lookDir, float4x4? toWorldMatrix)
@@ -543,11 +538,8 @@ namespace FerramAerospaceResearch.Geometry
             cameraTransform.forward = lookDir;
         }
 
-        private void OnPostRender()
+        private void FinalizeJob(RenderJob job)
         {
-            RenderJob job = CurrentRenderRenderJob;
-            CurrentRenderRenderJob = null;
-
             if (!gameObject.activeSelf || !job.active)
                 return;
 
