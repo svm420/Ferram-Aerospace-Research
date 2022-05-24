@@ -47,7 +47,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         protected override void Initialize(Shader shader = null, ComputeShader pixelCount = null, Kernel? main = null)
         {
             base.Initialize(shader, pixelCount, main);
-            debugArrow = ArrowPointer.Create(camera.transform, Vector3.zero, Vector3.forward, 10f, Color.red, false);
+            debugArrow = ArrowPointer.Create(transform, Vector3.zero, Vector3.forward, 10f, Color.red, false);
             DisplayArrow = false;
         }
 
@@ -55,6 +55,15 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             lastImage = result.renderTexture;
             MostRecentAreas = result.areas;
+        }
+
+        protected override void OnJobSubmitted(RenderJob job)
+        {
+            if (!DisplayArrow)
+                return;
+            Transform tr = debugArrow.transform;
+            tr.position = job.position;
+            tr.forward = job.forward;
         }
 
         public void DrawDebugImage(float width, bool partLabels = false)

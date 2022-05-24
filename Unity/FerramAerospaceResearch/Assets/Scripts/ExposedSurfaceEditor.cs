@@ -41,13 +41,6 @@ namespace FerramAerospaceResearch.Editor {
                 forward=lookDir,
                 device=device,
             });
-
-            Camera c = Camera.main;
-            if (c == null)
-                return;
-            c.CopyFrom(camera);
-            c.targetTexture = null;
-            c.ResetReplacementShader();
         }
 
         protected override void CompleteTextureProcessing(Result result) {

@@ -15,6 +15,9 @@ using UnityEngine.Rendering;
 using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
 
+// TODO: reuse render textures, native arrays, command buffers if sizes and objects haven't changed
+// TODO: construct view and projection matrices manually
+
 namespace FerramAerospaceResearch.Geometry
 {
     [StructLayout(LayoutKind.Explicit)]
@@ -48,6 +51,8 @@ namespace FerramAerospaceResearch.Geometry
             objectIds = new(ObjectReferenceEqualityComparer<Object>.Default);
 
         private MaterialPropertyBlock block;
+
+        public event Action<ObjectTagger> onRenderersChanged;
 
         public Dictionary<Object, TaggedInfo>.KeyCollection Keys
         {
@@ -91,6 +96,7 @@ namespace FerramAerospaceResearch.Geometry
             foreach (TaggedInfo info in Values)
                 rendererListPool.Push(info.renderers);
             objectIds.Clear();
+            onRenderersChanged?.Invoke(this);
         }
 
         private Color GetObjColor(Object obj)
@@ -117,6 +123,7 @@ namespace FerramAerospaceResearch.Geometry
             Color color = GetObjColor(obj);
             SetupRenderer(renderer, color, propertyBlock);
             objectIds[obj].renderers.Add(renderer);
+            onRenderersChanged?.Invoke(this);
             return color;
         }
 
@@ -188,8 +195,8 @@ namespace FerramAerospaceResearch.Geometry
     {
         private static bool supportsComputeShaders;
         private static bool computeWarningIssued;
+        private static float3 cameraScale;
         public ObjectTagger tagger;
-        public Camera camera;
 
         public Vector2Int renderSize = new()
         {
@@ -249,8 +256,19 @@ namespace FerramAerospaceResearch.Geometry
             public RenderTexture renderTexture;
         }
 
-        private record RenderJob : IDisposable
+        private struct Projection
         {
+            public float3 position;
+            public float3 forward;
+            public float4x4 viewMatrix;
+            public float4x4 projectionMatrix;
+            public double halfSize;
+        }
+
+        protected record RenderJob : IDisposable
+        {
+            public float3 position;
+            public float3 forward;
             public CommandBuffer commandBuffer;
             public ProcessingDevice device = ProcessingDevice.CPU;
             public JobHandle handle;
@@ -367,19 +385,7 @@ namespace FerramAerospaceResearch.Geometry
         protected virtual void Initialize(Shader shader = null, ComputeShader pixelCount = null, Kernel? main = null)
         {
             supportsComputeShaders = SystemInfo.supportsComputeShaders;
-            camera = gameObject.AddComponent<Camera>();
-            camera.enabled = false;
-            camera.orthographic = true;
-            camera.cullingMask = 1;
-            camera.orthographicSize = 3f;
-            camera.nearClipPlane = 0f;
-            camera.farClipPlane = 50f;
-            camera.clearFlags = CameraClearFlags.Color;
-            camera.backgroundColor = Color.clear;
-            camera.allowMSAA = false;
-            camera.allowHDR = false;
-            camera.depthTextureMode = DepthTextureMode.Depth;
-            camera.renderingPath = RenderingPath.VertexLit;
+            cameraScale = new float3(1, 1, SystemInfo.usesReversedZBuffer ? -1 : 1);
 
             if (shader == null)
                 shader = FARAssets.Instance.Shaders.ExposedSurface;
@@ -403,8 +409,6 @@ namespace FerramAerospaceResearch.Geometry
             renderTexture.antiAliasing = 1;
             renderTexture.filterMode = FilterMode.Point;
             renderTexture.autoGenerateMips = false;
-            camera.targetTexture = renderTexture;
-            camera.depthTextureMode = DepthTextureMode.Depth;
 
             return renderTexture;
         }
@@ -420,8 +424,14 @@ namespace FerramAerospaceResearch.Geometry
             RenderJob job = requestPool.Count == 0 ? new RenderJob() : requestPool.Pop();
             job.Result.renderTexture = GetRenderTexture();
 
-            FitCameraToVessel(request.bounds, request.forward, request.toWorldMatrix);
-            double pixelSize = camera.orthographicSize * 2 / renderSize.y;
+            Projection projection = FitCameraToVessel(request.bounds,
+                                                      request.forward,
+                                                      request.toWorldMatrix,
+                                                      (float)job.Result.renderTexture.width /
+                                                      job.Result.renderTexture.height);
+            double pixelSize = projection.halfSize * 2 / renderSize.y;
+            job.position = projection.position;
+            job.forward = projection.forward;
             job.Result.areaPerPixel = pixelSize * pixelSize;
             job.callback = request.callback;
             job.device = request.device;
@@ -443,9 +453,7 @@ namespace FerramAerospaceResearch.Geometry
 
             commandBuffer.BeginSample("ExposedSurfaceEvaluator.Render");
             // setup camera matrices since we're not using camera to render
-            commandBuffer.SetProjectionMatrix(camera.projectionMatrix);
-            commandBuffer.SetViewMatrix(camera.worldToCameraMatrix);
-
+            commandBuffer.SetViewProjectionMatrices(proj: projection.projectionMatrix, view: projection.viewMatrix);
             // render the selected objects
             commandBuffer.SetRenderTarget(new RenderTargetIdentifier(job.Result.renderTexture),
                                           RenderBufferLoadAction.DontCare,
@@ -472,11 +480,12 @@ namespace FerramAerospaceResearch.Geometry
 
                 job.pixels = new NativeArray<int>(count, Allocator.Persistent);
                 outputBuffer.SetData(job.pixels);
-                commandBuffer.SetComputeTextureParam(shader, MainKernel.index,
-                                  ShaderPropertyIds.InputTexture,
-                                  job.Result.renderTexture,
-                                  0,
-                                  RenderTextureSubElement.Color);
+                commandBuffer.SetComputeTextureParam(shader,
+                                                     MainKernel.index,
+                                                     ShaderPropertyIds.InputTexture,
+                                                     job.Result.renderTexture,
+                                                     0,
+                                                     RenderTextureSubElement.Color);
 
                 commandBuffer.BeginSample("ExposedSurfaceEvaluator.Compute");
                 commandBuffer.DispatchCompute(shader,
@@ -499,43 +508,56 @@ namespace FerramAerospaceResearch.Geometry
             Profiler.EndSample();
 
             FinalizeJob(job);
+            OnJobSubmitted(job);
         }
 
-        private void FitCameraToVessel(Bounds bounds, Vector3 lookDir, float4x4? toWorldMatrix)
+        protected virtual void OnJobSubmitted(RenderJob job)
+        {
+        }
+
+        private Projection FitCameraToVessel(Bounds bounds, float3 lookDir, float4x4? toWorldMatrix, float aspectRatio)
         {
             // size the camera viewport to fit the vessel
-            float3 vesselSizes = bounds.max - bounds.min;
+            float3 extents = bounds.extents;
             if (toWorldMatrix is not null)
             {
                 var scales = new float3(math.length(toWorldMatrix.Value.c0.xyz),
                                         math.length(toWorldMatrix.Value.c1.xyz),
                                         math.length(toWorldMatrix.Value.c2.xyz));
-                vesselSizes *= scales;
+                extents *= scales;
             }
 
-            float vesselSize = math.max(math.cmax(vesselSizes), 0.1f); // make sure it is never zero
-            float cameraSize = 0.55f * vesselSize; // slightly more than half-size to fit the vessel in
-            camera.farClipPlane = 50f + vesselSize;
-            camera.orthographicSize = cameraSize;
+            float maxExtent = math.max(math.cmax(extents), 0.1f); // make sure it is never zero
+            float cameraSize = 1.1f * maxExtent;                  // slightly more than half-size to fit the vessel in
 
             // place the camera so to fit vessel in view
             // https://forum.unity.com/threads/fit-object-exactly-into-perspective-cameras-field-of-view-focus-the-object.496472/#post-3229700
-            const float CameraDistance = 2.0f; // Constant factor
-            float cameraView =
-                2.0f * math.tan(0.5f * Mathf.Deg2Rad * camera.fieldOfView); // Visible height 1 meter in front
-            float distance = CameraDistance * vesselSize / cameraView; // Combined wanted distance from the object
-            distance += 0.5f * vesselSize; // Estimated offset from the center to the outside of the object
+            float3 center = bounds.center;
+            float3 position = center - 3 * cameraSize * math.normalize(lookDir);
 
-            Transform cameraTransform = camera.transform;
-            Vector3 position = bounds.center - distance * lookDir.normalized;
             if (toWorldMatrix is not null)
             {
                 position = math.transform(toWorldMatrix.Value, position);
                 lookDir = math.rotate(toWorldMatrix.Value, lookDir);
             }
 
-            cameraTransform.position = position;
-            cameraTransform.forward = lookDir;
+
+            // http://answers.unity.com/comments/1843226/view.html
+            var trs = float4x4.TRS(position, quaternion.LookRotation(lookDir, Vector3.up), cameraScale);
+            float4x4 viewMatrix = math.inverse(trs);
+            var projectionMatrix = float4x4.Ortho(height: cameraSize * 2,
+                                                  width: cameraSize * 2 * aspectRatio,
+                                                  near: 0.01f,
+                                                  far: 6 * cameraSize);
+
+            return new Projection
+            {
+                position = position,
+                forward = lookDir,
+                projectionMatrix = projectionMatrix,
+                viewMatrix = viewMatrix,
+                halfSize = cameraSize,
+            };
         }
 
         private void FinalizeJob(RenderJob job)
