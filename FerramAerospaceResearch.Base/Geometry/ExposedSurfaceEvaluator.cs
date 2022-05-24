@@ -12,6 +12,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
+using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
 using Random = System.Random;
 
@@ -34,23 +35,33 @@ namespace FerramAerospaceResearch.Geometry
         }
     }
 
-    public class ObjectTagger : IDisposable, IReadOnlyDictionary<Object, int>
+    public struct TaggedInfo
+    {
+        public int index;
+        public HashSet<Renderer> renderers;
+    }
+
+    public class ObjectTagger : IDisposable, IReadOnlyDictionary<Object, TaggedInfo>
     {
         private const int TagLength = 10;
         private const uint TagMask = (1 << TagLength) - 1;
+        private static readonly Stack<HashSet<Renderer>> rendererListPool = new();
 
         public uint Tag { get; private set; }
         private static readonly HashSet<uint> usedTags = new();
         private static readonly Random random = new();
-        private readonly Dictionary<Object, int> objectIds = new(ObjectReferenceEqualityComparer<Object>.Default);
+
+        private readonly Dictionary<Object, TaggedInfo>
+            objectIds = new(ObjectReferenceEqualityComparer<Object>.Default);
+
         private MaterialPropertyBlock block;
 
-        public Dictionary<Object, int>.KeyCollection Keys
+        public Dictionary<Object, TaggedInfo>.KeyCollection Keys
         {
             get { return objectIds.Keys; }
         }
 
-        public Dictionary<Object, int>.ValueCollection Values
+        public Dictionary<Object, TaggedInfo>.ValueCollection Values
         {
             get { return objectIds.Values; }
         }
@@ -90,12 +101,19 @@ namespace FerramAerospaceResearch.Geometry
         {
             Color color = GetObjColor(obj);
             foreach (Renderer renderer in renderers)
+            {
                 SetupRenderer(renderer, color, propertyBlock);
+                objectIds[obj].renderers.Add(renderer);
+            }
+
             return color;
         }
 
         public void Reset(bool newTag = false)
         {
+            foreach (TaggedInfo info in Values)
+                rendererListPool.Push(info.renderers);
+
             objectIds.Clear();
             if (!newTag)
                 return;
@@ -106,13 +124,19 @@ namespace FerramAerospaceResearch.Geometry
         private Color GetObjColor(Object obj)
         {
             // unique per object, stability doesn't matter as renderers will have to be rebuilt when anything changes
-            if (!objectIds.TryGetValue(obj, out int index))
+            if (!objectIds.TryGetValue(obj, out TaggedInfo info))
             {
-                index = objectIds.Count;
-                objectIds.Add(obj, index);
+                info = new TaggedInfo
+                {
+                    index = objectIds.Count,
+                    renderers = rendererListPool.Count == 0
+                                    ? new HashSet<Renderer>(ObjectReferenceEqualityComparer<Renderer>.Default)
+                                    : rendererListPool.Pop()
+                };
+                objectIds.Add(obj, info);
             }
 
-            uint id = Encode(index);
+            uint id = Encode(info.index);
             return ColorUintConverter.AsColor(id);
         }
 
@@ -120,6 +144,7 @@ namespace FerramAerospaceResearch.Geometry
         {
             Color color = GetObjColor(obj);
             SetupRenderer(renderer, color, propertyBlock);
+            objectIds[obj].renderers.Add(renderer);
             return color;
         }
 
@@ -136,12 +161,12 @@ namespace FerramAerospaceResearch.Geometry
             renderer.SetPropertyBlock(propertyBlock);
         }
 
-        public Dictionary<Object, int>.Enumerator GetEnumerator()
+        public Dictionary<Object, TaggedInfo>.Enumerator GetEnumerator()
         {
             return objectIds.GetEnumerator();
         }
 
-        IEnumerator<KeyValuePair<Object, int>> IEnumerable<KeyValuePair<Object, int>>.GetEnumerator()
+        IEnumerator<KeyValuePair<Object, TaggedInfo>> IEnumerable<KeyValuePair<Object, TaggedInfo>>.GetEnumerator()
         {
             return objectIds.GetEnumerator();
         }
@@ -161,28 +186,29 @@ namespace FerramAerospaceResearch.Geometry
             return objectIds.ContainsKey(key);
         }
 
-        public bool TryGetValue(Object key, out int value)
+        public bool TryGetValue(Object key, out TaggedInfo value)
         {
             return objectIds.TryGetValue(key, out value);
         }
 
-        public int this[Object key]
+        public TaggedInfo this[Object key]
         {
             get { return objectIds[key]; }
         }
 
-        IEnumerable<Object> IReadOnlyDictionary<Object, int>.Keys
+        IEnumerable<Object> IReadOnlyDictionary<Object, TaggedInfo>.Keys
         {
             get { return objectIds.Keys; }
         }
 
-        IEnumerable<int> IReadOnlyDictionary<Object, int>.Values
+        IEnumerable<TaggedInfo> IReadOnlyDictionary<Object, TaggedInfo>.Values
         {
             get { return objectIds.Values; }
         }
 
         public void Dispose()
         {
+            Reset();
             usedTags.Remove(Tag);
         }
     }
@@ -203,17 +229,19 @@ namespace FerramAerospaceResearch.Geometry
         public int depthBits = 24;
 
         private Shader replacementShader;
+        private Material replacementMaterial;
 
         public Shader Shader
         {
             get { return replacementShader; }
             set
             {
+                Debug.Assert(value != null, nameof(value) + " != null");
                 replacementShader = value;
-                if (value == null)
-                    camera.ResetReplacementShader();
+                if (replacementMaterial is null)
+                    replacementMaterial = new Material(value);
                 else
-                    camera.SetReplacementShader(value, null);
+                    replacementMaterial.shader = value;
             }
         }
 
@@ -252,7 +280,7 @@ namespace FerramAerospaceResearch.Geometry
 
         private record RenderJob : IDisposable
         {
-            public bool renderPending;
+            public CommandBuffer commandBuffer;
             public ProcessingDevice device = ProcessingDevice.CPU;
             public JobHandle handle;
             public Action callback;
@@ -342,11 +370,6 @@ namespace FerramAerospaceResearch.Geometry
             get { return activeJobs.Count; }
         }
 
-        public bool RenderPending
-        {
-            get { return CurrentRenderRenderJob is { renderPending: true }; }
-        }
-
         public void CancelPendingJobs()
         {
             if (CurrentRenderRenderJob != null)
@@ -386,6 +409,7 @@ namespace FerramAerospaceResearch.Geometry
             camera.allowMSAA = false;
             camera.allowHDR = false;
             camera.depthTextureMode = DepthTextureMode.Depth;
+            camera.renderingPath = RenderingPath.VertexLit;
 
             if (shader == null)
                 shader = FARAssets.Instance.Shaders.ExposedSurface;
@@ -417,8 +441,6 @@ namespace FerramAerospaceResearch.Geometry
 
         public void Render(Request request)
         {
-            if (RenderPending)
-                throw new MethodAccessException("Rendering is still ongoing!");
             if (tagger is null)
                 throw new NullReferenceException("Please set ExposedSurfaceEvaluator.tagger before rendering");
             if (tagger.Count == 0)
@@ -431,7 +453,6 @@ namespace FerramAerospaceResearch.Geometry
             FitCameraToVessel(request.bounds, request.forward, request.toWorldMatrix);
             double pixelSize = camera.orthographicSize * 2 / renderSize.y;
             CurrentRenderRenderJob.Result.areaPerPixel = pixelSize * pixelSize;
-            CurrentRenderRenderJob.renderPending = true;
             CurrentRenderRenderJob.callback = request.callback;
             CurrentRenderRenderJob.device = request.device;
             CurrentRenderRenderJob.active = true;
@@ -446,9 +467,71 @@ namespace FerramAerospaceResearch.Geometry
                 CurrentRenderRenderJob.device = ProcessingDevice.CPU;
             }
 
-            // TODO: try with Graphics.DrawMesh since Camera.Render() has a non-negligible performance cost
-            camera.Render();
+            CurrentRenderRenderJob.commandBuffer ??= new CommandBuffer();
+            CommandBuffer commandBuffer = CurrentRenderRenderJob.commandBuffer;
+            commandBuffer.name = "ExposedSurface";
+            commandBuffer.Clear();
+
+            commandBuffer.BeginSample("ExposedSurfaceEvaluator.Render");
+            // setup camera matrices since we're not using camera to render
+            commandBuffer.SetProjectionMatrix(camera.projectionMatrix);
+            commandBuffer.SetViewMatrix(camera.worldToCameraMatrix);
+
+            // render the selected objects
+            commandBuffer.SetRenderTarget(new RenderTargetIdentifier(CurrentRenderRenderJob.Result.renderTexture),
+                                          RenderBufferLoadAction.DontCare,
+                                          // TODO: add request option to store/discard the texture with debug shader
+                                          RenderBufferStoreAction.Store,
+                                          RenderBufferLoadAction.DontCare,
+                                          RenderBufferStoreAction.DontCare);
+            foreach (TaggedInfo info in tagger.Values)
+                foreach (Renderer renderer in info.renderers)
+                    commandBuffer.DrawRenderer(renderer, replacementMaterial);
+
+            commandBuffer.EndSample("ExposedSurfaceEvaluator.Render");
+
+            // dispatch compute in the same buffer
+            if (CurrentRenderRenderJob.device is ProcessingDevice.GPU)
+            {
+                RenderJob job = CurrentRenderRenderJob;
+                int count = tagger.Count;
+
+                // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
+                job.UpdateComputeShader(PixelCountShader, count, MainKernel);
+
+                ComputeShader shader = job.computeShader;
+                ComputeBuffer outputBuffer = job.outputBuffer;
+
+                job.pixels = new NativeArray<int>(count, Allocator.Persistent);
+                outputBuffer.SetData(job.pixels);
+                shader.SetTexture(MainKernel.index,
+                                  ShaderPropertyIds.InputTexture,
+                                  job.Result.renderTexture,
+                                  0,
+                                  RenderTextureSubElement.Color);
+                shader.SetInt(ShaderPropertyIds.Tag, (int)tagger.Tag);
+
+                commandBuffer.BeginSample("ExposedSurfaceEvaluator.Compute");
+                commandBuffer.DispatchCompute(shader,
+                                              MainKernel.index,
+                                              (job.Result.renderTexture.width +
+                                               (int)MainKernel.threadGroupSizes.x -
+                                               1) /
+                                              (int)MainKernel.threadGroupSizes.x,
+                                              (job.Result.renderTexture.height +
+                                               (int)MainKernel.threadGroupSizes.y -
+                                               1) /
+                                              (int)MainKernel.threadGroupSizes.y,
+                                              1);
+                commandBuffer.EndSample("ExposedSurfaceEvaluator.Compute");
+            }
+
+            // do we need a separate command buffer for the compute job to run on async queue?
+            Graphics.ExecuteCommandBuffer(commandBuffer);
+
             Profiler.EndSample();
+
+            OnPostRender();
         }
 
         private void FitCameraToVessel(Bounds bounds, Vector3 lookDir, float4x4? toWorldMatrix)
@@ -462,6 +545,7 @@ namespace FerramAerospaceResearch.Geometry
                                         math.length(toWorldMatrix.Value.c2.xyz));
                 vesselSizes *= scales;
             }
+
             float vesselSize = math.max(math.cmax(vesselSizes), 0.1f); // make sure it is never zero
             float cameraSize = 0.55f * vesselSize; // slightly more than half-size to fit the vessel in
             camera.farClipPlane = 50f + vesselSize;
@@ -489,9 +573,6 @@ namespace FerramAerospaceResearch.Geometry
 
         private void OnPostRender()
         {
-            if (!RenderPending)
-                return;
-
             RenderJob job = CurrentRenderRenderJob;
             CurrentRenderRenderJob = null;
 
@@ -499,7 +580,6 @@ namespace FerramAerospaceResearch.Geometry
                 return;
 
             Profiler.BeginSample("ExposedAreaEvaluator.ReadbackSetup");
-            job.renderPending = false;
             RenderTexture renderTexture = job.Result.renderTexture;
 
             // TODO: try readback through a command buffer as that is not bugged
@@ -508,31 +588,11 @@ namespace FerramAerospaceResearch.Geometry
             AsyncGPUReadbackRequest readbackRequest;
             if (job.device is ProcessingDevice.GPU)
             {
-                int count = tagger.Count;
-
-                // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
-                job.UpdateComputeShader(PixelCountShader, count, MainKernel);
-
-                ComputeShader shader = job.computeShader;
-                ComputeBuffer outputBuffer = job.outputBuffer;
-
-                job.pixels = new NativeArray<int>(count, Allocator.Persistent);
-                outputBuffer.SetData(job.pixels);
-                shader.SetTexture(MainKernel.index,
-                                  ShaderPropertyIds.InputTexture,
-                                  renderTexture,
-                                  0,
-                                  RenderTextureSubElement.Color);
-                shader.SetInt(ShaderPropertyIds.Tag, (int)tagger.Tag);
-
-                shader.Dispatch(MainKernel.index,
-                                (renderTexture.width + (int)MainKernel.threadGroupSizes.x - 1) /
-                                (int)MainKernel.threadGroupSizes.x,
-                                (renderTexture.height + (int)MainKernel.threadGroupSizes.y - 1) /
-                                (int)MainKernel.threadGroupSizes.y,
-                                1);
                 readbackRequest =
-                    AsyncGPUReadback.RequestIntoNativeArray(ref job.pixels, outputBuffer, sizeof(int) * count, 0);
+                    AsyncGPUReadback.RequestIntoNativeArray(ref job.pixels,
+                                                            job.outputBuffer,
+                                                            sizeof(int) * tagger.Count,
+                                                            0);
             }
             else
             {
@@ -623,6 +683,7 @@ namespace FerramAerospaceResearch.Geometry
             }
 
             CleanJobResources();
+            Destroy(replacementMaterial);
         }
 
         protected virtual void CompleteTextureProcessing(Result result)
@@ -634,9 +695,9 @@ namespace FerramAerospaceResearch.Geometry
             job.Result.hostTexture = job.tex;
             job.Result.pixelCounts = job.pixels;
             job.Result.areas.Clear();
-            foreach (KeyValuePair<Object, int> objectIndex in tagger)
+            foreach (KeyValuePair<Object, TaggedInfo> objectIndex in tagger)
             {
-                int index = objectIndex.Value;
+                int index = objectIndex.Value.index;
                 job.Result.areas[objectIndex.Key] = job.pixels[index] * job.Result.areaPerPixel;
             }
 

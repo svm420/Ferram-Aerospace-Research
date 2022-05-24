@@ -18,7 +18,7 @@
         <DebugSymbols>true</DebugSymbols>
         <DebugType>portable</DebugType>
         <Optimize>false</Optimize>
-        <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
+        <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
         <DefineConstants>DEBUG;TRACE;ASSERT;LOG_TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
@@ -28,8 +28,18 @@
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugType>portable</DebugType>
         <Optimize>true</Optimize>
-        <OutputPath>$(SolutionDir)bin\Release\</OutputPath>
+        <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
         <DefineConstants>TRACE;INFO</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Profiling|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>portable</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
+        <DefineConstants>TRACE;INFO;ENABLE_PROFILER</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

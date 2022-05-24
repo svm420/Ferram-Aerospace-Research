@@ -114,6 +114,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 partInit.Invoke(part, noArgs); // make sure renderers are setup by the part
                 List<Renderer> renderers = part.FindModelRenderersCached();
+                renderers.RemoveAll(renderer => renderer.gameObject.layer != 0);
                 Color c = Tagger.SetupRenderers(part, renderers);
                 cachedRenderers.Add(part, renderers);
                 part.mpb.SetColor(ShaderPropertyIds.ExposedColor, c);
@@ -168,9 +169,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     throw new ArgumentOutOfRangeException();
             }
 
+            // TODO: bounds seem off in KSP
             float4x4 vesselLocalToWorldMatrix = Vessel.transform.localToWorldMatrix;
 
-            if (!Airstream.RenderPending && InAtmosphere)
+            if (InAtmosphere)
             {
                 Vector3 forward = Vessel.velocityD.magnitude < 0.001
                                       ? Vector3.forward
@@ -183,9 +185,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     toWorldMatrix = vesselLocalToWorldMatrix,
                 });
             }
-
-            if (Sun.RenderPending)
-                return;
 
             Vector3 fromSun =
                 (VesselBounds.center - Vessel.transform.InverseTransformPoint(FlightGlobals.Bodies[0].position))

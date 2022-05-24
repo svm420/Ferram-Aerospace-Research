@@ -36,8 +36,6 @@ namespace FerramAerospaceResearch.Editor {
         }
 
         private void Update() {
-            if (RenderPending) return;
-
             Render(new Request(){
                 bounds=bounds,
                 forward=lookDir,

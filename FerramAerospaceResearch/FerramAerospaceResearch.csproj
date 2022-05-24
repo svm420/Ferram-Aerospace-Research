@@ -37,6 +37,16 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Profiling|AnyCPU' ">
+      <DebugType>portable</DebugType>
+      <Optimize>true</Optimize>
+      <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
+      <DefineConstants>TRACE;INFO;ENABLE_PROFILER</DefineConstants>
+      <ErrorReport>prompt</ErrorReport>
+      <WarningLevel>4</WarningLevel>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
