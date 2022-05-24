@@ -275,7 +275,9 @@ namespace FerramAerospaceResearch.Geometry
             public void UpdateComputeShader(ComputeShader shader, int count, Kernel main)
             {
                 bool rebind = false;
-                if (computeShader == null || computeShader.name != shader.name)
+                if (computeShader == null ||
+                    !computeShader.name.StartsWith(shader.name,
+                                                   StringComparison.Ordinal)) // copy adds (Clone) to the name
                 {
                     computeShader = Instantiate(shader);
                     rebind = true;
