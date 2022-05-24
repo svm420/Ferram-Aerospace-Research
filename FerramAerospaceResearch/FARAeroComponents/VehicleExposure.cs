@@ -48,7 +48,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             }
         }
 
-        public Vector2Int RenderSize
+        public int2 RenderSize
         {
             get { return Airstream.renderSize; }
             set
@@ -211,7 +211,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             ComputeDevice = deviceSelect.ActiveSelection;
 
             GUILayout.BeginHorizontal();
-            Vector2Int size = RenderSize;
+            int2 size = RenderSize;
             size.x = GUIUtils.TextEntryForInt(LocalizerExtensions.Get("FARExposureWidthLabel"), 100, size.x);
             size.y = GUIUtils.TextEntryForInt(LocalizerExtensions.Get("FARExposureHeightLabel"), 100, size.y);
             RenderSize = size;

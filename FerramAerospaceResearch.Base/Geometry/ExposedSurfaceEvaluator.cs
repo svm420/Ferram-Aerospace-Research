@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading;
 using FerramAerospaceResearch.Resources;
@@ -198,13 +199,11 @@ namespace FerramAerospaceResearch.Geometry
         private static float3 cameraScale;
         public ObjectTagger tagger;
 
-        public Vector2Int renderSize = new()
+        public int2 renderSize = new()
         {
             x = 512,
             y = 512
         };
-
-        public int depthBits = 24;
 
         private Shader replacementShader;
         private Material replacementMaterial;
@@ -265,6 +264,7 @@ namespace FerramAerospaceResearch.Geometry
             public double halfSize;
         }
 
+        [SuppressMessage("ReSharper", "Unity.NoNullPropagation")]
         protected record RenderJob : IDisposable
         {
             public float3 position;
@@ -281,6 +281,11 @@ namespace FerramAerospaceResearch.Geometry
 
             public ComputeShader computeShader;
             public ComputeBuffer outputBuffer;
+            private int originalShader;
+
+            // double buffering for debug visualizations
+            private RenderTexture currentTexture;
+            private RenderTexture secondTexture;
 
             ~RenderJob() => Dispose(false);
 
@@ -290,13 +295,13 @@ namespace FerramAerospaceResearch.Geometry
                 GC.SuppressFinalize(this);
             }
 
-            public void UpdateComputeShader(ComputeShader shader, int count, Kernel main)
+            public void ResetComputeForJob(ComputeShader shader, int count, Kernel main)
             {
                 bool rebind = false;
-                if (computeShader == null ||
-                    !computeShader.name.StartsWith(shader.name,
-                                                   StringComparison.Ordinal)) // copy adds (Clone) to the name
+                int shaderId = shader.GetInstanceID();
+                if (shaderId != originalShader)
                 {
+                    originalShader = shaderId;
                     computeShader = Instantiate(shader);
                     rebind = true;
                 }
@@ -309,12 +314,51 @@ namespace FerramAerospaceResearch.Geometry
                     rebind = true;
                 }
 
-                if (!rebind)
+                if (!rebind || !main.IsValid)
                     return;
 
-                if (!main.IsValid)
-                    return;
                 computeShader.SetBuffer(main.index, ShaderPropertyIds.OutputBuffer, outputBuffer);
+            }
+
+            public void ResetNativeForJob(int2 texSize, int objectCount)
+            {
+                if (currentTexture is null || currentTexture.width != texSize.x || currentTexture.height != texSize.y)
+                {
+                    currentTexture?.Release();
+                    secondTexture?.Release();
+                    currentTexture = Result.renderTexture = new RenderTexture(texSize.x,
+                                                                              texSize.y,
+                                                                              24,
+                                                                              RenderTextureFormat.Default,
+                                                                              RenderTextureReadWrite.Default);
+                    currentTexture.antiAliasing = 1;
+                    currentTexture.filterMode = FilterMode.Point;
+                    currentTexture.autoGenerateMips = false;
+                    secondTexture = new RenderTexture(currentTexture);
+
+                    if (tex.IsCreated)
+                        tex.Dispose();
+                    tex = new NativeArray<uint>(texSize.x * texSize.y, Allocator.Persistent);
+
+                    // swap render textures
+                    (currentTexture, secondTexture) = (secondTexture, currentTexture);
+                    Result.renderTexture = currentTexture;
+                }
+
+                switch (pixels.IsCreated)
+                {
+                    case true when pixels.Length == objectCount:
+                        unsafe
+                        {
+                            UnsafeUtility.MemClear(pixels.GetUnsafePtr(), pixels.Length * sizeof(int));
+                        }
+                        return;
+                    case true:
+                        pixels.Dispose();
+                        break;
+                }
+
+                pixels = new NativeArray<int>(objectCount, Allocator.Persistent);
             }
 
             private void Dispose(bool disposing)
@@ -341,6 +385,8 @@ namespace FerramAerospaceResearch.Geometry
                     tex.Dispose();
                 if (pixels.IsCreated)
                     pixels.Dispose();
+                currentTexture?.Release();
+                secondTexture?.Release();
             }
 
             public void ReleaseComputeBuffers()
@@ -399,20 +445,6 @@ namespace FerramAerospaceResearch.Geometry
             SetComputeShader(pixelCount, main);
         }
 
-        private RenderTexture GetRenderTexture()
-        {
-            var renderTexture = RenderTexture.GetTemporary(renderSize.x,
-                                                           renderSize.y,
-                                                           depthBits,
-                                                           RenderTextureFormat.Default,
-                                                           RenderTextureReadWrite.Default);
-            renderTexture.antiAliasing = 1;
-            renderTexture.filterMode = FilterMode.Point;
-            renderTexture.autoGenerateMips = false;
-
-            return renderTexture;
-        }
-
         public void Render(Request request)
         {
             if (tagger is null)
@@ -422,7 +454,7 @@ namespace FerramAerospaceResearch.Geometry
 
             Profiler.BeginSample("ExposedAreaEvaluator.RenderRequest");
             RenderJob job = requestPool.Count == 0 ? new RenderJob() : requestPool.Pop();
-            job.Result.renderTexture = GetRenderTexture();
+            job.ResetNativeForJob(renderSize, tagger.Count);
 
             Projection projection = FitCameraToVessel(request.bounds,
                                                       request.forward,
@@ -461,6 +493,7 @@ namespace FerramAerospaceResearch.Geometry
                                           RenderBufferStoreAction.Store,
                                           RenderBufferLoadAction.DontCare,
                                           RenderBufferStoreAction.DontCare);
+            commandBuffer.ClearRenderTarget(true, true, Color.clear);
             foreach (TaggedInfo info in tagger.Values)
                 foreach (Renderer renderer in info.renderers)
                     commandBuffer.DrawRenderer(renderer, replacementMaterial);
@@ -473,12 +506,11 @@ namespace FerramAerospaceResearch.Geometry
                 int count = tagger.Count;
 
                 // https://en.wikibooks.org/wiki/Cg_Programming/Unity/Computing_Color_Histograms
-                job.UpdateComputeShader(PixelCountShader, count, MainKernel);
+                job.ResetComputeForJob(PixelCountShader, count, MainKernel);
 
                 ComputeShader shader = job.computeShader;
                 ComputeBuffer outputBuffer = job.outputBuffer;
 
-                job.pixels = new NativeArray<int>(count, Allocator.Persistent);
                 outputBuffer.SetData(job.pixels);
                 commandBuffer.SetComputeTextureParam(shader,
                                                      MainKernel.index,
@@ -577,14 +609,11 @@ namespace FerramAerospaceResearch.Geometry
                 readbackRequest =
                     AsyncGPUReadback.RequestIntoNativeArray(ref job.pixels,
                                                             job.outputBuffer,
-                                                            sizeof(int) * tagger.Count,
+                                                            sizeof(int) * job.pixels.Length,
                                                             0);
             }
             else
             {
-                // only persistent works here as the readback may take too long resulting in the array getting deallocated
-                int pixelCount = renderTexture.width * renderTexture.height;
-                job.tex = new NativeArray<uint>(pixelCount, Allocator.Persistent);
                 // ref is not really needed here as Unity takes saves the pointer and size
                 readbackRequest = AsyncGPUReadback.RequestIntoNativeArray(ref job.tex, renderTexture);
             }
@@ -598,8 +627,6 @@ namespace FerramAerospaceResearch.Geometry
 
         private void ReleaseRequest(RenderJob renderJob)
         {
-            renderJob.ReleaseNative();
-            RenderTexture.ReleaseTemporary(renderJob.Result.renderTexture);
             requestPool.Push(renderJob);
         }
 
@@ -635,7 +662,6 @@ namespace FerramAerospaceResearch.Geometry
             if (renderJob.device != ProcessingDevice.GPU)
             {
                 // compute has already readback pixels
-                renderJob.pixels = new NativeArray<int>(tagger.Count, Allocator.Persistent);
                 renderJob.handle = new PixelCountJob
                 {
                     pixels = renderJob.pixels,
