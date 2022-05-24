@@ -14,7 +14,6 @@ using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
-using Random = System.Random;
 
 namespace FerramAerospaceResearch.Geometry
 {
@@ -43,13 +42,7 @@ namespace FerramAerospaceResearch.Geometry
 
     public class ObjectTagger : IDisposable, IReadOnlyDictionary<Object, TaggedInfo>
     {
-        private const int TagLength = 10;
-        private const uint TagMask = (1 << TagLength) - 1;
         private static readonly Stack<HashSet<Renderer>> rendererListPool = new();
-
-        public uint Tag { get; private set; }
-        private static readonly HashSet<uint> usedTags = new();
-        private static readonly Random random = new();
 
         private readonly Dictionary<Object, TaggedInfo>
             objectIds = new(ObjectReferenceEqualityComparer<Object>.Default);
@@ -66,34 +59,18 @@ namespace FerramAerospaceResearch.Geometry
             get { return objectIds.Values; }
         }
 
-        private void SetUniqueTag()
-        {
-            do
-            {
-                Tag = (uint)random.Next(1, 1 << TagLength); // 0 tag would coincide with empty pixels so don't use it
-            } while (usedTags.Contains(Tag));
-
-            usedTags.Add(Tag);
-        }
-
         public ObjectTagger()
         {
-            SetUniqueTag();
-        }
-
-        public static uint GetTag(uint value)
-        {
-            return value & TagMask;
         }
 
         public static int GetIndex(uint value)
         {
-            return (int)(value >> TagLength);
+            return (int)(value - 1);
         }
 
         public uint Encode(int index)
         {
-            return ((uint)(index) << TagLength) | Tag;
+            return (uint)(index + 1);
         }
 
         public Color SetupRenderers<T>(Object obj, T renderers, MaterialPropertyBlock propertyBlock = null)
@@ -109,16 +86,11 @@ namespace FerramAerospaceResearch.Geometry
             return color;
         }
 
-        public void Reset(bool newTag = false)
+        public void Reset()
         {
             foreach (TaggedInfo info in Values)
                 rendererListPool.Push(info.renderers);
-
             objectIds.Clear();
-            if (!newTag)
-                return;
-            usedTags.Remove(Tag);
-            SetUniqueTag();
         }
 
         private Color GetObjColor(Object obj)
@@ -209,7 +181,6 @@ namespace FerramAerospaceResearch.Geometry
         public void Dispose()
         {
             Reset();
-            usedTags.Remove(Tag);
         }
     }
 
@@ -509,7 +480,6 @@ namespace FerramAerospaceResearch.Geometry
                                   job.Result.renderTexture,
                                   0,
                                   RenderTextureSubElement.Color);
-                shader.SetInt(ShaderPropertyIds.Tag, (int)tagger.Tag);
 
                 commandBuffer.BeginSample("ExposedSurfaceEvaluator.Compute");
                 commandBuffer.DispatchCompute(shader,
@@ -650,10 +620,9 @@ namespace FerramAerospaceResearch.Geometry
             {
                 // compute has already readback pixels
                 renderJob.pixels = new NativeArray<int>(tagger.Count, Allocator.Persistent);
-                renderJob.handle = new TaggedPixelCountJob
+                renderJob.handle = new PixelCountJob
                 {
                     pixels = renderJob.pixels,
-                    tag = tagger.Tag,
                     texture = texture
                 }.Schedule(texture.Length, 64);
             }
@@ -717,17 +686,15 @@ namespace FerramAerospaceResearch.Geometry
         }
 
         [BurstCompile]
-        public struct TaggedPixelCountJob : IJobParallelFor
+        public struct PixelCountJob : IJobParallelFor
         {
             [ReadOnly] public NativeSlice<uint> texture;
-            public uint tag;
             public NativeSlice<int> pixels;
 
             public void Execute(int index)
             {
                 uint color = texture[index];
-
-                if (ObjectTagger.GetTag(color) != tag)
+                if (color == 0)
                     return;
 
                 int partIndex = ObjectTagger.GetIndex(color);

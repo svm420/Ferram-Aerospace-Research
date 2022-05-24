@@ -69,7 +69,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
             if (Event.current.type == EventType.Repaint)
             {
                 debugMaterial ??= Instantiate(FARAssets.Instance.Shaders.ExposedSurfaceDebug.Material);
-                debugMaterial.SetInt(ShaderPropertyIds._Tag, (int)tagger.Tag);
                 debugMaterial.SetColor(ShaderPropertyIds._BackgroundColor, DebugBackgroundColor);
                 debugMaterial.SetTexture(ShaderPropertyIds.ColorTex, DebugColors);
 

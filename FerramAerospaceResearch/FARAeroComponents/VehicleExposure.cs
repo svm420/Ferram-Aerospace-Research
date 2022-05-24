@@ -5,7 +5,6 @@ using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.Geometry;
 using FerramAerospaceResearch.Resources;
-using Smooth.Delegates;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -124,7 +123,6 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
                 part.mpb.SetTexture(ShaderPropertyIds.ColorTex, Airstream.DebugColors);
                 part.mpb.SetColor(ShaderPropertyIds._BackgroundColor, Airstream.DebugBackgroundColor);
-                part.mpb.SetInt(ShaderPropertyIds._Tag, (int)Tagger.Tag);
                 foreach (Renderer renderer in renderers)
                     renderer.SetPropertyBlock(part.mpb);
             }

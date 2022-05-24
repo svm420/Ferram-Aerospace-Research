@@ -69,7 +69,6 @@ namespace FerramAerospaceResearch.Editor {
             {
                 if (Event.current.type != EventType.Repaint)
                     return;
-                debugMaterial.SetInt(ShaderPropertyIds._Tag, (int)tagger.Tag);
                 Graphics.DrawTexture(render, renderTexture, debugMaterial);
             } else
 			    GUI.DrawTexture(render, renderTexture);

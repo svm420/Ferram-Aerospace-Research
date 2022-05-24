@@ -1,6 +1,5 @@
 #include "ExposedSurface.cginc"
 
-uniform int _Tag;
 uniform float4 _BackgroundColor;
 Texture2D _ColorTex;
 uniform float4 _ColorTex_TexelSize;
@@ -8,7 +7,7 @@ uniform SamplerState point_repeat_sampler;
 
 fixed4 debug_color(uint value)
 {
-    if (get_tag(value) != (uint)_Tag)
+    if (value == 0)
     {
         // remove fully transparent background pixels
         clip(_BackgroundColor.a - 1.f / 255.f);

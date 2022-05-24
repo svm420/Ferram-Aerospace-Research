@@ -5,7 +5,6 @@
         _MainTex ("Texture", 2D) = "black" {}
         _ColorTex ("Color Texture", 2D) = "white" {}
         _BackgroundColor ("Background", Color) = (0,0,0,0)
-        [HideInInspector] _Tag ("Tag", Int) = 0
     }
     SubShader
     {

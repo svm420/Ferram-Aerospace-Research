@@ -1,8 +1,6 @@
 ﻿#pragma kernel CountPixelsMain
 
 Texture2D<float4> InputTexture; // input texture
-int IdCount;
-uint Tag;
 
 RWStructuredBuffer<int> OutputBuffer;
 
@@ -14,8 +12,7 @@ void CountPixelsMain(uint3 id : SV_DispatchThreadID)
     float4 input = InputTexture.Load(id);
     uint color = pack_uint(input);
 
-    uint tag = get_tag(color);
-    if (tag != Tag) return;
+    if (color == 0) return;
     int index = get_index(color);
     InterlockedAdd(OutputBuffer[index], 1);
 }
