@@ -78,8 +78,8 @@ namespace FerramAerospaceResearch.Geometry
 
                     if (mat == null || mat.shader == null)
                         mat = FARAssets.Instance.Shaders.DebugVoxelFallback;
-                    else if (mat.HasProperty(ShaderPropertyIds.Cutoff))
-                        mat.SetFloat(ShaderPropertyIds.Cutoff, FARConfig.Shaders.DebugVoxel.Cutoff);
+                    else if (mat.HasProperty(ShaderPropertyIds._Cutoff))
+                        mat.SetFloat(ShaderPropertyIds._Cutoff, FARConfig.Shaders.DebugVoxel.Cutoff);
 
                     mat.mainTexture = FARAssets.Instance.Textures.DebugVoxel;
 

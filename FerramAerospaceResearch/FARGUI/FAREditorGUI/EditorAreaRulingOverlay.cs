@@ -167,8 +167,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             var rendererMaterial = new Material(material);
 
             renderer.useWorldSpace = false;
-            if (material.HasProperty(ShaderPropertyIds.Color))
-                rendererMaterial.SetColor(ShaderPropertyIds.Color, color);
+            if (material.HasProperty(ShaderPropertyIds._Color))
+                rendererMaterial.SetColor(ShaderPropertyIds._Color, color);
             else
                 FARLogger.Warning("Material " + material + " has no _Color property");
             renderer.material = rendererMaterial;

@@ -79,7 +79,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 debugMaterial ??= Instantiate(FARAssets.Instance.Shaders.ExposedSurfaceDebug.Material);
                 debugMaterial.SetColor(ShaderPropertyIds._BackgroundColor, DebugBackgroundColor);
-                debugMaterial.SetTexture(ShaderPropertyIds.ColorTex, DebugColors);
+                debugMaterial.SetTexture(ShaderPropertyIds._ColorTex, DebugColors);
 
                 // expects rect in screen coordinates
                 Graphics.DrawTexture(texRect, lastImage, debugMaterial);

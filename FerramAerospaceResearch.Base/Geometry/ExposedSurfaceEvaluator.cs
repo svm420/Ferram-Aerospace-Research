@@ -16,8 +16,10 @@ using UnityEngine.Rendering;
 using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
 
-// TODO: reuse render textures, native arrays, command buffers if sizes and objects haven't changed
-// TODO: construct view and projection matrices manually
+// TODO: reuse command buffers if objects haven't changed, manually set VP matrix before execution
+// TODO: combine requests into a single command buffer and a single Graphics.ExecuteCommandBuffer call
+// TODO: singleton executor without coroutines
+// TODO: native AsyncGPUReadback plugin for OpenGL
 
 namespace FerramAerospaceResearch.Geometry
 {
@@ -137,7 +139,7 @@ namespace FerramAerospaceResearch.Geometry
                 propertyBlock = block;
             }
 
-            propertyBlock.SetColor(ShaderPropertyIds.ExposedColor, color);
+            propertyBlock.SetColor(ShaderPropertyIds._ExposedColor, color);
             renderer.SetPropertyBlock(propertyBlock);
         }
 
@@ -352,6 +354,7 @@ namespace FerramAerospaceResearch.Geometry
                         {
                             UnsafeUtility.MemClear(pixels.GetUnsafePtr(), pixels.Length * sizeof(int));
                         }
+
                         return;
                     case true:
                         pixels.Dispose();
@@ -572,7 +575,6 @@ namespace FerramAerospaceResearch.Geometry
                 position = math.transform(toWorldMatrix.Value, position);
                 lookDir = math.rotate(toWorldMatrix.Value, lookDir);
             }
-
 
             // http://answers.unity.com/comments/1843226/view.html
             var trs = float4x4.TRS(position, quaternion.LookRotation(lookDir, Vector3.up), cameraScale);

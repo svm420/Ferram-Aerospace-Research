@@ -116,12 +116,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 renderers.RemoveAll(renderer => renderer.gameObject.layer != 0);
                 Color c = Tagger.SetupRenderers(part, renderers);
                 cachedRenderers.Add(part, renderers);
-                part.mpb.SetColor(ShaderPropertyIds.ExposedColor, c);
+                part.mpb.SetColor(ShaderPropertyIds._ExposedColor, c);
 
                 if (!overrideCameraShader)
                     continue;
 
-                part.mpb.SetTexture(ShaderPropertyIds.ColorTex, Airstream.DebugColors);
+                part.mpb.SetTexture(ShaderPropertyIds._ColorTex, Airstream.DebugColors);
                 part.mpb.SetColor(ShaderPropertyIds._BackgroundColor, Airstream.DebugBackgroundColor);
                 foreach (Renderer renderer in renderers)
                     renderer.SetPropertyBlock(part.mpb);
