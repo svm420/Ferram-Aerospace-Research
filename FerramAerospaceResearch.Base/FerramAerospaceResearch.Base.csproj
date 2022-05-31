@@ -148,6 +148,7 @@
         <Compile Include="Resources\Loading\ShaderBundleLoaderBase.cs" />
         <Compile Include="Resources\Loading\ShaderLoader.cs" />
         <Compile Include="Resources\Loading\TextureLoader.cs" />
+        <Compile Include="Resources\Pool.cs" />
         <Compile Include="Resources\ShaderPropertyIds.cs" />
         <Compile Include="Threading\MainThread.cs" />
         <Compile Include="Threading\ReaderWriteLockExtensions.cs" />
