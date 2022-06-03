@@ -323,8 +323,6 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             // ReSharper disable once InvertIf
             if (showDebugWindow)
             {
-                // shrink rect to fit
-                debugGuiRect.size = Vector2.zero;
                 debugGuiRect = GUILayout.Window(GetHashCode() + 3,
                                                 debugGuiRect,
                                                 DebugWindow,
@@ -445,7 +443,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private void DebugWindow(int windowId)
         {
             GUILayout.Label(LocalizerExtensions.Get("FARDebugWindowLabel"));
-            debugGUI.Display();
+            debugGUI.Display(ref debugGuiRect);
             GUI.DragWindow();
         }
 
