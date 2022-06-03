@@ -130,7 +130,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                                                       LocalizerExtensions.Get("FARFlightGUIWindowSelect2"),
                                                       LocalizerExtensions.Get("FARFlightGUIWindowSelect3")
                                                   },
-                                                  new[] {0, 1, 2, 3});
+                                                  new[] { 0, 1, 2, 3 });
 
             if (vesselFlightGUI.ContainsKey(_vessel))
                 vesselFlightGUI[_vessel] = this;
@@ -323,11 +323,13 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             // ReSharper disable once InvertIf
             if (showDebugWindow)
             {
+                // shrink rect to fit
+                debugGuiRect.size = Vector2.zero;
                 debugGuiRect = GUILayout.Window(GetHashCode() + 3,
                                                 debugGuiRect,
-                                                   DebugWindow,
-                                                   LocalizerExtensions.Get("FARDebugWindow"),
-                                                   GUILayout.MinWidth(200));
+                                                DebugWindow,
+                                                LocalizerExtensions.Get("FARDebugWindow"),
+                                                GUILayout.MinWidth(200));
                 GUIUtils.ClampToScreen(debugGuiRect);
             }
         }
@@ -360,9 +362,9 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                                                   buttonStyle,
                                                   GUILayout.ExpandWidth(true));
             showDebugWindow = GUILayout.Toggle(showDebugWindow,
-                                                  LocalizerExtensions.Get("FARFlightGUIFltDebug"),
-                                                  buttonStyle,
-                                                  GUILayout.ExpandWidth(true));
+                                               LocalizerExtensions.Get("FARFlightGUIFltDebug"),
+                                               buttonStyle,
+                                               GUILayout.ExpandWidth(true));
 
             bool logging = GUILayout.Toggle(flightDataLogger.IsActive,
                                             LocalizerExtensions.Get("FARFlightGUIFltLogging"),
@@ -377,7 +379,9 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             }
 
             flightDataLogger.Period =
-                GUIUtils.TextEntryForInt(LocalizerExtensions.Get("FARFlightGUIFltLogPeriod"), 150, flightDataLogger.Period);
+                GUIUtils.TextEntryForInt(LocalizerExtensions.Get("FARFlightGUIFltLogPeriod"),
+                                         150,
+                                         flightDataLogger.Period);
             flightDataLogger.FlushPeriod =
                 GUIUtils.TextEntryForInt(LocalizerExtensions.Get("FARFlightGUIFltLogFlushPeriod"),
                                          150,
