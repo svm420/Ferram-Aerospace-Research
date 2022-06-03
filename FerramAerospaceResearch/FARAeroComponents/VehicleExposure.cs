@@ -196,7 +196,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             });
         }
 
-        public void Display()
+        public bool Display()
         {
             deviceSelect ??= new GUIDropDown<Device>(new[]
                                                      {
@@ -246,16 +246,19 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     Camera.main.ResetReplacementShader();
             }
 
+            bool previous = displayLabels;
             displayLabels = GUILayout.Toggle(displayLabels, LocalizerExtensions.Get("FARExposureShowLabelsLabel"));
             GUI.enabled = true;
 
             if (!Enabled)
-                return;
+                return previous != displayLabels;
 
             if (displayAirstream)
                 Airstream.DrawDebugImage(250, displayLabels);
             else
                 Sun.DrawDebugImage(250, displayLabels);
+
+            return previous != displayLabels;
         }
 
         private void OnDestroy()

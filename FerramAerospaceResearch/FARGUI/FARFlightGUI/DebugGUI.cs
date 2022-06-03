@@ -18,14 +18,19 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                                         GUIDropDownStyles.ToggleButton);
 
             // changed, recompute the rect
-            if (previous != exposure) windowRect.size = Vector2.zero;
+            if (previous != exposure)
+                windowRect.size = Vector2.zero;
 
             // ReSharper disable once InvertIf
             if (exposure)
             {
                 if (vessel.FindVesselModuleImplementing<FARVesselAero>() is { } module)
-                    module.Exposure.Display();
+                    if (module.Exposure.Display())
+                    {
+                        windowRect.size = Vector2.zero;
+                    }
             }
+
             GUILayout.EndVertical();
         }
     }
