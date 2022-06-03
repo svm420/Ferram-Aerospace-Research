@@ -42,18 +42,6 @@
                 "destination": "$(AssetDir)"
             }
         ],
-        "[FerramAerospaceResearch.Base]": {
-            "install": [
-                {
-                    "source": "$(TargetDir)/$(TargetName).*",
-                    "destination": "$(PluginDir)"
-                },
-                {
-                    "source": "$(TargetDir)/$(TargetName).*",
-                    "destination": "$(UnityPluginsDir)"
-                }
-            ]
-        },
         "[FerramAerospaceResearch]": {
             "clean": [
                 "$(GameDir)"
@@ -70,6 +58,25 @@
                 {
                     "source": "GameData/$(ModName)",
                     "destination": "$(GameDir)"
+                }
+            ]
+        },
+        "|Editor": {
+            "install": []
+        },
+        "[FerramAerospaceResearch.Base]|!Editor": {
+            "install": [
+                {
+                    "source": "$(TargetDir)/$(TargetName).*",
+                    "destination": "$(PluginDir)"
+                }
+            ]
+        },
+        "[FerramAerospaceResearch.Base]|Editor": {
+            "install": [
+                {
+                    "source": "$(TargetDir)/$(TargetName).*",
+                    "destination": "$(UnityPluginsDir)"
                 }
             ]
         }

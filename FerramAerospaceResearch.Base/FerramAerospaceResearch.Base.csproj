@@ -11,7 +11,7 @@
         <AssemblyName>FerramAerospaceResearch.Base</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
-        <LangVersion>9</LangVersion>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,6 +44,17 @@
         <WarningLevel>4</WarningLevel>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Editor|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
+        <DefineConstants>DEBUG;TRACE;ASSERT;LOG_TRACE;ENABLE_UNITY_COLLECTIONS_CHECKS</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
     <ItemGroup>
         <Reference Include="System" />
         <Reference Include="Unity.Burst">
@@ -70,8 +81,11 @@
         <Reference Include="UnityEngine.AssetBundleModule">
             <HintPath>$(KSP_DIR_BUILD)\$(KSP_DATA_DIRNAME)\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.CoreModule">
+        <Reference Include="UnityEngine.CoreModule" Condition=" '$(Configuration)|$(Platform)' != 'Editor|AnyCPU' ">
             <HintPath>$(KSP_DIR_BUILD)\$(KSP_DATA_DIRNAME)\Managed\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule" Condition=" '$(Configuration)|$(Platform)' == 'Editor|AnyCPU' ">
+            <HintPath>$(UNITY_EDITOR_MANAGED_DIR)\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
             <HintPath>$(KSP_DIR_BUILD)\$(KSP_DATA_DIRNAME)\Managed\UnityEngine.IMGUIModule.dll</HintPath>
