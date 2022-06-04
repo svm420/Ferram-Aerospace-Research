@@ -13,5 +13,6 @@ namespace FerramAerospaceResearch.Resources
         public static readonly int OutputBuffer = Shader.PropertyToID("OutputBuffer");
         public static readonly int _ColorTex = Shader.PropertyToID("_ColorTex");
         public static readonly int _BackgroundColor = Shader.PropertyToID("_BackgroundColor");
+        public static readonly int _VPMatrix = Shader.PropertyToID("_VPMatrix");
     }
 }

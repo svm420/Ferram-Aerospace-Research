@@ -18,6 +18,7 @@ using Object = UnityEngine.Object;
 
 // TODO: reuse command buffers if objects haven't changed, manually set VP matrix before execution
 // TODO: combine requests into a single command buffer and a single Graphics.ExecuteCommandBuffer call
+// TODO: try using DrawMesh with MeshRenderer instead (may skip UpdateRendererBoundingVolumes if no other renderers)
 // TODO: singleton executor without coroutines
 // TODO: native AsyncGPUReadback plugin for OpenGL
 
@@ -482,13 +483,14 @@ namespace FerramAerospaceResearch.Geometry
                 job.device = ProcessingDevice.CPU;
             }
 
+            Profiler.BeginSample("ExposedSurfaceEvaluator.SetupCommandBuffer");
             CommandBuffer commandBuffer = job.commandBuffer ??= new CommandBuffer();
             commandBuffer.name = "ExposedSurface";
             commandBuffer.Clear();
 
             commandBuffer.BeginSample("ExposedSurfaceEvaluator.Render");
             // setup camera matrices since we're not using camera to render
-            commandBuffer.SetViewProjectionMatrices(proj: projection.projectionMatrix, view: projection.viewMatrix);
+            // commandBuffer.SetViewProjectionMatrices(proj: projection.projectionMatrix, view: projection.viewMatrix);
             // render the selected objects
             commandBuffer.SetRenderTarget(new RenderTargetIdentifier(job.Result.renderTexture),
                                           RenderBufferLoadAction.DontCare,
@@ -497,10 +499,13 @@ namespace FerramAerospaceResearch.Geometry
                                           RenderBufferLoadAction.DontCare,
                                           RenderBufferStoreAction.DontCare);
             commandBuffer.ClearRenderTarget(true, true, Color.clear);
+            float4x4 vp = math.mul(GL.GetGPUProjectionMatrix(projection.projectionMatrix, true), projection.viewMatrix);
+            // replacementMaterial.SetMatrix(ShaderPropertyIds._VPMatrix, vp);
             foreach (TaggedInfo info in tagger.Values)
                 foreach (Renderer renderer in info.renderers)
                     commandBuffer.DrawRenderer(renderer, replacementMaterial);
 
+            replacementMaterial.SetMatrix(ShaderPropertyIds._VPMatrix, vp);
             commandBuffer.EndSample("ExposedSurfaceEvaluator.Render");
 
             // dispatch compute in the same buffer
@@ -537,8 +542,12 @@ namespace FerramAerospaceResearch.Geometry
                 commandBuffer.EndSample("ExposedSurfaceEvaluator.Compute");
             }
 
+            Profiler.EndSample();
+
             // do we need a separate command buffer for the compute job to run on async queue?
+            Profiler.BeginSample("ExposedSurfaceEvaluator.ExecuteCommandBuffer");
             Graphics.ExecuteCommandBuffer(commandBuffer);
+            Profiler.EndSample();
 
             Profiler.EndSample();
 

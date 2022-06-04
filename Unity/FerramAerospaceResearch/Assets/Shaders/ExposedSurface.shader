@@ -6,41 +6,49 @@
     }
     SubShader
     {
-        Lighting Off Fog { Mode Off }
         Pass
         {
-          CGPROGRAM
+            CGPROGRAM
+            // pragmas
+            #pragma vertex vert
+            #pragma fragment frag
 
-                // pragmas
-                #pragma vertex vert
-                #pragma fragment frag
+            uniform float4 _ExposedColor;
 
-                uniform float4 _ExposedColor;
+            struct i2f
+            {
+                float4 vertex: POSITION;
+            };
 
-                struct i2f
-                {
-                    float4 vertex: POSITION;
-                };
+            struct v2f
+            {
+                float4 vertex: SV_POSITION;
+            };
 
-                struct v2f
-                {
-                    float4 vertex: SV_POSITION;
-                };
+            float4x4 _VPMatrix;
 
-                v2f vert(i2f v)
-                {
-                    v2f o;
-                    o.vertex = UnityObjectToClipPos(v.vertex);
+            inline float4 ObjectToClipPos(in float3 pos)
+            {
+                return mul(_VPMatrix, mul(unity_ObjectToWorld, float4(pos, 1.0)));
+            }
 
-                    return o;
-                }
+            inline float4 ObjectToClipPos(float4 pos)
+            {
+                return ObjectToClipPos(pos.xyz);
+            }
 
-                float4 frag(v2f i) : COLOR
-                {
-                    return _ExposedColor;
-                }
+            v2f vert(i2f v)
+            {
+                v2f o;
+                o.vertex = ObjectToClipPos(v.vertex);
+                return o;
+            }
 
-          ENDCG
+            float4 frag(v2f i) : COLOR
+            {
+                return _ExposedColor;
+            }
+            ENDCG
         }
     }
 }

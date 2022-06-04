@@ -431,19 +431,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bfd223cde411a444a6fdcb692c8ab0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 0}
-  renderSize: {x: 512, y: 512}
-  depthBits: 24
   objects:
-  - {fileID: 492433482}
-  - {fileID: 479145912}
-  - {fileID: 550936893}
-  - {fileID: 1954207099}
+  - go: {fileID: 492433482}
+    color: {r: 1, g: 0, b: 0, a: 1}
+  - go: {fileID: 479145912}
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - go: {fileID: 550936893}
+    color: {r: 0, g: 1, b: 0.0940752, a: 1}
+  - go: {fileID: 1954207099}
+    color: {r: 0.92176676, g: 0, b: 1, a: 1}
   lookDir: {x: 0, y: 0, z: 1}
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 1, y: 1, z: 1}
-  device: 0
+  device: 1
+  renderSize: {x: 512, y: 512}
   exposedSurfaceShader: {fileID: 4800000, guid: 51db73e998a880c4bb095d4e2e284a63,
     type: 3}
   pixelCountShader: {fileID: 7200000, guid: 2d778c6f876fe3146a4ac9460f76baf9, type: 3}
@@ -454,7 +456,10 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 0
-  debugMaterial: {fileID: 2100000, guid: 4928ca41c6d0d6242bee0c4d1ce20329, type: 2}
+  debugShader: {fileID: 4800000, guid: 79976886287e5354e8635107b2f8d903, type: 3}
+  debugBackground:
+    serializedVersion: 2
+    rgba: 4278190080
 --- !u!4 &1077718239
 Transform:
   m_ObjectHideFlags: 0

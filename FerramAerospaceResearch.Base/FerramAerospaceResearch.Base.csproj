@@ -87,6 +87,9 @@
         <Reference Include="UnityEngine.CoreModule" Condition=" '$(Configuration)|$(Platform)' == 'Editor|AnyCPU' ">
             <HintPath>$(UNITY_EDITOR_MANAGED_DIR)\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+          <HintPath>$(KSP_DIR_BUILD)\$(KSP_DATA_DIRNAME)\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
             <HintPath>$(KSP_DIR_BUILD)\$(KSP_DATA_DIRNAME)\Managed\UnityEngine.IMGUIModule.dll</HintPath>
         </Reference>
@@ -123,6 +126,15 @@
         <Compile Include="Geometry\DebugVoxel.cs" />
         <Compile Include="Geometry\DebugVoxelMesh.cs" />
         <Compile Include="Geometry\ExposedSurfaceEvaluator.cs" />
+        <Compile Include="Geometry\Exposure\CameraInfo.cs" />
+        <Compile Include="Geometry\Exposure\Debugger.cs" />
+        <Compile Include="Geometry\Exposure\Executor.cs" />
+        <Compile Include="Geometry\Exposure\ProcessingDevice.cs" />
+        <Compile Include="Geometry\Exposure\Renderer.cs" />
+        <Compile Include="Geometry\Exposure\RenderBatch.cs" />
+        <Compile Include="Geometry\Exposure\RenderRequest.cs" />
+        <Compile Include="Geometry\Exposure\RenderResources.cs" />
+        <Compile Include="Geometry\Exposure\RenderResult.cs" />
         <Compile Include="Geometry\IDebugVoxelMeshBuilder.cs" />
         <Compile Include="Geometry\MeshBuildData.cs" />
         <Compile Include="Interfaces\IConfigNode.cs" />
