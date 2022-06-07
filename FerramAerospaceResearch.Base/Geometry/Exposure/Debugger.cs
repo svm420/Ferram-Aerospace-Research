@@ -1,22 +1,25 @@
 using System;
 using System.IO;
-using System.Threading;
 using FerramAerospaceResearch.Resources;
 using JetBrains.Annotations;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Windows;
 using Object = UnityEngine.Object;
 
 namespace FerramAerospaceResearch.Geometry.Exposure;
 
 public class Debugger : IDisposable
 {
+    private RenderTexture texture;
+
     /// <summary>
     /// Texture to store the rendered result in, will be automatically created if null or resized to match the target
     /// </summary>
-    public RenderTexture texture;
+    public RenderTexture Texture
+    {
+        get { return texture; }
+        protected set { texture = value; }
+    }
 
     private RenderTexture tempPngTexture;
     private Texture2D pngTexture;
@@ -87,7 +90,7 @@ public class Debugger : IDisposable
         RenderResources.SetupTexture(ref texture, new int2(tex.width, tex.height));
         // don't really care about the overhead of copy texture as debug should not be used in regular gameplay
         // this way command buffer does not need to be reconstructed
-        Graphics.CopyTexture(tex, texture);
+        Graphics.CopyTexture(tex, Texture);
     }
 
     public void DrawTexture(float width, float height)
@@ -98,28 +101,28 @@ public class Debugger : IDisposable
         if (Event.current.type != EventType.Repaint)
             return;
 
-        Graphics.DrawTexture(texRect, texture, Material);
+        Graphics.DrawTexture(texRect, Texture, Material);
     }
 
     public void SaveToPNG([NotNull] string path, bool raw = false)
     {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
-        if (texture is null)
+        if (Texture is null)
             throw new InvalidOperationException("Cannot save null texture as PNG");
 
-        var size = new int2(texture.width, texture.height);
+        var size = new int2(Texture.width, Texture.height);
         RenderResources.SetupTexture(ref pngTexture, size);
         RenderResources.SetupTexture(ref tempPngTexture, size);
 
         if (raw)
         {
-            RenderTexture.active = texture;
+            RenderTexture.active = Texture;
         }
         else
         {
             // cannot blit to Texture2D directly...
-            Graphics.Blit(texture, tempPngTexture, Material);
+            Graphics.Blit(Texture, tempPngTexture, Material);
             RenderTexture.active = tempPngTexture;
         }
 
@@ -145,10 +148,10 @@ public class Debugger : IDisposable
     private void ReleaseUnmanagedResources()
     {
         ReleaseMaterial();
-        if (texture is not null)
+        if (Texture is not null)
         {
-            texture.Release();
-            texture = null;
+            Texture.Release();
+            Texture = null;
         }
 
         if (tempPngTexture is not null)
