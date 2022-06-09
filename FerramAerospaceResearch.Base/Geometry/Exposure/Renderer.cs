@@ -110,34 +110,46 @@ public static class Renderer
 
     public static CameraInfo ProjectToCameraRender(in float3 center, in float3 lookDir, in NativeSlice<float3> corners)
     {
-        var min = new float2(math.INFINITY);
-        var max = new float2(-math.INFINITY);
+        // first pass to compute camera position and its view matrix
         var nearFar = new float2(math.INFINITY, -math.INFINITY);
 
         float3 dir = math.normalize(lookDir);
         foreach (float3 corner in corners)
         {
             float depth = math.dot(corner, dir);
-            float2 planePos = (corner - depth * dir).xy;
-
-            min = math.min(min, planePos);
-            max = math.max(max, planePos);
-
             nearFar.x = math.min(nearFar.x, depth);
             nearFar.y = math.max(nearFar.y, depth);
         }
 
-        float3 camPos = center;
-        float centerDepth = (center - math.project(center, lookDir)).z;
+        float centerDepth = math.dot(center, dir);
         float extent = 1.1f * math.max(centerDepth - nearFar.x, nearFar.y - centerDepth);
-        camPos -= extent * lookDir;
-
-        var viewMatrix = float4x4.TRS(camPos, quaternion.LookRotation(lookDir, Vector3.up), cameraScale);
+        float3 camPos = center - extent * lookDir;
+        var viewMatrix = float4x4.TRS(camPos, quaternion.LookRotation(dir, Vector3.up), cameraScale);
         viewMatrix = math.inverse(viewMatrix);
-        float4x4 projectionMatrix =
-            GL.GetGPUProjectionMatrix(Matrix4x4.Ortho(min.x, max.x, min.y, max.y, 0.01f, 2 * extent), true);
 
-        float2 size = max - min;
+        // second pass to fit the corners into the camera view and compute the projection matrix
+        var min = new float3(math.INFINITY);
+        var max = new float3(-math.INFINITY);
+
+        foreach (float3 corner in corners)
+        {
+            float3 pos = math.transform(viewMatrix, corner);
+            min = math.min(min, pos);
+            max = math.max(max, pos);
+        }
+
+        // slightly expand the bounds so that no pixel falls on the boundary
+        max += 0.1f;
+        min -= 0.1f;
+
+        // take care of inverted depth
+        if (cameraScale.z < 0)
+            (min.z, max.z) = (-max.z, -min.z);
+
+        float4x4 projectionMatrix =
+            GL.GetGPUProjectionMatrix(Matrix4x4.Ortho(min.x, max.x, min.y, max.y, min.z, max.z), true);
+
+        float3 size = max - min;
 
         return new CameraInfo
         {
