@@ -125,7 +125,6 @@
         <Compile Include="FARConfig.cs" />
         <Compile Include="Geometry\DebugVoxel.cs" />
         <Compile Include="Geometry\DebugVoxelMesh.cs" />
-        <Compile Include="Geometry\ExposedSurfaceEvaluator.cs" />
         <Compile Include="Geometry\Exposure\CameraInfo.cs" />
         <Compile Include="Geometry\Exposure\Debugger.cs" />
         <Compile Include="Geometry\Exposure\Executor.cs" />

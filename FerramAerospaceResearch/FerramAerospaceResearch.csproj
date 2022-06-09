@@ -117,6 +117,7 @@
     <Compile Include="FARAPI.cs" />
     <Compile Include="FARDebugAndSettings.cs" />
     <Compile Include="FARFloatCurve.cs" />
+    <Compile Include="FARGUI\ExposureDebugger.cs" />
     <Compile Include="FARGUI\FAREditorGUI\DesignConcerns\AreaRulingConcern.cs" />
     <Compile Include="FARGUI\FAREditorGUI\DesignConcerns\AeroStabilityConcern.cs" />
     <Compile Include="FARGUI\FARFlightGUI\AeroVisualizationGUI.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="FARKSPAddonMainMenuSetup.cs" />
     <Compile Include="FARKSPAddonSpaceCenterScene.cs" />
     <Compile Include="FARPartExtensions.cs" />
+    <Compile Include="FARPartGeometry\BoundsRenderer.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\AirbreathingEngineCrossSectionAdjuster.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\CompoundPartGeoUpdater.cs" />
     <Compile Include="FARPartGeometry\GeometryModification\ICrossSectionAdjuster.cs" />
@@ -147,7 +149,6 @@
     <Compile Include="FARPartGeometry\PartSizePair8Bit.cs" />
     <Compile Include="FARPartGeometry\PartTint.cs" />
     <Compile Include="FARPartGeometry\PartTransformInfo.cs" />
-    <Compile Include="FARPartGeometry\ExposedSurface.cs" />
     <Compile Include="FARSettingsScenarioModule.cs" />
     <Compile Include="FARThreading\ThreadSafeDebugLogger.cs" />
     <Compile Include="FARThreading\VoxelizationThreadpool.cs" />

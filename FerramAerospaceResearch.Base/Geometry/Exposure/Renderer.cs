@@ -363,10 +363,10 @@ public class Renderer<T> : IDisposable, IReadOnlyDictionary<T, int> where T : Ob
 
     private void ReleaseUnmanagedResources()
     {
-        batchPool.Dispose();
-
         // cancel all jobs first before waiting
         CancelPendingJobs();
+
+        batchPool.Dispose();
 
         // need to wait before releasing resources
         foreach (RenderBatch job in activeBatches)
@@ -400,6 +400,11 @@ public class Renderer<T> : IDisposable, IReadOnlyDictionary<T, int> where T : Ob
             func(job, value);
         foreach (RenderBatch job in batchPool)
             func(job, value);
+    }
+
+    public Color ColorOf(T obj)
+    {
+        return ColorUintConverter.AsColor(Renderer.Encode(objects[obj]));
     }
 
     private Color GetObjColor(T obj)
