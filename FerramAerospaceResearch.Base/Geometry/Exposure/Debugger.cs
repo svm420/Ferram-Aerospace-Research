@@ -66,6 +66,7 @@ public class Debugger : IDisposable
     }
 
     private Texture2D objectColors;
+    private Color[] objectColorArray;
 
     public Texture2D ObjectColors
     {
@@ -73,7 +74,17 @@ public class Debugger : IDisposable
         set
         {
             objectColors = value;
+            objectColorArray = null;
             Material.SetTexture(ShaderPropertyIds._ColorTex, value);
+        }
+    }
+
+    public Color[] ObjectColorArray
+    {
+        get
+        {
+            objectColorArray ??= objectColors.GetPixels();
+            return objectColorArray;
         }
     }
 
