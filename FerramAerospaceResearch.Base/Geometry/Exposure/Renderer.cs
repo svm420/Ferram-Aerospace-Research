@@ -55,13 +55,10 @@ public struct PixelCountJob : IJobParallelFor
 
 public static class Renderer
 {
-    private static readonly bool supportsComputeShaders;
-    private static bool computeWarningIssued;
     private static readonly float3 cameraScale;
 
     static Renderer()
     {
-        supportsComputeShaders = SystemInfo.supportsComputeShaders;
         cameraScale = new float3(1, 1, SystemInfo.usesReversedZBuffer ? -1 : 1);
     }
 
@@ -73,20 +70,6 @@ public static class Renderer
     public static uint Encode(int index)
     {
         return (uint)(index + 1);
-    }
-
-    public static ProcessingDevice SelectActualDevice(ProcessingDevice device)
-    {
-        if (device is not ProcessingDevice.GPU || supportsComputeShaders)
-            return device;
-
-        if (!computeWarningIssued)
-            return ProcessingDevice.CPU;
-
-        FARLogger.Warning("Compute shaders are not supported on your system!");
-        computeWarningIssued = true;
-
-        return ProcessingDevice.CPU;
     }
 
     public static void TransformBoundsCorners(NativeSlice<float3> corners, in Bounds bounds, in float4x4 transform)
@@ -263,21 +246,21 @@ public class Renderer<T> : IDisposable, IReadOnlyDictionary<T, int> where T : Ob
     private bool isDirty = true;
 
     // request device to count pixels on
-    private ProcessingDevice device = ProcessingDevice.GPU;
+    private PhysicalDevice device = PhysicalDevice.GPU;
 
-    public ProcessingDevice Device
+    public PhysicalDevice Device
     {
         get { return device; }
         set
         {
             device = value;
-            ActualDevice = Renderer.SelectActualDevice(value);
+            ActualDevice = value.Select();
             ForEachJob(ActualDevice, (job, v) => job.Device = v);
         }
     }
 
     // actual device pixels are counted on
-    public ProcessingDevice ActualDevice { get; private set; }
+    public PhysicalDevice ActualDevice { get; private set; }
 
     public float AspectRatio
     {

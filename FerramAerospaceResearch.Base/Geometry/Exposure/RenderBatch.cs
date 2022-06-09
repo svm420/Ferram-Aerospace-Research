@@ -132,9 +132,9 @@ public class RenderBatch : IDisposable
         }
     }
 
-    private ProcessingDevice device = ProcessingDevice.GPU;
+    private PhysicalDevice device = PhysicalDevice.GPU;
 
-    public ProcessingDevice Device
+    public PhysicalDevice Device
     {
         get { return device; }
         set
@@ -269,14 +269,14 @@ public class RenderBatch : IDisposable
         {
             data.Resources.PrepareForNextJob(texSize: renderSize,
                                              count: renderers.Count,
-                                             compute: device is ProcessingDevice.GPU,
+                                             compute: device is PhysicalDevice.GPU,
                                              jobMaterial: Material,
                                              shader: PixelCountShader);
             AppendCommands(data.Resources, renderers);
         }
         else
         {
-            data.Resources.PrepareForNextJob(renderers.Count, device is ProcessingDevice.GPU);
+            data.Resources.PrepareForNextJob(renderers.Count, device is PhysicalDevice.GPU);
         }
 
         CameraInfo proj = Renderer.ProjectToCameraRender(center, lookDir, corners);
@@ -303,7 +303,7 @@ public class RenderBatch : IDisposable
         commandBuffer.EndSample("Exposure.Batch.Render");
 
         // also dispatch the compute shader in the same command buffer
-        if (device is ProcessingDevice.GPU)
+        if (device is PhysicalDevice.GPU)
         {
             commandBuffer.BeginSample("Exposure.Batch.Compute");
             commandBuffer.SetComputeTextureParam(data.computeShader,
@@ -342,7 +342,7 @@ public class RenderBatch : IDisposable
 
     private AsyncGPUReadbackRequest RequestReadback(in RenderResources data)
     {
-        if (device is ProcessingDevice.GPU)
+        if (device is PhysicalDevice.GPU)
         {
             NativeArray<int> pixels = data.ActualPixelCounts;
             return AsyncGPUReadback.RequestIntoNativeArray(ref pixels,

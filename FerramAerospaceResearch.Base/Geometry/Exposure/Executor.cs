@@ -20,7 +20,7 @@ public class Executor : MonoSingleton<Executor>
         public AsyncGPUReadbackRequest readbackRequest;
         public NativeSlice<uint> texture;
         public NativeSlice<int> pixelCounts;
-        public ProcessingDevice device;
+        public PhysicalDevice device;
 
         public Action<JobInfo, object> callback;
 
@@ -110,7 +110,7 @@ public class Executor : MonoSingleton<Executor>
                     }
 
                     info.readbackRequest.WaitForCompletion();
-                    if (info.device is ProcessingDevice.GPU)
+                    if (info.device is PhysicalDevice.GPU)
                     {
                         info.pixelCounts = info.readbackRequest.GetData<int>();
                         return true;

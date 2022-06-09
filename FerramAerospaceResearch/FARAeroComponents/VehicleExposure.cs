@@ -31,7 +31,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private readonly Dictionary<Part, List<Renderer>> cachedRenderers =
             new(ObjectReferenceEqualityComparer<Part>.Default);
 
-        private Device computeDevice = Device.PreferGPU;
+        private Device computeDevice = FARConfig.Exposure.Device;
 
         public Device ComputeDevice
         {
@@ -39,22 +39,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             set
             {
                 computeDevice = value;
-                switch (value)
-                {
-                    case Device.PreferGPU:
-                        exposureRenderer.Device = supportsComputeShaders ? ProcessingDevice.GPU : ProcessingDevice.CPU;
-                        break;
-                    case Device.CPU:
-                        exposureRenderer.Device = ProcessingDevice.CPU;
-                        break;
-                    case Device.GPU:
-                        exposureRenderer.Device = ProcessingDevice.GPU;
-                        break;
-                    case Device.None:
-                        return;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                computeDevice.Select((device, renderer) => renderer.Device = device, exposureRenderer);
             }
         }
 

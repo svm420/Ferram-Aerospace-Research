@@ -128,7 +128,6 @@
         <Compile Include="Geometry\Exposure\CameraInfo.cs" />
         <Compile Include="Geometry\Exposure\Debugger.cs" />
         <Compile Include="Geometry\Exposure\Executor.cs" />
-        <Compile Include="Geometry\Exposure\ProcessingDevice.cs" />
         <Compile Include="Geometry\Exposure\Renderer.cs" />
         <Compile Include="Geometry\Exposure\RenderBatch.cs" />
         <Compile Include="Geometry\Exposure\RenderRequest.cs" />
@@ -153,6 +152,7 @@
         <Compile Include="Reflection\ListValueReflection.cs" />
         <Compile Include="Reflection\NodeReflection.cs" />
         <Compile Include="Reflection\ReflectionUtils.cs" />
+        <Compile Include="Resources\Device.cs" />
         <Compile Include="Resources\FARAssetDictionary.cs" />
         <Compile Include="Resources\FARAssets.cs" />
         <Compile Include="Resources\FARComputeShaderCache.cs" />
