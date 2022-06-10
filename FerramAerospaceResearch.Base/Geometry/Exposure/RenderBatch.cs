@@ -297,7 +297,7 @@ public class RenderBatch : IDisposable
         // draw all renderers to the target
         commandBuffer.BeginSample("Exposure.Batch.Render");
         commandBuffer.SetRenderTarget(data.target);
-        commandBuffer.ClearRenderTarget(true, true, Color.clear);
+        commandBuffer.ClearRenderTarget(true, true, Color.white);
         foreach (HashSet<UnityEngine.Renderer> objectRenderers in renderers)
             foreach (UnityEngine.Renderer renderer in objectRenderers)
                 commandBuffer.DrawRenderer(renderer, data.material);

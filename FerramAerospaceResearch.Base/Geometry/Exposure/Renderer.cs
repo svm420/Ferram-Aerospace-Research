@@ -39,16 +39,15 @@ public struct PixelCountJob : IJobParallelFor
 
     public void Execute(int index)
     {
-        uint color = texture[index];
-        if (color == 0)
+        uint data = texture[index];
+        if (data >= pixels.Length)
             return;
 
-        int partIndex = Renderer.GetIndex(color);
         unsafe
         {
             // [] returns a copy so cannot use ref with it, instead access from the buffer pointer directly
             int* pixelBegin = (int*)pixels.GetUnsafePtr();
-            Interlocked.Increment(ref *(pixelBegin + partIndex));
+            Interlocked.Increment(ref *(pixelBegin + data));
         }
     }
 }
@@ -60,16 +59,6 @@ public static class Renderer
     static Renderer()
     {
         cameraScale = new float3(1, 1, SystemInfo.usesReversedZBuffer ? -1 : 1);
-    }
-
-    public static int GetIndex(uint value)
-    {
-        return (int)(value - 1);
-    }
-
-    public static uint Encode(int index)
-    {
-        return (uint)(index + 1);
     }
 
     public static void TransformBoundsCorners(NativeSlice<float3> corners, in Bounds bounds, in float4x4 transform)
@@ -388,7 +377,7 @@ public class Renderer<T> : IDisposable, IReadOnlyDictionary<T, int> where T : Ob
 
     public Color ColorOf(T obj)
     {
-        return ColorUintConverter.AsColor(Renderer.Encode(objects[obj]));
+        return ColorUintConverter.AsColor((uint)objects[obj]);
     }
 
     private Color GetObjColor(T obj)
@@ -401,8 +390,7 @@ public class Renderer<T> : IDisposable, IReadOnlyDictionary<T, int> where T : Ob
             objects.Add(obj, index);
         }
 
-        uint id = Renderer.Encode(index);
-        return ColorUintConverter.AsColor(id);
+        return ColorUintConverter.AsColor((uint)index);
     }
 
     public void CancelPendingJobs()

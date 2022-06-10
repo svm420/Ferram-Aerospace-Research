@@ -12,7 +12,7 @@ void CountPixelsMain(uint3 id : SV_DispatchThreadID)
     float4 input = InputTexture.Load(id);
     uint color = pack_uint(input);
 
-    if (color == 0) return;
+    if (!is_valid(color)) return;
     int index = get_index(color);
     InterlockedAdd(OutputBuffer[index], 1);
 }
