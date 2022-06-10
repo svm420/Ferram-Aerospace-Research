@@ -23,6 +23,8 @@ namespace FerramAerospaceResearch
 
         public static readonly VoxelizationConfig Voxelization = new();
 
+        public static readonly ExposureConfig Exposure = new();
+
         public static bool IsLoading
         {
             get { return isLoading; }

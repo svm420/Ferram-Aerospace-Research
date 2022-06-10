@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FerramAerospaceResearch.Geometry.Exposure;
+using Unity.Mathematics;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -12,6 +13,8 @@ public class ExposureDebugger : Debugger
     public RenderResult<Part> LatestResult { get; private set; }
     private static readonly GUILayoutOption[] partListOptions = { GUILayout.Height(250) };
     private static GUIStyle partLabelStyle;
+
+    public bool EnableDebugTexture { get; set; }
 
     public bool DisplayArrow
     {
@@ -38,17 +41,29 @@ public class ExposureDebugger : Debugger
         debugArrow = null;
     }
 
+    public void SetDirection(in float3 position, in float3 forward)
+    {
+        Transform tr = debugArrow.transform;
+        tr.position = position;
+        tr.forward = forward;
+    }
+
+    public void SetDirection(RenderResult result)
+    {
+        SetDirection(result.position, result.forward);
+    }
+
     protected override void OnReceiveResult(in RenderRequest request, RenderResult result, RenderTexture tex)
     {
-        base.OnReceiveResult(request, result, tex);
+        if (EnableDebugTexture)
+            base.OnReceiveResult(request, result, tex);
+
         LatestResult = result as RenderResult<Part>;
 
         if (!DisplayArrow)
             return;
 
-        Transform tr = debugArrow.transform;
-        tr.position = result.position;
-        tr.forward = result.forward;
+        SetDirection(result);
     }
 
     public void Display(float width, bool partLabels = false)

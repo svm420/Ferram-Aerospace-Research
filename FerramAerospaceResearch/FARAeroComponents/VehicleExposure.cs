@@ -13,17 +13,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
 {
     public class VehicleExposure : MonoBehaviour
     {
-        private static bool supportsComputeShaders;
-
-        public enum Device
+        public enum Direction
         {
-            PreferGPU,
-            CPU,
-            GPU,
-            None,
-        }
+            Airstream,
+            Sun,
+            Body
+        };
 
         public static readonly Device[] DeviceOptions = { Device.PreferGPU, Device.CPU, Device.GPU, Device.None };
+        public static readonly Direction[] DirectionOptions = { Direction.Airstream, Direction.Sun, Direction.Body };
 
         private readonly Renderer<Part> exposureRenderer = new();
         private BoundsRenderer boundsRenderer;
@@ -45,6 +43,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private RenderRequest airstreamRequest;
         private RenderRequest sunRequest;
+        private RenderRequest bodyRequest;
         private readonly List<RenderRequest> requests = new();
 
         private ExposureDebugger AirstreamDebugger
@@ -55,6 +54,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private ExposureDebugger SunDebugger
         {
             get { return (ExposureDebugger)sunRequest.debugger; }
+        }
+
+        private ExposureDebugger BodyDebugger
+        {
+            get { return (ExposureDebugger)bodyRequest.debugger; }
         }
 
         public Bounds VesselBounds
@@ -87,7 +91,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             set { exposureRenderer.RenderSize = value; }
         }
 
-        private Color debugBackgroundColor = Color.black;
+        private Color debugBackgroundColor = FARConfig.Exposure.DebugBackgroundColor;
 
         public Color DebugBackgroundColor
         {
@@ -97,6 +101,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 debugBackgroundColor = value;
                 airstreamRequest.debugger.BackgroundColor = value;
                 sunRequest.debugger.BackgroundColor = value;
+                bodyRequest.debugger.BackgroundColor = value;
             }
         }
 
@@ -116,15 +121,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private static readonly object[] noArgs = Array.Empty<object>();
         private static readonly GUILayoutOption[] noLayoutOptions = Array.Empty<GUILayoutOption>();
 
-        private bool displayAirstream = true;
         private bool displayArrow;
         private bool displayLabels = true;
         private bool overrideCameraShader;
         private GUIDropDown<Device> deviceSelect;
+        private GUIDropDown<Direction> directionSelect;
+        private Direction displayedDirection;
 
         private void Awake()
         {
-            supportsComputeShaders = SystemInfo.supportsComputeShaders;
             deviceSelect = new GUIDropDown<Device>(new[]
                                                    {
                                                        LocalizerExtensions.Get("FARDevicePreferGPU"),
@@ -134,8 +139,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
                                                    },
                                                    DeviceOptions,
                                                    DeviceOptions.IndexOf(ComputeDevice));
+            directionSelect = new GUIDropDown<Direction>(new[]
+                                                         {
+                                                             LocalizerExtensions
+                                                                 .Get("FARExposureDirectionAirstream"),
+                                                             LocalizerExtensions.Get("FARExposureDirectionSun"),
+                                                             LocalizerExtensions.Get("FARExposureDirectionBody"),
+                                                         },
+                                                         DirectionOptions);
 
             ComputeDevice = computeDevice;
+            exposureRenderer.RenderSize = new int2(FARConfig.Exposure.Width, FARConfig.Exposure.Height);
             exposureRenderer.Material = FARAssets.Instance.Shaders.ExposedSurface;
             exposureRenderer.RenderSize = RenderSize;
             exposureRenderer.PixelCountKernel = FARAssets.Instance.ComputeShaders.CountPixels.Kernel;
@@ -145,9 +159,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 debugger = new ExposureDebugger
                 {
-                    BackgroundColor = debugBackgroundColor,
-                    enabled = false,
                     Material = FARAssets.Instance.Shaders.ExposedSurfaceDebug,
+                    BackgroundColor = debugBackgroundColor,
+                    enabled = true,
+                    EnableDebugTexture = false,
                     ObjectColors = FARConfig.Voxelization.ColorMapTexture(),
                     ArrowColor = Color.red,
                     DisplayArrow = false
@@ -160,11 +175,28 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 debugger = new ExposureDebugger
                 {
-                    BackgroundColor = debugBackgroundColor,
-                    enabled = false,
                     Material = airstreamRequest.debugger.Material,
+                    BackgroundColor = debugBackgroundColor,
+                    enabled = true,
+                    EnableDebugTexture = false,
                     ObjectColors = airstreamRequest.debugger.ObjectColors,
                     ArrowColor = Color.yellow,
+                    DisplayArrow = false
+                },
+                result = new RenderResult<Part> { renderer = exposureRenderer },
+                userData = this
+            };
+
+            bodyRequest = new RenderRequest
+            {
+                debugger = new ExposureDebugger
+                {
+                    Material = airstreamRequest.debugger.Material,
+                    BackgroundColor = debugBackgroundColor,
+                    enabled = true,
+                    EnableDebugTexture = false,
+                    ObjectColors = airstreamRequest.debugger.ObjectColors,
+                    ArrowColor = Color.blue,
                     DisplayArrow = false
                 },
                 result = new RenderResult<Part> { renderer = exposureRenderer },
@@ -230,34 +262,56 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (FlightDriver.Pause || exposureRenderer.Count == 0 || !Enabled)
                 return;
 
+            switch (displayedDirection)
+            {
+                case Direction.Airstream:
+                    AirstreamDebugger.EnableDebugTexture = false;
+                    break;
+                case Direction.Sun:
+                    SunDebugger.EnableDebugTexture = false;
+                    break;
+                case Direction.Body:
+                    BodyDebugger.EnableDebugTexture = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
             // TODO: bounds seem off in KSP
             float4x4 vesselLocalToWorldMatrix = Vessel.transform.localToWorldMatrix;
             requests.Clear();
 
-            airstreamRequest.debugger.enabled = false;
-            sunRequest.debugger.enabled = false;
+            Transform vesselTransform = Vessel.transform;
 
-            if (InAtmosphere)
+            if (InAtmosphere && FARConfig.Exposure.Airstream)
             {
                 Vector3 forward = Vessel.velocityD.magnitude < 0.001
                                       ? Vector3.forward
-                                      : Vessel.transform.InverseTransformDirection(Vessel.srf_velocity).normalized;
+                                      : vesselTransform.InverseTransformDirection(Vessel.srf_velocity).normalized;
                 requests.Add(airstreamRequest with { lookDir = -forward });
             }
 
-            Vector3 fromSun =
-                (VesselBounds.center - Vessel.transform.InverseTransformPoint(FlightGlobals.Bodies[0].position))
-                .normalized;
-            requests.Add(sunRequest with { lookDir = fromSun });
+            if (FARConfig.Exposure.Sun)
+            {
+                Vector3 fromSun =
+                    (VesselBounds.center - vesselTransform.InverseTransformPoint(FlightGlobals.Bodies[0].position))
+                    .normalized;
+                requests.Add(sunRequest with { lookDir = fromSun });
+            }
 
-            exposureRenderer.Render(requests, vesselLocalToWorldMatrix);
+            if (FARConfig.Exposure.Body)
+            {
+                Vector3 fromBody =
+                    (VesselBounds.center - vesselTransform.InverseTransformPoint(Vessel.mainBody.position)).normalized;
+                requests.Add(bodyRequest with { lookDir = fromBody });
+            }
+
+            if (requests.Count != 0)
+                exposureRenderer.Render(requests, vesselLocalToWorldMatrix);
         }
 
         public bool Display()
         {
-            airstreamRequest.debugger.enabled = true;
-            sunRequest.debugger.enabled = true;
-
             deviceSelect.GUIDropDownDisplay(noLayoutOptions);
             ComputeDevice = deviceSelect.ActiveSelection;
 
@@ -270,18 +324,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             // TODO: background color picker
 
-            GUI.enabled = Enabled && InAtmosphere;
-            if (!InAtmosphere)
-                displayAirstream = false; // no airstream in space
-            displayAirstream = GUILayout.Toggle(displayAirstream,
-                                                displayAirstream
-                                                    ? LocalizerExtensions.Get("FARExposureAirstreamLabel")
-                                                    : LocalizerExtensions.Get("FARExposureSunLabel"));
-
-            GUI.enabled = Enabled;
             displayArrow = GUILayout.Toggle(displayArrow, LocalizerExtensions.Get("FARExposureArrowLabel"));
-            AirstreamDebugger.DisplayArrow = displayArrow && InAtmosphere;
-            SunDebugger.DisplayArrow = displayArrow;
+            AirstreamDebugger.DisplayArrow = displayArrow && InAtmosphere && FARConfig.Exposure.Airstream;
+            SunDebugger.DisplayArrow = displayArrow && FARConfig.Exposure.Sun;
+            BodyDebugger.DisplayArrow = displayArrow && FARConfig.Exposure.Body;
 
             boundsRenderer.enabled =
                 GUILayout.Toggle(boundsRenderer.enabled, LocalizerExtensions.Get("FARDrawBoundsLabel"));
@@ -300,19 +346,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     Camera.main.ResetReplacementShader();
             }
 
-            bool previous = displayLabels;
-            displayLabels = GUILayout.Toggle(displayLabels, LocalizerExtensions.Get("FARExposureShowLabelsLabel"));
-            GUI.enabled = true;
+            Direction previousDirection = directionSelect.ActiveSelection;
+            directionSelect.GUIDropDownDisplay(noLayoutOptions);
+            displayedDirection = directionSelect.ActiveSelection;
 
-            if (!Enabled)
-                return previous != displayLabels;
-
-            if (displayAirstream)
-                AirstreamDebugger.Display(250, displayLabels);
-            else
-                SunDebugger.Display(250, displayLabels);
-
-            return previous != displayLabels;
+            return displayedDirection switch
+            {
+                Direction.Airstream => DisplayRequestDebug(airstreamRequest, FARConfig.Exposure.Airstream),
+                Direction.Sun => DisplayRequestDebug(sunRequest, FARConfig.Exposure.Sun),
+                Direction.Body => DisplayRequestDebug(bodyRequest, FARConfig.Exposure.Body),
+                _ => throw new ArgumentOutOfRangeException()
+            } || previousDirection != displayedDirection;
         }
 
         private void OnDestroy()
@@ -328,6 +372,29 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             sunRequest.debugger.Dispose();
             sunRequest = default;
+
+            bodyRequest.debugger.Dispose();
+            bodyRequest = default;
+        }
+
+        private bool DisplayRequestDebug(in RenderRequest request, Observable<bool> toggle)
+        {
+            var debugger = (ExposureDebugger)request.debugger;
+            debugger.EnableDebugTexture = true;
+
+            bool enable = toggle;
+            toggle.Set(GUILayout.Toggle(toggle, LocalizerExtensions.Get("FARExposureEnableLabel")));
+
+            if (!toggle)
+                return enable;
+
+            bool previous = displayLabels;
+            displayLabels = GUILayout.Toggle(displayLabels, LocalizerExtensions.Get("FARExposureShowLabelsLabel"));
+
+            if (Enabled)
+                debugger.Display(250, displayLabels);
+
+            return previous != displayLabels || toggle != enable;
         }
     }
 }

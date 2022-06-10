@@ -114,6 +114,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Config\DebugConfig.cs" />
+        <Compile Include="Config\ExposureConfig.cs" />
         <Compile Include="Config\FlightLogConfig.cs" />
         <Compile Include="Config\GUIColors.cs" />
         <Compile Include="Config\ResourceNode.cs" />
@@ -173,6 +174,7 @@
         <Compile Include="Resources\Loading\ShaderBundleLoaderBase.cs" />
         <Compile Include="Resources\Loading\ShaderLoader.cs" />
         <Compile Include="Resources\Loading\TextureLoader.cs" />
+        <Compile Include="Resources\PhysicalDevice.cs" />
         <Compile Include="Resources\Pool.cs" />
         <Compile Include="Resources\ShaderPropertyIds.cs" />
         <Compile Include="Threading\MainThread.cs" />
