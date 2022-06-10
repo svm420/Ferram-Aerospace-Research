@@ -139,6 +139,7 @@ public static class Renderer
             forward = lookDir,
             projectedArea = (double)size.x * size.y,
             position = camPos,
+            centerDistance = extent,
             vpMatrix = math.mul(projectionMatrix, viewMatrix),
         };
     }

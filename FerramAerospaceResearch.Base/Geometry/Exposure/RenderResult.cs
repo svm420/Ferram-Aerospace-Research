@@ -12,6 +12,7 @@ public class RenderResult
 {
     public float3 position;
     public float3 forward;
+    public float centerDistance;
     public NativeSlice<int> pixelCounts;
     public readonly List<double> Areas = new();
     public double areaPerPixel;

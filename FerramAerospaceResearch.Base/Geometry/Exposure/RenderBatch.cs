@@ -284,6 +284,7 @@ public class RenderBatch : IDisposable
 
         data.result.position = proj.position;
         data.result.forward = proj.forward;
+        data.result.centerDistance = proj.centerDistance;
         data.result.areaPerPixel = proj.projectedArea / (renderSize.x * renderSize.y);
         data.result.pixelCounts = data.Resources.ActualPixelCounts;
         Profiler.EndSample();

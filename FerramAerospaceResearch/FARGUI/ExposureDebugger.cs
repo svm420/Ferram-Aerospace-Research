@@ -41,16 +41,18 @@ public class ExposureDebugger : Debugger
         debugArrow = null;
     }
 
-    public void SetDirection(in float3 position, in float3 forward)
+    public void SetArrowDirection(in float3 position, in float3 forward, float? length = null)
     {
         Transform tr = debugArrow.transform;
         tr.position = position;
         tr.forward = forward;
+        if (length is not null)
+            debugArrow.Length = length.Value;
     }
 
-    public void SetDirection(RenderResult result)
+    public void SetArrowDirection(RenderResult result)
     {
-        SetDirection(result.position, result.forward);
+        SetArrowDirection(result.position, result.forward, result.centerDistance);
     }
 
     protected override void OnReceiveResult(in RenderRequest request, RenderResult result, RenderTexture tex)
@@ -63,7 +65,7 @@ public class ExposureDebugger : Debugger
         if (!DisplayArrow)
             return;
 
-        SetDirection(result);
+        SetArrowDirection(result);
     }
 
     public void Display(float width, bool partLabels = false)
