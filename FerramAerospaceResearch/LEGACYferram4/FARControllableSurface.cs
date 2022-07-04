@@ -462,6 +462,9 @@ namespace ferram4
             movableSection = part.FindModelTransform(transformName); //And the transform
             if (movableSection is null)
             {
+                FARLogger.WarningFormat("No valid control surface model with transform name {0} found on {1}, animations disabled",
+                                        transformName,
+                                        part?.partName);
                 animated = false;
                 return;
             }
