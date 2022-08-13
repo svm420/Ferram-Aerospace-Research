@@ -42,6 +42,7 @@ Copyright 2022, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
+using System;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
@@ -418,6 +419,29 @@ namespace FerramAerospaceResearch
             }
 
             return !(vesselAeroModule is null) && vesselAeroModule.HasValidVoxelizationCurrently();
+        }
+
+        /// <summary>
+        /// Set a modifier function for part local forces in case FAR does not correctly handle them.
+        /// It will be called before applying the forces to the part/simulation.
+        /// </summary>
+        /// <param name="part">Part to apply modifier to</param>
+        /// <param name="modifier">Modifier function of part local forces.
+        /// Signature is (part, (drag, lift, torque)) -> (new_drag, new_lift, new_torque)</param>
+        public static void SetPartAeroForceModifier(Part part, Func<Part, Vector3, Vector3> modifier)
+        {
+            part.FindModuleImplementing<FARAeroPartModule>().AeroForceModifier = modifier;
+        }
+
+        /// <summary>
+        /// Get the current part local forces modifier function
+        /// </summary>
+        /// <param name="part"></param>
+        /// <returns>Modifier function of part local forces if set and the part is valid, otherwise null.
+        /// Signature is (part, (drag, lift, torque)) -> (new_drag, new_lift, new_torque)</returns>
+        public static Func<Part, Vector3, Vector3> GetPartAeroForceModifier(Part part)
+        {
+            return part.FindModuleImplementing<FARAeroPartModule>()?.AeroForceModifier;
         }
     }
 }

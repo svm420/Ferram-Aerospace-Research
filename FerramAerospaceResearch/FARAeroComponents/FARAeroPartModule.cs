@@ -115,6 +115,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private bool updateVisualization;
         public FARWingAerodynamicModel LegacyWingModel { get; private set; }
 
+        public Func<Part, Vector3, Vector3> AeroForceModifier { get; set; }
+
         public ProjectedArea ProjectedAreas
         {
             get { return projectedArea; }
@@ -270,7 +272,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private void Start()
         {
-            shield = new DummyAirstreamShield {part = part};
+            shield = new DummyAirstreamShield { part = part };
 
             if (waterSlowDragNew < 0)
             {
@@ -761,6 +763,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             LegacyWingModel = null;
             stockAeroSurfaceModule = null;
+            AeroForceModifier = null;
         }
 
         public struct ProjectedArea

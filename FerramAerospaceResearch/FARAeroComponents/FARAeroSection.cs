@@ -46,6 +46,7 @@ using System;
 using System.Collections.Generic;
 using ferram4;
 using FerramAerospaceResearch.FARPartGeometry;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
@@ -446,6 +447,24 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 else
                     torqueVector -= dampingMoment * nonAxialAngLocalVel +
                                     axialAngLocalVel * (rollDampingMoment * axialAngLocalVel.magnitude) / 0.001f;
+
+                if (aeroModule.AeroForceModifier is not null)
+                {
+                    float velLocalForceMagnitude = Vector3.Dot(forceVector, velLocalNorm);
+                    Vector3 velParallelForce = velLocalForceMagnitude * velLocalNorm; // anti-drag
+                    Vector3 velNormalForce = forceVector - velParallelForce; // lift + side force
+                    var localForce = new Vector3
+                    {
+                        x = -velLocalForceMagnitude,
+                        y = velNormalForce.magnitude,
+                        z = torqueVector.magnitude,
+                    };
+                    float3 newLocalForce = aeroModule.AeroForceModifier(aeroModule.part, localForce);
+                    float3 multiplier = newLocalForce / localForce;
+
+                    forceVector = velParallelForce * multiplier.x + velNormalForce * multiplier.y;
+                    torqueVector *= multiplier.z;
+                }
 
                 forceVector *= data.dragFactor;
                 torqueVector *= data.dragFactor;
