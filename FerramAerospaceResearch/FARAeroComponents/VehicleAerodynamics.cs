@@ -49,7 +49,6 @@ using ferram4;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARPartGeometry.GeometryModification;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.Settings;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
@@ -110,7 +109,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         public Bounds VoxelBounds
         {
-            get { return _voxel.Bounds; }
+            get { return _voxel?.Bounds ?? new Bounds(); }
         }
 
         public VehicleAerodynamics()
