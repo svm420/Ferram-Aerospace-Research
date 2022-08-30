@@ -272,13 +272,13 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (GroundStop || atmPressure.NearlyEqual(0))
+                if (GroundStop || atmPressure.NearlyEqual(0) || part.ShieldedFromAirstream)
                     return false;
                 if (DeploymentState == DeploymentStates.CUT)
                     return false;
                 if (PressureCheck)
                     return true;
-                return !PressureCheck && IsDeployed;
+                return IsDeployed;
             }
         }
 
