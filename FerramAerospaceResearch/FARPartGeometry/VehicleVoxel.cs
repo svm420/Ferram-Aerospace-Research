@@ -257,7 +257,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             //This places the center of the voxel at the center of the vehicle to achieve maximum symmetry
             LocalLowerRightCorner = center - extents;
-            Bounds = new Bounds(center, extents);
+            Bounds = new Bounds(center, 2 * extents);
 
             voxelChunks = new VoxelChunk[xLength, yLength, zLength];
 
