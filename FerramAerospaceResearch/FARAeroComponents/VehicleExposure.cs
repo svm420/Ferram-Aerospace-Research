@@ -352,12 +352,13 @@ namespace FerramAerospaceResearch.FARAeroComponents
             displayedDirection = directionSelect.ActiveSelection;
 
             return displayedDirection switch
-            {
-                Direction.Airstream => DisplayRequestDebug(airstreamRequest, FARConfig.Exposure.Airstream),
-                Direction.Sun => DisplayRequestDebug(sunRequest, FARConfig.Exposure.Sun),
-                Direction.Body => DisplayRequestDebug(bodyRequest, FARConfig.Exposure.Body),
-                _ => throw new ArgumentOutOfRangeException()
-            } || previousDirection != displayedDirection;
+                   {
+                       Direction.Airstream => DisplayRequestDebug(airstreamRequest, FARConfig.Exposure.Airstream),
+                       Direction.Sun => DisplayRequestDebug(sunRequest, FARConfig.Exposure.Sun),
+                       Direction.Body => DisplayRequestDebug(bodyRequest, FARConfig.Exposure.Body),
+                       _ => throw new ArgumentOutOfRangeException()
+                   } ||
+                   previousDirection != displayedDirection;
         }
 
         private void OnDestroy()
