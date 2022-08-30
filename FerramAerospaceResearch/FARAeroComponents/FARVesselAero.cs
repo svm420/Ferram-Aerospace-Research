@@ -295,7 +295,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             if (velocityWorldVector.NearlyEqual(lastSimResults.VelocityVector) &&
                 (FARAtmosphere.IsCustom
-                 // Custom atmospheres are not guaranteed to be independent of latitude and longitude
+                     // Custom atmospheres are not guaranteed to be independent of latitude and longitude
                      ? position.NearlyEqual(lastSimResults.Position)
                      : altitude.NearlyEqual(lastSimResults.Position.z)))
             {
@@ -308,7 +308,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             var dummy = new FARCenterQuery();
 
             //Calculate main gas properties
-            GasProperties properties = FARAtmosphere.GetGasProperties(vessel.mainBody, position, Planetarium.GetUniversalTime());
+            GasProperties properties =
+                FARAtmosphere.GetGasProperties(vessel.mainBody, position, Planetarium.GetUniversalTime());
 
             if (properties.Pressure <= 0 || properties.Temperature <= 0)
             {
@@ -523,15 +524,21 @@ namespace FerramAerospaceResearch.FARAeroComponents
             base.OnLoadVessel();
         }
 
-        public override void OnUnloadVessel()
+        private void Unsubscribe()
         {
             GameEvents.onVesselStandardModification.Remove(VesselUpdateEvent);
+        }
+
+        public override void OnUnloadVessel()
+        {
+            Unsubscribe();
 
             base.OnUnloadVessel();
         }
 
         private void OnDestroy()
         {
+            Unsubscribe();
             DisableModule();
         }
 
