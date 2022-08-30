@@ -222,7 +222,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             {
                 partInit.Invoke(part, noArgs); // make sure renderers are setup by the part
                 List<Renderer> renderers = part.FindModelRenderersCached();
-                renderers.RemoveAll(renderer => renderer.gameObject.layer != 0);
+                // for some reason the list of renderers can contain nulls on some loads
+                renderers.RemoveAll(renderer => renderer != null && renderer.gameObject.layer != 0);
                 exposureRenderer.SetupRenderers(part, renderers, part.mpb);
                 cachedRenderers.Add(part, renderers);
             }
