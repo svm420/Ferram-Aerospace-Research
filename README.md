@@ -65,6 +65,13 @@ Set all the other winglet/control surface values to zero
 
 master------------------------------------  
 
+[Experimental, WIP] Rendering based exposed surface computation approach. At the moment, has no effect on physics computations and doesn't work with OpenGL, and thus is disabled by default. Can be enabled from the debug window in flight GUI and contains settings and visualizations only. Has a low-to-moderate performance cost. Requires KSPBurst as dependency and KSP 1.12.  
+Respect shielding for chute deployment [4121b20](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/4121b2036c20cf75a4eaac781a5d33bf186f3972)  
+Unsubscribe from `onVesselStandardModification` on destruction as `OUnloadVessel` may not be called [efec236](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/efec236f46d7677a4076fbb9235f18bdae2dae01)  
+Fixed inconsistent aerodynamic forces between regular launches and reverting when using `GeometryPartModule` with non-default values [2324be4](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/2324be41cd309b4d5957eaa4dd0f52271363899d)  
+Added API function to get/set a modifier function for part local forces before applying them [476e99b](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/476e99b84a5bea015de9a71555988234d81dff85)  
+Fixed rare NRE in `FARControllableSurface.get_MovableSection` when no control surface transforms where found [#136](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/136). In addition, control surface animations will be disabled for such parts.  
+Zero PID error integral if there is any roll input, thanks [@tanihwa](https://github.com/tanihwa) [#134](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/134)  
 Find latest binaries in [GitHub Actions](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml)  
 NRE fixes, thanks [@BrettRyland](https://github.com/BrettRyland) [#133](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/133)  
 
