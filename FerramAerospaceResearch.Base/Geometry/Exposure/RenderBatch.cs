@@ -195,7 +195,7 @@ public class RenderBatch : IDisposable
         isDirty = true;
     }
 
-    public unsafe void Execute<T>(
+    public unsafe bool Execute<T>(
         List<HashSet<UnityEngine.Renderer>> renderers,
         T requests,
         in Bounds bounds,
@@ -204,6 +204,7 @@ public class RenderBatch : IDisposable
         object callbackData = null
     ) where T : IReadOnlyList<RenderRequest>
     {
+        bool success = true;
         Profiler.BeginSample("Exposure.Batch.Execute");
         FARLogger.Assert(IsDone, "Cannot request a new job while the old is not done yet!");
 
@@ -235,7 +236,7 @@ public class RenderBatch : IDisposable
             data.request = requests[i];
             data.result = data.request.result ?? data.DefaultResult;
             float3 lookDir = math.rotate(transform, data.request.lookDir);
-            CreateJob(ref data, renderers, center, lookDir, corners);
+            success &= CreateJob(ref data, renderers, center, lookDir, corners);
         }
 
         isDirty = false;
@@ -254,9 +255,11 @@ public class RenderBatch : IDisposable
         Profiler.EndSample();
 
         Profiler.EndSample();
+
+        return success;
     }
 
-    private void CreateJob(
+    private bool CreateJob(
         ref JobData data,
         List<HashSet<UnityEngine.Renderer>> renderers,
         in float3 center,
@@ -264,6 +267,7 @@ public class RenderBatch : IDisposable
         in NativeSlice<float3> corners
     )
     {
+        bool success = true;
         Profiler.BeginSample("Exposure.Batch.CreateJob");
         if (isDirty)
         {
@@ -272,7 +276,7 @@ public class RenderBatch : IDisposable
                                              compute: device is PhysicalDevice.GPU,
                                              jobMaterial: Material,
                                              shader: PixelCountShader);
-            AppendCommands(data.Resources, renderers);
+            success = AppendCommands(data.Resources, renderers);
         }
         else
         {
@@ -288,19 +292,38 @@ public class RenderBatch : IDisposable
         data.result.areaPerPixel = proj.projectedArea / (renderSize.x * renderSize.y);
         data.result.pixelCounts = data.Resources.ActualPixelCounts;
         Profiler.EndSample();
+
+        return success;
     }
 
-    private void AppendCommands(in RenderResources data, List<HashSet<UnityEngine.Renderer>> renderers)
+    private bool AppendCommands(in RenderResources data, List<HashSet<UnityEngine.Renderer>> renderers)
     {
+        bool success = true;
         Profiler.BeginSample("Exposure.Batch.AppendCommands");
 
         // draw all renderers to the target
         commandBuffer.BeginSample("Exposure.Batch.Render");
         commandBuffer.SetRenderTarget(data.target);
         commandBuffer.ClearRenderTarget(true, true, Color.white);
+        int i = -1;
         foreach (HashSet<UnityEngine.Renderer> objectRenderers in renderers)
+        {
+            ++i;
+            int j = -1;
             foreach (UnityEngine.Renderer renderer in objectRenderers)
+            {
+                ++j;
+                if (renderer == null)
+                {
+                    FARLogger.Warning($"Renderer {renderer} at ({i}, {j}) is null!");
+                    success = false;
+                    continue;
+                }
+
                 commandBuffer.DrawRenderer(renderer, data.material);
+            }
+        }
+
         commandBuffer.EndSample("Exposure.Batch.Render");
 
         // also dispatch the compute shader in the same command buffer
@@ -324,6 +347,8 @@ public class RenderBatch : IDisposable
         }
 
         Profiler.EndSample();
+
+        return success;
     }
 
     private void Submit(JobData data)

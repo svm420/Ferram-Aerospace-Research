@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using FerramAerospaceResearch.Resources;
 using Unity.Burst;
@@ -452,8 +453,30 @@ public class Renderer<T> : IDisposable, IReadOnlyDictionary<T, int> where T : Ob
         }
 
         RenderBatch batch = batchPool.Acquire();
-        batch.Execute(renderers, requests, Bounds, transform, onRenderBatchCompletedAction, this);
+        if (!batch.Execute(renderers, requests, Bounds, transform, onRenderBatchCompletedAction, this))
+        {
+            StringBuilder sb =
+                BuildRendererMessage("There were errors in setting up exposure computations, renderers in use:");
+
+            FARLogger.Warning(sb.ToString());
+        }
+
         activeBatches.Add(batch);
+    }
+
+    public StringBuilder BuildRendererMessage(string message, StringBuilder sb = null)
+    {
+        sb ??= new StringBuilder(1024);
+        if (!string.IsNullOrEmpty(message))
+            sb.AppendLine(message);
+        for (int i = 0; i < renderers.Count; ++i)
+            sb.Append(i).Append(": ").AppendLine(string.Join(", ", renderers[i]));
+
+        sb.AppendLine("With objects:");
+        foreach (KeyValuePair<T, int> pair in objects)
+            sb.Append(pair.Value).Append(": ").AppendLine(pair.Key.ToString());
+
+        return sb;
     }
 
     // convert only once to avoid GC allocations
