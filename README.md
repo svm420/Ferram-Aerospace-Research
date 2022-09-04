@@ -1,4 +1,4 @@
-# Ferram Aerospace Research Continued v0.16.0.5 "Mader"
+# Ferram Aerospace Research Continued v0.16.1.0 "Marangoni"
 
 [![Build](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml/badge.svg?branch=master)](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml)  
 
@@ -63,7 +63,7 @@ Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
 
-master------------------------------------  
+0.16.1.0V "Marangoni"------------------------------------  
 
 [Experimental, WIP] Rendering based exposed surface computation approach. At the moment, has no effect on physics computations and doesn't work with OpenGL, and thus is disabled by default. Can be enabled from the debug window in flight GUI and contains settings and visualizations only. Has a low-to-moderate performance cost. Requires KSPBurst as dependency and KSP 1.12.  
 Respect shielding for chute deployment [4121b20](https://github.com/dkavolis/Ferram-Aerospace-Research/commit/4121b2036c20cf75a4eaac781a5d33bf186f3972)  
