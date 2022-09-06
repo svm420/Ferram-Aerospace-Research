@@ -57,7 +57,6 @@ using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
 {
-    [Serializable]
     internal struct GeometryPartModuleConfig
     {
         public bool forceUseColliders;
@@ -112,7 +111,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private int _sendUpdateTick;
         private int _meshesToUpdate = -1;
 
-        [SerializeField] private GeometryPartModuleConfig config = new();
+        private GeometryPartModuleConfig config = new();
 
         public bool HasCrossSectionAdjusters
         {
@@ -215,6 +214,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
         private void Start()
         {
             destroyed = false;
+
+            GeometryPartModule modulePrefab = part.partInfo.partPrefab.FindModuleImplementing<GeometryPartModule>();
+            if (modulePrefab is not null)
+                config = modulePrefab.config;
 
             //RebuildAllMeshData();
             SetupIGeometryUpdaters();
@@ -1046,16 +1049,9 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             base.OnLoad(node);
 
+            // Flight passes node from the craft config which is empty, using the loaded prefab instead
             if (HighLogic.LoadedSceneIsFlight)
-            {
-                // Flight passes node from the craft config which is empty, use the loaded prefab instead
-                GeometryPartModule modulePrefab = part.partInfo.partPrefab.FindModuleImplementing<GeometryPartModule>();
-                if (modulePrefab is not null)
-                {
-                    config = modulePrefab.config;
-                    return;
-                }
-            }
+                return;
 
             LoadBool(node, "forceUseColliders", ref config.forceUseColliders);
             LoadBool(node, "forceUseMeshes", ref config.forceUseMeshes);
