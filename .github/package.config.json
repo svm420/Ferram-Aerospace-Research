@@ -13,5 +13,18 @@
                 ]
             }
         ]
+    },
+    "replace": {
+        "regex": [
+            {
+                "pattern": "$(ModName).Base/Version.cs",
+                "substitutions": [
+                    {
+                        "search": "GitSha = null",
+                        "replace": "GitSha = \"$(env:GITHUB_SHA)\""
+                    }
+                ]
+            }
+        ]
     }
 }

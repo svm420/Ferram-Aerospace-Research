@@ -83,6 +83,10 @@ namespace FerramAerospaceResearch
 
         private IEnumerator DoLoad(Action callback)
         {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse, updated from CI
+            if (Version.GitSha != null)
+                FARLogger.Info($"FerramAerospaceResearch CI build from commit {Version.GitSha}");
+
             // offload to another thread and wait for it to complete
             Task task = Task.Factory.StartNew(InitTask);
             yield return new WaitUntil(() => task.IsCompleted);

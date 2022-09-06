@@ -51,6 +51,7 @@ jobs:
         run: |
           cp "${{ github.workspace }}/.github/package.build.props" "${{ github.workspace }}/Directory.Build.props.user"
           cp "${{ github.workspace }}/.github/package.config.json" "${{ github.workspace }}/config.json.user"
+          python -m buildtools replace
           msbuild /p:Configuration=Release ${{ github.workspace }}/FerramAerospaceResearch.sln -m
 
       - name: Package
@@ -61,5 +62,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: FerramAerospaceResearch-${{ github.sha }}
+          name: FerramAerospaceResearch
           path: ${{ steps.package-mod.outputs.archive }}

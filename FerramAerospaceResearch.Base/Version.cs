@@ -18,5 +18,10 @@ namespace FerramAerospaceResearch
         /// String of the numerical version with name
         /// </summary>
         public static readonly string LongString = $"{ShortString} '{Name}'";
+
+        /// <summary>
+        /// String of the build commit in CI
+        /// </summary>
+        public const string GitSha = null;
     }
 }
