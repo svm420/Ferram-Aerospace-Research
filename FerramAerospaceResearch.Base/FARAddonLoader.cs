@@ -83,9 +83,11 @@ namespace FerramAerospaceResearch
 
         private IEnumerator DoLoad(Action callback)
         {
+#pragma warning disable CS0162
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse, updated from CI
             if (Version.GitSha != null)
                 FARLogger.Info($"FerramAerospaceResearch CI build from commit {Version.GitSha}");
+#pragma warning restore CS0162
 
             // offload to another thread and wait for it to complete
             Task task = Task.Factory.StartNew(InitTask);
