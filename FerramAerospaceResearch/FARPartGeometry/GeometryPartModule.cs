@@ -215,10 +215,6 @@ namespace FerramAerospaceResearch.FARPartGeometry
         {
             destroyed = false;
 
-            GeometryPartModule modulePrefab = part.partInfo.partPrefab.FindModuleImplementing<GeometryPartModule>();
-            if (modulePrefab is not null)
-                config = modulePrefab.config;
-
             //RebuildAllMeshData();
             SetupIGeometryUpdaters();
             SetupICrossSectionAdjusters();
@@ -243,6 +239,10 @@ namespace FerramAerospaceResearch.FARPartGeometry
             _sceneSetup = true; //this exists only to ensure that OnStart has occurred first
             if (ignoreLayer0 < 0)
                 ignoreLayer0 = LayerMask.NameToLayer("TransparentFX");
+
+            GeometryPartModule modulePrefab = part.partInfo.partPrefab.FindModuleImplementing<GeometryPartModule>();
+            if (modulePrefab is not null)
+                config = modulePrefab.config;
 
             if (part.collider == null &&
                 !part.Modules.Contains<ModuleWheelBase>() &&
