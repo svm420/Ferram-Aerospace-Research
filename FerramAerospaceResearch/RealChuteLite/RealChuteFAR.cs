@@ -164,6 +164,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         private DeploymentStates state = DeploymentStates.NONE;
         private SafeState safeState = SafeState.SAFE;
         private float massDelta;
+        private bool shieldedCanDeploy;
 
         //GUI
         private bool visible, hid;
@@ -272,7 +273,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (GroundStop || atmPressure.NearlyEqual(0) || part.ShieldedFromAirstream)
+                if (GroundStop || atmPressure.NearlyEqual(0) || !(shieldedCanDeploy || !part.ShieldedFromAirstream))
                     return false;
                 if (DeploymentState == DeploymentStates.CUT)
                     return false;
@@ -1260,12 +1261,13 @@ namespace FerramAerospaceResearch.RealChuteLite
             {
                 if (deployAltitude <= 500)
                     deployAltitude += 200;
+                node.TryGetValue("shieldedCanDeploy", ref shieldedCanDeploy);
+                return;
             }
-            else
-            {
-                Part prefab = part.partInfo.partPrefab;
-                massDelta = prefab == null ? 0 : TotalMass - prefab.mass;
-            }
+
+            Part prefab = part.partInfo.partPrefab;
+            massDelta = prefab == null ? 0 : TotalMass - prefab.mass;
+            shieldedCanDeploy = prefab.FindModuleImplementing<RealChuteFAR>().shieldedCanDeploy;
         }
 
         public override void OnActive()
