@@ -122,6 +122,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 part.dragVectorSqrMag = part.dragVector.sqrMagnitude;
                 if (part.dragVectorSqrMag.NearlyEqual(0) || part.ShieldedFromAirstream)
                 {
+                    part.submergedDynamicPressurekPa = 0;
+                    part.dynamicPressurekPa = 0;
                     part.dragVectorMag = 0f;
                     part.dragVectorDir = Vector3.zero;
                     part.dragVectorDirLocal = Vector3.zero;
