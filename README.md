@@ -1,4 +1,4 @@
-# Ferram Aerospace Research Continued v0.16.1.1 "Marangoni"
+# Ferram Aerospace Research Continued v0.16.1.2 "Marangoni"
 
 [![Build](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml/badge.svg?branch=master)](https://github.com/dkavolis/Ferram-Aerospace-Research/actions/workflows/package.yml)  
 Download latest build [here](https://nightly.link/dkavolis/Ferram-Aerospace-Research/workflows/package/master/FerramAerospaceResearch.zip)  
@@ -63,6 +63,10 @@ For control surfaces, use above but replace `FARWingAerodynamicModel` with `FARC
 Set all the other winglet/control surface values to zero
 
 ## CHANGELOG
+
+0.16.1.2V "Marangoni"------------------------------------  
+
+Fixed `submergedDynamicPressurekPa` and `dynamicPressurekPa` not getting set to 0 when part becomes shielded, thanks [@siimav](https://github.com/siimav) [#145](https://github.com/dkavolis/Ferram-Aerospace-Research/pull/145)  
 
 0.16.1.1V "Marangoni"------------------------------------  
 

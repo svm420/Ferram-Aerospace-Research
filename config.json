@@ -13,7 +13,7 @@
         "VersionMajor": 0,
         "VersionMinor": 16,
         "VersionBuild": 1,
-        "VersionRevision": 1,
+        "VersionRevision": 2,
         "VersionName": "Marangoni",
         "Year": 2022,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
