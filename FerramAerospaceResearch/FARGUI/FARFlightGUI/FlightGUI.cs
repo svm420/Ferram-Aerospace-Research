@@ -149,6 +149,8 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             GameEvents.onHideUI.Add(HideUI);
         }
 
+        public override Activation GetActivation() => Activation.FlightScene | Activation.LoadedVessels;
+
         private void OnDestroy()
         {
             FlightGUIDrawer.SetGUIActive(this, false);
