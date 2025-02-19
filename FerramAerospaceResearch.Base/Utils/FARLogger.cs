@@ -35,6 +35,12 @@ namespace FerramAerospaceResearch
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Log(LogLevel level, object message)
+        {
+            LogHandler.Log(level, Tag, message);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Info(object message)
         {
             LogHandler.LogInfo(Tag, message);
@@ -89,6 +95,12 @@ namespace FerramAerospaceResearch
         public static void Exception(Exception exception, object message = null)
         {
             LogHandler.LogException(exception, Tag, message ?? DefaultExceptionMessage);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void LogFormat(LogLevel level, string format, params object[] args)
+        {
+            LogHandler.LogFormat(level, Tag, format, args);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

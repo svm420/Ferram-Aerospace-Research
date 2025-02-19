@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -50,6 +50,7 @@ using System.Threading;
 using ferram4;
 using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.Geometry;
+using KSPCommunityFixes;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARPartGeometry
@@ -91,6 +92,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
         public double ElementSize { get; private set; }
 
         public Vector3d LocalLowerRightCorner { get; private set; }
+        public Bounds Bounds { get; private set; }
 
         public VoxelCrossSection[] EmptyCrossSectionArray
         {
@@ -140,7 +142,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 MAX_CHUNKS_IN_QUEUE = chunksForQueue;
                 MAX_CHUNKS_ALLOWED = (int)Math.Ceiling(1.5 * MAX_CHUNKS_IN_QUEUE);
 
-                FARLogger.Info("" + MAX_CHUNKS_IN_QUEUE + " " + MAX_CHUNKS_ALLOWED);
+                ThreadSafeDebugLogger.Info("" + MAX_CHUNKS_IN_QUEUE + " " + MAX_CHUNKS_ALLOWED);
                 for (int i = 0; i < MAX_CHUNKS_IN_QUEUE; i++)
                     clearedChunks.Push(new VoxelChunk(0, Vector3.zero, 0, 0, 0, null, useHigherResVoxels));
 
@@ -215,7 +217,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (double.IsInfinity(Volume)) //...if something broke, get out of here
             {
-                FARLogger.Error("Voxel Volume was infinity; ending voxelization");
+                ThreadSafeDebugLogger.Error("Voxel Volume was infinity; ending voxelization");
                 return;
             }
 
@@ -233,7 +235,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             {
                 while (chunksInUse >= MAX_CHUNKS_ALLOWED)
                 {
-                    ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel waiting for chunks to be released");
+                    ThreadSafeDebugLogger.Info("Voxel waiting for chunks to be released");
                     Monitor.Wait(clearedChunks);
                 }
 
@@ -256,6 +258,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             //This places the center of the voxel at the center of the vehicle to achieve maximum symmetry
             LocalLowerRightCorner = center - extents;
+            Bounds = new Bounds(center, 2 * extents);
 
             voxelChunks = new VoxelChunk[xLength, yLength, zLength];
 
@@ -265,7 +268,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
         }
 
@@ -278,13 +281,13 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
             if (g.HasCrossSectionAdjusters && g.MaxCrossSectionAdjusterArea > 0)
                 return int.MaxValue;
-            if (modules.Contains("ProceduralFairingSide") || modules.Contains<ModuleProceduralFairing>())
+            if (modules.Contains("ProceduralFairingSide") || g.part.HasModuleImplementingFast<ModuleProceduralFairing>())
                 return 3;
             if (modules.Contains("ProceduralFairingBase"))
                 return 2;
-            if (modules.Contains<FARControllableSurface>() ||
-                modules.Contains<ModuleRCS>() ||
-                modules.Contains<ModuleEngines>())
+            if (g.part.HasModuleImplementingFast<FARControllableSurface>() ||
+                g.part.HasModuleImplementingFast<ModuleRCS>() ||
+                g.part.HasModuleImplementingFast<ModuleEngines>())
                 return 1;
 
             return -1;
@@ -295,7 +298,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             threadsQueued = Environment.ProcessorCount - 1;
 
             if (!multiThreaded)
-                //Go through it backwards; this ensures that children (and so interior to cargo bay parts) are handled first
+            //Go through it backwards; this ensures that children (and so interior to cargo bay parts) are handled first
             {
                 foreach (GeometryPartModule m in geoModules)
                 {
@@ -431,7 +434,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //account for different angles effects on voxel cube's projected area
                 elementArea *= angleSizeIncreaseFactor;
 
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel Element CrossSection Area: " + elementArea);
+                ThreadSafeDebugLogger.Info("Voxel Element CrossSection Area: " + elementArea);
 
                 double invMag = 1 / Math.Sqrt(x * x + y * y + z * z);
 
@@ -675,8 +678,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
-                                                                       m);
+                        ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: areacount is NaN at section " + m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -693,7 +695,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //account for different angles effects on voxel cube's projected area
                 elementArea *= angleSizeIncreaseFactor;
 
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel Element CrossSection Area: " + elementArea);
+                ThreadSafeDebugLogger.Info("Voxel Element CrossSection Area: " + elementArea);
 
                 double invMag = 1 / Math.Sqrt(x * x + y * y + z * z);
 
@@ -931,8 +933,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
-                                                                       m);
+                        ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: areacount is NaN at section " + m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -950,7 +951,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 //account for different angles effects on voxel cube's projected area
                 elementArea *= angleSizeIncreaseFactor;
 
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Voxel Element CrossSection Area: " + elementArea);
+                ThreadSafeDebugLogger.Info("Voxel Element CrossSection Area: " + elementArea);
 
                 double invMag = 1 / Math.Sqrt(x * x + y * y + z * z);
 
@@ -1193,8 +1194,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     crossSections[m].centroid = centroid * ElementSize + LocalLowerRightCorner;
 
                     if (double.IsNaN(areaCount))
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("FAR VOXEL ERROR: areacount is NaN at section " +
-                                                                       m);
+                        ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: areacount is NaN at section " + m);
 
                     crossSections[m].area = areaCount * elementArea;
                     crossSections[m].flatnessRatio = flatnessRatio;
@@ -1357,6 +1357,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                 return;
             VoxelizationThreadpool.Instance.RunOnMainThread(() =>
             {
+                if (voxelMesh == null) { FARLogger.Debug($"Visual voxel has disappeared!"); return; }
                 FARLogger.Debug("Clearing visual voxels");
                 voxelMesh.gameObject.SetActive(false);
                 voxelMesh.Clear();
@@ -1668,7 +1669,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
             finally
             {
@@ -2267,7 +2268,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
             finally
             {
@@ -2310,7 +2311,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
             }
             catch (Exception e)
             {
-                ThreadSafeDebugLogger.Instance.RegisterException(e);
+                ThreadSafeDebugLogger.Exception(e);
             }
             finally
             {
@@ -2357,7 +2358,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     {
                         if (p is null)
                             continue;
-                        pt = new SweepPlanePoint(p, i, k) {jLastInactive = j};
+                        pt = new SweepPlanePoint(p, i, k) { jLastInactive = j };
                         sweepPlane[i, k] = pt;
                     }
                     else

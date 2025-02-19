@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Daumantas Kavolis, aka dkavolis
+Copyright 2022, Daumantas Kavolis, aka dkavolis
 
    This file is part of Ferram Aerospace Research.
 
@@ -251,7 +251,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                 replacements[VesselNameKey] = Localizer.Format(Vessel.vesselName);
             replacements[DatetimeKey] = DateTime.Now.ToString(FARConfig.FlightLog.DatetimeFormat);
             string filename = Path.Combine(FARConfig.FlightLog.Directory,
-                                           FARConfig.FlightLog.NameFormat.ToString(replacements));
+                                           KSPUtil.SanitizeFilename(FARConfig.FlightLog.NameFormat.ToString(replacements)));
 
             return filename;
         }

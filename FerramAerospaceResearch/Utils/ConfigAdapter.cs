@@ -75,7 +75,7 @@ namespace FerramAerospaceResearch
             return new LoadGuard(op);
         }
 
-        private static readonly Dictionary<string, string> lastConfigs = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> lastConfigs = new();
         public int Priority { get; set; } = 999;
 
         public void DoReload()
@@ -106,53 +106,106 @@ namespace FerramAerospaceResearch
                 FARLogger.Exception(task.Exception, "Exception while setting up config");
         }
 
+        public static void Load<T>(NodeReflection reflection, ref T instance, ConfigNode node = null)
+        {
+            object instanceRef = instance;
+
+            if (node is null)
+            {
+                ConfigNode[] nodes = GameDatabase.Instance.GetConfigNodes(reflection.Id);
+
+                if (reflection.AllowMultiple)
+                {
+                    node = new ConfigNode();
+                    foreach (ConfigNode configNode in nodes)
+                        node.AddNode(configNode);
+                }
+                else
+                {
+                    switch (nodes.Length)
+                    {
+                        case 0:
+                            FARLogger.Warning($"Could not find config nodes {reflection.Id}");
+                            return;
+                        case > 1:
+                            FARLogger.Warning($"Found {nodes.Length} {reflection.Id} nodes");
+                            break;
+                    }
+
+                    node = nodes[nodes.Length - 1];
+                }
+            }
+
+            LoadVisitor loader = new() { Node = node };
+            int errors = reflection.Load(loader, ref instanceRef);
+
+            if (errors > 0)
+                FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), reflection.Id);
+        }
+
+        public static void Load<T>(ref T instance, ConfigNode node = null)
+        {
+            var reflection = NodeReflection.GetReflection(instance?.GetType() ?? typeof(T));
+            Load(reflection, ref instance, node);
+        }
+
+        public static T Load<T>(ConfigNode node)
+        {
+            var instance = (T)ReflectionUtils.CreateInstance(typeof(T));
+            Load(ref instance, node);
+            return instance;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="node"></param>
+        /// <param name="asPatch">if true, save all values as MM patch, otherwise as KSP config</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static ConfigNode Save<T>(T instance, ConfigNode node = null, bool asPatch = false)
+        {
+            node ??= new ConfigNode();
+            var reflection = NodeReflection.GetReflection(instance?.GetType() ?? typeof(T));
+            SaveVisitor visitor = new()
+            {
+                IsPatch = asPatch,
+                Node = node
+            };
+            reflection.Save(visitor, instance);
+            return node;
+        }
+
+        public static ConfigNode Save<T>(ConfigNode node = null, bool asPatch = false)
+        {
+            var instance = (T)ReflectionUtils.FindInstance(typeof(T));
+            return Save(instance, node, asPatch);
+        }
+
+        public enum SaveType
+        {
+            Patch,
+            Cache,
+            KSPConfig,
+        }
+
         private static void LoadConfigs()
         {
             // clear config cache so it can be rebuilt
             lastConfigs.Clear();
 
-            var load = new LoadVisitor();
             foreach (KeyValuePair<string, ReflectedConfig> pair in ConfigReflection.Instance.Configs)
             {
-                ConfigNode[] nodes = GameDatabase.Instance.GetConfigNodes(pair.Key);
-                if (pair.Value.Reflection.AllowMultiple)
-                {
-                    var root = new ConfigNode();
-                    foreach (ConfigNode configNode in nodes)
-                        root.AddNode(configNode);
-
-                    load.Node = root;
-                    object instance = pair.Value.Instance;
-                    int errors = pair.Value.Reflection.Load(load, ref instance);
-
-                    if (errors > 0)
-                        FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), pair.Key);
-                }
-                else
-                {
-                    if (nodes.Length == 0)
-                    {
-                        FARLogger.Warning($"Could not find config nodes {pair.Key}");
-                        continue;
-                    }
-
-                    if (nodes.Length > 1)
-                        FARLogger.Warning($"Found {nodes.Length.ToString()} {pair.Key} nodes");
-
-                    foreach (ConfigNode node in nodes)
-                    {
-                        load.Node = node;
-                        object instance = pair.Value.Instance;
-                        int errors = pair.Value.Reflection.Load(load, ref instance);
-
-                        if (errors > 0)
-                            FARLogger.ErrorFormat("{0} errors while loading {1}", errors.ToString(), node.name);
-                    }
-                }
+                object instance = pair.Value.Instance;
+                Load(pair.Value.Reflection, ref instance);
             }
 
             using LoadGuard guard = Guard(Operation.Saving);
-            SaveConfigs("Custom", true, ".cfg.far", FARConfig.Debug.DumpOnLoad);
+            SaveType saveType = SaveType.Cache;
+            if (FARConfig.Debug.DumpOnLoad)
+                saveType = SaveType.Patch;
+            SaveConfigs("Custom", saveType, ".cfg.far");
         }
 
         public static IEnumerator SaveAll()
@@ -180,15 +233,14 @@ namespace FerramAerospaceResearch
 
         private static void SaveConfigs(
             string prefix,
-            bool isPatch = true,
-            string extension = ".cfg",
-            bool force = false
+            SaveType saveType = SaveType.Patch,
+            string extension = ".cfg"
         )
         {
             var node = new ConfigNode();
             var save = new SaveVisitor
             {
-                IsPatch = isPatch,
+                IsPatch = saveType is SaveType.Patch or SaveType.Cache,
                 Node = node
             };
             foreach (KeyValuePair<string, ReflectedConfig> pair in ConfigReflection.Instance.Configs)
@@ -205,7 +257,7 @@ namespace FerramAerospaceResearch
 
                 if (!pair.Value.Reflection.AllowMultiple)
                 {
-                    Serialization.MakeTopNode(node, pair.Key, null, isPatch);
+                    Serialization.MakeTopNode(node, pair.Key, null, save.IsPatch);
                 }
 
                 string nodeStr = node.ToString();
@@ -216,7 +268,8 @@ namespace FerramAerospaceResearch
                     lastConfigs.Add(pair.Key, nodeStr);
 
                 // only write if requested or if the node has been modified, first time oldStr should be null so can be skipped
-                if (force || (!string.IsNullOrEmpty(oldStr) && nodeStr != oldStr))
+                // cached configs do not need to be written to file
+                if (saveType is not SaveType.Cache && !string.IsNullOrEmpty(oldStr) && nodeStr != oldStr)
                 {
                     FARLogger.DebugFormat("Saving {0} config to {1}:\n{2}\n\n{3}", pair.Key, path, oldStr, nodeStr);
                     System.IO.File.WriteAllText(path, nodeStr);
@@ -374,7 +427,7 @@ namespace FerramAerospaceResearch
                                   : Node.GetNode(reflection.Id, "name", reflection.Name);
             if (node != null)
             {
-                var load = new LoadVisitor {Node = node};
+                var load = new LoadVisitor { Node = node };
                 int errors = reflection.Load(load, ref nodeObject);
 
                 if (errors > 0)

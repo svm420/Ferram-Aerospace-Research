@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -110,7 +110,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
 
                 float tmpTestVert = vert.x + vert.y + vert.z;
                 if (float.IsNaN(tmpTestVert) || float.IsInfinity(tmpTestVert))
-                    ThreadSafeDebugLogger.Instance.RegisterMessage("Mesh error in " + module.part.partInfo.title);
+                    ThreadSafeDebugLogger.Error("Mesh error in " + module.part.partInfo.title);
                 vertices[i] = vert;
             }
 
@@ -127,7 +127,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                                   bounds.extents.z;
             if (float.IsNaN(tmpTestBounds) || float.IsInfinity(tmpTestBounds))
             {
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Bounds error in " + module.part.partInfo.title);
+                ThreadSafeDebugLogger.Error("Bounds error in " + module.part.partInfo.title);
                 valid = false;
             }
             else
@@ -178,8 +178,7 @@ namespace FerramAerospaceResearch.FARPartGeometry
                     float tmpTestVert = vert.x + vert.y + vert.z;
                     if (float.IsNaN(tmpTestVert) || float.IsInfinity(tmpTestVert))
                     {
-                        ThreadSafeDebugLogger.Instance.RegisterMessage("Transform error in " +
-                                                                       module.part.partInfo.title);
+                        ThreadSafeDebugLogger.Error("Transform error in " + module.part.partInfo.title);
                         valid = false;
                     }
                     else

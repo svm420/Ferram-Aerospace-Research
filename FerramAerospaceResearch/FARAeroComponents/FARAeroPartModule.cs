@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -51,6 +51,7 @@ using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.RealChuteLite;
 using FerramAerospaceResearch.Settings;
 using KSP.Localization;
+using KSPCommunityFixes;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
@@ -114,6 +115,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private ModuleLiftingSurface stockAeroSurfaceModule;
         private bool updateVisualization;
         public FARWingAerodynamicModel LegacyWingModel { get; private set; }
+
+        public Func<Part, Vector3, Vector3> AeroForceModifier { get; set; }
 
         public ProjectedArea ProjectedAreas
         {
@@ -236,8 +239,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
             double areaForStress = projectedArea.totalArea / 6;
             if (!FARDebugValues.allowStructuralFailures ||
                 areaForStress <= 0.1 ||
-                part.Modules.Contains<RealChuteFAR>() ||
-                part.Modules.Contains<ModuleAblator>())
+                part.HasModuleImplementingFast<RealChuteFAR>() ||
+                part.HasModuleImplementingFast<ModuleAblator>())
             {
                 partForceMaxY = double.MaxValue;
                 partForceMaxXZ = double.MaxValue;
@@ -270,7 +273,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private void Start()
         {
-            shield = new DummyAirstreamShield {part = part};
+            shield = new DummyAirstreamShield { part = part };
 
             if (waterSlowDragNew < 0)
             {
@@ -301,17 +304,15 @@ namespace FerramAerospaceResearch.FARAeroComponents
             partTransform = part.partTransform;
 
             materialColorUpdater = new MaterialColorUpdater(partTransform, PhysicsGlobals.TemperaturePropertyID);
-            if (part.Modules.Contains<FARWingAerodynamicModel>())
-                LegacyWingModel = part.Modules.GetModule<FARWingAerodynamicModel>();
-            else if (part.Modules.Contains<FARControllableSurface>())
-                LegacyWingModel = part.Modules.GetModule<FARControllableSurface>();
+            if (part.FindModuleImplementingFast<FARWingAerodynamicModel>() is FARWingAerodynamicModel pm)
+                LegacyWingModel = pm;
+            else if (part.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface pm2)
+                LegacyWingModel = pm2;
             else
                 LegacyWingModel = null;
 
             // For handling airbrakes aero visualization
-            stockAeroSurfaceModule = part.Modules.Contains<ModuleAeroSurface>()
-                                         ? part.Modules.GetModule<ModuleAeroSurface>()
-                                         : null;
+            stockAeroSurfaceModule = part.FindModuleImplementingFast<ModuleAeroSurface>();
         }
 
         public double ProjectedAreaWorld(Vector3 normalizedDirectionVector)
@@ -579,9 +580,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private void ApplyAeroStressFailure()
         {
             bool failureOccured = false;
-            if (part.Modules.Contains<ModuleProceduralFairing>())
+            if (part.FindModuleImplementingFast<ModuleProceduralFairing>() is ModuleProceduralFairing fairing)
             {
-                ModuleProceduralFairing fairing = part.Modules.GetModule<ModuleProceduralFairing>();
                 fairing.ejectionForce = 0.5f;
 
                 fairing.DeployFairing();
@@ -761,6 +761,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
             LegacyWingModel = null;
             stockAeroSurfaceModule = null;
+            AeroForceModifier = null;
         }
 
         public struct ProjectedArea

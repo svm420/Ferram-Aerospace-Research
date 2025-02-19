@@ -1,0 +1,30 @@
+{
+    "variables": {
+        "KSP_DIR_INSTALL": "$(KSP_DIR_BUILD)"
+    },
+    "package": {
+        "compression": null,
+        "+dependencies": [
+            {
+                "path": "$(KSP_DIR_BUILD)/Ships",
+                "destination": "Ships",
+                "include": [
+                    "**/*"
+                ]
+            }
+        ]
+    },
+    "replace": {
+        "regex": [
+            {
+                "pattern": "$(ModName).Base/Version.cs",
+                "substitutions": [
+                    {
+                        "search": "GitSha = null",
+                        "replace": "GitSha = \"$(env:GITHUB_SHA)\""
+                    }
+                ]
+            }
+        ]
+    }
+}

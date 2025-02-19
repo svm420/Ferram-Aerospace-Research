@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -44,6 +44,7 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 
 using System;
 using System.Globalization;
+using UnityEngine;
 
 namespace FerramAerospaceResearch
 {
@@ -52,39 +53,55 @@ namespace FerramAerospaceResearch
         public const double rad2deg = 180d / Math.PI;
         public const double deg2rad = Math.PI / 180d;
 
+        // https://floating-point-gui.de/errors/comparison/
+
         public static bool NearlyEqual(this double a, double b, double epsilon = 1e-14)
         {
             // ReSharper disable CompareOfFloatsByEqualityOperator
             // shortcut, handles infinities
-            if (a.Equals(b))
+            if (a == b)
                 return true;
 
             // a or b is zero or both are extremely close to it
             // relative error is less meaningful here
+            double absA = Math.Abs(a);
+            double absB = Math.Abs(b);
             double diff = Math.Abs(a - b);
-            if (a == 0 || b == 0 || diff < double.Epsilon)
+            if (a == 0 || b == 0 || absA + absB < double.Epsilon)
                 return diff < epsilon * double.Epsilon;
 
             // use relative error
-            return diff / (Math.Abs(a) + Math.Abs(b)) < epsilon;
+            return diff / Math.Min(absA + absB, double.MaxValue) < epsilon;
             // ReSharper restore CompareOfFloatsByEqualityOperator
+        }
+
+        public static bool NearlyEqual(this Vector3 a, Vector3 b, float epsilon = 1e-6f)
+        {
+            return a.x.NearlyEqual(b.x, epsilon) && a.y.NearlyEqual(b.y, epsilon) && a.z.NearlyEqual(b.z, epsilon);
+        }
+
+        public static bool NearlyEqual(this Vector3d a, Vector3d b, double epsilon = 1e-14)
+        {
+            return a.x.NearlyEqual(b.x, epsilon) && a.y.NearlyEqual(b.y, epsilon) && a.z.NearlyEqual(b.z, epsilon);
         }
 
         public static bool NearlyEqual(this float a, float b, float epsilon = 1e-6f)
         {
             // ReSharper disable CompareOfFloatsByEqualityOperator
             // shortcut, handles infinities
-            if (a.Equals(b))
+            if (a == b)
                 return true;
 
             // a or b is zero or both are extremely close to it
             // relative error is less meaningful here
-            float diff = Math.Abs(a - b);
-            if (a == 0 || b == 0 || diff < float.Epsilon)
+            float absA = Mathf.Abs(a);
+            float absB = Mathf.Abs(b);
+            float diff = Mathf.Abs(a - b);
+            if (a == 0 || b == 0 || absA + absB < float.Epsilon)
                 return diff < epsilon * float.Epsilon;
 
             // use relative error
-            return diff / (Math.Abs(a) + Math.Abs(b)) < epsilon;
+            return diff / Mathf.Min(absA + absB, float.MaxValue) < epsilon;
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 

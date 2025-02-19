@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -47,6 +47,7 @@ using System.Collections.Generic;
 using System.IO;
 using ferram4;
 using FerramAerospaceResearch.Settings;
+using KSPCommunityFixes;
 using UnityEngine;
 
 namespace FerramAerospaceResearch
@@ -366,7 +367,7 @@ namespace FerramAerospaceResearch
         public static bool IsNonphysical(Part p)
         {
             return p.physicalSignificance == Part.PhysicalSignificance.NONE ||
-                   p.Modules.Contains<LaunchClamp>() ||
+                   p.HasModuleImplementingFast<LaunchClamp>() ||
                    HighLogic.LoadedSceneIsEditor &&
                    p != EditorLogic.RootPart &&
                    p.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE;

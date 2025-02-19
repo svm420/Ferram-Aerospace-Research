@@ -6,12 +6,12 @@ using UnityEngine;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FerramAerospaceResearch.Settings
+namespace FerramAerospaceResearch.Config
 {
     [ConfigNode("ColorMap")]
     public class ColorMap
     {
-        [ConfigValueIgnore] public static readonly ColorMap Default = new ColorMap
+        [ConfigValueIgnore] public static readonly ColorMap Default = new()
         {
             Name = "default",
             Colors = {new Color(0.18f, 0f, 0.106f)}
@@ -19,7 +19,7 @@ namespace FerramAerospaceResearch.Settings
 
         [ConfigValue("name")] public string Name { get; set; }
 
-        [ConfigValue("color")] public List<Color> Colors { get; } = new List<Color>();
+        [ConfigValue("color")] public List<Color> Colors { get; } = new();
 
         public Color this[int index]
         {
@@ -33,21 +33,21 @@ namespace FerramAerospaceResearch.Settings
         }
     }
 
-    [ConfigNode("Voxelization", shouldSave: false, parent: typeof(FARConfig))]
-    public static class VoxelizationSettings
+    [ConfigNode("Voxelization", shouldSave: false)]
+    public class VoxelizationConfig
     {
-        [ConfigValue("default")] public static string Default { get; set; }
+        [ConfigValue("default")] public string Default { get; set; }
 
-        [ConfigValue] public static List<ColorMap> ColorMaps { get; } = new List<ColorMap>();
+        [ConfigValue] public List<ColorMap> ColorMaps { get; } = new();
 
-        [ConfigValue("debugInFlight")] public static bool DebugInFlight { get; set; } = false;
+        [ConfigValue("debugInFlight")] public bool DebugInFlight { get; set; } = false;
 
-        public static ColorMap FirstOrDefault()
+        public ColorMap FirstOrDefault()
         {
             return FirstOrDefault(Default);
         }
 
-        public static ColorMap FirstOrDefault(string name)
+        public ColorMap FirstOrDefault(string name)
         {
             if (string.IsNullOrEmpty(name))
                 return ColorMap.Default;
@@ -58,6 +58,20 @@ namespace FerramAerospaceResearch.Settings
             }
 
             return ColorMap.Default;
+        }
+
+        public Texture2D ColorMapTexture(string name)
+        {
+            ColorMap map = FirstOrDefault(name);
+            var tex = new Texture2D(map.Colors.Count, 1) { filterMode = FilterMode.Point };
+            tex.SetPixels(map.Colors.ToArray());
+            tex.Apply();
+            return tex;
+        }
+
+        public Texture2D ColorMapTexture()
+        {
+            return ColorMapTexture(Default);
         }
     }
 }

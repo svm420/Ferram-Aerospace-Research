@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -56,6 +56,7 @@ using FerramAerospaceResearch.FARThreading;
 using FerramAerospaceResearch.Resources;
 using KSP.Localization;
 using KSP.UI.Screens;
+using KSPCommunityFixes;
 using ModuleWheels;
 using PreFlightTests;
 using UnityEngine;
@@ -330,16 +331,14 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             {
                 if (p == null)
                     continue;
-                if (p.Modules.Contains<FARWingAerodynamicModel>())
+                if (p.FindModuleImplementingFast<FARWingAerodynamicModel>() is FARWingAerodynamicModel w)
                 {
-                    FARWingAerodynamicModel w = p.Modules.GetModule<FARWingAerodynamicModel>();
                     if (updateWingInteractions)
                         w.EditorUpdateWingInteractions();
                     _wingAerodynamicModel.Add(w);
                 }
-                else if (p.Modules.Contains<FARControllableSurface>())
+                else if (p.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface c)
                 {
-                    FARControllableSurface c = p.Modules.GetModule<FARControllableSurface>();
                     if (updateWingInteractions)
                         c.EditorUpdateWingInteractions();
                     _wingAerodynamicModel.Add(c);
@@ -424,10 +423,7 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
 
             foreach (Part p in partList)
             {
-                if (!p.Modules.Contains<GeometryPartModule>())
-                    continue;
-                GeometryPartModule g = p.Modules.GetModule<GeometryPartModule>();
-                if (g == null)
+                if (!(p.FindModuleImplementingFast<GeometryPartModule>() is GeometryPartModule g))
                     continue;
                 if (g.Ready)
                 {
@@ -715,9 +711,8 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
             List<Part> partsList = EditorLogic.SortedShipList;
             foreach (Part p in partsList)
             {
-                if (p.Modules.Contains<ModuleWheelDeployment>())
+                if (p.FindModuleImplementingFast<ModuleWheelDeployment>() is ModuleWheelDeployment l)
                 {
-                    ModuleWheelDeployment l = p.Modules.GetModule<ModuleWheelDeployment>();
                     l.ActionToggle(new KSPActionParam(KSPActionGroup.Gear,
                                                       gearToggle ? KSPActionType.Activate : KSPActionType.Deactivate));
                 }
@@ -748,23 +743,34 @@ namespace FerramAerospaceResearch.FARGUI.FAREditorGUI
                 if (p.Modules.Contains("KSPWheelAdjustableGear"))
                 {
                     PartModule m = p.Modules["KSPWheelAdjustableGear"];
-                    MethodInfo method = m.GetType().GetMethod("deploy", BindingFlags.Instance | BindingFlags.Public);
-                    try
-                    {
-                        if (method == null)
-                            FARLogger.Error("KSPWheelAdjustableGear does not have method 'animate");
-                        else
-                            method.Invoke(m, null);
-                    }
-                    catch (Exception e)
-                    {
-                        //we just catch and print this ourselves to allow things to continue working, since there seems to be a bug in KSPWheels as of this writing
-                        FARLogger.Exception(e);
-                    }
+                    ToggleGearDeploymentOnKSPWheelPM(m, "deployAction");
+                }
+                else if (p.Modules.Contains("KSPWheelDeployment"))
+                {
+                    PartModule m = p.Modules["KSPWheelDeployment"];
+                    ToggleGearDeploymentOnKSPWheelPM(m, "toggleGearAction");
                 }
             }
 
             gearToggle = !gearToggle;
+        }
+
+        private void ToggleGearDeploymentOnKSPWheelPM(PartModule pm, string methodName)
+        {
+            MethodInfo method = pm.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+            var action = new KSPActionParam(KSPActionGroup.Gear, gearToggle ? KSPActionType.Activate : KSPActionType.Deactivate);
+            try
+            {
+                if (method == null)
+                    FARLogger.Error($"{pm.GetType().Name} does not have method '{methodName}'");
+                else
+                    method.Invoke(pm, new[] { action });
+            }
+            catch (Exception e)
+            {
+                //we just catch and print this ourselves to allow things to continue working, since there seems to be a bug in KSPWheels as of this writing
+                FARLogger.Exception(e);
+            }
         }
 
         private enum FAREditorMode

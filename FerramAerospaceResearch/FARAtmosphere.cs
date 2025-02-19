@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -50,6 +50,16 @@ namespace FerramAerospaceResearch
 {
     public static partial class FARAtmosphere
     {
+        public static Vector3d CurrentPosition(this Vessel vessel)
+        {
+            return new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude);
+        }
+
+        public static Vector3d CurrentPosition(this Vessel vessel, double altitude)
+        {
+            return new Vector3d(vessel.latitude, vessel.longitude, altitude);
+        }
+
         internal class DelegateDispatcher<Arg1, Arg2, Arg3, Ret>
         {
             private Func<Arg1, Arg2, Arg3, Ret> function;
@@ -89,6 +99,11 @@ namespace FerramAerospaceResearch
 
             public readonly Func<Arg1, Arg2, Arg3, Ret> Default;
             public readonly string Name;
+
+            public bool IsCustom
+            {
+                get { return !ReferenceEquals(function, Default); }
+            }
 
             public Ret Invoke(Arg1 arg1, Arg2 arg2, Arg3 arg3)
             {
@@ -178,6 +193,17 @@ namespace FerramAerospaceResearch
             new(((body, latLonAltitude, ut) => PhysicsGlobals.IdealGasConstant / body.atmosphereMolarMass),
                 "GasConstant");
 
+        public static bool IsCustom { get; private set; }
+
+        private static void UpdateIsCustom()
+        {
+            IsCustom = windFunction.IsCustom ||
+                       pressureFunction.IsCustom ||
+                       temperatureFunction.IsCustom ||
+                       adiabaticIndexFunction.IsCustom ||
+                       gasConstantFunction.IsCustom;
+        }
+
         /// <summary>
         ///     Calculates the wind's intensity using the specified wind function.
         ///     If any exception occurs, it is suppressed and Vector3.zero is returned.
@@ -200,6 +226,7 @@ namespace FerramAerospaceResearch
         public static void SetWindFunction(WindDelegate newFunction)
         {
             windFunction.Function = newFunction;
+            UpdateIsCustom();
         }
 
         /// <summary>
@@ -216,7 +243,7 @@ namespace FerramAerospaceResearch
 
         public static double GetPressure(Vessel vessel, double ut)
         {
-            return GetPressure(vessel.mainBody, new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude), ut);
+            return GetPressure(vessel.mainBody, vessel.CurrentPosition(), ut);
         }
 
         public static double GetPressure(Vessel vessel)
@@ -232,6 +259,7 @@ namespace FerramAerospaceResearch
         public static void SetPressureFunction(PropertyDelegate newFunction)
         {
             pressureFunction.Function = newFunction;
+            UpdateIsCustom();
         }
 
         /// <summary>
@@ -248,9 +276,7 @@ namespace FerramAerospaceResearch
 
         public static double GetTemperature(Vessel vessel, double ut)
         {
-            return GetTemperature(vessel.mainBody,
-                                  new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude),
-                                  ut);
+            return GetTemperature(vessel.mainBody, vessel.CurrentPosition(), ut);
         }
 
         public static double GetTemperature(Vessel vessel)
@@ -266,6 +292,7 @@ namespace FerramAerospaceResearch
         public static void SetTemperatureFunction(PropertyDelegate newFunction)
         {
             temperatureFunction.Function = newFunction;
+            UpdateIsCustom();
         }
 
         /// <summary>
@@ -282,9 +309,7 @@ namespace FerramAerospaceResearch
 
         public static double GetAdiabaticIndex(Vessel vessel, double ut)
         {
-            return GetAdiabaticIndex(vessel.mainBody,
-                                     new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude),
-                                     ut);
+            return GetAdiabaticIndex(vessel.mainBody, vessel.CurrentPosition(), ut);
         }
 
         public static double GetAdiabaticIndex(Vessel vessel)
@@ -300,6 +325,7 @@ namespace FerramAerospaceResearch
         public static void SetAdiabaticIndexFunction(PropertyDelegate newFunction)
         {
             adiabaticIndexFunction.Function = newFunction;
+            UpdateIsCustom();
         }
 
         /// <summary>
@@ -316,9 +342,7 @@ namespace FerramAerospaceResearch
 
         public static double GetGasConstant(Vessel vessel, double ut)
         {
-            return GetGasConstant(vessel.mainBody,
-                                  new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude),
-                                  ut);
+            return GetGasConstant(vessel.mainBody, vessel.CurrentPosition(), ut);
         }
 
         public static double GetGasConstant(Vessel vessel)
@@ -334,6 +358,7 @@ namespace FerramAerospaceResearch
         public static void SetGasConstantFunction(PropertyDelegate newFunction)
         {
             gasConstantFunction.Function = newFunction;
+            UpdateIsCustom();
         }
 
         /// <summary>
@@ -353,16 +378,12 @@ namespace FerramAerospaceResearch
 
         public static GasProperties GetGasProperties(Vessel vessel, double altitude, double ut)
         {
-            return GetGasProperties(vessel.mainBody,
-                                    new Vector3d(vessel.latitude, vessel.longitude, altitude),
-                                    ut);
+            return GetGasProperties(vessel.mainBody, vessel.CurrentPosition(altitude), ut);
         }
 
         public static GasProperties GetGasProperties(Vessel vessel, double ut)
         {
-            return GetGasProperties(vessel.mainBody,
-                                    new Vector3d(vessel.latitude, vessel.longitude, vessel.altitude),
-                                    ut);
+            return GetGasProperties(vessel.mainBody, vessel.CurrentPosition(), ut);
         }
 
         public static GasProperties GetGasProperties(Vessel vessel)

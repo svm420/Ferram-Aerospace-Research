@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -42,9 +42,11 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 	http://forum.kerbalspaceprogram.com/threads/60863
  */
 
+using System;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
+using KSPCommunityFixes;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -221,9 +223,8 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (!p.Modules.Contains<FARControllableSurface>())
+                if (!(p.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface surface))
                     continue;
-                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 surface.SetDeflection(surface.flapDeflectionLevel + 1);
             }
         }
@@ -235,9 +236,8 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (!p.Modules.Contains<FARControllableSurface>())
+                if (!(p.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface surface))
                     continue;
-                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 surface.SetDeflection(surface.flapDeflectionLevel - 1);
             }
         }
@@ -251,9 +251,8 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (!p.Modules.Contains<FARControllableSurface>())
+                if (!(p.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface surface))
                     continue;
-                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 if (surface.isFlap)
                     return surface.flapDeflectionLevel;
             }
@@ -268,9 +267,8 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (!p.Modules.Contains<FARControllableSurface>())
+                if (!(p.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface surface))
                     continue;
-                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 surface.brake = spoilerActive;
             }
         }
@@ -284,9 +282,8 @@ namespace FerramAerospaceResearch
         {
             foreach (Part p in v.parts)
             {
-                if (!p.Modules.Contains<FARControllableSurface>())
+                if (!(p.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface surface))
                     continue;
-                FARControllableSurface surface = p.Modules.GetModule<FARControllableSurface>();
                 if (surface.isSpoiler)
                     return surface.brake;
             }
@@ -418,6 +415,29 @@ namespace FerramAerospaceResearch
             }
 
             return !(vesselAeroModule is null) && vesselAeroModule.HasValidVoxelizationCurrently();
+        }
+
+        /// <summary>
+        /// Set a modifier function for part local forces in case FAR does not correctly handle them.
+        /// It will be called before applying the forces to the part/simulation.
+        /// </summary>
+        /// <param name="part">Part to apply modifier to</param>
+        /// <param name="modifier">Modifier function of part local forces.
+        /// Signature is (part, (drag, lift, torque)) -> (new_drag, new_lift, new_torque)</param>
+        public static void SetPartAeroForceModifier(Part part, Func<Part, Vector3, Vector3> modifier)
+        {
+            part.FindModuleImplementingFast<FARAeroPartModule>().AeroForceModifier = modifier;
+        }
+
+        /// <summary>
+        /// Get the current part local forces modifier function
+        /// </summary>
+        /// <param name="part"></param>
+        /// <returns>Modifier function of part local forces if set and the part is valid, otherwise null.
+        /// Signature is (part, (drag, lift, torque)) -> (new_drag, new_lift, new_torque)</returns>
+        public static Func<Part, Vector3, Vector3> GetPartAeroForceModifier(Part part)
+        {
+            return part.FindModuleImplementingFast<FARAeroPartModule>()?.AeroForceModifier;
         }
     }
 }

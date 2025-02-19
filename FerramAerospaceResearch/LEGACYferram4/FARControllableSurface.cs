@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -45,6 +45,7 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 using System;
 using FerramAerospaceResearch;
 using FerramAerospaceResearch.Settings;
+using KSPCommunityFixes;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -58,22 +59,17 @@ namespace ferram4
 
 
         // ReSharper disable once NotAccessedField.Global
-        [KSPField(isPersistant = false)]
-        public Vector3 controlSurfacePivot = new Vector3(1f, 0f, 0f);
+        [KSPField(isPersistant = false)] public Vector3 controlSurfacePivot = new Vector3(1f, 0f, 0f);
 
-        [KSPField(isPersistant = false)]
-        public float ctrlSurfFrac = 1;
+        [KSPField(isPersistant = false)] public float ctrlSurfFrac = 1;
 
-        [KSPField(isPersistant = false)]
-        public string transformName = "obj_ctrlSrf";
+        [KSPField(isPersistant = false)] public string transformName = "obj_ctrlSrf";
 
         // These TWO fields MUST be set up so that they are copied by Object.Instantiate.
         // Otherwise detaching and re-attaching wings with deflected flaps etc breaks until save/load.
-        [SerializeField]
-        protected Quaternion MovableOrig = Quaternion.identity;
+        [SerializeField] protected Quaternion MovableOrig = Quaternion.identity;
 
-        [SerializeField]
-        private bool MovableOrigReady;
+        [SerializeField] private bool MovableOrigReady;
 
         //        protected int MovableSectionFlip = 1;
 
@@ -177,21 +173,28 @@ namespace ferram4
         public float maxdeflectFlap = 15;
 
         [KSPField(guiName = "FARCtrlShowDynamicDeflection", guiActiveEditor = true, guiActive = true),
-           UI_Toggle(affectSymCounterparts = UI_Scene.All,
-           scene = UI_Scene.All,
-           disabledText = "FARCtrlSurfStdText",
-           enabledText = "FARCtrlSurfStdText")]
+         UI_Toggle(affectSymCounterparts = UI_Scene.All,
+                   scene = UI_Scene.All,
+                   disabledText = "FARCtrlSurfStdText",
+                   enabledText = "FARCtrlSurfStdText")]
         private bool showDynamicDeflection = false;
 
-        [KSPField(guiName = "FARCtrlDynamicDeflection", isPersistant = true, guiActiveEditor = false, guiActive = false),
+        [KSPField(guiName = "FARCtrlDynamicDeflection",
+                  isPersistant = true,
+                  guiActiveEditor = false,
+                  guiActive = false),
          UI_Toggle(affectSymCounterparts = UI_Scene.All,
-                    enabledText = "FARCtrlSurfFlapActive",
-                    scene = UI_Scene.All,
-                    disabledText = "FARCtrlSurfFlapInActive")]
+                   enabledText = "FARCtrlSurfFlapActive",
+                   scene = UI_Scene.All,
+                   disabledText = "FARCtrlSurfFlapInActive")]
         public bool isDynamicDeflection = false;
+
         public bool isPrevDynamicDeflection = true;
 
-        [KSPField(guiName = "FARCtrlDynamicStartSpeed", isPersistant = true, guiActiveEditor = false, guiActive = false),
+        [KSPField(guiName = "FARCtrlDynamicStartSpeed",
+                  isPersistant = true,
+                  guiActiveEditor = false,
+                  guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
                        maxValue = 1000.0f,
                        minValue = 0f,
@@ -201,18 +204,21 @@ namespace ferram4
 
         [KSPField(guiName = "FARCtrlDynamicExponent", isPersistant = true, guiActiveEditor = false, guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-               maxValue = 4.0f,
-               minValue = 0.0f,
-               scene = UI_Scene.All,
-               stepIncrement = 0.1f)]
+                       maxValue = 4.0f,
+                       minValue = 0.0f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 0.1f)]
         public float exponent = 2f;
 
-        [KSPField(guiName = "FARCtrlDynamicMinControl", isPersistant = true, guiActiveEditor = false, guiActive = false),
+        [KSPField(guiName = "FARCtrlDynamicMinControl",
+                  isPersistant = true,
+                  guiActiveEditor = false,
+                  guiActive = false),
          UI_FloatRange(affectSymCounterparts = UI_Scene.All,
-                maxValue = 1f,
-                minValue = 0f,
-                scene = UI_Scene.All,
-                stepIncrement = 0.05f)]
+                       maxValue = 1f,
+                       minValue = 0f,
+                       scene = UI_Scene.All,
+                       stepIncrement = 0.05f)]
         public float minControl = 0.1f;
 
         protected double PitchLocation;
@@ -238,6 +244,7 @@ namespace ferram4
         private bool justStarted;
 
         private Transform lastReferenceTransform;
+        private bool animated;
 
         public static double timeConstant
         {
@@ -255,26 +262,6 @@ namespace ferram4
         {
             get { return FARAeroData.ControlSurfaceTimeConstantSpoiler; }
             set { FARAeroData.ControlSurfaceTimeConstantSpoiler = value; }
-        }
-
-        protected Transform MovableSection
-        {
-            get
-            {
-                if (movableSection != null)
-                    return movableSection;
-                movableSection = part.FindModelTransform(transformName); //And the transform
-                if (!MovableOrigReady)
-                {
-                    // In parts copied by symmetry, these fields should already be set,
-                    // while the transform may not be in the original orientation anymore.
-                    MovableOrig = movableSection.localRotation; //Its original orientation
-                    MovableOrigReady = true;
-                }
-
-                flipAxis = Vector3.Dot(movableSection.right, part.partTransform.right) <= 0;
-                return movableSection;
-            }
         }
 
         // TODO 1.2: ITorqueProvider now reports two Vector3s, positive torque(that produced by control actuation 1,1,1) and negative torque(that produced by -1,-1,-1).
@@ -339,9 +326,9 @@ namespace ferram4
         {
             foreach (Part p in part.symmetryCounterparts)
             {
-                foreach (PartModule m in p.Modules)
-                    if (m is FARControllableSurface controllableSurface)
-                        controllableSurface.SetDeflection(flapDeflectionLevel);
+                var modules = p.FindModulesImplementingReadOnly<FARControllableSurface>();
+                foreach (FARControllableSurface controllableSurface in modules)
+                    controllableSurface.SetDeflection(flapDeflectionLevel);
             }
         }
 
@@ -427,8 +414,8 @@ namespace ferram4
         public override void Initialization()
         {
             base.Initialization();
-            if (part.Modules.GetModule<ModuleControlSurface>())
-                part.RemoveModule(part.Modules.GetModule<ModuleControlSurface>());
+            if (part.FindModuleImplementingFast<ModuleControlSurface>() is ModuleControlSurface mcs)
+                part.RemoveModule(mcs);
 
             OnVesselPartsChange += CalculateSurfaceFunctions;
             UpdateEvents();
@@ -464,16 +451,58 @@ namespace ferram4
                 }
         }
 
+        public override void OnStartFinished(StartState state)
+        {
+            base.OnStartFinished(state);
+
+            UpdateMovableSection();
+        }
+
+        private void UpdateMovableSection()
+        {
+            movableSection = part.FindModelTransform(transformName); //And the transform
+            if (movableSection is null)
+            {
+                FARLogger.WarningFormat("No valid control surface model with transform name {0} found on {1}, animations disabled",
+                                        transformName,
+                                        part?.partName);
+                animated = false;
+                return;
+            }
+
+            if (!MovableOrigReady)
+            {
+                // In parts copied by symmetry, these fields should already be set,
+                // while the transform may not be in the original orientation anymore.
+                MovableOrig = movableSection.localRotation; //Its original orientation
+                MovableOrigReady = true;
+            }
+
+            flipAxis = Vector3.Dot(movableSection.right, part.partTransform.right) <= 0;
+
+            animated = HighLogic.LoadedSceneIsFlight && part is not null && vessel is not null;
+        }
+
         public override void FixedUpdate()
         {
             if (justStarted)
-                CalculateSurfaceFunctions();
-
-            if (HighLogic.LoadedSceneIsFlight && !(part is null) && !(vessel is null))
             {
+                UpdateShipPartsList();
+                CalculateSurfaceFunctions();
+            }
+
+            if (animated)
+            {
+                // make sure the transform is still alive
+                if (movableSection == null)
+                {
+                    MovableOrigReady = false;
+                    UpdateMovableSection();
+                }
+
                 bool process = part.isControllable || justStarted && isFlap;
 
-                if (process && !(MovableSection is null) && part.Rigidbody)
+                if (movableSection is not null && process && part.Rigidbody)
                 {
                     // Set member vars for desired AoA
                     if (isSpoiler)
@@ -633,10 +662,11 @@ namespace ferram4
             double factor = 1;
             if (vessel.atmDensity > 0.01 && isDynamicDeflection && vessel.srfSpeed > 0)
             {
-                 factor = Math.Pow(dynamicControlStartSpeed / vessel.srfSpeed, exponent) / (vessel.atmDensity / vessel.lastBody.atmDensityASL);
+                factor = Math.Pow(dynamicControlStartSpeed / vessel.srfSpeed, exponent) /
+                         (vessel.atmDensity / vessel.lastBody.atmDensityASL);
             }
 
-            return factor.Clamp(minControl,1);
+            return factor.Clamp(minControl, 1);
         }
 
         public override double CalculateAoA(Vector3d velocity)
@@ -668,8 +698,8 @@ namespace ferram4
         )
         {
             double error = desired - current;
-            if (!forceSetToDesired && Math.Abs(error) >= 0.01
-            ) // DaMichel: i changed the threshold since i noticed a "bump" at max deflection
+            // DaMichel: i changed the threshold since i noticed a "bump" at max deflection
+            if (!forceSetToDesired && Math.Abs(error) >= 0.01)
             {
                 double tmp1 = error / blendTimeConstant;
                 current += (TimeWarp.fixedDeltaTime * tmp1).Clamp(-Math.Abs(0.6 * error), Math.Abs(0.6 * error));
@@ -744,14 +774,14 @@ namespace ferram4
             deflectedNormal.z = Math.Sqrt(tmp);
 
             // Visually animate the surface
-            MovableSection.localRotation = MovableOrig;
+            movableSection.localRotation = MovableOrig;
             if (!AoAoffset.NearlyEqual(0))
             {
                 Quaternion localRot = flipAxis
                                           ? Quaternion.FromToRotation(deflectedNormal, new Vector3(0, 0, 1))
                                           : Quaternion.FromToRotation(new Vector3(0, 0, 1), deflectedNormal);
 
-                MovableSection.localRotation *= localRot;
+                movableSection.localRotation *= localRot;
             }
 
             CheckShielded();

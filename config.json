@@ -1,75 +1,82 @@
 {
     "root": ".",
-    "build_props": "Directory.Build.Props",
+    "build_props": "Directory.Build.props",
     "variables": {
         "ModName": "FerramAerospaceResearch",
-        "ModDirRelative": "GameData/$(ModName)/",
-        "ModDir": "$(SolutionDir)$(ModDirRelative)",
-        "PluginDir": "$(ModDir)Plugins/",
-        "AssetDir": "$(ModDir)Assets/",
-        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.12/",
-        "KSPGameData": "$(KSP_DIR_INSTALL)GameData/",
-        "GameDir": "$(KSPGameData)$(ModName)/",
+        "ModDirRelative": "GameData/$(ModName)",
+        "ModDir": "$(SolutionDir)/$(ModDirRelative)",
+        "PluginDir": "$(ModDir)/Plugins",
+        "AssetDir": "$(ModDir)/Assets",
+        "KSP_DIR_INSTALL": "C:/Zaidimai/KSP 1.12",
+        "KSPGameData": "$(KSP_DIR_INSTALL)/GameData",
+        "GameDir": "$(KSPGameData)/$(ModName)",
         "VersionMajor": 0,
         "VersionMinor": 16,
-        "VersionBuild": 0,
-        "VersionRevision": 3,
-        "VersionName": "Mader",
-        "Year": 2020,
+        "VersionBuild": 1,
+        "VersionRevision": 2,
+        "VersionName": "Marangoni",
+        "Year": 2022,
         "NumericalVersion": "$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)",
         "VersionString": "$(NumericalVersion) \"$(VersionName)\"",
         "VersionRegex": "\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?\\s*\"\\w+\"",
         "KSPMajorMin": 1,
         "KSPMajorMax": 1,
-        "KSPMinorMin": 8,
+        "KSPMinorMin": 12,
         "KSPMinorMax": 12,
-        "UnityDir": "$(SolutionDir)Unity/$(ModName)/",
-        "AssetBundleDir": "$(UnityDir)AssetBundles/",
-        "UnityAssetsDir": "$(UnityDir)Assets/",
-        "UnityPluginsDir": "$(UnityAssetsDir)Plugins/",
-        "BurstOuputDir": "$(SolutionDir)Unity/Burst/",
+        "UnityDir": "$(SolutionDir)/Unity/$(ModName)",
+        "AssetBundleDir": "$(UnityDir)/AssetBundles",
+        "UnityAssetsDir": "$(UnityDir)/Assets",
+        "UnityPluginsDir": "$(UnityAssetsDir)/Plugins",
+        "BurstOuputDir": "$(SolutionDir)/Unity/Burst",
         "BurstOuputName": "lib_burst_generated"
     },
     "post_build": {
         "clean": [],
         "install": [
             {
-                "source": "$(TargetDir)$(TargetName).*",
+                "source": "$(TargetDir)/$(TargetName).*",
                 "destination": "$(PluginDir)"
             },
             {
-                "source": "$(AssetBundleDir)*.far",
+                "source": "$(AssetBundleDir)/*.far",
                 "destination": "$(AssetDir)"
             }
         ],
-        "[FerramAerospaceResearch.Base]": {
-            "install": [
-                {
-                    "source": "$(TargetDir)$(TargetName).*",
-                    "destination": "$(PluginDir)"
-                },
-                {
-                    "source": "$(TargetDir)$(TargetName).*",
-                    "destination": "$(UnityPluginsDir)"
-                }
-            ]
-        },
         "[FerramAerospaceResearch]": {
             "clean": [
                 "$(GameDir)"
             ],
             "install": [
                 {
-                    "source": "$(TargetDir)$(TargetName).*",
+                    "source": "$(TargetDir)/$(TargetName).*",
                     "destination": "$(PluginDir)"
                 },
                 {
-                    "source": "$(AssetBundleDir)*.far",
+                    "source": "$(AssetBundleDir)/*.far",
                     "destination": "$(AssetDir)"
                 },
                 {
                     "source": "GameData/$(ModName)",
                     "destination": "$(GameDir)"
+                }
+            ]
+        },
+        "|Editor": {
+            "install": []
+        },
+        "[FerramAerospaceResearch.Base]|!Editor": {
+            "install": [
+                {
+                    "source": "$(TargetDir)/$(TargetName).*",
+                    "destination": "$(PluginDir)"
+                }
+            ]
+        },
+        "[FerramAerospaceResearch.Base]|Editor": {
+            "install": [
+                {
+                    "source": "$(TargetDir)/$(TargetName).*",
+                    "destination": "$(UnityPluginsDir)"
                 }
             ]
         }
@@ -147,25 +154,25 @@
         ],
         "template_files": [
             {
-                "source": "$(ModDir)FAR.version.in",
-                "destination": "$(ModDir)FAR.version"
+                "source": "$(ModDir)/FAR.version.in",
+                "destination": "$(ModDir)/FAR.version"
             }
         ]
     },
     "package": {
         "compression": "deflated",
         "filename": "FAR_$(VersionMajor)_$(VersionMinor)_$(VersionBuild)_$(VersionRevision)_$(VersionName).zip",
-        "output_dir": "$(SolutionDir)releases",
+        "output_dir": "$(SolutionDir)/releases",
         "include": [
-            "$(ModDirRelative)**/*",
+            "$(ModDirRelative)/**/*",
             "Ships",
             "README.md"
         ],
         "exclude": [
-            "$(ModDirRelative)**/*db",
-            "$(ModDirRelative)**/*.in",
-            "$(ModDirRelative)**/*.dll.*",
-            "$(ModDirRelative)**/FARLogger_*"
+            "$(ModDirRelative)/**/*db",
+            "$(ModDirRelative)/**/*.in",
+            "$(ModDirRelative)/**/*.dll.*",
+            "$(ModDirRelative)/**/FARLogger_*"
         ],
         "map": [
             {
@@ -175,8 +182,8 @@
         ],
         "dependencies": [
             {
-                "path": "$(KSPGameData)ModularFlightIntegrator",
-                "destination": "GameData/ModularFlightIntegrator/",
+                "path": "$(KSPGameData)/ModularFlightIntegrator",
+                "destination": "GameData/ModularFlightIntegrator",
                 "include": [
                     "*"
                 ],
@@ -188,14 +195,24 @@
                 ]
             },
             {
+                "path": "$(KSPGameData)/000_KSPBurst",
+                "destination": "GameData/000_KSPBurst",
+                "include": [
+                    "**/*"
+                ],
+                "exclude": [
+                    "*.zip"
+                ]
+            },
+            {
                 "path": "$(KSPGameData)",
-                "destination": "GameData/",
+                "destination": "GameData",
                 "include": [
                     "ModuleManager*.dll"
                 ],
                 "map": [
                     {
-                        "source": "$(SolutionDir)releases/MM_LICENSE",
+                        "source": "$(SolutionDir)/releases/MM_LICENSE",
                         "destination": "LICENSE_ModuleManager"
                     }
                 ]
@@ -203,7 +220,7 @@
         ]
     },
     "burst_compile": {
-        "bcl": "$(UnityDir)Library/PackageCache/com.unity.burst@1.3.1/.Runtime/bcl.exe",
+        "bcl": "$(UnityDir)/Library/PackageCache/com.unity.burst@1.5.0/.Runtime/bcl.exe",
         "debug": true,
         "targets": [
             {
@@ -222,15 +239,15 @@
                 "float_mode": "Default",
                 "debug": "None",
                 "debugMode": false,
-                "output": "$(BurstOuputDir)windows/$(BurstOuputName)",
+                "output": "$(BurstOuputDir)/windows/$(BurstOuputName)",
                 "verbose": false,
                 "log_timings": true,
                 "root_assemblies": [
-                    "$(PluginDir)*.dll",
-                    "$(KSP_DIR_INSTALL)KSP_x64_Data/Managed/*.dll"
+                    "$(PluginDir)/*.dll",
+                    "$(KSP_DIR_INSTALL)/$(KSP_DATA_DIRNAME)/Managed/*.dll"
                 ],
                 "assembly_folders": [
-                    "$(KSP_DIR_INSTALL)KSP_x64_Data/Managed",
+                    "$(KSP_DIR_INSTALL)/$(KSP_DATA_DIRNAME)/Managed",
                     "$(PluginDir)"
                 ],
                 "include_root_assembly_references": true
@@ -238,12 +255,12 @@
             {
                 "platform": "Linux",
                 "include": "Windows",
-                "output": "$(BurstOuputDir)linux/$(BurstOuputName)"
+                "output": "$(BurstOuputDir)/linux/$(BurstOuputName)"
             },
             {
                 "platform": "macOS",
                 "include": "Windows",
-                "output": "$(BurstOuputDir)macos/$(BurstOuputName)"
+                "output": "$(BurstOuputDir)/macos/$(BurstOuputName)"
             }
         ]
     }

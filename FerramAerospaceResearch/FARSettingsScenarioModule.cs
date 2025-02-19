@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -48,6 +48,8 @@ using FerramAerospaceResearch.FARGUI;
 using FerramAerospaceResearch.FARGUI.FARFlightGUI;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.Geometry;
+using FerramAerospaceResearch.Reflection;
+using UniLinq;
 using UnityEngine;
 
 namespace FerramAerospaceResearch
@@ -55,12 +57,32 @@ namespace FerramAerospaceResearch
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.SPACECENTER, GameScenes.EDITOR, GameScenes.FLIGHT)]
     public class FARSettingsScenarioModule : ScenarioModule
     {
-        private static List<string> presetNames;
-        public bool newGame;
-        public FARDifficultyAndExactnessSettings settings;
+        [ConfigNode("FARDifficultyPresets", shouldSave: false, isRoot: true)]
+        public static class FARDifficultyPresetsConfig
+        {
+            // reflection shows lots of false positives...
 
+            // ReSharper disable once FieldCanBeMadeReadOnly.Global
+            // ReSharper disable once ConvertToConstant.Global
+            [ConfigValue("index")] public static int Index = 4;
+
+            // ReSharper disable once CollectionNeverUpdated.Global
+            [ConfigValue] public static readonly List<FARDifficultyAndExactnessSettings> Values = new();
+
+            [ConfigValueIgnore] public static string[] Names { get; private set; }
+
+            public static void AfterLoaded()
+            {
+                Names = Values.Select(preset => preset.name).ToArray();
+                for (int i = 0; i < Values.Count; ++i)
+                    Values[i].index = i;
+            }
+        }
+
+        public bool newGame;
+
+        public FARDifficultyAndExactnessSettings settings;
         public FARDifficultyAndExactnessSettings customSettings;
-        public List<FARDifficultyAndExactnessSettings> presets;
         public FARVoxelSettings voxelSettings;
 
         public List<ConfigNode> flightGUISettings;
@@ -97,9 +119,9 @@ namespace FerramAerospaceResearch
             if (Instance != null)
                 return;
             Instance = new GameObject().AddComponent<FARSettingsScenarioModule>();
+            DontDestroyOnLoad(Instance);
             FARLogger.Info("Creating new setting module for tutorial/scenario");
             Instance.OnLoad(new ConfigNode());
-            Instance.Start();
         }
 
         private void Start()
@@ -144,16 +166,15 @@ namespace FerramAerospaceResearch
         public override void OnLoad(ConfigNode node)
         {
             Instance = this;
-            GeneratePresets();
-            int index = 4;
+            int index = FARDifficultyPresetsConfig.Index;
             if (node.HasValue("newGame"))
                 newGame = bool.Parse(node.GetValue("newGame"));
 
             if (node.HasValue("index"))
                 index = int.Parse(node.GetValue("index"));
 
-            dropdown = new GUIDropDown<FARDifficultyAndExactnessSettings>(presetNames.ToArray(),
-                                                                          presets.ToArray(),
+            dropdown = new GUIDropDown<FARDifficultyAndExactnessSettings>(FARDifficultyPresetsConfig.Names,
+                                                                          FARDifficultyPresetsConfig.Values.ToArray(),
                                                                           index < 0 ? 2 : index);
             voxelSettings = new FARVoxelSettings();
 
@@ -183,17 +204,15 @@ namespace FerramAerospaceResearch
                 if (node.HasValue("numDerivSmoothingPasses"))
                     settings.numDerivSmoothingPasses = int.Parse(node.GetValue("numDerivSmoothingPasses"));
 
-
                 customSettings = settings;
             }
             else
             {
-                settings = presets[index];
+                settings = FARDifficultyPresetsConfig.Values[index];
                 customSettings = new FARDifficultyAndExactnessSettings(-1);
             }
 
             currentIndex = index;
-
 
             FARLogger.Info("Loading FAR Data");
             flightGUISettings = new List<ConfigNode>();
@@ -202,36 +221,6 @@ namespace FerramAerospaceResearch
                     flightGUISettings.Add(flightGUINode);
 
             FARDebugAndSettings.LoadConfigs(node);
-        }
-
-        private void GeneratePresets()
-        {
-            presets = new List<FARDifficultyAndExactnessSettings>();
-            presetNames = new List<string>();
-
-            var tmp = new FARDifficultyAndExactnessSettings(0.6, 0.03, 2, 2, 0);
-            presets.Add(tmp);
-            presetNames.Add("Low Drag, Lenient Area Ruling");
-
-            tmp = new FARDifficultyAndExactnessSettings(0.7, 0.03, 2, 2, 1);
-            presets.Add(tmp);
-            presetNames.Add("Moderate Drag, Lenient Area Ruling");
-
-            tmp = new FARDifficultyAndExactnessSettings(0.7, 0.015, 2, 1, 2);
-            presets.Add(tmp);
-            presetNames.Add("Moderate Drag, Moderate Area Ruling");
-
-            tmp = new FARDifficultyAndExactnessSettings(0.85, 0.015, 2, 1, 3);
-            presets.Add(tmp);
-            presetNames.Add("High Drag, Moderate Area Ruling");
-
-            tmp = new FARDifficultyAndExactnessSettings(1, 0.015, 2, 1, 4);
-            presets.Add(tmp);
-            presetNames.Add("Full Drag, Moderate Area Ruling");
-
-            tmp = new FARDifficultyAndExactnessSettings(1, 0.010, 1, 1, 5);
-            presets.Add(tmp);
-            presetNames.Add("Full Drag, Strict Area Ruling");
         }
 
         public void DisplaySelection()
@@ -278,7 +267,7 @@ namespace FerramAerospaceResearch
                 if (currentIndex >= 0)
                     currentIndex = -1;
                 else
-                    currentIndex = 4;
+                    currentIndex = FARDifficultyPresetsConfig.Index;
             }
 
             GUILayout.EndHorizontal();
@@ -321,16 +310,20 @@ namespace FerramAerospaceResearch
         }
     }
 
+    [ConfigNode("FARDifficultyAndExactnessSettings", shouldSave: false, isRoot: false, allowMultiple: true)]
     public class FARDifficultyAndExactnessSettings
     {
         // TODO: index should be the index in the list, allow multiple custom settings
-        public readonly int index;
-        public double fractionTransonicDrag = 0.7;
-        public double gaussianVehicleLengthFractionForSmoothing = 0.015;
-        public int numAreaSmoothingPasses = 2;
+        [ConfigValueIgnore] public int index = -1;
+        [ConfigValue] public double fractionTransonicDrag = 0.7;
+        [ConfigValue] public double gaussianVehicleLengthFractionForSmoothing = 0.015;
+        [ConfigValue] public int numAreaSmoothingPasses = 2;
+        [ConfigValue] public int numDerivSmoothingPasses = 1;
+        [ConfigValue] public string name = string.Empty;
 
-        public int numDerivSmoothingPasses = 1;
-
+        public FARDifficultyAndExactnessSettings()
+        {
+        }
 
         public FARDifficultyAndExactnessSettings(int index)
         {
@@ -342,7 +335,8 @@ namespace FerramAerospaceResearch
             double gaussianLength,
             int areaPass,
             int derivPass,
-            int index
+            int index,
+            string name = ""
         )
         {
             this.index = index;
@@ -350,6 +344,7 @@ namespace FerramAerospaceResearch
             gaussianVehicleLengthFractionForSmoothing = gaussianLength;
             numAreaSmoothingPasses = areaPass;
             numDerivSmoothingPasses = derivPass;
+            this.name = name;
         }
     }
 

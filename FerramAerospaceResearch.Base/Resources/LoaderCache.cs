@@ -6,8 +6,9 @@ namespace FerramAerospaceResearch.Resources
 {
     public class LoaderCache
     {
-        public Loaders<Shader> Shaders { get; } = new Loaders<Shader>();
-        public Loaders<Texture2D> Textures { get; } = new Loaders<Texture2D>();
+        public Loaders<Shader> Shaders { get; } = new();
+        public Loaders<ComputeShader> ComputeShaders { get; } = new();
+        public Loaders<Texture2D> Textures { get; } = new();
     }
 
     public class Loaders<T> : Dictionary<string, IAssetLoader<T>>

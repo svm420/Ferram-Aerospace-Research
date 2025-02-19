@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -181,16 +181,19 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
 
                 phi *= -FARMathUtil.deg2rad;
 
-                double output = ControlStateChange(sys, phi);
 
+                // If there's any input, assume the pilot is in control
                 if (Math.Abs(state.roll - state.rollTrim) < 0.01)
                 {
+                    double output = ControlStateChange(sys, phi);
                     if (output > 1)
                         output = 1;
                     else if (output < -1)
                         output = -1;
 
                     state.roll = (float)output + state.rollTrim;
+                } else {
+                    sys.errorIntegral = 0;
                 }
             }
             else

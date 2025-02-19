@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -49,7 +49,7 @@ using ferram4;
 using FerramAerospaceResearch.FARPartGeometry;
 using FerramAerospaceResearch.FARPartGeometry.GeometryModification;
 using FerramAerospaceResearch.FARThreading;
-using FerramAerospaceResearch.Settings;
+using KSPCommunityFixes;
 using UnityEngine;
 
 namespace FerramAerospaceResearch.FARAeroComponents
@@ -71,7 +71,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
         private readonly List<float> weighting = new List<float>();
 
         private VehicleVoxel _voxel;
-        private VoxelCrossSection[] _vehicleCrossSection = new VoxelCrossSection[1];
+        private VoxelCrossSection[] _vehicleCrossSection = Array.Empty<VoxelCrossSection>();
         private double[] _ductedAreaAdjustment = new double[1];
 
         private int _voxelCount;
@@ -107,6 +107,11 @@ namespace FerramAerospaceResearch.FARAeroComponents
 
         private bool visualizing;
         public bool Voxelizing { get; private set; }
+
+        public Bounds VoxelBounds
+        {
+            get { return _voxel?.Bounds ?? new Bounds(); }
+        }
 
         public VehicleAerodynamics()
         {
@@ -219,23 +224,17 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Part p = aeroModule.part;
                 if (!p)
                     continue;
-                if (p.Modules.Contains<FARWingAerodynamicModel>())
+                if (p.FindModuleImplementingFast<FARWingAerodynamicModel>() is FARWingAerodynamicModel w)
                 {
-                    var w = p.Modules.GetModule<FARWingAerodynamicModel>();
-                    if (w is null)
-                        continue;
                     w.isShielded = false;
                     w.NUFAR_ClearExposedAreaFactor();
                     _legacyWingModels.Add(w);
                 }
-                else if (p.Modules.Contains<FARControllableSurface>())
+                else if (p.FindModuleImplementingFast<FARControllableSurface>() is FARControllableSurface c)
                 {
-                    FARWingAerodynamicModel w = p.Modules.GetModule<FARControllableSurface>();
-                    if (w is null)
-                        continue;
-                    w.isShielded = false;
-                    w.NUFAR_ClearExposedAreaFactor();
-                    _legacyWingModels.Add(w);
+                    c.isShielded = false;
+                    c.NUFAR_ClearExposedAreaFactor();
+                    _legacyWingModels.Add(c);
                 }
             }
 
@@ -405,12 +404,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 }
                 catch (Exception e)
                 {
-                    ThreadSafeDebugLogger.Instance.RegisterException(e);
+                    ThreadSafeDebugLogger.Exception(e);
                 }
                 finally
                 {
                     //Always, when we finish up, if we're in flight, cleanup the voxel
-                    if (HighLogic.LoadedSceneIsFlight && !VoxelizationSettings.DebugInFlight && _voxel != null)
+                    if (HighLogic.LoadedSceneIsFlight && !FARConfig.Voxelization.DebugInFlight && _voxel != null)
                     {
                         _voxel.CleanupVoxel();
                         _voxel = null;
@@ -436,7 +435,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     continue;
 
                 // Could be left null if a launch clamp
-                var geoModule = p.Modules.GetModule<GeometryPartModule>();
+                var geoModule = p.FindModuleImplementingFast<GeometryPartModule>();
 
                 hitParts.Add(p);
 
@@ -444,9 +443,8 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 Vector3 candVector = Vector3.zero;
 
                 //intakes are probably pointing in the direction we're gonna be going in
-                if (p.Modules.Contains<ModuleResourceIntake>())
+                if (p.FindModuleImplementingFast<ModuleResourceIntake>() is ModuleResourceIntake intake)
                 {
-                    var intake = p.Modules.GetModule<ModuleResourceIntake>();
                     Transform intakeTrans = p.FindModelTransform(intake.intakeTransformName);
                     if (!(intakeTrans is null))
                         candVector = intakeTrans.TransformDirection(Vector3.forward);
@@ -454,9 +452,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 //aggregate wings for later calc...
                 else if (geoModule == null ||
                          geoModule.IgnoreForMainAxis ||
-                         p.Modules.Contains<FARWingAerodynamicModel>() ||
-                         p.Modules.Contains<FARControllableSurface>() ||
-                         p.Modules.Contains<ModuleWheelBase>() ||
+                         p.HasModuleImplementingFast<FARWingAerodynamicModel>() ||
+                         p.HasModuleImplementingFast<FARControllableSurface>() ||
+                         p.HasModuleImplementingFast<ModuleWheelBase>() ||
                          p.Modules.Contains("KSPWheelBase"))
                 {
                     continue;
@@ -496,10 +494,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     hitParts.Add(q);
 
                     //intakes are probably pointing in the direction we're gonna be going in
-                    if (q.Modules.Contains<ModuleResourceIntake>())
+                    if (q.FindModuleImplementingFast<ModuleResourceIntake>() is ModuleResourceIntake intake2)
                     {
-                        var intake = q.Modules.GetModule<ModuleResourceIntake>();
-                        Transform intakeTrans = q.FindModelTransform(intake.intakeTransformName);
+                        Transform intakeTrans = q.FindModelTransform(intake2.intakeTransformName);
                         if (!(intakeTrans is null))
                             candVector += intakeTrans.TransformDirection(Vector3.forward);
                     }
@@ -707,12 +704,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
             if (oneSidedFilterLength < 2)
             {
                 oneSidedFilterLength = 2;
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Needed to adjust filter length up");
+                ThreadSafeDebugLogger.Info("Needed to adjust filter length up");
             }
             else if (oneSidedFilterLength > 40)
             {
                 oneSidedFilterLength = 40;
-                ThreadSafeDebugLogger.Instance.RegisterMessage("Reducing filter length to prevent overflow");
+                ThreadSafeDebugLogger.Info("Reducing filter length to prevent overflow");
             }
 
             int M = oneSidedFilterLength;
@@ -1031,9 +1028,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
             for (int i = front; i <= back; i++)
             {
                 if (double.IsNaN(_vehicleCrossSection[i].area))
-                    ThreadSafeDebugLogger.Instance
-                                         .RegisterMessage("FAR VOXEL ERROR: Voxel CrossSection Area is NaN at section " +
-                                                          i);
+                    ThreadSafeDebugLogger.Error("FAR VOXEL ERROR: Voxel CrossSection Area is NaN at section " + i);
 
                 filledVolume += _vehicleCrossSection[i].area;
             }
@@ -1066,12 +1061,12 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 extraAreaSmoothingPasses = 0;
 
 
-            ThreadSafeDebugLogger.Instance.RegisterMessage("Std dev for smoothing: " +
-                                                           stdDevCutoff +
-                                                           " voxel total vol: " +
-                                                           voxelVolume +
-                                                           " filled vol: " +
-                                                           filledVolume);
+            ThreadSafeDebugLogger.Info("Std dev for smoothing: " +
+                                       stdDevCutoff +
+                                       " voxel total vol: " +
+                                       voxelVolume +
+                                       " filled vol: " +
+                                       filledVolume);
 
             AdjustCrossSectionForAirDucting(_vehicleCrossSection,
                                             _currentGeoModules,
@@ -1287,8 +1282,9 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     xForcePressureAoA0.SetPoint(0,
                                                 new Vector3d(CriticalMach,
                                                              (sonicBaseDrag * 0.2f +
-                                                              0.325f * hypersonicDragForward * hypersonicDragForwardFrac
-                                                             ) *
+                                                              0.325f *
+                                                              hypersonicDragForward *
+                                                              hypersonicDragForwardFrac) *
                                                              lowFinenessRatioFactor,
                                                              0));
                     xForcePressureAoA180.SetPoint(0,
@@ -1454,12 +1450,10 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     if (key is null)
                         continue;
 
-                    if (!key.Modules.Contains<FARAeroPartModule>())
+                    if (!(key.FindModuleImplementingFast<FARAeroPartModule>() is FARAeroPartModule m))
                         continue;
 
-                    var m = key.Modules.GetModule<FARAeroPartModule>();
-                    if (!(m is null))
-                        includedModules.Add(m);
+                    includedModules.Add(m);
 
                     if (_moduleAndAreasDict.ContainsKey(m))
                         _moduleAndAreasDict[m] += areas;
@@ -1541,7 +1535,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                 VoxelizationThreadpool.Instance.RunOnMainThread(() =>
                 {
                     foreach (KeyValuePair<FARAeroPartModule, FARAeroPartModule.ProjectedArea> pair in
-                        _moduleAndAreasDict)
+                             _moduleAndAreasDict)
                         pair.Key.SetProjectedArea(pair.Value, _localToWorldMatrix);
                 });
 
@@ -1652,7 +1646,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     }
                     else if (i == back)
                     {
-                        firstDerivArea = vehicleCrossSection[i].area - vehicleCrossSection[i + 1].area;
+                        firstDerivArea = vehicleCrossSection[i - 1].area - vehicleCrossSection[i].area;
                         firstDerivArea /= sectionThickness;
                     }
                     else
@@ -1693,7 +1687,7 @@ namespace FerramAerospaceResearch.FARAeroComponents
                     }
                     else if (i == back)
                     {
-                        firstDerivArea = vehicleCrossSection[i].area - vehicleCrossSection[i + 1].area;
+                        firstDerivArea = vehicleCrossSection[i - 1].area - vehicleCrossSection[i].area;
                         firstDerivArea /= -sectionThickness;
                     }
                     else

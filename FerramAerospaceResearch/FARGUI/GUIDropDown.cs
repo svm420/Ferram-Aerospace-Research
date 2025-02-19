@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -45,17 +45,58 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 
 using UnityEngine;
 
-// ReSharper disable StaticMemberInGenericType
-
 namespace FerramAerospaceResearch.FARGUI
 {
+    internal static class GUIDropDownStyles
+    {
+        public static readonly GUIStyle List;
+        public static readonly GUIStyle ToggleButton;
+        public static readonly GUIStyle DropDownItem;
+
+        public static readonly GUIStyle SelectedItem;
+
+        static GUIDropDownStyles()
+        {
+            List = new GUIStyle(GUI.skin.window) { padding = new RectOffset(1, 1, 1, 1) };
+            ToggleButton = new GUIStyle(GUI.skin.button);
+            ToggleButton.normal.textColor = ToggleButton.focused.textColor = Color.white;
+            ToggleButton.hover.textColor =
+                ToggleButton.active.textColor = ToggleButton.onActive.textColor = Color.yellow;
+            ToggleButton.onNormal.textColor =
+                ToggleButton.onFocused.textColor = ToggleButton.onHover.textColor = Color.green;
+
+            DropDownItem = new GUIStyle(GUI.skin.button)
+            {
+                padding = new RectOffset(2, 2, 2, 2),
+                margin =
+                {
+                    top = 1,
+                    bottom = 1
+                }
+            };
+
+            SelectedItem = new GUIStyle(GUI.skin.button)
+            {
+                padding = new RectOffset(2, 2, 2, 2),
+                margin =
+                {
+                    top = 1,
+                    bottom = 1
+                }
+            };
+            SelectedItem.normal.textColor = SelectedItem.focused.textColor =
+                                                SelectedItem.hover.textColor =
+                                                    SelectedItem.active.textColor =
+                                                        SelectedItem.onActive.textColor =
+                                                            SelectedItem.onNormal.textColor =
+                                                                SelectedItem.onFocused.textColor =
+                                                                    SelectedItem.onHover.textColor =
+                                                                        XKCDColors.KSPNotSoGoodOrange;
+        }
+    }
+
     public class GUIDropDown<T>
     {
-        private static GUIStyle listStyle;
-        private static GUIStyle toggleBtnStyle;
-        private static GUIStyle dropdownItemStyle;
-
-        private static GUIStyle selectedItemStyle;
         private readonly string[] stringOptions;
         private readonly T[] typeOptions;
         private int selectedOption;
@@ -78,12 +119,10 @@ namespace FerramAerospaceResearch.FARGUI
 
         public void GUIDropDownDisplay(params GUILayoutOption[] guiOptions)
         {
-            InitStyles();
-
             FARGUIDropDownDisplay display = FARGUIDropDownDisplay.Instance;
             toggleBtnState = GUILayout.Toggle(toggleBtnState,
                                               "▼ " + stringOptions[selectedOption] + " ▼",
-                                              toggleBtnStyle,
+                                              GUIDropDownStyles.ToggleButton,
                                               guiOptions);
 
             // Calculate absolute regions for the button and dropdown list, this only works when
@@ -94,58 +133,17 @@ namespace FerramAerospaceResearch.FARGUI
             btnRect.y += relativePos.y;
             var dropdownRect = new Rect(btnRect.x, btnRect.y + btnRect.height, btnRect.width, 150);
 
-            if (!isActive && toggleBtnState && Event.current.type == EventType.Repaint)
+            switch (isActive)
+            {
                 // User activated the dropdown
-                ShowList(btnRect, dropdownRect);
-            else if (isActive && (!toggleBtnState || !display.ContainsMouse()))
+                case false when toggleBtnState && Event.current.type == EventType.Repaint:
+                    ShowList(btnRect, dropdownRect);
+                    break;
                 // User deactivated the dropdown or moved the mouse cursor away
-                HideList();
-        }
-
-        private static void InitStyles()
-        {
-            if (listStyle == null)
-                listStyle = new GUIStyle(GUI.skin.window) {padding = new RectOffset(1, 1, 1, 1)};
-            if (toggleBtnStyle == null)
-            {
-                toggleBtnStyle = new GUIStyle(GUI.skin.button);
-                toggleBtnStyle.normal.textColor = toggleBtnStyle.focused.textColor = Color.white;
-                toggleBtnStyle.hover.textColor =
-                    toggleBtnStyle.active.textColor = toggleBtnStyle.onActive.textColor = Color.yellow;
-                toggleBtnStyle.onNormal.textColor =
-                    toggleBtnStyle.onFocused.textColor = toggleBtnStyle.onHover.textColor = Color.green;
+                case true when (!toggleBtnState || !display.ContainsMouse()):
+                    HideList();
+                    break;
             }
-
-            if (dropdownItemStyle == null)
-                dropdownItemStyle = new GUIStyle(GUI.skin.button)
-                {
-                    padding = new RectOffset(2, 2, 2, 2),
-                    margin =
-                    {
-                        top = 1,
-                        bottom = 1
-                    }
-                };
-
-            if (selectedItemStyle != null)
-                return;
-            selectedItemStyle = new GUIStyle(GUI.skin.button)
-            {
-                padding = new RectOffset(2, 2, 2, 2),
-                margin =
-                {
-                    top = 1,
-                    bottom = 1
-                }
-            };
-            selectedItemStyle.normal.textColor = selectedItemStyle.focused.textColor =
-                                                     selectedItemStyle.hover.textColor =
-                                                         selectedItemStyle.active.textColor =
-                                                             selectedItemStyle.onActive.textColor =
-                                                                 selectedItemStyle.onNormal.textColor =
-                                                                     selectedItemStyle.onFocused.textColor =
-                                                                         selectedItemStyle.onHover.textColor =
-                                                                             XKCDColors.KSPNotSoGoodOrange;
         }
 
         private void ShowList(Rect btnRect, Rect dropdownRect)
@@ -157,7 +155,7 @@ namespace FerramAerospaceResearch.FARGUI
                                                            btnRect,
                                                            dropdownRect,
                                                            OnDisplayList,
-                                                           listStyle);
+                                                           GUIDropDownStyles.List);
             InputLockManager.SetControlLock(ControlTypes.All, "DropdownScrollLock");
         }
 
@@ -173,11 +171,12 @@ namespace FerramAerospaceResearch.FARGUI
         private void OnDisplayList(int id)
         {
             GUI.BringWindowToFront(id);
-            scrollPos = GUILayout.BeginScrollView(scrollPos, listStyle);
+            scrollPos = GUILayout.BeginScrollView(scrollPos, GUIDropDownStyles.List);
             for (int i = 0; i < stringOptions.Length; i++)
             {
                 // Highlight the selected item
-                GUIStyle tmpStyle = selectedOption == i ? selectedItemStyle : dropdownItemStyle;
+                GUIStyle tmpStyle =
+                    selectedOption == i ? GUIDropDownStyles.SelectedItem : GUIDropDownStyles.DropDownItem;
                 if (!GUILayout.Button(stringOptions[i], tmpStyle))
                     continue;
                 FARLogger.Info("Selected " + stringOptions[i]);

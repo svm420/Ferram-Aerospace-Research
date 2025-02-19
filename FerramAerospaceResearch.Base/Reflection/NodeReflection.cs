@@ -328,23 +328,78 @@ namespace FerramAerospaceResearch.Reflection
             return count;
         }
 
+        private const BindingFlags SpecialMethodFlags = BindingFlags.Public | BindingFlags.Static;
+
+        private struct TypeMethodPair
+        {
+            public Type type;
+            public string name;
+
+            public override int GetHashCode()
+            {
+                // https://stackoverflow.com/a/1646913/13262469
+                // or use Microsoft.Bcl.HashCode NuGet package
+                int hash = 17;
+                hash = hash * 31 + type.GetHashCode();
+                hash = hash * 31 + name.GetHashCode();
+                return hash;
+            }
+        }
+
+        private static readonly Dictionary<TypeMethodPair, MethodInfo> specialMethods = new();
+
+        private static MethodInfo FindSpecialMethod(Type type, string name)
+        {
+            TypeMethodPair pair = new()
+            {
+                type = type,
+                name = name
+            };
+            if (specialMethods.TryGetValue(pair, out MethodInfo info))
+                return info;
+
+            info = type.GetMethod(name, SpecialMethodFlags);
+            info = info?.GetParameters().Length == 0 ? info : null;
+
+            specialMethods.Add(pair, info);
+            return info;
+        }
+
         public int Save(INodeSaver saver, object instance)
         {
-            var save = new NodeReader {Saver = saver};
+            var save = new NodeReader { Saver = saver };
             var node = instance as IConfigNode;
-            node?.BeforeSaved();
+
+            if (node is null)
+                FindSpecialMethod(ValueType, "BeforeSaved")?.Invoke(null, null);
+            else
+                node.BeforeSaved();
+
             int count = Apply(ref instance, save);
-            node?.AfterSaved();
+
+            if (node is null)
+                FindSpecialMethod(ValueType, "AfterSaved")?.Invoke(null, null);
+            else
+                node.AfterSaved();
             return count;
         }
 
         public int Load(INodeLoader loader, ref object instance)
         {
-            var load = new NodeLoader {Loader = loader};
+            var load = new NodeLoader { Loader = loader };
             var node = instance as IConfigNode;
-            node?.BeforeLoaded();
+
+            if (node is null)
+                FindSpecialMethod(ValueType, "BeforeLoaded")?.Invoke(null, null);
+            else
+                node.BeforeLoaded();
+
             int count = Apply(ref instance, load);
-            node?.AfterLoaded();
+
+            if (node is null)
+                FindSpecialMethod(ValueType, "AfterLoaded")?.Invoke(null, null);
+            else
+                node.AfterLoaded();
             return count;
         }
 

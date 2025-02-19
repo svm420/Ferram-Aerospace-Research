@@ -6,6 +6,7 @@ using System.Text;
 using FerramAerospaceResearch.PartExtensions;
 using KSP.Localization;
 using KSP.UI.Screens;
+using KSPCommunityFixes;
 using UnityEngine;
 using Random = System.Random;
 
@@ -164,6 +165,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         private DeploymentStates state = DeploymentStates.NONE;
         private SafeState safeState = SafeState.SAFE;
         private float massDelta;
+        private bool shieldedCanDeploy;
 
         //GUI
         private bool visible, hid;
@@ -272,13 +274,13 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             get
             {
-                if (GroundStop || atmPressure.NearlyEqual(0))
+                if (GroundStop || atmPressure.NearlyEqual(0) || !(shieldedCanDeploy || !part.ShieldedFromAirstream))
                     return false;
                 if (DeploymentState == DeploymentStates.CUT)
                     return false;
                 if (PressureCheck)
                     return true;
-                return !PressureCheck && IsDeployed;
+                return IsDeployed;
             }
         }
 
@@ -443,21 +445,21 @@ namespace FerramAerospaceResearch.RealChuteLite
                 case "STOWED":
                 {
                     parachute.gameObject.SetActive(false);
-                    cap.gameObject.SetActive(true);
+                    cap?.gameObject.SetActive(true);
                     break;
                 }
 
                 case "RCDEPLOYED": //This is not a predeployed state, no touchy
                 {
                     parachute.gameObject.SetActive(false);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                     break;
                 }
 
                 case "SEMIDEPLOYED": //  stock
                 {
                     parachute.gameObject.SetActive(true);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                     // to the end of the animation
                     part.SkipToAnimationTime(semiDeployedAnimation, 0, 1);
                     break;
@@ -466,7 +468,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 case "DEPLOYED": //  stock
                 {
                     parachute.gameObject.SetActive(true);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                     // to the end of the animation
                     part.SkipToAnimationTime(fullyDeployedAnimation, 0, 1);
                     break;
@@ -580,7 +582,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             DeploymentState = DeploymentStates.STOWED;
             randomTimer.Reset();
             time = 0;
-            cap.gameObject.SetActive(true);
+            cap?.gameObject.SetActive(true);
             part.DragCubes.SetCubeWeight("PACKED", 1);
             part.DragCubes.SetCubeWeight("RCDEPLOYED", 0);
         }
@@ -593,8 +595,8 @@ namespace FerramAerospaceResearch.RealChuteLite
             {
                 var parachutes = new List<RealChuteFAR>();
                 if (HighLogic.LoadedSceneIsEditor)
-                    parachutes.AddRange(EditorLogic.SortedShipList.Where(p => p.Modules.Contains<RealChuteFAR>())
-                                                   .Select(p => p.Modules.GetModule<RealChuteFAR>()));
+                    parachutes.AddRange(EditorLogic.SortedShipList.Where(p => p.HasModuleImplementingFast<RealChuteFAR>())
+                                                   .Select(p => p.FindModuleImplementingFast<RealChuteFAR>()));
                 else if (HighLogic.LoadedSceneIsFlight)
                     parachutes.AddRange(vessel.FindPartModulesImplementing<RealChuteFAR>());
                 if (parachutes.Count > 1 && parachutes.Exists(p => p.visible))
@@ -657,7 +659,7 @@ namespace FerramAerospaceResearch.RealChuteLite
         {
             foreach (Part p in part.symmetryCounterparts)
             {
-                var module = (RealChuteFAR)p.Modules["RealChuteFAR"];
+                var module = p.FindModuleImplementingFast<RealChuteFAR>();
                 module.minAirPressureToOpen = minAirPressureToOpen;
                 module.deployAltitude = deployAltitude;
             }
@@ -727,7 +729,7 @@ namespace FerramAerospaceResearch.RealChuteLite
             part.Effect("rcpredeploy");
             DeploymentState = DeploymentStates.PREDEPLOYED;
             parachute.gameObject.SetActive(true);
-            cap.gameObject.SetActive(false);
+            cap?.gameObject.SetActive(false);
             part.PlayAnimation(semiDeployedAnimation, semiDeploymentSpeed);
             dragTimer.Start();
             part.DragCubes.SetCubeWeight("PACKED", 0);
@@ -1184,7 +1186,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 initiated = true;
                 armed = false;
                 chuteCount = maxSpares;
-                cap.gameObject.SetActive(true);
+                cap?.gameObject.SetActive(true);
             }
 
             float tmpPartMass = TotalMass;
@@ -1213,7 +1215,7 @@ namespace FerramAerospaceResearch.RealChuteLite
                 if (DeploymentState != DeploymentStates.STOWED)
                 {
                     part.stackIcon.SetIconColor(XKCDColors.Red);
-                    cap.gameObject.SetActive(false);
+                    cap?.gameObject.SetActive(false);
                 }
 
                 if (staged && IsDeployed)
@@ -1260,12 +1262,13 @@ namespace FerramAerospaceResearch.RealChuteLite
             {
                 if (deployAltitude <= 500)
                     deployAltitude += 200;
+                node.TryGetValue("shieldedCanDeploy", ref shieldedCanDeploy);
+                return;
             }
-            else
-            {
-                Part prefab = part.partInfo.partPrefab;
-                massDelta = prefab == null ? 0 : TotalMass - prefab.mass;
-            }
+
+            Part prefab = part.partInfo.partPrefab;
+            massDelta = prefab == null ? 0 : TotalMass - prefab.mass;
+            shieldedCanDeploy = prefab.FindModuleImplementingFast<RealChuteFAR>().shieldedCanDeploy;
         }
 
         public override void OnActive()

@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -47,6 +47,7 @@ using System.Collections.Generic;
 using ferram4;
 using FerramAerospaceResearch.FARAeroComponents;
 using KSP.UI.Screens.Flight;
+using KSPCommunityFixes;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -60,7 +61,7 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
         private readonly FARCenterQuery aeroForces = new FARCenterQuery();
         private readonly int intakeAirId;
         private readonly double intakeAirDensity = 1;
-        private NavBall _navball;
+        // private NavBall _navball;
 
         private List<FARAeroPartModule> _currentAeroModules;
         private List<FARWingAerodynamicModel> _LEGACY_currentWingAeroModel = new List<FARWingAerodynamicModel>();
@@ -188,11 +189,11 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             vesselInfo.liftToDragRatio = vesselInfo.liftForce / vesselInfo.dragForce;
         }
 
-        private void GetNavball()
-        {
-            if (HighLogic.LoadedSceneIsFlight)
-                _navball = Object.FindObjectOfType<NavBall>();
-        }
+        // private void GetNavball()
+        // {
+        //     if (HighLogic.LoadedSceneIsFlight)
+        //         _navball = Object.FindObjectOfType<NavBall>();
+        // }
 
         private void CalculateVesselOrientation(Vector3d velVectorNorm)
         {
@@ -215,17 +216,43 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
             if (double.IsNaN(vesselInfo.sideslipAngle))
                 vesselInfo.sideslipAngle = 0;
 
-            if (_navball == null)
-                GetNavball();
-            if (!_navball)
-                return;
-            Quaternion vesselRot = Quaternion.Inverse(_navball.relativeGymbal);
+            // if (_navball == null)
+            //     GetNavball();
+            // if (!_navball)
+            //     return;
+            // Quaternion vesselRot = Quaternion.Inverse(_navball.relativeGymbal);
 
-            vesselInfo.headingAngle = vesselRot.eulerAngles.y;
-            vesselInfo.pitchAngle =
-                vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
-            vesselInfo.rollAngle =
-                vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
+            // vesselInfo.headingAngle = vesselRot.eulerAngles.y;
+            // vesselInfo.pitchAngle =
+            //     vesselRot.eulerAngles.x > 180 ? 360 - vesselRot.eulerAngles.x : -vesselRot.eulerAngles.x;
+            // vesselInfo.rollAngle =
+            //     vesselRot.eulerAngles.z > 180 ? 360 - vesselRot.eulerAngles.z : -vesselRot.eulerAngles.z;
+
+            // Gives the same numbers as the above, but also works in IVA mode which doesn't have a NavBall instance.
+            var localUp = (_vessel.transform.position - _vessel.mainBody.transform.position).normalized;
+            var east = Vector3.Cross(localUp, _vessel.mainBody.RotationAxis).normalized;
+            var north = Vector3.Cross(east, localUp).normalized;
+            vesselInfo.headingAngle = (SignedAngle(north, Vector3.ProjectOnPlane(up, localUp).normalized, localUp) + 360f) % 360f;
+            vesselInfo.pitchAngle = 90f - SignedAngle(localUp, up, Vector3.Cross(localUp, up).normalized);
+            vesselInfo.rollAngle = SignedAngle(Vector3.Cross(localUp, up).normalized, right, -up);
+        }
+
+        /// <summary>
+        /// A more precise version of Vector3.SignedAngle at low angles.
+        /// From https://www.reddit.com/r/Unity3D/comments/aruqz9/if_vector3angle_is_too_imprecise_or_jittery_at/
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="axis"></param>
+        /// <returns></returns>
+        float SignedAngle(Vector3 from, Vector3 to, Vector3 axis)
+        {
+            var cross = Vector3.Cross(from, to);
+            var dot = Vector3.Dot(from, to);
+            var angle = Mathf.Atan2(cross.magnitude, dot) * Mathf.Rad2Deg;
+            if (Vector3.Dot(axis, cross) < 0.0f)
+                angle = -angle;
+            return angle;
         }
 
         private void CalculateEngineAndIntakeBasedParameters(double vesselSpeed)
@@ -250,28 +277,26 @@ namespace FerramAerospaceResearch.FARGUI.FARFlightGUI
                     vesselInfo.dryMass += p.mass;
                 }
 
-                foreach (PartModule m in p.Modules)
-                    switch (m)
-                    {
-                        case ModuleEngines e:
-                            FuelConsumptionFromEngineModule(e,
-                                                            ref totalThrust,
-                                                            ref totalThrust_Isp,
-                                                            ref fuelConsumptionVol,
-                                                            ref airDemandVol,
-                                                            invDeltaTime);
-                            break;
-                        case ModuleResourceIntake intake:
-                        {
-                            if (intake.intakeEnabled)
-                            {
-                                airAvailableVol += intake.airFlow * intakeAirDensity / invDeltaTime;
-                                vesselInfo.fullMass -= p.Resources[intake.resourceName].amount * intakeAirDensity;
-                            }
+                var engineModules = p.FindModulesImplementingReadOnly<ModuleEngines>();
+                foreach (ModuleEngines e in engineModules)
+                {
+                    FuelConsumptionFromEngineModule(e,
+                                                    ref totalThrust,
+                                                    ref totalThrust_Isp,
+                                                    ref fuelConsumptionVol,
+                                                    ref airDemandVol,
+                                                    invDeltaTime);
+                }
 
-                            break;
-                        }
+                var intakeModules = p.FindModulesImplementingReadOnly<ModuleResourceIntake>();
+                foreach (ModuleResourceIntake intake in intakeModules)
+                {
+                    if (intake.intakeEnabled)
+                    {
+                        airAvailableVol += intake.airFlow * intakeAirDensity / invDeltaTime;
+                        vesselInfo.fullMass -= p.Resources[intake.resourceName].amount * intakeAirDensity;
                     }
+                }
             }
 
             if (totalThrust > 0)

@@ -1,9 +1,9 @@
 /*
-Ferram Aerospace Research v0.16.0.3 "Mader"
+Ferram Aerospace Research v0.16.1.2 "Marangoni"
 =========================
 Aerodynamics model for Kerbal Space Program
 
-Copyright 2020, Michael Ferrara, aka Ferram4
+Copyright 2022, Michael Ferrara, aka Ferram4
 
    This file is part of Ferram Aerospace Research.
 
@@ -45,6 +45,7 @@ Copyright 2020, Michael Ferrara, aka Ferram4
 using System;
 using System.Collections.Generic;
 using FerramAerospaceResearch;
+using KSPCommunityFixes;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -68,6 +69,7 @@ namespace ferram4
 
         public void ForceOnVesselPartsChange()
         {
+            UpdateShipPartsList();
             OnVesselPartsChange?.Invoke();
         }
 
@@ -78,17 +80,15 @@ namespace ferram4
 
         public virtual void Initialization()
         {
-            OnVesselPartsChange = UpdateShipPartsList;
             UpdateShipPartsList();
         }
 
         public void TriggerPartColliderUpdate()
         {
             //Set up part collider list to easy runtime overhead with memory churning
-            foreach (PartModule m in part.Modules)
+            var modules = part.FindModulesImplementingReadOnly<FARPartModule>();
+            foreach (FARPartModule farModule in modules)
             {
-                if (!(m is FARPartModule farModule))
-                    continue;
                 if (farModule.partColliders == null)
                     continue;
                 partColliders = farModule.partColliders;
